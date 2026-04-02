@@ -1,0 +1,6 @@
+database/*.db
+database/*.sqlite
+tmp/
+public/uploads/*
+!public/uploads/.gitkeep
+config/database.php
