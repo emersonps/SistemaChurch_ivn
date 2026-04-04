@@ -31,6 +31,15 @@
         <div class="card shadow-sm">
             <div class="card-header bg-white"><?= empty($editing) ? 'Novo Vídeo' : 'Editar Vídeo' ?></div>
             <div class="card-body">
+                <?php if (!empty($editing)): ?>
+                    <div class="alert alert-primary d-flex justify-content-between align-items-center flex-wrap gap-2">
+                        <div>
+                            <div class="fw-semibold">Editando agora</div>
+                            <div><?= htmlspecialchars($editing['title'] ?? '') ?></div>
+                        </div>
+                        <span class="badge bg-dark">ID <?= (int)($editing['id'] ?? 0) ?></span>
+                    </div>
+                <?php endif; ?>
                 <form action="/developer/manuals" method="POST">
                     <?= csrf_field() ?>
                     <?php if (!empty($editing['id'])): ?>
@@ -91,6 +100,9 @@
                             <i class="fas fa-save me-1"></i> <?= empty($editing) ? 'Cadastrar Vídeo' : 'Salvar Alterações' ?>
                         </button>
                         <?php if (!empty($editing)): ?>
+                            <a href="<?= htmlspecialchars($editing['youtube_url'] ?? '#') ?>" target="_blank" rel="noopener noreferrer" class="btn btn-outline-danger">
+                                <i class="fab fa-youtube me-1"></i> Abrir Vídeo Atual
+                            </a>
                             <a href="/developer/manuals" class="btn btn-outline-secondary">Cancelar</a>
                         <?php endif; ?>
                     </div>
@@ -122,7 +134,7 @@
                                             <span class="badge bg-<?= (int)$video['is_active'] === 1 ? 'success' : 'secondary' ?>">
                                                 <?= (int)$video['is_active'] === 1 ? 'Ativo' : 'Inativo' ?>
                                             </span>
-                                            <a href="/developer/manuals?edit=<?= (int)$video['id'] ?>" class="btn btn-sm btn-outline-primary">
+                                            <a href="/developer/manuals/edit/<?= (int)$video['id'] ?>" class="btn btn-sm btn-outline-primary">
                                                 <i class="fas fa-edit"></i>
                                             </a>
                                             <form action="/developer/manuals/delete/<?= (int)$video['id'] ?>" method="POST" onsubmit="return confirm('Deseja remover este vídeo do manual?');">

@@ -96,6 +96,9 @@ elseif ($uri == '/developer/manuals') {
         (new ManualController())->manage();
     }
 }
+elseif (preg_match('#^/developer/manuals/edit/(\d+)$#', $uri, $matches)) {
+    (new ManualController())->manage($matches[1]);
+}
 elseif ($method == 'POST' && preg_match('#^/developer/manuals/delete/(\d+)$#', $uri, $matches)) {
     (new ManualController())->delete($matches[1]);
 }
