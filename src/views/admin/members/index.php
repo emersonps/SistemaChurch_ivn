@@ -127,17 +127,9 @@ ksort($groupedMembers); // Ordenar abas alfabeticamente
                             </span>
                         </td>
                         <td class="align-middle text-end">
-                            <div class="btn-group">
-                                <a href="/admin/members/show/<?= $member['id'] ?>" class="btn btn-sm btn-outline-primary" title="Ficha">
-                                    <i class="fas fa-user"></i>
-                                </a>
-                                <a href="/admin/members/edit/<?= $member['id'] ?>" class="btn btn-sm btn-outline-secondary" title="Editar">
-                                    <i class="fas fa-edit"></i>
-                                </a>
-                                <a href="/admin/members/delete/<?= $member['id'] ?>" class="btn btn-sm btn-outline-danger" title="Excluir" onclick="return confirm('Tem certeza que deseja excluir este membro?')">
-                                    <i class="fas fa-trash"></i>
-                                </a>
-                            </div>
+                            <a href="/admin/members/show/<?= $member['id'] ?>" class="btn btn-sm btn-outline-primary" title="Ficha">
+                                <i class="fas fa-user me-1"></i> Ficha
+                            </a>
                         </td>
                     </tr>
                     <?php endforeach; ?>

@@ -13,12 +13,41 @@ require_once __DIR__ . '/layout_developer.php';
         <div class="alert alert-danger"><?= $error ?></div>
     <?php endif; ?>
 
+    <div class="row mb-4">
+        <div class="col-md-6 col-xl-4 mb-3">
+            <div class="card shadow border-left-success h-100">
+                <div class="card-body">
+                    <div class="text-muted small">Usuários Logados Online</div>
+                    <div class="h3 mb-0"><?= count($onlineUsers ?? []) ?></div>
+                    <div class="small text-muted">Conta usuários reais por login, sem duplicar páginas abertas.</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-xl-4 mb-3">
+            <div class="card shadow border-left-secondary h-100">
+                <div class="card-body">
+                    <div class="text-muted small">Visitantes Ativos</div>
+                    <div class="h3 mb-0"><?= count($activeVisitors ?? []) ?></div>
+                    <div class="small text-muted">Sessões sem login vistas nos últimos 5 minutos.</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-4 mb-3">
+            <div class="card shadow border-left-info h-100">
+                <div class="card-body">
+                    <div class="text-muted small">Leitura Mais Confiável</div>
+                    <div class="small">A lista abaixo mostra apenas a última atividade de cada usuário autenticado, evitando múltiplas linhas do mesmo usuário local.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Usuários Online Agora -->
     <div class="row mb-4">
         <div class="col-12">
             <div class="card shadow border-left-success">
                 <div class="card-header py-3 d-flex justify-content-between align-items-center">
-                    <h6 class="m-0 font-weight-bold text-success"><i class="fas fa-users"></i> Usuários Online (Últimos 5 min)</h6>
+                    <h6 class="m-0 font-weight-bold text-success"><i class="fas fa-users"></i> Usuários Logados Online (Últimos 5 min)</h6>
                     <span class="badge bg-success rounded-pill"><?= count($onlineUsers ?? []) ?> Online</span>
                 </div>
                 <div class="card-body">
@@ -43,7 +72,7 @@ require_once __DIR__ . '/layout_developer.php';
                                         <tr>
                                             <td>
                                                 <i class="fas fa-circle text-success small me-1"></i> 
-                                                <?= htmlspecialchars($ou['user_name'] ?? 'Visitante') ?>
+                                                <?= htmlspecialchars($ou['user_name'] ?? 'Usuário') ?>
                                             </td>
                                             <td>
                                                 <?php 
@@ -62,6 +91,47 @@ require_once __DIR__ . '/layout_developer.php';
                                             <td><?= htmlspecialchars($ou['ip_address']) ?></td>
                                             <td><code><?= htmlspecialchars($ou['requested_url']) ?></code></td>
                                             <td><?= date('d/m/Y H:i:s', strtotime($ou['last_activity'])) ?></td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow border-left-secondary">
+                <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                    <h6 class="m-0 font-weight-bold text-secondary"><i class="fas fa-user-secret"></i> Visitantes Ativos (Últimos 5 min)</h6>
+                    <span class="badge bg-secondary rounded-pill"><?= count($activeVisitors ?? []) ?> Sessões</span>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-sm">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Identificação</th>
+                                    <th>IP</th>
+                                    <th>Página Atual</th>
+                                    <th>Última Atividade</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php if (empty($activeVisitors)): ?>
+                                    <tr>
+                                        <td colspan="4" class="text-center text-muted">Nenhum visitante ativo no momento.</td>
+                                    </tr>
+                                <?php else: ?>
+                                    <?php foreach ($activeVisitors as $visitor): ?>
+                                        <tr>
+                                            <td>Visitante</td>
+                                            <td><?= htmlspecialchars($visitor['ip_address'] ?? '-') ?></td>
+                                            <td><code><?= htmlspecialchars($visitor['requested_url'] ?? '-') ?></code></td>
+                                            <td><?= date('d/m/Y H:i:s', strtotime($visitor['last_activity'])) ?></td>
                                         </tr>
                                     <?php endforeach; ?>
                                 <?php endif; ?>

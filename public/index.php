@@ -89,6 +89,16 @@ elseif ($uri == '/developer/migrations/rollback' && $method == 'POST') {
 elseif ($uri == '/admin/manual') {
     (new ManualController())->index();
 }
+elseif ($uri == '/developer/manuals') {
+    if ($method == 'POST') {
+        (new ManualController())->store();
+    } else {
+        (new ManualController())->manage();
+    }
+}
+elseif ($method == 'POST' && preg_match('#^/developer/manuals/delete/(\d+)$#', $uri, $matches)) {
+    (new ManualController())->delete($matches[1]);
+}
 elseif ($uri == '/admin/login') {
     if ($method == 'POST') {
         (new AuthController())->login();
@@ -125,6 +135,15 @@ elseif ($uri == '/developer/dashboard') {
 }
 elseif ($uri == '/developer/payments') {
     (new DeveloperController())->payments();
+}
+elseif ($uri == '/developer/backups') {
+    (new DeveloperController())->backups();
+}
+elseif ($uri == '/developer/backups/generate' && $method == 'POST') {
+    (new DeveloperController())->generateBackup();
+}
+elseif ($uri == '/developer/backups/download') {
+    (new DeveloperController())->downloadBackup();
 }
 elseif ($uri == '/developer/payments/generate') {
     (new DeveloperController())->generateCharge();
@@ -175,6 +194,13 @@ elseif (preg_match('#^/developer/users/edit/(\d+)$#', $uri, $matches)) {
 }
 elseif ($uri == '/developer/users/password') {
     (new DeveloperController())->changeUserPassword();
+}
+elseif ($uri == '/developer/users/password-by-cpf') {
+    if ($method == 'POST') {
+        (new UserController())->passwordByCpfUpdate();
+    } else {
+        (new UserController())->passwordByCpf();
+    }
 }
 elseif ($uri == '/admin/logout') {
     (new AuthController())->logout();
@@ -692,6 +718,13 @@ elseif (preg_match('#^/admin/users/delete/(\d+)$#', $uri, $matches)) {
 elseif (preg_match('#^/admin/users/members-by-congregation/(.+)$#', $uri, $matches)) {
     (new UserController())->getMembersByCongregation($matches[1]);
 }
+elseif ($uri == '/admin/users/password-by-cpf') {
+    if ($method == 'POST') {
+        (new UserController())->passwordByCpfUpdate();
+    } else {
+        (new UserController())->passwordByCpf();
+    }
+}
 
 // RBAC Permissions Route
 elseif ($uri == '/admin/permissions') {
@@ -773,6 +806,12 @@ elseif ($uri == '/portal/dashboard' || $uri == '/portal') {
 }
 elseif ($uri == '/portal/profile') {
     (new PortalController())->profile();
+}
+elseif ($uri == '/portal/change-password') {
+    (new PortalController())->changePassword();
+}
+elseif ($uri == '/portal/manual') {
+    (new ManualController())->portal();
 }
 elseif ($uri == '/portal/financial') {
     (new PortalController())->financial();

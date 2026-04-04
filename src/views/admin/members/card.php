@@ -19,7 +19,7 @@
         <button onclick="window.print()" class="btn btn-sm btn-secondary me-2">
             <i class="fas fa-print"></i> Imprimir
         </button>
-        <a href="/admin/members" class="btn btn-sm btn-outline-secondary">
+        <a href="/admin/members/show/<?= $member['id'] ?>" class="btn btn-sm btn-outline-secondary">
             <i class="fas fa-arrow-left"></i> Voltar
         </a>
     </div>

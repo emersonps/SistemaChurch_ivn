@@ -3,7 +3,7 @@
 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
     <h1 class="h2">Histórico de <?= htmlspecialchars($member['name']) ?></h1>
     <div>
-        <a href="/admin/members" class="btn btn-outline-secondary btn-sm">
+        <a href="/admin/members/show/<?= $member['id'] ?>" class="btn btn-outline-secondary btn-sm">
             <i class="fas fa-arrow-left me-1"></i> Voltar
         </a>
     </div>

@@ -45,9 +45,10 @@ class PortalController {
         $congregation_id = $member['congregation_id'];
         $sql_events = "SELECT * FROM events 
                        WHERE event_date >= $current_date_sql 
+                       AND COALESCE(status, 'active') = 'active'
                        AND (
-                            (type != 'interno' AND (congregation_id IS NULL OR congregation_id = ?))
-                            OR (type = 'interno' AND (
+                            (LOWER(type) != 'interno' AND (congregation_id IS NULL OR congregation_id = ?))
+                            OR (LOWER(type) = 'interno' AND (
                                 EXISTS(SELECT 1 FROM event_allowed_members am WHERE am.event_id = events.id AND am.member_id = ?)
                                 OR EXISTS(SELECT 1 FROM event_allowed_congregations ac WHERE ac.event_id = events.id AND ac.congregation_id = ?)
                             ))
@@ -211,6 +212,52 @@ class PortalController {
         ]);
     }
 
+    public function changePassword() {
+        $this->requireMemberLogin();
+        $member_id = $_SESSION['member_id'];
+        $db = (new Database())->connect();
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            verify_csrf();
+
+            $currentPassword = $_POST['current_password'] ?? '';
+            $newPassword = $_POST['new_password'] ?? '';
+            $confirmPassword = $_POST['confirm_password'] ?? '';
+
+            $stmt = $db->prepare("SELECT id, password FROM members WHERE id = ?");
+            $stmt->execute([$member_id]);
+            $member = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if (!$member) {
+                redirect('/portal/logout');
+                return;
+            }
+
+            if ($newPassword !== $confirmPassword) {
+                view('portal/change_password', ['error' => 'A nova senha e a confirmação não conferem.']);
+                return;
+            }
+
+            if (strlen($newPassword) < 6) {
+                view('portal/change_password', ['error' => 'A nova senha deve ter pelo menos 6 caracteres.']);
+                return;
+            }
+
+            if (empty($member['password']) || !password_verify($currentPassword, $member['password'])) {
+                view('portal/change_password', ['error' => 'Senha atual incorreta.']);
+                return;
+            }
+
+            $hash = password_hash($newPassword, PASSWORD_DEFAULT);
+            $db->prepare("UPDATE members SET password = ? WHERE id = ?")->execute([$hash, $member_id]);
+
+            view('portal/change_password', ['success' => 'Senha alterada com sucesso!']);
+            return;
+        }
+
+        view('portal/change_password');
+    }
+
     public function financial() {
         $this->requireMemberLogin();
         $member_id = $_SESSION['member_id'];
@@ -292,10 +339,10 @@ class PortalController {
         $sql = "SELECT e.*, c.name as congregation_name 
                 FROM events e 
                 LEFT JOIN congregations c ON e.congregation_id = c.id
-                WHERE e.event_date >= $current_date_sql AND e.status = 'active'
+                WHERE e.event_date >= $current_date_sql AND COALESCE(e.status, 'active') = 'active'
                 AND (
-                    (e.type != 'interno' AND (e.congregation_id IS NULL OR e.congregation_id = ?))
-                    OR (e.type = 'interno' AND (
+                    (LOWER(e.type) != 'interno' AND (e.congregation_id IS NULL OR e.congregation_id = ?))
+                    OR (LOWER(e.type) = 'interno' AND (
                         EXISTS(SELECT 1 FROM event_allowed_members am WHERE am.event_id = e.id AND am.member_id = ?)
                         OR EXISTS(SELECT 1 FROM event_allowed_congregations ac WHERE ac.event_id = e.id AND ac.congregation_id = ?)
                     ))

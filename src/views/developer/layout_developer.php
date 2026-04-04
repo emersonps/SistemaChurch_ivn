@@ -68,6 +68,16 @@
                         </a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link <?= strpos($_SERVER['REQUEST_URI'], '/developer/backups') !== false ? 'active' : '' ?>" href="/developer/backups">
+                            <i class="fas fa-box-archive me-2"></i> Backups do Banco
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link <?= strpos($_SERVER['REQUEST_URI'], '/developer/manuals') !== false ? 'active' : '' ?>" href="/developer/manuals">
+                            <i class="fas fa-circle-play me-2"></i> Gerenciar Manuais
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link <?= strpos($_SERVER['REQUEST_URI'], '/developer/import') !== false && strpos($_SERVER['REQUEST_URI'], '/developer/import/expenses') === false ? 'active' : '' ?>" href="/developer/import">
                             <i class="fas fa-file-import me-2"></i> Importar Entradas
                         </a>
@@ -125,6 +135,16 @@
                         <li class="nav-item">
                             <a class="nav-link <?= strpos($_SERVER['REQUEST_URI'], '/developer/users') !== false || strpos($_SERVER['REQUEST_URI'], '/developer/roles') !== false ? 'active' : '' ?>" href="/developer/users">
                                 <i class="fas fa-users-cog me-2"></i> Gerenciar Permissões (Roles)
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link <?= strpos($_SERVER['REQUEST_URI'], '/developer/backups') !== false ? 'active' : '' ?>" href="/developer/backups">
+                                <i class="fas fa-box-archive me-2"></i> Backups do Banco
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link <?= strpos($_SERVER['REQUEST_URI'], '/developer/manuals') !== false ? 'active' : '' ?>" href="/developer/manuals">
+                                <i class="fas fa-circle-play me-2"></i> Gerenciar Manuais
                             </a>
                         </li>
                         <li class="nav-item">

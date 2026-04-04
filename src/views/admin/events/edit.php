@@ -116,7 +116,7 @@
                 <label class="form-label">Membros Autorizados</label>
                 <select class="form-select" name="allowed_members[]" multiple size="8">
                     <?php foreach (($members ?? []) as $m): ?>
-                        <option value="<?= $m['id'] ?>" <?= in_array($m['id'], ($allowedMemberIds ?? [])) ? 'selected' : '' ?>><?= htmlspecialchars($m['name']) ?></option>
+                        <option value="<?= $m['id'] ?>" <?= in_array($m['id'], ($allowedMemberIds ?? [])) ? 'selected' : '' ?>><?= htmlspecialchars($m['name']) ?><?= !empty($m['congregation_name']) ? ' (' . htmlspecialchars($m['congregation_name']) . ')' : '' ?></option>
                     <?php endforeach; ?>
                 </select>
                 <small class="text-muted">Selecione um ou mais membros específicos.</small>

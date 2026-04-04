@@ -2,7 +2,12 @@
 
 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
     <h1 class="h2">Gerenciar Usuários</h1>
-    <div class="btn-toolbar mb-2 mb-md-0">
+    <div class="btn-toolbar mb-2 mb-md-0 gap-2">
+        <?php if (in_array(($_SESSION['user_role'] ?? ''), ['admin', 'developer'], true)): ?>
+        <a href="/admin/users/password-by-cpf" class="btn btn-sm btn-outline-warning">
+            <i class="fas fa-unlock-alt me-1"></i> Redefinir Senha por CPF
+        </a>
+        <?php endif; ?>
         <a href="/admin/users/create" class="btn btn-sm btn-primary">
             <i class="fas fa-plus"></i> Novo Usuário
         </a>

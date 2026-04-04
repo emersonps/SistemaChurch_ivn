@@ -58,6 +58,16 @@
                         </a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link <?= $_SERVER['REQUEST_URI'] == '/portal/change-password' ? 'active' : '' ?>" href="/portal/change-password">
+                            <i class="fas fa-key me-2"></i> Alterar Senha
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link <?= $_SERVER['REQUEST_URI'] == '/portal/manual' ? 'active' : '' ?>" href="/portal/manual">
+                            <i class="fas fa-circle-play me-2"></i> Manual
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link <?= $_SERVER['REQUEST_URI'] == '/portal/financial' ? 'active' : '' ?>" href="/portal/financial">
                             <i class="fas fa-hand-holding-usd me-2"></i> Meus Dízimos
                         </a>

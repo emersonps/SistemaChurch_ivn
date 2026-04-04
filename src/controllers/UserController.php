@@ -2,6 +2,47 @@
 // src/controllers/UserController.php
 
 class UserController {
+    private function requireAdminOrDeveloper() {
+        requireLogin();
+        $role = $_SESSION['user_role'] ?? '';
+        if (!in_array($role, ['admin', 'developer'], true)) {
+            redirect('/admin/dashboard');
+        }
+    }
+
+    private function getPasswordResetRoutePrefix() {
+        return ($_SESSION['user_role'] ?? '') === 'developer' ? '/developer/users/password-by-cpf' : '/admin/users/password-by-cpf';
+    }
+
+    private function findMemberByCpf(PDO $db, $cpf) {
+        $cpf = preg_replace('/[^0-9]/', '', (string)$cpf);
+        if ($cpf === '') {
+            return null;
+        }
+
+        $stmt = $db->prepare("SELECT id, name, cpf, congregation_id, password FROM members WHERE REPLACE(REPLACE(REPLACE(cpf, '.', ''), '-', ''), ' ', '') = ? LIMIT 1");
+        $stmt->execute([$cpf]);
+        return $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
+    }
+
+    private function getLinkedSystemUsers(PDO $db, $memberId) {
+        $users = [];
+
+        $stmt = $db->prepare("
+            SELECT DISTINCT u.id, u.username, u.role
+            FROM users u
+            LEFT JOIN user_members um ON um.user_id = u.id
+            WHERE u.member_id = ? OR um.member_id = ?
+            ORDER BY u.username ASC
+        ");
+        $stmt->execute([$memberId, $memberId]);
+        foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $user) {
+            $users[$user['id']] = $user;
+        }
+
+        return array_values($users);
+    }
+
     public function index() {
         requirePermission('users.manage');
         $db = (new Database())->connect();
@@ -393,5 +434,87 @@ class UserController {
         $permissionGroups = buildPermissionGroups($permissions);
         
         view('admin/users/permissions', ['roles' => $roles, 'permissions' => $permissions, 'permissionGroups' => $permissionGroups]);
+    }
+
+    public function passwordByCpf() {
+        $this->requireAdminOrDeveloper();
+        $db = (new Database())->connect();
+        $cpf = $_GET['cpf'] ?? '';
+        $member = null;
+        $linkedUsers = [];
+
+        if ($cpf !== '') {
+            $member = $this->findMemberByCpf($db, $cpf);
+            if ($member) {
+                $linkedUsers = $this->getLinkedSystemUsers($db, $member['id']);
+            }
+        }
+
+        view('admin/users/password_by_cpf', [
+            'cpf' => $cpf,
+            'member' => $member,
+            'linkedUsers' => $linkedUsers,
+            'actionUrl' => $this->getPasswordResetRoutePrefix()
+        ]);
+    }
+
+    public function passwordByCpfUpdate() {
+        $this->requireAdminOrDeveloper();
+        verify_csrf();
+
+        $cpf = $_POST['cpf'] ?? '';
+        $newPassword = $_POST['new_password'] ?? '';
+        $confirmPassword = $_POST['confirm_password'] ?? '';
+        $redirectBase = $this->getPasswordResetRoutePrefix();
+
+        if ($cpf === '' || $newPassword === '' || $confirmPassword === '') {
+            $_SESSION['flash_error'] = 'Preencha CPF, nova senha e confirmação.';
+            redirect($redirectBase);
+            return;
+        }
+
+        if (strlen($newPassword) < 6) {
+            $_SESSION['flash_error'] = 'A nova senha deve ter pelo menos 6 caracteres.';
+            redirect($redirectBase . '?cpf=' . urlencode($cpf));
+            return;
+        }
+
+        if ($newPassword !== $confirmPassword) {
+            $_SESSION['flash_error'] = 'A confirmação da senha não confere.';
+            redirect($redirectBase . '?cpf=' . urlencode($cpf));
+            return;
+        }
+
+        $db = (new Database())->connect();
+        $member = $this->findMemberByCpf($db, $cpf);
+        if (!$member) {
+            $_SESSION['flash_error'] = 'Nenhum membro/usuário encontrado para o CPF informado.';
+            redirect($redirectBase);
+            return;
+        }
+
+        $hash = password_hash($newPassword, PASSWORD_DEFAULT);
+        $linkedUsers = $this->getLinkedSystemUsers($db, $member['id']);
+
+        $db->beginTransaction();
+        try {
+            $db->prepare("UPDATE members SET password = ? WHERE id = ?")->execute([$hash, $member['id']]);
+
+            if (!empty($linkedUsers)) {
+                $stmtUser = $db->prepare("UPDATE users SET password = ? WHERE id = ?");
+                foreach ($linkedUsers as $user) {
+                    $stmtUser->execute([$hash, $user['id']]);
+                }
+            }
+
+            $db->commit();
+            $suffix = empty($linkedUsers) ? '' : ' Usuários do sistema vinculados também foram atualizados.';
+            $_SESSION['flash_success'] = 'Senha redefinida com sucesso para o CPF informado.' . $suffix;
+        } catch (Exception $e) {
+            $db->rollBack();
+            $_SESSION['flash_error'] = 'Não foi possível redefinir a senha.';
+        }
+
+        redirect($redirectBase . '?cpf=' . urlencode($cpf));
     }
 }

@@ -31,6 +31,48 @@ class DeveloperController {
         return false;
     }
     
+    private function formatBytes($bytes) {
+        $units = ['B', 'KB', 'MB', 'GB'];
+        $bytes = (float)$bytes;
+        for ($i = 0; $i < count($units) - 1 && $bytes >= 1024; $i++) {
+            $bytes /= 1024;
+        }
+        return number_format($bytes, $bytes >= 10 ? 0 : 2, ',', '.') . ' ' . $units[$i];
+    }
+    
+    private function getRecentActivityWhere(PDO $db, $field = 'last_activity') {
+        if ($db->getAttribute(PDO::ATTR_DRIVER_NAME) === 'mysql') {
+            return "$field > NOW() - INTERVAL 5 MINUTE";
+        }
+        return "$field > datetime('now', '-5 minutes')";
+    }
+
+    private function buildOnlineSummary(array $rows) {
+        $loggedUsers = [];
+        $visitors = [];
+
+        foreach ($rows as $row) {
+            $userType = $row['user_type'] ?? 'visitor';
+            if (in_array($userType, ['admin', 'member'], true) && !empty($row['user_id'])) {
+                $actorKey = $userType . ':' . $row['user_id'];
+                if (!isset($loggedUsers[$actorKey])) {
+                    $loggedUsers[$actorKey] = $row;
+                }
+                continue;
+            }
+
+            $sessionKey = 'visitor:' . ($row['session_id'] ?? '');
+            if (!isset($visitors[$sessionKey])) {
+                $visitors[$sessionKey] = $row;
+            }
+        }
+
+        return [
+            'logged_users' => array_values($loggedUsers),
+            'visitors' => array_values($visitors)
+        ];
+    }
+    
     public function index() {
         $this->requireDeveloper();
         $db = (new Database())->connect();
@@ -44,11 +86,10 @@ class DeveloperController {
         // Count online users (active in the last 5 minutes)
         $online_users = 0;
         try {
-            $stmt = $db->query("SELECT COUNT(DISTINCT session_id) FROM access_logs WHERE last_activity > datetime('now', '-5 minutes')");
-            if ($db->getAttribute(PDO::ATTR_DRIVER_NAME) === 'mysql') {
-                $stmt = $db->query("SELECT COUNT(DISTINCT session_id) FROM access_logs WHERE last_activity > NOW() - INTERVAL 5 MINUTE");
-            }
-            $online_users = $stmt->fetchColumn();
+            $whereRecent = $this->getRecentActivityWhere($db);
+            $recentLogs = $db->query("SELECT user_id, user_type, session_id, last_activity FROM access_logs WHERE $whereRecent ORDER BY last_activity DESC")->fetchAll(PDO::FETCH_ASSOC);
+            $summary = $this->buildOnlineSummary($recentLogs);
+            $online_users = count($summary['logged_users']);
         } catch (PDOException $e) {
             // Ignore if table doesn't exist
         }
@@ -770,20 +811,16 @@ class DeveloperController {
         $db = (new Database())->connect();
         
         try {
-            // Get online users (active in the last 5 minutes)
-            $onlineQuery = "SELECT DISTINCT session_id, user_name, user_type, ip_address, last_activity, requested_url 
-                           FROM access_logs 
-                           WHERE last_activity > datetime('now', '-5 minutes') 
-                           ORDER BY last_activity DESC";
-                           
-            if ($db->getAttribute(PDO::ATTR_DRIVER_NAME) === 'mysql') {
-                $onlineQuery = "SELECT DISTINCT session_id, user_name, user_type, ip_address, last_activity, requested_url 
-                               FROM access_logs 
-                               WHERE last_activity > NOW() - INTERVAL 5 MINUTE 
-                               ORDER BY last_activity DESC";
-            }
-            
-            $onlineUsers = $db->query($onlineQuery)->fetchAll();
+            $whereRecent = $this->getRecentActivityWhere($db);
+            $activeRows = $db->query("
+                SELECT user_id, user_name, user_type, ip_address, last_activity, requested_url, session_id
+                FROM access_logs
+                WHERE $whereRecent
+                ORDER BY last_activity DESC
+            ")->fetchAll(PDO::FETCH_ASSOC);
+            $summary = $this->buildOnlineSummary($activeRows);
+            $onlineUsers = $summary['logged_users'];
+            $activeVisitors = $summary['visitors'];
             
             // Get all logs (limit to 1000 for performance)
             $logsQuery = "SELECT * FROM access_logs ORDER BY last_activity DESC LIMIT 1000";
@@ -791,6 +828,7 @@ class DeveloperController {
             
         } catch (PDOException $e) {
             $onlineUsers = [];
+            $activeVisitors = [];
             $logs = [];
             $error = "Tabela de logs não encontrada. Execute as migrações.";
         }
@@ -798,8 +836,66 @@ class DeveloperController {
         require_once __DIR__ . '/../views/developer/access_logs.php';
     }
 
+
+    public function backups() {
+        $this->requireDeveloper();
+        $manager = new DatabaseBackupManager();
+        $generated = null;
+
+        try {
+            $generated = $manager->ensureWeeklyBackup();
+            if ($generated) {
+                $_SESSION['success'] = 'Backup semanal automático gerado com sucesso.';
+            }
+        } catch (Exception $e) {
+            $_SESSION['error'] = 'Não foi possível gerar o backup automático: ' . $e->getMessage();
+        }
+
+        $backups = array_map(function ($backup) {
+            $backup['size_label'] = $this->formatBytes($backup['size']);
+            $backup['created_at_label'] = date('d/m/Y H:i', $backup['created_at']);
+            return $backup;
+        }, $manager->listBackups());
+
+        require_once __DIR__ . '/../views/developer/backups.php';
+    }
+
+    public function generateBackup() {
+        $this->requireDeveloper();
+
+        try {
+            $manager = new DatabaseBackupManager();
+            $manager->createBackup('manual');
+            $_SESSION['success'] = 'Backup manual gerado com sucesso.';
+        } catch (Exception $e) {
+            $_SESSION['error'] = 'Falha ao gerar backup: ' . $e->getMessage();
+        }
+
+        redirect('/developer/backups');
+    }
+
+    public function downloadBackup() {
+        $this->requireDeveloper();
+
+        $filename = $_GET['file'] ?? '';
+        $manager = new DatabaseBackupManager();
+        $path = $manager->getBackupPath($filename);
+        if (!$path) {
+            redirect('/developer/backups');
+        }
+
+        header('Content-Description: File Transfer');
+        header('Content-Type: application/sql');
+        header('Content-Disposition: attachment; filename="' . basename($path) . '"');
+        header('Content-Length: ' . filesize($path));
+        header('Cache-Control: no-store, no-cache, must-revalidate');
+        header('Pragma: public');
+        readfile($path);
+        exit;
+    }
     public function users() {
         $this->requireDeveloper();
+        require_once __DIR__ . '/../views/developer/users.php';
         require_once __DIR__ . '/../views/developer/users.php';
     }
 

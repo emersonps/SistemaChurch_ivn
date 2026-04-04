@@ -17,8 +17,30 @@
             <i class="fas fa-edit me-1"></i> Editar
         </a>
         <?php endif; ?>
+        <?php if (($_SESSION['user_role'] ?? '') === 'admin'): ?>
+        <a href="/admin/members/delete/<?= $member['id'] ?>" class="btn btn-outline-danger btn-sm" onclick="return confirm('Tem certeza que deseja excluir este membro?');">
+            <i class="fas fa-trash me-1"></i> Excluir
+        </a>
+        <?php endif; ?>
     </div>
 </div>
+
+<?php if (isset($_SESSION['flash_error'])): ?>
+<div class="alert alert-danger alert-dismissible fade show" role="alert">
+    <i class="fas fa-exclamation-triangle me-2"></i>
+    <?= $_SESSION['flash_error'] ?>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+<?php unset($_SESSION['flash_error']); ?>
+<?php endif; ?>
+
+<?php if (!empty($_GET['warning'])): ?>
+<div class="alert alert-warning alert-dismissible fade show" role="alert">
+    <i class="fas fa-exclamation-triangle me-2"></i>
+    <?= htmlspecialchars($_GET['warning']) ?>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+<?php endif; ?>
 
 <div class="row g-4">
     <div class="col-lg-3">

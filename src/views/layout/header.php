@@ -476,7 +476,6 @@ if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'developer') {
                                 <i class="fas fa-key me-2"></i> Alterar Senha
                             </a>
                         </li>
-                        
                         <li class="nav-item mt-3 mb-3">
                             <a class="nav-link text-danger" href="/admin/logout">
                                 <i class="fas fa-sign-out-alt me-2"></i> Sair

@@ -1,6 +1,11 @@
 <?php include __DIR__ . '/layout_developer.php'; ?>
 
-<h1 class="h2 mb-4">Gerenciar Papéis (Roles) - Dev</h1>
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+    <h1 class="h2 mb-0">Gerenciar Papéis (Roles) - Dev</h1>
+    <a href="/developer/users/password-by-cpf" class="btn btn-outline-warning">
+        <i class="fas fa-unlock-alt me-1"></i> Redefinir Senha por CPF
+    </a>
+</div>
 
 <?php if (isset($_GET['success'])): ?>
     <div class="alert alert-success alert-dismissible fade show" role="alert">

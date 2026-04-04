@@ -522,6 +522,11 @@ class MemberController {
 
     public function delete($id) {
         requirePermission('members.manage');
+        if (($_SESSION['user_role'] ?? '') !== 'admin') {
+            $_SESSION['flash_error'] = 'Apenas administradores podem excluir membros.';
+            redirect('/admin/members/show/' . $id);
+            return;
+        }
         $db = (new Database())->connect();
         
         // Fetch member data
@@ -537,6 +542,13 @@ class MemberController {
                 if (!empty($member['name']) && !empty($member['congregation_id'])) {
                     $db->prepare("UPDATE congregations SET leader_name = NULL WHERE id = ? AND leader_member_id IS NULL AND LOWER(leader_name) = LOWER(?)")->execute([$member['congregation_id'], $member['name']]);
                 }
+
+                // Clear relations that may keep stale references in event/member selectors
+                $db->prepare("DELETE FROM event_allowed_members WHERE member_id = ?")->execute([$id]);
+                $db->prepare("DELETE FROM event_attendance WHERE member_id = ?")->execute([$id]);
+                $db->prepare("DELETE FROM group_members WHERE member_id = ?")->execute([$id]);
+                $db->prepare("DELETE FROM user_members WHERE member_id = ?")->execute([$id]);
+                $db->prepare("UPDATE users SET member_id = NULL WHERE member_id = ?")->execute([$id]);
                 
                 // Delete photo if exists
                 if (!empty($member['photo'])) {
@@ -551,8 +563,12 @@ class MemberController {
                 $stmtDel->execute([$id]);
                 
                 $db->commit();
+                $_SESSION['flash_success'] = 'Membro excluído com sucesso.';
             } catch (Exception $e) {
                 $db->rollBack();
+                $_SESSION['flash_error'] = 'Não foi possível excluir o membro. Verifique se ainda existem vínculos ativos.';
+                redirect('/admin/members/show/' . $id);
+                return;
             }
         }
         
@@ -884,12 +900,12 @@ class MemberController {
                 $groupNames = array_column($groupsAffected, 'name');
                 $msg .= implode(", ", $groupNames) . ". Por favor, selecione novos líderes.";
                 
-                redirect('/admin/members?warning=' . urlencode($msg));
+                redirect('/admin/members/show/' . $id . '?warning=' . urlencode($msg));
                 return;
             }
         }
 
-        redirect('/admin/members');
+        redirect('/admin/members/show/' . $id);
     }
     
     public function deleteDocument($docId) {

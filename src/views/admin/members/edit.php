@@ -324,7 +324,7 @@
 
     <div class="col-12 text-end">
         <button type="submit" class="btn btn-primary px-4">Salvar Alterações</button>
-        <a href="/admin/members" class="btn btn-outline-secondary px-4">Cancelar</a>
+        <a href="/admin/members/show/<?= $member['id'] ?>" class="btn btn-outline-secondary px-4">Voltar para a Ficha</a>
     </div>
 </form>
 
