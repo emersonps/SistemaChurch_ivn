@@ -213,10 +213,10 @@ class ManualController {
         ]);
     }
 
-    public function manage() {
+    public function manage($editId = null) {
         $this->requireDeveloper();
         $db = (new Database())->connect();
-        $editing = !empty($_GET['edit']) ? $this->loadEditVideo($db, (int)$_GET['edit']) : null;
+        $editing = $editId ? $this->loadEditVideo($db, (int)$editId) : null;
 
         view('developer/manuals', [
             'videos' => $this->loadManageVideos($db),
@@ -242,13 +242,13 @@ class ManualController {
 
         if ($title === '' || $theme === '' || $youtubeUrl === '' || !$videoId) {
             $_SESSION['error'] = 'Preencha tema, título e um link válido do YouTube.';
-            redirect('/developer/manuals' . ($id ? '?edit=' . $id : ''));
+            redirect($id ? '/developer/manuals/edit/' . $id : '/developer/manuals');
             return;
         }
 
         if (empty($targets)) {
             $_SESSION['error'] = 'Selecione pelo menos um perfil de visualização.';
-            redirect('/developer/manuals' . ($id ? '?edit=' . $id : ''));
+            redirect($id ? '/developer/manuals/edit/' . $id : '/developer/manuals');
             return;
         }
 
