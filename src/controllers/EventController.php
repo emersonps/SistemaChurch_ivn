@@ -67,13 +67,13 @@ class EventController {
         $stmt->execute($params);
         $congregations = $stmt->fetchAll();
         
-        $sqlMembers = "SELECT id, name, congregation_id FROM members";
+        $sqlMembers = "SELECT m.id, m.name, m.congregation_id, c.name AS congregation_name FROM members m LEFT JOIN congregations c ON c.id = m.congregation_id";
         $paramsMembers = [];
         if ($_SESSION['user_role'] !== 'admin' && !empty($_SESSION['user_congregation_id'])) {
-            $sqlMembers .= " WHERE congregation_id = ?";
+            $sqlMembers .= " WHERE m.congregation_id = ?";
             $paramsMembers[] = $_SESSION['user_congregation_id'];
         }
-        $sqlMembers .= " ORDER BY name ASC";
+        $sqlMembers .= " ORDER BY m.name ASC";
         $stmtM = $db->prepare($sqlMembers);
         $stmtM->execute($paramsMembers);
         $members = $stmtM->fetchAll();
@@ -216,13 +216,13 @@ class EventController {
         $stmt->execute($params);
         $congregations = $stmt->fetchAll();
         
-        $sqlMembers = "SELECT id, name, congregation_id FROM members";
+        $sqlMembers = "SELECT m.id, m.name, m.congregation_id, c.name AS congregation_name FROM members m LEFT JOIN congregations c ON c.id = m.congregation_id";
         $paramsMembers = [];
         if ($_SESSION['user_role'] !== 'admin' && !empty($_SESSION['user_congregation_id'])) {
-            $sqlMembers .= " WHERE congregation_id = ?";
+            $sqlMembers .= " WHERE m.congregation_id = ?";
             $paramsMembers[] = $_SESSION['user_congregation_id'];
         }
-        $sqlMembers .= " ORDER BY name ASC";
+        $sqlMembers .= " ORDER BY m.name ASC";
         $stmtM = $db->prepare($sqlMembers);
         $stmtM->execute($paramsMembers);
         $members = $stmtM->fetchAll();
