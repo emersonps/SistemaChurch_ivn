@@ -1969,9 +1969,11 @@ $firstAndLastName = function ($name) {
                                     <i class="fas fa-chevron-right"></i>
                                 </button>
                             </div>
+                            <?php /* CTA oculto temporariamente
                             <div class="hero-countdown-cta">
                                 <a href="/portal/login" class="btn btn-primary rounded-pill">Ver escalas da semana</a>
                             </div>
+                            */ ?>
                         </div>
                     <?php endif; ?>
                 </div>
