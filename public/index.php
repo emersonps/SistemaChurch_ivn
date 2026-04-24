@@ -689,6 +689,24 @@ elseif ($uri == '/admin/settings/test-birthdays') {
     (new SettingsController())->testBirthdays();
 }
 
+// Rotas públicas de oração
+elseif ($uri == '/oracao') {
+    if ($method == 'POST') {
+        (new PrayerController())->store();
+    } else {
+        (new PrayerController())->index();
+    }
+}
+elseif (preg_match('#^/oracao/amem/(\d+)$#', $uri, $matches) && $method == 'POST') {
+    (new PrayerController())->amen($matches[1]);
+}
+elseif (preg_match('#^/oracao/editar/(\d+)$#', $uri, $matches) && $method == 'POST') {
+    (new PrayerController())->update($matches[1]);
+}
+elseif (preg_match('#^/oracao/excluir/(\d+)$#', $uri, $matches) && $method == 'POST') {
+    (new PrayerController())->delete($matches[1]);
+}
+
 // Rotas da Galeria
 elseif ($uri == '/galeria') {
     (new GalleryController())->publicIndex();

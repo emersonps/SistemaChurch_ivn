@@ -126,12 +126,6 @@ elseif ($uri == '/developer/payments') {
 elseif ($uri == '/developer/payments/generate') {
     (new DeveloperController())->generateCharge();
 }
-elseif ($uri == '/developer/payments/sync-central' && $method == 'POST') {
-    (new DeveloperController())->syncPaymentsToCentral();
-}
-elseif ($uri == '/developer/payments/sync-from-central' && $method == 'POST') {
-    (new DeveloperController())->syncPaymentsFromCentral();
-}
 elseif ($uri == '/developer/payments/delete') {
     (new DeveloperController())->deletePayment();
 }
@@ -509,6 +503,22 @@ elseif ($uri == '/admin/settings/test-birthdays') {
 }
 
 // Rotas da Galeria
+elseif ($uri == '/oracao') {
+    if ($method == 'POST') {
+        (new PrayerController())->store();
+    } else {
+        (new PrayerController())->index();
+    }
+}
+elseif (preg_match('#^/oracao/amem/(\d+)$#', $uri, $matches) && $method == 'POST') {
+    (new PrayerController())->amen($matches[1]);
+}
+elseif (preg_match('#^/oracao/editar/(\d+)$#', $uri, $matches) && $method == 'POST') {
+    (new PrayerController())->update($matches[1]);
+}
+elseif (preg_match('#^/oracao/excluir/(\d+)$#', $uri, $matches) && $method == 'POST') {
+    (new PrayerController())->delete($matches[1]);
+}
 elseif ($uri == '/galeria') {
     (new GalleryController())->publicIndex();
 }
