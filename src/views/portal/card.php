@@ -1,4 +1,5 @@
 <?php include __DIR__ . '/layout/header.php'; ?>
+<?php $siteProfile = getChurchSiteProfileSettings(); ?>
 
 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom no-print">
     <h1 class="h2">Minha Carteirinha</h1>
@@ -59,7 +60,7 @@
             <!-- Lado Esquerdo: Foto e Logo -->
             <div class="d-flex flex-column align-items-center justify-content-start pt-1" style="width: 32%;">
                 <div class="mb-2">
-                    <img src="/assets/img/logo.png" alt="Logo" style="height: 54px; width: auto; filter: drop-shadow(0px 2px 2px rgba(0,0,0,0.1));">
+                    <img src="<?= htmlspecialchars($siteProfile['logo_url'] ?? '/assets/img/logo.png') ?>" alt="<?= htmlspecialchars($siteProfile['alias'] ?? 'IVN') ?>" style="height: 54px; width: auto; filter: drop-shadow(0px 2px 2px rgba(0,0,0,0.1));">
                 </div>
                 <div class="border border-2 rounded-3 overflow-hidden shadow-sm" style="width: 72px; height: 95px; background-color: #fff; border-color: <?= $currentLayout['left'] ?> !important;">
                     <?php if (!empty($member['photo'])): ?>
@@ -75,8 +76,8 @@
             <!-- Lado Direito: Informações -->
             <div class="ps-2 d-flex flex-column" style="width: 68%; margin-top: -2px;">
                 <div class="mb-2 pe-1">
-                    <h6 class="m-0 fw-bold text-uppercase" style="color: <?= $finalSiglaColor ?>; font-size: 16px; letter-spacing: 0.5px;">IVN</h6>
-                    <div class="fw-bold text-uppercase" style="font-size: 7px; line-height: 1.1; color: #333; max-width: 170px;">Igreja Vida Nova</div>
+                    <h6 class="m-0 fw-bold text-uppercase" style="color: <?= $finalSiglaColor ?>; font-size: 16px; letter-spacing: 0.5px;"><?= htmlspecialchars($siteProfile['alias'] ?? 'IVN') ?></h6>
+                    <div class="fw-bold text-uppercase" style="font-size: 7px; line-height: 1.1; color: #333; max-width: 170px;"><?= htmlspecialchars($siteProfile['name'] ?? 'Igreja Vida Nova') ?></div>
                 </div>
 
                 <div class="mb-2 pe-1">
@@ -136,7 +137,7 @@
         
         <!-- Marca d'água no verso -->
         <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); opacity: 0.05; z-index: 0;">
-            <img src="/assets/img/logo.png" style="width: 150px; height: auto;">
+            <img src="<?= htmlspecialchars($siteProfile['logo_url'] ?? '/assets/img/logo.png') ?>" style="width: 150px; height: auto;">
         </div>
 
         <div style="position: absolute; top: 0; left: 0; width: 100%; height: 20px; background-color: <?= $currentLayout['back_top'] ?>; z-index: 1; display: flex; align-items: center; justify-content: center; border-bottom: <?= $isImageLayout ? '1px solid #dee2e6' : 'none' ?>;">

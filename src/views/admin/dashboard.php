@@ -239,6 +239,7 @@ $totalFinancialFormatted = 'R$ ' . number_format($total_financial, 2, ',', '.');
 <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
 
 <!-- Modal Cartão de Aniversário -->
+<?php $siteProfile = getChurchSiteProfileSettings(); ?>
 <div class="modal fade" id="birthdayModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg">
@@ -256,7 +257,7 @@ $totalFinancialFormatted = 'R$ ' . number_format($total_financial, 2, ',', '.');
                     <div class="d-flex flex-column justify-content-center align-items-center h-100 p-4" style="position: relative; z-index: 2; font-family: 'Lato', sans-serif;">
                         <div class="mb-4 text-center">
                             <!-- Tenta carregar logo, se falhar mostra ícone -->
-                            <img src="/assets/img/logo.png" alt="IVN" style="max-height: 80px; max-width: 150px; object-fit: contain; filter: drop-shadow(0 2px 2px rgba(0,0,0,0.1));" onerror="this.onerror=null; this.style.display='none'; document.getElementById('fallbackIcon').style.display='block';">
+                            <img src="<?= htmlspecialchars($siteProfile['logo_url'] ?? '/assets/img/logo.png') ?>" alt="<?= htmlspecialchars($siteProfile['alias'] ?? 'IVN') ?>" style="max-height: 80px; max-width: 150px; object-fit: contain; filter: drop-shadow(0 2px 2px rgba(0,0,0,0.1));" onerror="this.onerror=null; this.style.display='none'; document.getElementById('fallbackIcon').style.display='block';">
                             <i id="fallbackIcon" class="fas fa-church fa-3x text-warning" style="display:none;"></i>
                         </div>
                         
@@ -274,7 +275,7 @@ $totalFinancialFormatted = 'R$ ' . number_format($total_financial, 2, ',', '.');
                         <span class="fw-bold text-secondary small text-uppercase" style="letter-spacing: 1px; color: #8b7d4b;">Números 6:24-25</span>
                         
                         <div class="mt-auto pt-4">
-                            <small class="text-uppercase fw-bold text-muted" style="letter-spacing: 2px; font-size: 0.7rem;">Família IVN</small>
+                            <small class="text-uppercase fw-bold text-muted" style="letter-spacing: 2px; font-size: 0.7rem;">Família <?= htmlspecialchars($siteProfile['alias'] ?? 'IVN') ?></small>
                         </div>
                     </div>
                 </div>
@@ -310,7 +311,7 @@ $totalFinancialFormatted = 'R$ ' . number_format($total_financial, 2, ',', '.');
     }
 
     function shareWhatsApp() {
-        const message = `🎉 *Parabéns, ${currentMemberName}!* 🎉\n\nNeste dia especial, louvamos a Deus pela sua vida! Que o Senhor continue te abençoando grandemente.\n\n"O Senhor te abençoe e te guarde..." (Nm 6:24)\n\nCom carinho,\n*Família IVN*`;
+        const message = `🎉 *Parabéns, ${currentMemberName}!* 🎉\n\nNeste dia especial, louvamos a Deus pela sua vida! Que o Senhor continue te abençoando grandemente.\n\n"O Senhor te abençoe e te guarde..." (Nm 6:24)\n\nCom carinho,\n*Família <?= addslashes($siteProfile['alias'] ?? 'IVN') ?>*`;
         const url = `https://wa.me/?text=${encodeURIComponent(message)}`;
         window.open(url, '_blank');
     }

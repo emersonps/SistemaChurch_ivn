@@ -1,3 +1,4 @@
+<?php $siteProfile = getChurchSiteProfileSettings(); ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -24,7 +25,7 @@
 
 <div class="container">
     <div class="receipt-box text-center shadow-sm">
-        <h3><i class="fas fa-church"></i> Igreja Vida Nova</h3>
+        <h3><i class="fas fa-church"></i> <?= htmlspecialchars($siteProfile['name'] ?? 'Igreja Vida Nova') ?></h3>
         <h5 class="text-muted"><?= htmlspecialchars($tithe['congregation_name'] ?? 'Igreja Sede') ?></h5>
         <hr>
         

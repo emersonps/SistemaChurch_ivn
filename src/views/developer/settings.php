@@ -12,6 +12,14 @@
     <?php unset($_SESSION['success']); ?>
 <?php endif; ?>
 
+<?php $globalSyncLocked = !empty($globalSettingsSyncConfig['enabled']); ?>
+<?php if ($globalSyncLocked): ?>
+    <div class="alert alert-warning">
+        <i class="fas fa-link me-2"></i>
+        Nome, sigla, telefone, e-mail, texto "Quem Somos", redes sociais e a URL da logo estão sendo sincronizados pela central.
+    </div>
+<?php endif; ?>
+
 <?php if (isset($_SESSION['error'])): ?>
     <div class="alert alert-danger alert-dismissible fade show" role="alert">
         <i class="fas fa-exclamation-circle me-2"></i> <?= $_SESSION['error'] ?>
@@ -33,63 +41,51 @@
                     <div class="mb-4 text-center">
                         <label class="form-label d-block fw-bold">Logo Atual</label>
                         <div class="p-3 bg-light border rounded d-inline-block">
-                            <img src="/assets/img/logo.png?v=<?= time() ?>" alt="Logo Atual" style="max-height: 100px; max-width: 200px; object-fit: contain;">
+                            <img src="<?= htmlspecialchars($siteProfile['logo_url'] ?? '/assets/img/logo.png') ?>?v=<?= time() ?>" alt="Logo Atual" style="max-height: 100px; max-width: 200px; object-fit: contain;">
                         </div>
                     </div>
 
                     <div class="mb-3">
                         <label class="form-label fw-bold">Nova Logo (Opcional)</label>
-                        <input type="file" name="logo" class="form-control" accept="image/png">
-                        <div class="form-text">Envie um arquivo PNG com fundo transparente. Ele substituirá a logo atual em todo o sistema.</div>
+                        <input type="file" name="logo" class="form-control" accept="image/png" <?= $globalSyncLocked ? 'disabled' : '' ?>>
+                        <div class="form-text">Envie um arquivo PNG com fundo transparente. Ele substituirá a logo atual em todo o sistema quando a central não estiver controlando a identidade.</div>
                     </div>
                     
                     <hr class="my-4">
                     
                     <?php
-                    // Tentar inferir o nome atual do header
-                    $currentAlias = 'IVN';
-                    $currentName = 'Igreja Vida Nova';
-                    $headerPath = __DIR__ . '/../layout/header.php';
-                    if (file_exists($headerPath)) {
-                        $content = file_get_contents($headerPath);
-                        if (preg_match('/<title><\?= \$seo_title \?\? \'(.*?)\' \?><\/title>/', $content, $matches)) {
-                            $parts = explode(' - ', $matches[1]);
-                            if (count($parts) >= 2) {
-                                $currentAlias = trim($parts[0]);
-                                $currentName = trim($parts[1]);
-                            }
-                        }
-                    }
+                    $currentAlias = $siteProfile['alias'] ?? 'IVN';
+                    $currentName = $siteProfile['name'] ?? 'Igreja Vida Nova';
                     ?>
 
                     <div class="mb-3">
                         <label class="form-label fw-bold">Sigla da Igreja</label>
-                        <input type="text" name="church_alias" class="form-control text-uppercase" value="<?= htmlspecialchars($currentAlias) ?>" required>
+                        <input type="text" name="church_alias" class="form-control text-uppercase" value="<?= htmlspecialchars($currentAlias) ?>" required <?= $globalSyncLocked ? 'disabled' : '' ?>>
                         <div class="form-text">Ex: IVN, ADMP, IEJ. Usado em menus, títulos curtos e carteirinha.</div>
                     </div>
 
                     <div class="mb-4">
                         <label class="form-label fw-bold">Nome Completo da Igreja</label>
-                        <input type="text" name="church_name" class="form-control" value="<?= htmlspecialchars($currentName) ?>" required>
+                        <input type="text" name="church_name" class="form-control" value="<?= htmlspecialchars($currentName) ?>" required <?= $globalSyncLocked ? 'disabled' : '' ?>>
                         <div class="form-text">Ex: Igreja Vida Nova. Usado em cabeçalhos, rodapés e documentos oficiais.</div>
                     </div>
 
                     <div class="row g-3 mb-4">
                         <div class="col-md-6">
                             <label class="form-label fw-bold">Telefone da Igreja</label>
-                            <input type="text" name="church_phone" class="form-control" value="<?= htmlspecialchars($siteProfile['phone'] ?? '') ?>" placeholder="+55 (00) 00000-0000">
+                            <input type="text" name="church_phone" class="form-control" value="<?= htmlspecialchars($siteProfile['phone'] ?? '') ?>" placeholder="+55 (00) 00000-0000" <?= $globalSyncLocked ? 'disabled' : '' ?>>
                             <div class="form-text">Usado no rodapé e nos pontos públicos de contato.</div>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label fw-bold">E-mail da Igreja</label>
-                            <input type="email" name="church_email" class="form-control" value="<?= htmlspecialchars($siteProfile['email'] ?? '') ?>" placeholder="contato@suaigreja.com.br">
+                            <input type="email" name="church_email" class="form-control" value="<?= htmlspecialchars($siteProfile['email'] ?? '') ?>" placeholder="contato@suaigreja.com.br" <?= $globalSyncLocked ? 'disabled' : '' ?>>
                             <div class="form-text">Usado no rodapé e nos contatos públicos do site.</div>
                         </div>
                     </div>
 
                     <div class="mb-4">
                         <label class="form-label fw-bold">Texto "Quem Somos"</label>
-                        <textarea name="church_about_text" class="form-control" rows="6" placeholder="Descreva a história, missão e identidade da igreja."><?= htmlspecialchars($siteProfile['about_text'] ?? '') ?></textarea>
+                        <textarea name="church_about_text" class="form-control" rows="6" placeholder="Descreva a história, missão e identidade da igreja." <?= $globalSyncLocked ? 'disabled' : '' ?>><?= htmlspecialchars($siteProfile['about_text'] ?? '') ?></textarea>
                         <div class="form-text">Este texto aparece na seção "Quem Somos" do site público.</div>
                     </div>
 
@@ -107,7 +103,7 @@
                     <div class="mb-4">
                         <div class="d-flex justify-content-between align-items-center mb-2">
                             <label class="form-label fw-bold mb-0">Redes Sociais</label>
-                            <button type="button" class="btn btn-outline-primary btn-sm" id="add-social-link">
+                            <button type="button" class="btn btn-outline-primary btn-sm" id="add-social-link" <?= $globalSyncLocked ? 'disabled' : '' ?>>
                                 <i class="fas fa-plus me-1"></i> Adicionar Rede
                             </button>
                         </div>
@@ -115,7 +111,7 @@
                             <?php foreach ($socialFormRows as $social): ?>
                                 <div class="row g-2 align-items-center social-link-row">
                                     <div class="col-md-4">
-                                        <select name="social_platform[]" class="form-select">
+                                        <select name="social_platform[]" class="form-select" <?= $globalSyncLocked ? 'disabled' : '' ?>>
                                             <?php foreach ($socialIconOptions as $optionKey => $option): ?>
                                                 <option value="<?= htmlspecialchars($optionKey) ?>" <?= ($social['platform'] ?? '') === $optionKey ? 'selected' : '' ?>>
                                                     <?= htmlspecialchars($option['label']) ?>
@@ -124,10 +120,10 @@
                                         </select>
                                     </div>
                                     <div class="col-md-7">
-                                        <input type="url" name="social_url[]" class="form-control" value="<?= htmlspecialchars($social['url'] ?? '') ?>" placeholder="https://...">
+                                        <input type="url" name="social_url[]" class="form-control" value="<?= htmlspecialchars($social['url'] ?? '') ?>" placeholder="https://..." <?= $globalSyncLocked ? 'disabled' : '' ?>>
                                     </div>
                                     <div class="col-md-1 d-grid">
-                                        <button type="button" class="btn btn-outline-danger remove-social-link">
+                                        <button type="button" class="btn btn-outline-danger remove-social-link" <?= $globalSyncLocked ? 'disabled' : '' ?>>
                                             <i class="fas fa-trash"></i>
                                         </button>
                                     </div>

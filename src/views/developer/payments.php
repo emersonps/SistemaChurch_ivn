@@ -6,38 +6,87 @@
     <div class="alert alert-success">Operação realizada com sucesso.</div>
 <?php endif; ?>
 
+<?php if (isset($_SESSION['success'])): ?>
+    <div class="alert alert-success"><?= htmlspecialchars($_SESSION['success']) ?></div>
+    <?php unset($_SESSION['success']); ?>
+<?php endif; ?>
+
+<?php if (isset($_SESSION['error'])): ?>
+    <div class="alert alert-danger"><?= htmlspecialchars($_SESSION['error']) ?></div>
+    <?php unset($_SESSION['error']); ?>
+<?php endif; ?>
+
+<div class="card mb-4">
+    <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <h5 class="mb-0">Centralização das Cobranças</h5>
+        <span class="badge bg-<?= $billingSyncEnabled ? 'success' : 'secondary' ?>">
+            <?= $billingSyncEnabled ? 'Central conectada' : 'Central não configurada' ?>
+        </span>
+    </div>
+    <div class="card-body">
+        <?php if ($billingSyncEnabled): ?>
+            <div class="small text-muted mb-3">
+                Instância: <strong><?= htmlspecialchars($billingSyncConfig['instance_code'] ?? '') ?></strong> |
+                Central: <strong><?= htmlspecialchars($billingSyncConfig['central_url'] ?? '') ?></strong>
+            </div>
+            <div class="alert alert-info">
+                A central é a fonte oficial das cobranças. No ivn esta tela funciona apenas para consulta e atualização a partir da central.
+            </div>
+            <div class="d-flex flex-wrap gap-2">
+                <form method="POST" action="/developer/payments/sync-from-central">
+                    <?= csrf_field() ?>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-cloud-download-alt me-1"></i> Atualizar do central para o ivn
+                    </button>
+                </form>
+            </div>
+        <?php else: ?>
+            <div class="text-muted">
+                Configure primeiro a central em <a href="/developer/manual-sync">Sincronização da Central</a> para enviar o histórico de cobranças do sistema.
+            </div>
+        <?php endif; ?>
+    </div>
+</div>
+
 <div class="card mb-4">
     <div class="card-header bg-primary text-white">
         <h5 class="mb-0">Gerar/Atualizar Cobrança</h5>
     </div>
     <div class="card-body">
-        <form method="POST" action="/developer/payments/generate">
-            <div class="row align-items-end">
-                <div class="col-md-2">
-                    <label class="form-label">Mês de Referência</label>
-                    <input type="month" name="month" class="form-control" required value="<?= date('Y-m') ?>">
-                </div>
-                <div class="col-md-2">
-                    <label class="form-label">Dia Venc.</label>
-                    <input type="number" name="due_day" class="form-control" value="5" min="1" max="31" required>
-                </div>
-                <div class="col-md-2">
-                    <label class="form-label">Valor (R$)</label>
-                    <input type="number" step="0.01" name="amount" class="form-control" value="59.99" required>
-                </div>
-                <div class="col-md-3">
-                    <label class="form-label">Status</label>
-                    <select name="status" class="form-select">
-                        <option value="pending">Pendente (Gerar Cobrança)</option>
-                        <option value="paid">Pago (Baixa Manual)</option>
-                        <option value="overdue">Atrasado</option>
-                    </select>
-                </div>
-                <div class="col-md-3">
-                    <button type="submit" class="btn btn-success w-100">Executar</button>
-                </div>
+        <?php if (!empty($billingManagedByCentral)): ?>
+            <div class="text-muted">
+                A geração e a alteração de cobranças foram bloqueadas no ivn. Faça esse gerenciamento diretamente pela central.
             </div>
-        </form>
+        <?php else: ?>
+            <form method="POST" action="/developer/payments/generate">
+                <?= csrf_field() ?>
+                <div class="row align-items-end">
+                    <div class="col-md-2">
+                        <label class="form-label">Mês de Referência</label>
+                        <input type="month" name="month" class="form-control" required value="<?= date('Y-m') ?>">
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">Dia Venc.</label>
+                        <input type="number" name="due_day" class="form-control" value="5" min="1" max="31" required>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">Valor (R$)</label>
+                        <input type="number" step="0.01" name="amount" class="form-control" value="59.99" required>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Status</label>
+                        <select name="status" class="form-select">
+                            <option value="pending">Pendente (Gerar Cobrança)</option>
+                            <option value="paid">Pago (Baixa Manual)</option>
+                            <option value="overdue">Atrasado</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <button type="submit" class="btn btn-success w-100">Executar</button>
+                    </div>
+                </div>
+            </form>
+        <?php endif; ?>
     </div>
 </div>
 
@@ -75,14 +124,19 @@
                         <td><?= !empty($p['due_date']) ? date('d/m/Y', strtotime($p['due_date'])) : (!empty($p['payment_date']) && $p['status'] !== 'paid' ? date('d/m/Y', strtotime($p['payment_date'])) : '-') ?></td>
                         <td><?= $p['status'] === 'paid' && !empty($p['payment_date']) ? date('d/m/Y H:i', strtotime($p['payment_date'])) : '-' ?></td>
                         <td>
+                            <?php if (!empty($billingManagedByCentral)): ?>
+                                <span class="text-muted small">Gerenciado pela central</span>
+                            <?php else: ?>
                             <a href="/developer/payments/delete?id=<?= $p['id'] ?>" class="btn btn-sm btn-danger" onclick="return confirm('Tem certeza que deseja excluir este registro?');">
                                 <i class="fas fa-trash"></i>
                             </a>
                             <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#editStatusModal<?= $p['id'] ?>" <?= $p['status'] === 'paid' ? 'disabled title="Pagamento já quitado"' : '' ?>>
                                 <i class="fas fa-edit"></i>
                             </button>
+                            <?php endif; ?>
                             
                             <!-- Modal Edit Status -->
+                            <?php if (empty($billingManagedByCentral)): ?>
                             <div class="modal fade" id="editStatusModal<?= $p['id'] ?>" tabindex="-1" aria-hidden="true">
                                 <div class="modal-dialog">
                                     <div class="modal-content">
@@ -92,6 +146,7 @@
                                         </div>
                                         <form action="/developer/payments/update-status" method="POST">
                                             <div class="modal-body">
+                                                <?= csrf_field() ?>
                                                 <input type="hidden" name="id" value="<?= $p['id'] ?>">
                                                 <div class="mb-3">
                                                     <label class="form-label">Mês de Referência</label>
@@ -123,6 +178,7 @@
                                     </div>
                                 </div>
                             </div>
+                            <?php endif; ?>
                         </td>
                     </tr>
                     <?php endforeach; ?>

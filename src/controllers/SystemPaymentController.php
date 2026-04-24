@@ -71,6 +71,8 @@ class SystemPaymentController {
     
     public function index() {
         requirePermission('system_payments.view');
+        $this->syncFromCentralSilently();
+        $billingManagedByCentral = (new CentralBillingSyncService())->hasRemoteConfig();
         $db = (new Database())->connect();
         $hasDueDateColumn = $this->tableHasColumn($db, 'system_payments', 'due_date');
         
@@ -152,6 +154,7 @@ class SystemPaymentController {
         
         view('admin/system_payments/index', [
             'payments' => $payments,
+            'billingManagedByCentral' => $billingManagedByCentral,
             'status' => $status,
             'daysRemaining' => $daysRemaining,
             'currentMonth' => $currentMonth,
@@ -168,6 +171,10 @@ class SystemPaymentController {
     
     public function pay() {
         requirePermission('system_payments.manage');
+        if ((new CentralBillingSyncService())->hasRemoteConfig()) {
+            $_SESSION['error'] = 'As cobranças são gerenciadas pela central. A confirmação local de pagamento está bloqueada.';
+            redirect('/admin/system-payments');
+        }
         
         // Only developer can mark as paid (confirm payment)
         // Or if the logic is: Developer generates charge (pending), Admin pays (maybe upload receipt or just manual confirm?)
@@ -265,6 +272,16 @@ class SystemPaymentController {
             }
             
             redirect('/admin/system-payments?success=1');
+        }
+    }
+
+    private function syncFromCentralSilently() {
+        try {
+            $service = new CentralBillingSyncService();
+            if ($service->hasRemoteConfig()) {
+                $service->syncFromCentral(true);
+            }
+        } catch (Exception $e) {
         }
     }
 }

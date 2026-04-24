@@ -217,17 +217,25 @@ class ManualController {
         $this->requireDeveloper();
         $db = (new Database())->connect();
         $editing = $editId ? $this->loadEditVideo($db, (int)$editId) : null;
+        $syncConfig = (new CentralManualSyncService())->getConfig();
 
         view('developer/manuals', [
             'videos' => $this->loadManageVideos($db),
             'targetChoices' => $this->getTargetChoices($db),
-            'editing' => $editing
+            'editing' => $editing,
+            'syncConfig' => $syncConfig,
+            'syncLocked' => !empty($syncConfig['enabled'])
         ]);
     }
 
     public function store() {
         $this->requireDeveloper();
         verify_csrf();
+        if ((new CentralManualSyncService())->isEnabled()) {
+            $_SESSION['error'] = 'A edição local dos manuais está bloqueada enquanto a sincronização com a central estiver ativa.';
+            redirect('/developer/manual-sync');
+            return;
+        }
 
         $db = (new Database())->connect();
         $id = !empty($_POST['id']) ? (int)$_POST['id'] : null;
@@ -283,6 +291,11 @@ class ManualController {
     public function delete($id) {
         $this->requireDeveloper();
         verify_csrf();
+        if ((new CentralManualSyncService())->isEnabled()) {
+            $_SESSION['error'] = 'A exclusão local dos manuais está bloqueada enquanto a sincronização com a central estiver ativa.';
+            redirect('/developer/manual-sync');
+            return;
+        }
         $db = (new Database())->connect();
         $stmt = $db->prepare("DELETE FROM manual_videos WHERE id = ?");
         $stmt->execute([(int)$id]);

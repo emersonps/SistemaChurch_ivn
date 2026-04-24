@@ -1,4 +1,5 @@
 <?php include __DIR__ . '/../../layout/header.php'; ?>
+<?php $siteProfile = getChurchSiteProfileSettings(); ?>
 
 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
     <h1 class="h2">Layout da Carteirinha</h1>
@@ -22,7 +23,7 @@
             <!-- Cor da Sigla da Igreja -->
             <div class="row mb-4">
                 <div class="col-md-4">
-                    <label class="form-label fw-bold"><i class="fas fa-palette me-1"></i> Cor da Sigla (IVN)</label>
+                    <label class="form-label fw-bold"><i class="fas fa-palette me-1"></i> Cor da Sigla (<?= htmlspecialchars($siteProfile['alias'] ?? 'IVN') ?>)</label>
                     <div class="input-group">
                         <?php $siglaColor = getSystemSetting('card_sigla_color', '#0d6efd'); ?>
                         <input type="color" class="form-control form-control-color" name="card_sigla_color" value="<?= $siglaColor ?>" title="Escolha a cor da sigla da igreja">

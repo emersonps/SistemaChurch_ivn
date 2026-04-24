@@ -95,7 +95,7 @@ ksort($groupedClosures);
 <div class="modal fade" id="newClosureModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
         <form action="/admin/financial/closures/store" method="POST">
-            <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
+            <?= csrf_field() ?>
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Novo Fechamento</h5>

@@ -62,6 +62,35 @@ header("X-Frame-Options: SAMEORIGIN");
 header("X-XSS-Protection: 1; mode=block");
 header("Referrer-Policy: strict-origin-when-cross-origin");
 
+if ($uri == '/manifest.webmanifest') {
+    $siteProfile = getChurchSiteProfileSettings();
+    header('Content-Type: application/manifest+json; charset=utf-8');
+    echo json_encode([
+        'name' => ($siteProfile['alias'] ?? 'IVN') . ' - ' . ($siteProfile['name'] ?? 'Igreja Vida Nova'),
+        'short_name' => $siteProfile['alias'] ?? 'IVN',
+        'start_url' => '/',
+        'display' => 'standalone',
+        'background_color' => '#000000',
+        'theme_color' => '#000000',
+        'description' => 'Aplicativo oficial da ' . ($siteProfile['alias'] ?? 'IVN'),
+        'icons' => [
+            [
+                'src' => $siteProfile['logo_url'] ?? '/assets/img/logo.png',
+                'sizes' => '192x192',
+                'type' => 'image/png',
+                'purpose' => 'any'
+            ],
+            [
+                'src' => $siteProfile['logo_url'] ?? '/assets/img/logo.png',
+                'sizes' => '512x512',
+                'type' => 'image/png',
+                'purpose' => 'any'
+            ]
+        ]
+    ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    exit;
+}
+
 // Global CSRF Check for POST requests to /admin (except login)
 if ($method === 'POST' && strpos($uri, '/admin') === 0) {
     // Exception for login (we will handle it inside AuthController if needed, 
@@ -101,6 +130,18 @@ elseif (preg_match('#^/developer/manuals/edit/(\d+)$#', $uri, $matches)) {
 }
 elseif ($method == 'POST' && preg_match('#^/developer/manuals/delete/(\d+)$#', $uri, $matches)) {
     (new ManualController())->delete($matches[1]);
+}
+elseif ($uri == '/developer/manual-sync') {
+    (new ManualSyncController())->index();
+}
+elseif ($uri == '/developer/manual-sync/save' && $method == 'POST') {
+    (new ManualSyncController())->save();
+}
+elseif ($uri == '/developer/manual-sync/run' && $method == 'POST') {
+    (new ManualSyncController())->sync();
+}
+elseif ($uri == '/developer/manual-sync/global-settings' && $method == 'POST') {
+    (new ManualSyncController())->syncGlobalSettings();
 }
 elseif ($uri == '/admin/login') {
     if ($method == 'POST') {
@@ -150,6 +191,12 @@ elseif ($uri == '/developer/backups/download') {
 }
 elseif ($uri == '/developer/payments/generate') {
     (new DeveloperController())->generateCharge();
+}
+elseif ($uri == '/developer/payments/sync-central' && $method == 'POST') {
+    (new DeveloperController())->syncPaymentsToCentral();
+}
+elseif ($uri == '/developer/payments/sync-from-central' && $method == 'POST') {
+    (new DeveloperController())->syncPaymentsFromCentral();
 }
 elseif ($uri == '/developer/payments/delete') {
     (new DeveloperController())->deletePayment();

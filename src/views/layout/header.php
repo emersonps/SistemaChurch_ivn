@@ -1,4 +1,5 @@
 <?php
+$siteProfile = getChurchSiteProfileSettings();
 // Bloquear acesso de desenvolvedores ao painel admin
 if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'developer') {
     // Se tentar acessar qualquer página admin, redireciona para o painel de dev
@@ -16,12 +17,12 @@ if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'developer') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Igreja Vida Nova</title>
+    <title><?= htmlspecialchars($siteProfile['name'] ?? 'Igreja Vida Nova') ?></title>
     <!-- Favicon -->
-    <link rel="icon" type="image/png" href="/assets/img/logo.png?v=1">
-    <link rel="apple-touch-icon" href="/assets/img/logo.png?v=1">
+    <link rel="icon" type="image/png" href="<?= htmlspecialchars($siteProfile['logo_url'] ?? '/assets/img/logo.png') ?>?v=1">
+    <link rel="apple-touch-icon" href="<?= htmlspecialchars($siteProfile['logo_url'] ?? '/assets/img/logo.png') ?>?v=1">
     <!-- PWA / Web App Manifest -->
-    <link rel="manifest" href="/manifest.json">
+    <link rel="manifest" href="/manifest.webmanifest">
     <meta name="theme-color" content="#b30000">
     
     <!-- Bootstrap 5 CDN -->
@@ -42,6 +43,7 @@ if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'developer') {
         .text-primary { color: #b30000 !important; }
         .btn-primary { background-color: #b30000; border-color: #b30000; }
         .btn-primary:hover { background-color: #800000; border-color: #800000; }
+        .sidebar-brand-logo { max-height: 42px; max-width: 100%; object-fit: contain; }
     </style>
 </head>
 <body>
@@ -49,9 +51,9 @@ if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'developer') {
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4 d-md-none">
         <div class="container-fluid">
             <?php 
-            $navTitle = 'IVN Admin';
+            $navTitle = ($siteProfile['alias'] ?? 'IVN') . ' Admin';
             if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'secretary') {
-                $navTitle = 'IVN Secretaria';
+                $navTitle = ($siteProfile['alias'] ?? 'IVN') . ' Secretaria';
             }
             ?>
             <a class="navbar-brand" href="/admin"><?= $navTitle ?></a>
@@ -192,7 +194,10 @@ if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'developer') {
         <div class="row">
             <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-white sidebar collapse">
                 <div class="position-sticky pt-3">
-                    <h4 class="px-3 pb-3 border-bottom text-danger">IVN</h4>
+                    <div class="px-3 pb-3 border-bottom text-center">
+                        <img src="<?= htmlspecialchars($siteProfile['logo_url'] ?? '/assets/img/logo.png') ?>" alt="<?= htmlspecialchars($siteProfile['alias'] ?? 'IVN') ?>" class="sidebar-brand-logo mb-2">
+                        <h4 class="text-danger mb-0"><?= htmlspecialchars($siteProfile['alias'] ?? 'IVN') ?></h4>
+                    </div>
                     <ul class="nav flex-column">
                         <!-- Principal -->
                         <?php if (hasPermission('dashboard.view')): ?>
@@ -500,6 +505,11 @@ if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'developer') {
                 // But user wants "always updated". DB call is safer.
                 
                 try {
+                    $billingSyncService = new CentralBillingSyncService();
+                    if ($billingSyncService->hasRemoteConfig()) {
+                        $billingSyncService->syncFromCentral();
+                    }
+
                     $db = (new Database())->connect();
                     $currentMonth = date('Y-m');
                     
@@ -524,64 +534,64 @@ if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'developer') {
                         ? "SELECT reference_month, status, due_date, payment_date FROM system_payments WHERE status <> 'paid' ORDER BY reference_month ASC"
                         : "SELECT reference_month, status, payment_date FROM system_payments WHERE status <> 'paid' ORDER BY reference_month ASC";
                     $stmt = $db->query($select);
-                    $payments = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                    $systemPaymentAlertRows = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     
-                    $showAlert = false;
-                    $alertType = '';
-                    $dueDateText = '05/' . date('m/Y');
+                    $systemPaymentShowAlert = false;
+                    $systemPaymentAlertType = '';
+                    $systemPaymentDueDateText = '05/' . date('m/Y');
                     
-                    $payment = null;
-                    $closestDaysRemaining = null;
-                    foreach ($payments as $candidate) {
+                    $systemPaymentAlertCurrent = null;
+                    $systemPaymentClosestDaysRemaining = null;
+                    foreach ($systemPaymentAlertRows as $candidate) {
                         $candidateDueDateRaw = $candidate['due_date'] ?? ($candidate['payment_date'] ?? (($candidate['reference_month'] ?? $currentMonth) . '-05 00:00:00'));
                         $candidateDueDate = date('Y-m-d', strtotime($candidateDueDateRaw));
                         $candidateDaysRemaining = (int)floor((strtotime($candidateDueDate) - strtotime(date('Y-m-d'))) / 86400);
 
-                        if ($payment === null || $candidateDaysRemaining < $closestDaysRemaining) {
-                            $payment = $candidate;
-                            $closestDaysRemaining = $candidateDaysRemaining;
-                            $dueDateText = date('d/m/Y', strtotime($candidateDueDateRaw));
+                        if ($systemPaymentAlertCurrent === null || $candidateDaysRemaining < $systemPaymentClosestDaysRemaining) {
+                            $systemPaymentAlertCurrent = $candidate;
+                            $systemPaymentClosestDaysRemaining = $candidateDaysRemaining;
+                            $systemPaymentDueDateText = date('d/m/Y', strtotime($candidateDueDateRaw));
                         }
                     }
 
-                    if ($payment) {
-                        $daysRemaining = $closestDaysRemaining;
-                        if ($daysRemaining < 0) {
-                            $showAlert = true;
-                            $alertType = 'overdue';
-                        } elseif ($daysRemaining === 0) {
-                            $showAlert = true;
-                            $alertType = 'today';
-                        } elseif ($daysRemaining <= 2 && $daysRemaining > 0) {
-                            $showAlert = true;
-                            $alertType = 'alert';
+                    if ($systemPaymentAlertCurrent) {
+                        $systemPaymentDaysRemaining = $systemPaymentClosestDaysRemaining;
+                        if ($systemPaymentDaysRemaining < 0) {
+                            $systemPaymentShowAlert = true;
+                            $systemPaymentAlertType = 'overdue';
+                        } elseif ($systemPaymentDaysRemaining === 0) {
+                            $systemPaymentShowAlert = true;
+                            $systemPaymentAlertType = 'today';
+                        } elseif ($systemPaymentDaysRemaining <= 2 && $systemPaymentDaysRemaining > 0) {
+                            $systemPaymentShowAlert = true;
+                            $systemPaymentAlertType = 'alert';
                         }
                     }
                     
-                    if ($showAlert):
+                    if ($systemPaymentShowAlert):
             ?>
                 <!-- Modal -->
                 <div class="modal fade" id="paymentAlertModal" tabindex="-1" aria-labelledby="paymentAlertLabel" aria-hidden="true">
                   <div class="modal-dialog">
                     <div class="modal-content">
-                      <div class="modal-header bg-<?= $alertType == 'overdue' ? 'danger' : 'warning' ?> text-white">
+                      <div class="modal-header bg-<?= $systemPaymentAlertType == 'overdue' ? 'danger' : 'warning' ?> text-white">
                         <h5 class="modal-title" id="paymentAlertLabel">
                             <i class="fas fa-exclamation-triangle"></i> 
-                            <?= $alertType == 'overdue' ? 'Pagamento Atrasado!' : ($alertType == 'today' ? 'Pagamento Vence Hoje' : 'Lembrete de Pagamento') ?>
+                            <?= $systemPaymentAlertType == 'overdue' ? 'Pagamento Atrasado!' : ($systemPaymentAlertType == 'today' ? 'Pagamento Vence Hoje' : 'Lembrete de Pagamento') ?>
                         </h5>
                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                       </div>
                       <div class="modal-body">
                         <p class="fs-5">
-                            <?= $alertType == 'overdue' 
-                                ? 'O pagamento da hospedagem/domínio venceu em ' . $dueDateText . ' e ainda não consta no sistema.' 
-                                : ($alertType == 'today'
-                                    ? 'O pagamento da hospedagem/domínio vence hoje (' . $dueDateText . ').'
-                                    : 'O pagamento da hospedagem/domínio vence em ' . $dueDateText . '.') ?>
+                            <?= $systemPaymentAlertType == 'overdue' 
+                                ? 'O pagamento da hospedagem/domínio venceu em ' . $systemPaymentDueDateText . ' e ainda não consta no sistema.' 
+                                : ($systemPaymentAlertType == 'today'
+                                    ? 'O pagamento da hospedagem/domínio vence hoje (' . $systemPaymentDueDateText . ').'
+                                    : 'O pagamento da hospedagem/domínio vence em ' . $systemPaymentDueDateText . '.') ?>
                         </p>
-                        <p><?= $alertType == 'overdue'
+                        <p><?= $systemPaymentAlertType == 'overdue'
                             ? 'Por favor, regularize a situação.'
-                            : ($alertType == 'today'
+                            : ($systemPaymentAlertType == 'today'
                                 ? 'Hoje é a data de vencimento. Se possível, realize o pagamento para evitar atraso.'
                                 : 'Se desejar, já pode se programar para realizar o pagamento dentro do prazo.') ?></p>
                       </div>
@@ -597,7 +607,7 @@ if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'developer') {
                     document.addEventListener('DOMContentLoaded', function() {
                         var modalElement = document.getElementById('paymentAlertModal');
                         var myModal = new bootstrap.Modal(modalElement);
-                        var alertType = '<?= $alertType ?>';
+                        var alertType = '<?= $systemPaymentAlertType ?>';
                         var storageKey = 'system_payment_alert_last_shown';
                         var sessionKey = 'system_payment_alert_session_shown_<?= (int)($_SESSION["user_id"] ?? 0) ?>_<?= session_id() ?>';
                         var now = Date.now();
@@ -633,7 +643,10 @@ if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'developer') {
 <?php else: // Member/Public View ?>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
         <div class="container">
-            <a class="navbar-brand" href="/">IVN</a>
+            <a class="navbar-brand d-flex align-items-center gap-2" href="/">
+                <img src="<?= htmlspecialchars($siteProfile['logo_url'] ?? '/assets/img/logo.png') ?>" alt="<?= htmlspecialchars($siteProfile['alias'] ?? 'IVN') ?>" style="height: 32px; width: auto; object-fit: contain;">
+                <span><?= htmlspecialchars($siteProfile['alias'] ?? 'IVN') ?></span>
+            </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>

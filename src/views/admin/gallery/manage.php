@@ -16,7 +16,7 @@
                     </div>
                 <?php else: ?>
                     <form action="/admin/gallery/upload/<?= $album['id'] ?>" method="POST" enctype="multipart/form-data" class="row g-3 align-items-end">
-                        <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
+                        <?= csrf_field() ?>
                         <div class="col-auto">
                             <label for="photo" class="form-label">Selecionar Imagem</label>
                             <input type="file" class="form-control" name="photo" id="photo" accept="image/*" required>

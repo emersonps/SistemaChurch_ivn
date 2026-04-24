@@ -1,4 +1,5 @@
 <?php include __DIR__ . '/../../layout/header.php'; ?>
+<?php $siteProfile = getChurchSiteProfileSettings(); ?>
 
 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
     <h1 class="h2">Relatório Financeiro</h1>
@@ -55,7 +56,7 @@
 <div class="card">
     <div class="card-body">
         <div class="text-center mb-4">
-            <h4>Relatório Financeiro - IVN</h4>
+            <h4>Relatório Financeiro - <?= htmlspecialchars($siteProfile['alias'] ?? 'IVN') ?></h4>
             <p class="text-muted">
                 Período: <?= date('d/m/Y', strtotime($filters['start_date'])) ?> a <?= date('d/m/Y', strtotime($filters['end_date'])) ?>
                 <br>

@@ -1,15 +1,16 @@
+<?php $siteProfile = getChurchSiteProfileSettings(); ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IVN - Igreja Vida Nova</title>
+    <title><?= htmlspecialchars(($siteProfile['alias'] ?? 'IVN') . ' - ' . ($siteProfile['name'] ?? 'Igreja Vida Nova')) ?></title>
 
     <!-- Favicon -->
-    <link rel="shortcut icon" href="/assets/img/logo.png" type="image/png">
-    <link rel="icon" href="/assets/img/logo.png" type="image/png">
+    <link rel="shortcut icon" href="<?= htmlspecialchars($siteProfile['logo_url'] ?? '/assets/img/logo.png') ?>" type="image/png">
+    <link rel="icon" href="<?= htmlspecialchars($siteProfile['logo_url'] ?? '/assets/img/logo.png') ?>" type="image/png">
     <!-- PWA / Web App Manifest -->
-    <link rel="manifest" href="/manifest.json">
+    <link rel="manifest" href="/manifest.webmanifest">
     <meta name="theme-color" content="#b30000">
 
     <!-- Bootstrap 5 -->
@@ -231,8 +232,8 @@
         <div class="container">
             <a class="navbar-brand" href="#">
                 <!-- Placeholder para a logo -->
-                <img src="/assets/img/logo.png" alt="IVN" onerror="this.style.display='none'">
-                <span class="d-none d-md-inline">IVN</span>
+                <img src="<?= htmlspecialchars($siteProfile['logo_url'] ?? '/assets/img/logo.png') ?>" alt="<?= htmlspecialchars($siteProfile['alias'] ?? 'IVN') ?>" onerror="this.style.display='none'">
+                <span class="d-none d-md-inline"><?= htmlspecialchars($siteProfile['alias'] ?? 'IVN') ?></span>
             </a>
             <button class="navbar-toggler bg-gold" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
@@ -261,7 +262,7 @@
     <!-- Hero Section -->
     <header class="hero-section" id="inicio">
         <div class="container">
-            <h1 class="display-3 hero-title mb-4">Bem-vindo à <span class="hero-highlight">IVN</span></h1>
+            <h1 class="display-3 hero-title mb-4">Bem-vindo à <span class="hero-highlight"><?= htmlspecialchars($siteProfile['alias'] ?? 'IVN') ?></span></h1>
             <p class="lead mb-5 fs-4">Uma igreja comprometida com a Palavra de Deus e o amor ao próximo.</p>
             <div class="d-flex justify-content-center gap-3">
                 <a href="#cultos" class="btn btn-primary btn-lg rounded-pill shadow-lg">Nossos Cultos</a>
@@ -330,17 +331,16 @@
     </script>
     <?php endif; ?>
 
-    <?php $siteProfile = getChurchSiteProfileSettings(); ?>
     <!-- About Section -->
     <section id="sobre" class="py-5">
         <div class="container py-5">
             <div class="row align-items-center">
                 <div class="col-md-6 text-center">
-                    <img src="/assets/img/logo.png" class="img-fluid" alt="IVN Logo" style="max-height: 400px;">
+                    <img src="<?= htmlspecialchars($siteProfile['logo_url'] ?? '/assets/img/logo.png') ?>" class="img-fluid" alt="<?= htmlspecialchars($siteProfile['alias'] ?? 'IVN') ?> Logo" style="max-height: 400px;">
                 </div>
                 <div class="col-md-6 mt-4 mt-md-0 ps-md-5">
                     <h2 class="section-title">Quem Somos</h2>
-                    <p class="lead text-muted">A IVN – Igreja Vida Nova</p>
+                    <p class="lead text-muted"><?= htmlspecialchars(($siteProfile['alias'] ?? 'IVN') . ' – ' . ($siteProfile['name'] ?? 'Igreja Vida Nova')) ?></p>
                     <p class="text-secondary"><?= nl2br(htmlspecialchars($siteProfile['about_text'])) ?></p>
                     <a href="#" class="btn btn-outline-danger mt-3 rounded-pill px-4">Saiba Mais</a>
                 </div>

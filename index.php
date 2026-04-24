@@ -126,6 +126,12 @@ elseif ($uri == '/developer/payments') {
 elseif ($uri == '/developer/payments/generate') {
     (new DeveloperController())->generateCharge();
 }
+elseif ($uri == '/developer/payments/sync-central' && $method == 'POST') {
+    (new DeveloperController())->syncPaymentsToCentral();
+}
+elseif ($uri == '/developer/payments/sync-from-central' && $method == 'POST') {
+    (new DeveloperController())->syncPaymentsFromCentral();
+}
 elseif ($uri == '/developer/payments/delete') {
     (new DeveloperController())->deletePayment();
 }

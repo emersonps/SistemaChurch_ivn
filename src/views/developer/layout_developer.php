@@ -78,6 +78,11 @@
                         </a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link <?= strpos($_SERVER['REQUEST_URI'], '/developer/manual-sync') !== false ? 'active' : '' ?>" href="/developer/manual-sync">
+                            <i class="fas fa-arrows-rotate me-2"></i> Sincronização da Central
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link <?= strpos($_SERVER['REQUEST_URI'], '/developer/import') !== false && strpos($_SERVER['REQUEST_URI'], '/developer/import/expenses') === false ? 'active' : '' ?>" href="/developer/import">
                             <i class="fas fa-file-import me-2"></i> Importar Entradas
                         </a>
@@ -145,6 +150,11 @@
                         <li class="nav-item">
                             <a class="nav-link <?= strpos($_SERVER['REQUEST_URI'], '/developer/manuals') !== false ? 'active' : '' ?>" href="/developer/manuals">
                                 <i class="fas fa-circle-play me-2"></i> Gerenciar Manuais
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link <?= strpos($_SERVER['REQUEST_URI'], '/developer/manual-sync') !== false ? 'active' : '' ?>" href="/developer/manual-sync">
+                                <i class="fas fa-arrows-rotate me-2"></i> Sincronização da Central
                             </a>
                         </li>
                         <li class="nav-item">

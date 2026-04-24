@@ -4,6 +4,12 @@
     <h1 class="h2">Pagamento do Sistema</h1>
 </div>
 
+<?php if (!empty($billingManagedByCentral)): ?>
+<div class="alert alert-info">
+    A central é a fonte oficial das cobranças. Esta tela mostra apenas a situação atual sincronizada para consulta.
+</div>
+<?php endif; ?>
+
 <div class="row mb-4">
     <div class="col-md-6">
         <div class="card shadow-sm h-100">
@@ -64,7 +70,11 @@
 
                     <hr class="w-100">
                     
-                    <?php if (($_SESSION['user_role'] ?? '') === 'developer'): ?>
+                    <?php if (!empty($billingManagedByCentral)): ?>
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i> A baixa e a alteração da cobrança devem ser feitas diretamente na central.
+                        </div>
+                    <?php elseif (($_SESSION['user_role'] ?? '') === 'developer'): ?>
                         <form method="POST" action="/admin/system-payments/pay" onsubmit="return confirm('Confirmar que o pagamento foi realizado?');">
                             <?= csrf_field() ?>
                             <input type="hidden" name="month" value="<?= $currentMonth ?>">

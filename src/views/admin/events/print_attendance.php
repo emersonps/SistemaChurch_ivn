@@ -64,18 +64,15 @@
 </head>
 <body onload="window.print()">
 
+    <?php $siteProfile = getChurchSiteProfileSettings(); ?>
+
     <div class="no-print" style="margin-bottom: 20px; text-align: center;">
         <button onclick="window.print()" style="padding: 10px 20px; font-size: 14px; cursor: pointer;">Imprimir</button>
         <button onclick="window.close()" style="padding: 10px 20px; font-size: 14px; cursor: pointer;">Fechar</button>
     </div>
 
     <div class="header">
-        <?php 
-        // Tentar pegar o nome da igreja do banco de dados (settings) se possível, ou usar o default
-        $churchName = 'Igreja Vida Nova'; 
-        // Na prática, o white label já substituiu o texto acima nos arquivos, então está correto.
-        ?>
-        <h1><?= $churchName ?></h1>
+        <h1><?= htmlspecialchars($siteProfile['name'] ?? 'Igreja Vida Nova') ?></h1>
         <h2>Relatório de Lista de Presença</h2>
     </div>
 

@@ -26,6 +26,13 @@
     <?php unset($_SESSION['error']); ?>
 <?php endif; ?>
 
+<?php if (!empty($syncLocked)): ?>
+    <div class="alert alert-warning">
+        <div class="fw-semibold mb-1">Edição local bloqueada</div>
+        <div>Os manuais desta instalação estão sendo controlados pela central. Para atualizar o conteúdo, use <a href="/developer/manual-sync" class="alert-link">Sincronizar Manuais</a>.</div>
+    </div>
+<?php endif; ?>
+
 <div class="row g-4">
     <div class="col-xl-5">
         <div class="card shadow-sm">
@@ -48,23 +55,23 @@
 
                     <div class="mb-3">
                         <label class="form-label">Tema</label>
-                        <input type="text" name="theme" class="form-control" value="<?= htmlspecialchars($editing['theme'] ?? '') ?>" required>
+                        <input type="text" name="theme" class="form-control" value="<?= htmlspecialchars($editing['theme'] ?? '') ?>" required <?= !empty($syncLocked) ? 'disabled' : '' ?>>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Título do Vídeo</label>
-                        <input type="text" name="title" class="form-control" value="<?= htmlspecialchars($editing['title'] ?? '') ?>" required>
+                        <input type="text" name="title" class="form-control" value="<?= htmlspecialchars($editing['title'] ?? '') ?>" required <?= !empty($syncLocked) ? 'disabled' : '' ?>>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Link do YouTube</label>
-                        <input type="url" name="youtube_url" class="form-control" value="<?= htmlspecialchars($editing['youtube_url'] ?? '') ?>" placeholder="https://www.youtube.com/watch?v=..." required>
+                        <input type="url" name="youtube_url" class="form-control" value="<?= htmlspecialchars($editing['youtube_url'] ?? '') ?>" placeholder="https://www.youtube.com/watch?v=..." required <?= !empty($syncLocked) ? 'disabled' : '' ?>>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Descrição</label>
-                        <textarea name="description" class="form-control" rows="4"><?= htmlspecialchars($editing['description'] ?? '') ?></textarea>
+                        <textarea name="description" class="form-control" rows="4" <?= !empty($syncLocked) ? 'disabled' : '' ?>><?= htmlspecialchars($editing['description'] ?? '') ?></textarea>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Ordem de Exibição</label>
-                        <input type="number" name="sort_order" class="form-control" value="<?= htmlspecialchars((string)($editing['sort_order'] ?? 0)) ?>">
+                        <input type="number" name="sort_order" class="form-control" value="<?= htmlspecialchars((string)($editing['sort_order'] ?? 0)) ?>" <?= !empty($syncLocked) ? 'disabled' : '' ?>>
                     </div>
 
                     <?php $selectedTokens = $editing['target_tokens'] ?? []; ?>
@@ -73,7 +80,7 @@
                         <?php foreach (array_filter($targetChoices, fn($c) => strpos($c['type'], 'admin_') === 0) as $choice): ?>
                             <?php $token = in_array($choice['type'], ['admin_all'], true) ? $choice['type'] : $choice['type'] . ':' . $choice['key']; ?>
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" name="admin_targets[]" value="<?= htmlspecialchars($token) ?>" id="target_<?= md5($token) ?>" <?= in_array($token, $selectedTokens, true) ? 'checked' : '' ?>>
+                                <input class="form-check-input" type="checkbox" name="admin_targets[]" value="<?= htmlspecialchars($token) ?>" id="target_<?= md5($token) ?>" <?= in_array($token, $selectedTokens, true) ? 'checked' : '' ?> <?= !empty($syncLocked) ? 'disabled' : '' ?>>
                                 <label class="form-check-label" for="target_<?= md5($token) ?>"><?= htmlspecialchars($choice['label']) ?></label>
                             </div>
                         <?php endforeach; ?>
@@ -84,19 +91,19 @@
                         <?php foreach (array_filter($targetChoices, fn($c) => strpos($c['type'], 'member_') === 0) as $choice): ?>
                             <?php $token = in_array($choice['type'], ['member_all'], true) ? $choice['type'] : $choice['type'] . ':' . $choice['key']; ?>
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" name="member_targets[]" value="<?= htmlspecialchars($token) ?>" id="target_<?= md5($token) ?>" <?= in_array($token, $selectedTokens, true) ? 'checked' : '' ?>>
+                                <input class="form-check-input" type="checkbox" name="member_targets[]" value="<?= htmlspecialchars($token) ?>" id="target_<?= md5($token) ?>" <?= in_array($token, $selectedTokens, true) ? 'checked' : '' ?> <?= !empty($syncLocked) ? 'disabled' : '' ?>>
                                 <label class="form-check-label" for="target_<?= md5($token) ?>"><?= htmlspecialchars($choice['label']) ?></label>
                             </div>
                         <?php endforeach; ?>
                     </div>
 
                     <div class="form-check form-switch mb-3">
-                        <input class="form-check-input" type="checkbox" id="is_active" name="is_active" value="1" <?= !isset($editing['is_active']) || (int)$editing['is_active'] === 1 ? 'checked' : '' ?>>
+                        <input class="form-check-input" type="checkbox" id="is_active" name="is_active" value="1" <?= !isset($editing['is_active']) || (int)$editing['is_active'] === 1 ? 'checked' : '' ?> <?= !empty($syncLocked) ? 'disabled' : '' ?>>
                         <label class="form-check-label" for="is_active">Vídeo ativo</label>
                     </div>
 
                     <div class="d-flex gap-2">
-                        <button type="submit" class="btn btn-primary">
+                        <button type="submit" class="btn btn-primary" <?= !empty($syncLocked) ? 'disabled' : '' ?>>
                             <i class="fas fa-save me-1"></i> <?= empty($editing) ? 'Cadastrar Vídeo' : 'Salvar Alterações' ?>
                         </button>
                         <?php if (!empty($editing)): ?>
@@ -134,12 +141,12 @@
                                             <span class="badge bg-<?= (int)$video['is_active'] === 1 ? 'success' : 'secondary' ?>">
                                                 <?= (int)$video['is_active'] === 1 ? 'Ativo' : 'Inativo' ?>
                                             </span>
-                                            <a href="/developer/manuals/edit/<?= (int)$video['id'] ?>" class="btn btn-sm btn-outline-primary">
+                                            <a href="/developer/manuals/edit/<?= (int)$video['id'] ?>" class="btn btn-sm btn-outline-primary <?= !empty($syncLocked) ? 'disabled' : '' ?>">
                                                 <i class="fas fa-edit"></i>
                                             </a>
-                                            <form action="/developer/manuals/delete/<?= (int)$video['id'] ?>" method="POST" onsubmit="return confirm('Deseja remover este vídeo do manual?');">
+                                            <form action="/developer/manuals/delete/<?= (int)$video['id'] ?>" method="POST" onsubmit="return <?= !empty($syncLocked) ? 'false' : "confirm('Deseja remover este vídeo do manual?');" ?>">
                                                 <?= csrf_field() ?>
-                                                <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                <button type="submit" class="btn btn-sm btn-outline-danger" <?= !empty($syncLocked) ? 'disabled' : '' ?>>
                                                     <i class="fas fa-trash"></i>
                                                 </button>
                                             </form>

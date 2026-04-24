@@ -14,7 +14,7 @@
             <i class="fas fa-edit"></i> Editar
         </a>
         <form action="/admin/groups/delete/<?= $group['id'] ?>" method="POST" class="d-inline" onsubmit="return confirm('Tem certeza que deseja excluir este grupo?');">
-            <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
+            <?= csrf_field() ?>
             <button type="submit" class="btn btn-sm btn-outline-danger">
                 <i class="fas fa-trash"></i> Excluir
             </button>
@@ -148,7 +148,7 @@
                                             <i class="fas fa-exchange-alt"></i>
                                         </button>
                                         <form action="/admin/groups/members/remove" method="POST" class="d-inline" onsubmit="return confirm('Remover este membro do grupo?');">
-                                            <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
+                                            <?= csrf_field() ?>
                                             <input type="hidden" name="group_id" value="<?= $group['id'] ?>">
                                             <input type="hidden" name="member_id" value="<?= $m['member_id'] ?>">
                                             <button type="submit" class="btn btn-sm btn-outline-danger border-0">
@@ -172,7 +172,7 @@
 <div class="modal fade" id="addMemberModal" tabindex="-1">
     <div class="modal-dialog">
         <form action="/admin/groups/members/add" method="POST">
-            <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
+            <?= csrf_field() ?>
             <input type="hidden" name="group_id" value="<?= $group['id'] ?>">
             <div class="modal-content">
                 <div class="modal-header">
@@ -213,7 +213,7 @@
 <div class="modal fade" id="transferMemberModal" tabindex="-1">
     <div class="modal-dialog">
         <form action="/admin/groups/members/transfer" method="POST">
-            <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
+            <?= csrf_field() ?>
             <input type="hidden" name="from_group_id" value="<?= $group['id'] ?>">
             <input type="hidden" name="member_id" id="transferMemberId">
             
@@ -310,7 +310,7 @@
 <div class="modal fade" id="convertVisitorModal" tabindex="-1">
     <div class="modal-dialog">
         <form action="/admin/groups/members/convert" method="POST">
-            <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
+            <?= csrf_field() ?>
             <input type="hidden" name="group_id" value="<?= $group['id'] ?>">
             <input type="hidden" name="member_id" id="convertMemberId">
             

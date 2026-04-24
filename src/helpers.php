@@ -148,27 +148,53 @@ function requirePermission($permission) {
 
 // CSRF Protection Functions
 function csrf_token() {
+    if (empty($_SESSION['csrf_tokens']) || !is_array($_SESSION['csrf_tokens'])) {
+        $_SESSION['csrf_tokens'] = [];
+    }
+
     if (empty($_SESSION['csrf_token'])) {
         $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
     }
+
+    if (!in_array($_SESSION['csrf_token'], $_SESSION['csrf_tokens'], true)) {
+        $_SESSION['csrf_tokens'][] = $_SESSION['csrf_token'];
+    }
+
+    $_SESSION['csrf_tokens'] = array_slice(array_values(array_unique($_SESSION['csrf_tokens'])), -5);
+
     return $_SESSION['csrf_token'];
 }
 
 function csrf_field() {
     $token = csrf_token();
-    return '<input type="hidden" name="csrf_token" value="' . $token . '">';
+    return '<input type="hidden" name="csrf_token" value="' . htmlspecialchars($token, ENT_QUOTES, 'UTF-8') . '">';
 }
 
 function verify_csrf() {
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        $postToken = $_POST['csrf_token'] ?? '';
-        $sessionToken = $_SESSION['csrf_token'] ?? '';
-        
-        if (empty($postToken) || $postToken !== $sessionToken) {
+        $postToken = $_POST['csrf_token'] ?? ($_SERVER['HTTP_X_CSRF_TOKEN'] ?? '');
+        $postToken = trim((string)$postToken);
+        $postToken = preg_replace('/^\xEF\xBB\xBF+/', '', $postToken);
+        $sessionToken = csrf_token();
+        $validTokens = $_SESSION['csrf_tokens'] ?? [$sessionToken];
+
+        if (!is_array($validTokens)) {
+            $validTokens = [$sessionToken];
+        }
+
+        $isValid = false;
+        foreach ($validTokens as $validToken) {
+            if (is_string($validToken) && $validToken !== '' && hash_equals($validToken, $postToken)) {
+                $isValid = true;
+                break;
+            }
+        }
+
+        if (!$isValid) {
             // Debug Log (opcional, remover em produção se desejar)
             $logDir = dirname(__DIR__) . '/tmp/logs';
             if (!file_exists($logDir)) @mkdir($logDir, 0777, true);
-            file_put_contents($logDir . '/csrf_error.log', date('Y-m-d H:i:s') . " - IP: " . $_SERVER['REMOTE_ADDR'] . " - POST: '$postToken' vs SESSION: '$sessionToken'\n", FILE_APPEND);
+            file_put_contents($logDir . '/csrf_error.log', date('Y-m-d H:i:s') . " - IP: " . ($_SERVER['REMOTE_ADDR'] ?? '-') . " - POST: '$postToken' vs SESSION: '$sessionToken'\n", FILE_APPEND);
             
             http_response_code(403);
             die('
@@ -596,6 +622,9 @@ function getChurchSiteProfileSettings() {
     }
 
     return [
+        'name' => getSystemSetting('church_name', 'Igreja Vida Nova'),
+        'alias' => getSystemSetting('church_alias', 'IVN'),
+        'logo_url' => getSystemSetting('church_logo_url', '/assets/img/logo.png'),
         'phone' => getSystemSetting('church_phone', '+55 (92) 99386-6290'),
         'email' => getSystemSetting('church_email', 'contato@ivn.com.br'),
         'about_text' => getSystemSetting(

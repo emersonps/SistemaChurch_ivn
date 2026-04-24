@@ -201,7 +201,7 @@
 <div class="modal fade" id="addTeacherModal" tabindex="-1">
     <div class="modal-dialog">
         <form action="/admin/ebd/classes/assign-teacher/<?= $class['id'] ?>" method="POST">
-            <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
+            <?= csrf_field() ?>
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Adicionar Professor</h5>
@@ -231,7 +231,7 @@
 <div class="modal fade" id="addStudentModal" tabindex="-1">
     <div class="modal-dialog">
         <form action="/admin/ebd/classes/enroll/<?= $class['id'] ?>" method="POST">
-            <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
+            <?= csrf_field() ?>
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Matricular Aluno</h5>

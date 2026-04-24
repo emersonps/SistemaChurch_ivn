@@ -101,6 +101,8 @@ class DeveloperController {
     public function settings() {
         $this->requireDeveloper();
         $db = (new Database())->connect();
+        $globalSyncConfig = (new CentralGlobalSettingsSyncService())->getConfig();
+        $whiteLabelService = new WhiteLabelService();
         
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $churchName = $_POST['church_name'] ?? 'Igreja Vida Nova';
@@ -110,9 +112,10 @@ class DeveloperController {
             $churchAboutText = trim($_POST['church_about_text'] ?? '');
             $socialPlatforms = $_POST['social_platform'] ?? [];
             $socialUrls = $_POST['social_url'] ?? [];
+            $logoUrl = getSystemSetting('church_logo_url', '/assets/img/logo.png');
             
             // Handle logo upload
-            if (isset($_FILES['logo']) && $_FILES['logo']['error'] === UPLOAD_ERR_OK) {
+            if (empty($globalSyncConfig['enabled']) && isset($_FILES['logo']) && $_FILES['logo']['error'] === UPLOAD_ERR_OK) {
                 $fileExt = strtolower(pathinfo($_FILES['logo']['name'], PATHINFO_EXTENSION));
                 if ($fileExt === 'png') {
                     $targetPath = __DIR__ . '/../../public/assets/img/logo.png';
@@ -121,6 +124,7 @@ class DeveloperController {
                         copy($targetPath, $targetPath . '.bak');
                     }
                     move_uploaded_file($_FILES['logo']['tmp_name'], $targetPath);
+                    $logoUrl = '/assets/img/logo.png';
                 } else {
                     $_SESSION['error'] = "A logo deve ser um arquivo PNG.";
                     redirect('/developer/settings');
@@ -147,99 +151,30 @@ class DeveloperController {
                 $churchAboutText = getChurchSiteProfileSettings()['about_text'];
             }
 
-            $this->saveSystemSetting($db, 'church_phone', $churchPhone);
-            $this->saveSystemSetting($db, 'church_email', $churchEmail);
-            $this->saveSystemSetting($db, 'church_about_text', $churchAboutText);
-            $this->saveSystemSetting($db, 'church_social_links', json_encode($socialLinks, JSON_UNESCAPED_UNICODE));
+            $whiteLabelService->saveBrandingSettings($db, $churchAlias, $churchName, $logoUrl);
+
+            if (empty($globalSyncConfig['enabled'])) {
+                $whiteLabelService->saveSystemSetting($db, 'church_phone', $churchPhone);
+                $whiteLabelService->saveSystemSetting($db, 'church_email', $churchEmail);
+                $whiteLabelService->saveSystemSetting($db, 'church_about_text', $churchAboutText);
+                $whiteLabelService->saveSystemSetting($db, 'church_social_links', json_encode($socialLinks, JSON_UNESCAPED_UNICODE));
+            }
             
-            // Execute mass replace across codebase using the existing revert logic approach
-            $this->applyWhiteLabel($churchAlias, $churchName);
+            $whiteLabelService->applyBranding($churchAlias, $churchName);
             
             $_SESSION['success'] = "Configurações aplicadas com sucesso em todo o sistema!";
+            if (!empty($globalSyncConfig['enabled'])) {
+                $_SESSION['success'] .= " Os dados institucionais compartilhados continuam sendo controlados pela central.";
+            }
             redirect('/developer/settings');
             return;
         }
         
         view('developer/settings', [
             'siteProfile' => getChurchSiteProfileSettings(),
-            'socialIconOptions' => getChurchSocialIconOptions()
+            'socialIconOptions' => getChurchSocialIconOptions(),
+            'globalSettingsSyncConfig' => $globalSyncConfig
         ]);
-    }
-    
-    private function applyWhiteLabel($newAlias, $newName) {
-        $directories = [
-            __DIR__ . '/../', // src
-            __DIR__ . '/../../public', // public
-        ];
-
-        // Mapeamento padrão que existe hoje no código
-        // Como o script replace_text_v2 mudou tudo para IVN e "Igreja Vida Nova"
-        // Precisamos primeiro ler o alias atual?
-        // Para simplificar, como o dev vai usar isso ativamente, vamos substituir usando Regex flexível 
-        // ou assumir que o sistema SEMPRE substitui o atual pelo novo.
-        // Como não guardamos o "atual", vamos ter que assumir que o atual é o default, ou buscar no header.php.
-        
-        $headerPath = __DIR__ . '/../views/layout/header.php';
-        $currentAlias = 'IVN'; // Default fallback
-        $currentName = 'Igreja Vida Nova';
-        
-        if (file_exists($headerPath)) {
-            $content = file_get_contents($headerPath);
-            if (preg_match('/<title><\?= \$seo_title \?\? \'(.*?)\' \?><\/title>/', $content, $matches)) {
-                $parts = explode(' - ', $matches[1]);
-                if (count($parts) >= 2) {
-                    $currentAlias = trim($parts[0]);
-                    $currentName = trim($parts[1]);
-                }
-            }
-        }
-        
-        // Se o novo for igual ao atual, pula
-        if ($currentAlias === $newAlias && $currentName === $newName) {
-            return;
-        }
-
-        $extensions = ['php', 'json', 'html'];
-        $modifiedFiles = 0;
-
-        foreach ($directories as $dir) {
-            if (!is_dir($dir)) continue;
-
-            $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($dir));
-            foreach ($iterator as $file) {
-                if ($file->isFile() && in_array($file->getExtension(), $extensions)) {
-                    $path = $file->getPathname();
-                    $content = file_get_contents($path);
-                    $originalContent = $content;
-
-                    // Regex bounds to avoid breaking code like variables (e.g. $currentAlias)
-                    // We just do a simple str_replace since the names are usually specific enough
-                    
-                    // Substituir Nome Completo
-                    if ($currentName !== $newName) {
-                        $content = str_replace($currentName, $newName, $content);
-                    }
-                    
-                    // Substituir Alias (Sigla)
-                    if ($currentAlias !== $newAlias) {
-                        // Substituição principal (case sensitive, com word boundaries)
-                        $content = preg_replace('/\b' . preg_quote($currentAlias, '/') . '\b(?!(?:_MEMBER|_logo))/', $newAlias, $content);
-                        
-                        // Substituição para lowercase em keywords (manifest/seo)
-                        $content = preg_replace('/\b' . preg_quote(strtolower($currentAlias), '/') . '\b(?!(?:_member))/', strtolower($newAlias), $content);
-                        
-                        // Substituição específica para emails (contato@SIGLAANTIGA.com.br)
-                        // Como o @ e o . não são caracteres de palavra (\b pode falhar), fazemos um replace direto com ignorar case
-                        $content = str_ireplace('contato@' . $currentAlias, 'contato@' . strtolower($newAlias), $content);
-                    }
-
-                    if ($content !== $originalContent) {
-                        file_put_contents($path, $content);
-                        $modifiedFiles++;
-                    }
-                }
-            }
-        }
     }
 
     private function saveSystemSetting($db, $key, $value) {
@@ -266,6 +201,14 @@ class DeveloperController {
     
     public function payments() {
         $this->requireDeveloper();
+        $billingSyncService = new CentralBillingSyncService();
+        $billingSyncConfig = $billingSyncService->getConnectionConfig();
+        $billingSyncEnabled = $billingSyncService->hasRemoteConfig();
+        $billingManagedByCentral = $billingSyncEnabled;
+        if ($billingSyncEnabled) {
+            $this->syncPaymentsFromCentralSilently();
+        }
+
         $db = (new Database())->connect();
         $hasDueDateColumn = $this->tableHasColumn($db, 'system_payments', 'due_date');
 
@@ -276,6 +219,45 @@ class DeveloperController {
         }
         
         require_once __DIR__ . '/../views/developer/payments.php';
+    }
+
+    public function syncPaymentsToCentral() {
+        $this->requireDeveloper();
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            verify_csrf();
+
+            try {
+                $service = new CentralBillingSyncService();
+                if ($service->hasRemoteConfig()) {
+                    $_SESSION['error'] = 'As cobranças são gerenciadas pela central. O ivn está apenas em modo consulta/exibição.';
+                } else {
+                    $result = $service->syncPayments();
+                    $_SESSION['success'] = $result['message'];
+                }
+            } catch (Exception $e) {
+                $_SESSION['error'] = $e->getMessage();
+            }
+        }
+
+        redirect('/developer/payments');
+    }
+
+    public function syncPaymentsFromCentral() {
+        $this->requireDeveloper();
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            verify_csrf();
+
+            try {
+                $result = (new CentralBillingSyncService())->syncFromCentral();
+                $_SESSION['success'] = $result['message'];
+            } catch (Exception $e) {
+                $_SESSION['error'] = $e->getMessage();
+            }
+        }
+
+        redirect('/developer/payments');
     }
     
     public function import() {
@@ -603,6 +585,10 @@ class DeveloperController {
 
     public function generateCharge() {
         $this->requireDeveloper();
+        if ($this->isBillingManagedByCentral()) {
+            $_SESSION['error'] = 'As cobranças são gerenciadas pela central. Gere ou altere a cobrança apenas na central.';
+            redirect('/developer/payments');
+        }
         $db = (new Database())->connect();
         
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -678,6 +664,8 @@ class DeveloperController {
                      }
                  }
             }
+
+            $this->syncPaymentsToCentralSilently();
             
             redirect('/developer/payments?success=1');
         }
@@ -685,16 +673,25 @@ class DeveloperController {
     
     public function deletePayment() {
         $this->requireDeveloper();
+        if ($this->isBillingManagedByCentral()) {
+            $_SESSION['error'] = 'As cobranças são gerenciadas pela central. A exclusão local está bloqueada.';
+            redirect('/developer/payments');
+        }
         $id = $_GET['id'] ?? null;
         if ($id) {
             $db = (new Database())->connect();
             $db->exec("DELETE FROM system_payments WHERE id = $id");
+            $this->syncPaymentsToCentralSilently();
         }
         redirect('/developer/payments');
     }
     
     public function updateStatus() {
         $this->requireDeveloper();
+        if ($this->isBillingManagedByCentral()) {
+            $_SESSION['error'] = 'As cobranças são gerenciadas pela central. A edição local está bloqueada.';
+            redirect('/developer/payments');
+        }
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $id = $_POST['id'];
             $status = $_POST['status'];
@@ -800,6 +797,8 @@ class DeveloperController {
                             }
                         }
                     }
+
+                    $this->syncPaymentsToCentralSilently();
                 }
             }
         }
@@ -1002,5 +1001,29 @@ class DeveloperController {
         } else {
             redirect('/developer/users');
         }
+    }
+
+    private function syncPaymentsToCentralSilently() {
+        try {
+            $service = new CentralBillingSyncService();
+            if ($service->hasRemoteConfig() && !$this->isBillingManagedByCentral()) {
+                $service->syncPayments();
+            }
+        } catch (Exception $e) {
+        }
+    }
+
+    private function syncPaymentsFromCentralSilently() {
+        try {
+            $service = new CentralBillingSyncService();
+            if ($service->hasRemoteConfig()) {
+                $service->syncFromCentral();
+            }
+        } catch (Exception $e) {
+        }
+    }
+
+    private function isBillingManagedByCentral() {
+        return (new CentralBillingSyncService())->hasRemoteConfig();
     }
 }
