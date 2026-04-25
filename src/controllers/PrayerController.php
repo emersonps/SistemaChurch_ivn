@@ -5,6 +5,20 @@ class PrayerController {
         return (new Database())->connect();
     }
 
+    private function currentPage() {
+        $page = (int)($_POST['page'] ?? $_GET['page'] ?? 1);
+        return $page > 0 ? $page : 1;
+    }
+
+    private function muralRedirectUrl($page = null) {
+        $currentPage = $page !== null ? (int)$page : $this->currentPage();
+        if ($currentPage < 1) {
+            $currentPage = 1;
+        }
+
+        return '/oracao?page=' . $currentPage . '#mural';
+    }
+
     private function isModerator() {
         $role = $_SESSION['user_role'] ?? '';
         return isset($_SESSION['user_id']) && in_array($role, ['admin', 'developer'], true);
@@ -75,20 +89,8 @@ class PrayerController {
         $db = $this->db();
         $sessionKey = $this->ensurePrayerSessionKey();
         $canModerate = $this->isModerator();
-
-        $requests = $db->query("
-            SELECT *
-            FROM prayer_requests
-            WHERE status = 'published'
-            ORDER BY created_at DESC, id DESC
-        ")->fetchAll(PDO::FETCH_ASSOC);
-
-        $amenedIds = [];
-        if (!empty($requests)) {
-            $stmt = $db->prepare("SELECT prayer_request_id FROM prayer_request_amens WHERE session_key = ?");
-            $stmt->execute([$sessionKey]);
-            $amenedIds = array_map('intval', $stmt->fetchAll(PDO::FETCH_COLUMN));
-        }
+        $perPage = 5;
+        $currentPage = $this->currentPage();
 
         $stats = $db->query("
             SELECT
@@ -98,11 +100,40 @@ class PrayerController {
             WHERE status = 'published'
         ")->fetch(PDO::FETCH_ASSOC) ?: ['total_requests' => 0, 'total_amens' => 0];
 
+        $totalRequests = (int)($stats['total_requests'] ?? 0);
+        $totalPages = max(1, (int)ceil($totalRequests / $perPage));
+        if ($currentPage > $totalPages) {
+            $currentPage = $totalPages;
+        }
+        $offset = ($currentPage - 1) * $perPage;
+
+        $stmtRequests = $db->prepare("
+            SELECT *
+            FROM prayer_requests
+            WHERE status = 'published'
+            ORDER BY created_at DESC, id DESC
+            LIMIT :limit OFFSET :offset
+        ");
+        $stmtRequests->bindValue(':limit', $perPage, PDO::PARAM_INT);
+        $stmtRequests->bindValue(':offset', $offset, PDO::PARAM_INT);
+        $stmtRequests->execute();
+        $requests = $stmtRequests->fetchAll(PDO::FETCH_ASSOC);
+
+        $amenedIds = [];
+        if (!empty($requests)) {
+            $stmt = $db->prepare("SELECT prayer_request_id FROM prayer_request_amens WHERE session_key = ?");
+            $stmt->execute([$sessionKey]);
+            $amenedIds = array_map('intval', $stmt->fetchAll(PDO::FETCH_COLUMN));
+        }
+
         view('public/prayer', [
             'requests' => $requests,
             'amenedIds' => $amenedIds,
             'canModerate' => $canModerate,
-            'stats' => $stats
+            'stats' => $stats,
+            'currentPage' => $currentPage,
+            'perPage' => $perPage,
+            'totalPages' => $totalPages
         ]);
     }
 
@@ -144,7 +175,7 @@ class PrayerController {
         $id = (int)$id;
         if ($id <= 0 || !$this->requestExists($id)) {
             $_SESSION['error'] = 'Pedido de oração não encontrado.';
-            redirect('/oracao#mural');
+            redirect($this->muralRedirectUrl());
         }
 
         $db = $this->db();
@@ -164,7 +195,7 @@ class PrayerController {
             $_SESSION['error'] = 'Você já marcou Amém neste pedido.';
         }
 
-        redirect('/oracao#mural');
+        redirect($this->muralRedirectUrl());
     }
 
     public function update($id) {
@@ -178,12 +209,12 @@ class PrayerController {
 
         if ($id <= 0 || $message === '') {
             $_SESSION['error'] = 'Não foi possível salvar esse pedido.';
-            redirect('/oracao#mural');
+            redirect($this->muralRedirectUrl());
         }
 
         if (!$isAnonymous && $name === '') {
             $_SESSION['error'] = 'Informe um nome ou marque o pedido como anônimo.';
-            redirect('/oracao#mural');
+            redirect($this->muralRedirectUrl());
         }
 
         $stmt = $this->db()->prepare("
@@ -199,7 +230,7 @@ class PrayerController {
         ]);
 
         $_SESSION['success'] = 'Pedido atualizado com sucesso.';
-        redirect('/oracao#mural');
+        redirect($this->muralRedirectUrl());
     }
 
     public function delete($id) {
@@ -209,7 +240,7 @@ class PrayerController {
         $id = (int)$id;
         if ($id <= 0) {
             $_SESSION['error'] = 'Pedido inválido.';
-            redirect('/oracao#mural');
+            redirect($this->muralRedirectUrl());
         }
 
         $db = $this->db();
@@ -218,6 +249,6 @@ class PrayerController {
         $stmt->execute([$id]);
 
         $_SESSION['success'] = 'Pedido removido com sucesso.';
-        redirect('/oracao#mural');
+        redirect($this->muralRedirectUrl());
     }
 }

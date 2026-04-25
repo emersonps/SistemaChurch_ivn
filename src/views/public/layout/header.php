@@ -6,14 +6,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
     <!-- Dynamic SEO Tags -->
-    <title><?= $seo_title ?? (($siteProfile['alias'] ?? 'IVN') . ' - ' . ($siteProfile['name'] ?? 'Igreja Vida Nova')) ?></title>
-    <meta name="description" content="<?= $seo_description ?? ('A ' . ($siteProfile['alias'] ?? 'IVN') . ' é uma comunidade cristã comprometida com a proclamação do Evangelho, edificação da família e adoração a Deus.') ?>">
-    <meta name="keywords" content="<?= htmlspecialchars(implode(', ', array_unique(array_filter(['igreja', 'assembleia de deus', $siteProfile['alias'] ?? 'IVN', 'culto', 'evangelho', 'jesus', 'família', 'adoração'])))) ?>">
-    <meta name="author" content="<?= htmlspecialchars($siteProfile['alias'] ?? 'IVN') ?>">
+    <title><?= $seo_title ?? (($siteProfile['alias'] ?? 'Igreja') . ' - ' . ($siteProfile['name'] ?? 'Nossa Igreja')) ?></title>
+    <meta name="description" content="<?= $seo_description ?? ('A ' . ($siteProfile['name'] ?? $siteProfile['alias'] ?? 'igreja') . ' é uma comunidade cristã comprometida com a proclamação do Evangelho, edificação da família e adoração a Deus.') ?>">
+    <meta name="keywords" content="<?= htmlspecialchars(implode(', ', array_unique(array_filter(['igreja', 'assembleia de deus', $siteProfile['alias'] ?? $siteProfile['name'] ?? 'igreja', 'culto', 'evangelho', 'jesus', 'família', 'adoração'])))) ?>">
+    <meta name="author" content="<?= htmlspecialchars($siteProfile['alias'] ?? $siteProfile['name'] ?? 'Igreja') ?>">
     <meta name="robots" content="index, follow">
     
     <!-- Open Graph / Social Media -->
-    <meta property="og:title" content="<?= $seo_title ?? (($siteProfile['alias'] ?? 'IVN') . ' - ' . ($siteProfile['name'] ?? 'Igreja Vida Nova')) ?>">
+    <meta property="og:title" content="<?= $seo_title ?? (($siteProfile['alias'] ?? 'Igreja') . ' - ' . ($siteProfile['name'] ?? 'Nossa Igreja')) ?>">
     <meta property="og:description" content="<?= $seo_description ?? 'Venha adorar a Deus conosco!' ?>">
     <meta property="og:image" content="<?= $seo_image ?? ($siteProfile['logo_url'] ?? '/assets/img/logo.png') ?>">
     <meta property="og:url" content="<?= $_SERVER['REQUEST_URI'] ?? '' ?>">
@@ -31,7 +31,7 @@
     <meta name="theme-color" content="#000000">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="<?= htmlspecialchars($siteProfile['alias'] ?? 'IVN') ?>">
+    <meta name="apple-mobile-web-app-title" content="<?= htmlspecialchars($siteProfile['alias'] ?? $siteProfile['name'] ?? 'Igreja') ?>">
 
     <!-- Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -247,8 +247,8 @@
     <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center" href="/">
-                <img src="<?= htmlspecialchars($siteProfile['logo_url'] ?? '/assets/img/logo.png') ?>" alt="<?= htmlspecialchars($siteProfile['alias'] ?? 'IVN') ?>" height="50" class="me-2">
-                <span class="d-none d-md-block fw-bold"><?= htmlspecialchars($siteProfile['alias'] ?? 'IVN') ?></span>
+                <img src="<?= htmlspecialchars($siteProfile['logo_url'] ?? '/assets/img/logo.png') ?>" alt="<?= htmlspecialchars($siteProfile['alias'] ?? $siteProfile['name'] ?? 'Igreja') ?>" height="50" class="me-2">
+                <span class="d-none d-md-block fw-bold"><?= htmlspecialchars($siteProfile['alias'] ?? $siteProfile['name'] ?? 'Igreja') ?></span>
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>

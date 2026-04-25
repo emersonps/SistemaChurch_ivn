@@ -19,7 +19,7 @@ $firstAndLastName = function ($name) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IVN - Igreja Vida Nova</title>
+    <title><?= htmlspecialchars(($siteProfile['alias'] ?? 'Igreja') . ' - ' . ($siteProfile['name'] ?? 'Nossa Igreja')) ?></title>
 
     <!-- Favicon -->
     <link rel="shortcut icon" href="<?= htmlspecialchars($siteProfile['logo_url'] ?? '/assets/img/logo.png') ?>" type="image/png">
@@ -1865,8 +1865,8 @@ $firstAndLastName = function ($name) {
         <div class="container">
             <a class="navbar-brand" href="#">
                 <!-- Placeholder para a logo -->
-                <img src="<?= htmlspecialchars($siteProfile['logo_url'] ?? '/assets/img/logo.png') ?>" alt="<?= htmlspecialchars($siteProfile['alias'] ?? 'IVN') ?>" onerror="this.style.display='none'">
-                <span class="d-none d-md-inline"><?= htmlspecialchars($siteProfile['alias'] ?? 'IVN') ?></span>
+                <img src="<?= htmlspecialchars($siteProfile['logo_url'] ?? '/assets/img/logo.png') ?>" alt="<?= htmlspecialchars($siteProfile['alias'] ?? $siteProfile['name'] ?? 'Igreja') ?>" onerror="this.style.display='none'">
+                <span class="d-none d-md-inline"><?= htmlspecialchars($siteProfile['alias'] ?? $siteProfile['name'] ?? 'Igreja') ?></span>
             </a>
             <button class="navbar-toggler bg-gold" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
@@ -1898,7 +1898,7 @@ $firstAndLastName = function ($name) {
         <div class="container">
             <div class="row align-items-center g-4">
                 <div class="col-lg-7">
-                    <h1 class="display-3 hero-title mb-3">Bem-vindo à<br><span class="hero-highlight"><?= htmlspecialchars($siteProfile['name'] ?? 'Igreja Vida Nova') ?></span></h1>
+                    <h1 class="display-3 hero-title mb-3">Bem-vindo à<br><span class="hero-highlight"><?= htmlspecialchars($siteProfile['name'] ?? 'Nossa Igreja') ?></span></h1>
                     <p class="lead mb-4 fs-4">Uma igreja comprometida com a Palavra de Deus e o amor ao próximo.</p>
                     <div class="hero-actions">
                         <a href="/portal/login" class="btn btn-hero-secondary"><i class="fas fa-user me-2"></i> Área do Membro</a>
@@ -2980,8 +2980,9 @@ $firstAndLastName = function ($name) {
                 const verseText = devotionalVerseText ? devotionalVerseText.textContent.trim() : '';
                 const verseReference = devotionalVerseReference ? devotionalVerseReference.textContent.trim() : '';
                 const verseTheme = devotionalVerseTheme ? devotionalVerseTheme.textContent.replace('Tema:', '').trim() : '';
+                const churchLabel = <?= json_encode($siteProfile['name'] ?? $siteProfile['alias'] ?? 'Igreja', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;
                 if (!verseText && !verseReference) return 'Palavra para o seu coração';
-                return verseText + (verseReference ? ' - ' + verseReference : '') + (verseTheme ? ' | Tema: ' + verseTheme : '') + ' | Igreja IVN';
+                return verseText + (verseReference ? ' - ' + verseReference : '') + (verseTheme ? ' | Tema: ' + verseTheme : '') + (churchLabel ? ' | ' + churchLabel : '');
             }
 
             function updateFaithDockInset() {
@@ -3113,7 +3114,7 @@ $firstAndLastName = function ($name) {
                     devotionalShareButton.addEventListener('click', async function() {
                         const shareText = getCurrentDevotionalShareText();
                         const sharePayload = {
-                            title: 'Devocional do Dia',
+                            title: 'Devocional do Dia - ' + <?= json_encode($siteProfile['alias'] ?? $siteProfile['name'] ?? 'Igreja', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>,
                             text: shareText
                         };
 

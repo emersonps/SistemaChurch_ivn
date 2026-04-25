@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Galeria de Fotos - <?= htmlspecialchars($siteProfile['alias'] ?? 'IVN') ?></title>
+    <title>Galeria de Fotos - <?= htmlspecialchars($siteProfile['alias'] ?? $siteProfile['name'] ?? 'Igreja') ?></title>
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="<?= htmlspecialchars($siteProfile['logo_url'] ?? '/assets/img/logo.png') ?>?v=1">
     
@@ -142,8 +142,8 @@
     <header class="simple-header">
         <div class="container header-container">
             <a href="/" class="brand-logo">
-                <img src="<?= htmlspecialchars($siteProfile['logo_url'] ?? '/assets/img/logo.png') ?>" alt="<?= htmlspecialchars($siteProfile['alias'] ?? 'IVN') ?> Logo">
-                <?= htmlspecialchars($siteProfile['alias'] ?? 'IVN') ?>
+                <img src="<?= htmlspecialchars($siteProfile['logo_url'] ?? '/assets/img/logo.png') ?>" alt="<?= htmlspecialchars($siteProfile['alias'] ?? $siteProfile['name'] ?? 'Igreja') ?> Logo">
+                <?= htmlspecialchars($siteProfile['alias'] ?? $siteProfile['name'] ?? 'Igreja') ?>
             </a>
             <a href="/" class="nav-link-home">
                 <i class="fas fa-home me-1"></i> Início

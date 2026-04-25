@@ -4,7 +4,7 @@
         <div class="container">
             <div class="row">
                 <div class="col-md-4 mb-4">
-                    <h5><?= htmlspecialchars($siteProfile['alias'] ?? 'IVN') ?></h5>
+                    <h5><?= htmlspecialchars($siteProfile['alias'] ?? $siteProfile['name'] ?? 'Igreja') ?></h5>
                     <p>Levando a palavra de Deus e transformando vidas através do amor de Cristo.</p>
                 </div>
                 <div class="col-md-4 mb-4">
@@ -24,7 +24,7 @@
                 </div>
             </div>
             <hr class="my-4 border-secondary">
-            <p class="mb-0 small text-gold">&copy; <?= date('Y') ?> <?= htmlspecialchars($siteProfile['alias'] ?? 'IVN') ?>. Todos os direitos reservados.</p>
+            <p class="mb-0 small text-gold">&copy; <?= date('Y') ?> <?= htmlspecialchars($siteProfile['alias'] ?? $siteProfile['name'] ?? 'Igreja') ?>. Todos os direitos reservados.</p>
         </div>
     </footer>
 

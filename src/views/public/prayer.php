@@ -1,15 +1,18 @@
 <?php
+$siteProfile = getChurchSiteProfileSettings();
 $amenedLookup = array_fill_keys(array_map('intval', $amenedIds ?? []), true);
 $totalRequests = (int)($stats['total_requests'] ?? 0);
 $totalAmens = (int)($stats['total_amens'] ?? 0);
+$currentPage = max(1, (int)($currentPage ?? 1));
+$totalPages = max(1, (int)($totalPages ?? 1));
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mural de Oracao - IVN</title>
-    <link rel="icon" type="image/png" href="/assets/img/logo.png?v=1">
+    <title>Mural de Oração - <?= htmlspecialchars($siteProfile['alias'] ?? $siteProfile['name'] ?? 'Igreja') ?></title>
+    <link rel="icon" type="image/png" href="<?= htmlspecialchars($siteProfile['logo_url'] ?? '/assets/img/logo.png') ?>">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
@@ -243,6 +246,16 @@ $totalAmens = (int)($stats['total_amens'] ?? 0);
             box-shadow: inset 0 1px 0 rgba(255,255,255,0.6);
         }
 
+        .request-avatar i {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            line-height: 1;
+            font-size: 1.35rem;
+        }
+
         .request-avatar.is-anonymous {
             background: linear-gradient(135deg, rgba(45,26,33,0.08), rgba(139,21,56,0.12));
             color: #6a4250;
@@ -316,6 +329,28 @@ $totalAmens = (int)($stats['total_amens'] ?? 0);
             display: flex;
             flex-wrap: wrap;
             gap: .55rem;
+        }
+
+        .prayer-pagination {
+            margin-top: 1.8rem;
+        }
+
+        .prayer-pagination .page-link {
+            color: var(--prayer-wine);
+            border-color: rgba(139,21,56,0.16);
+            padding: .65rem .95rem;
+            border-radius: 999px;
+        }
+
+        .prayer-pagination .page-item.active .page-link {
+            background: linear-gradient(135deg, var(--prayer-wine), var(--prayer-wine-dark));
+            border-color: transparent;
+            color: #fff;
+            box-shadow: 0 12px 24px rgba(90,16,38,0.16);
+        }
+
+        .prayer-pagination .page-item.disabled .page-link {
+            color: #9ca3af;
         }
 
         .moderation-tools details {
@@ -408,8 +443,8 @@ $totalAmens = (int)($stats['total_amens'] ?? 0);
     <header class="simple-header">
         <div class="container header-container">
             <a href="/" class="brand-logo">
-                <img src="/assets/img/logo.png" alt="IVN">
-                IVN
+                <img src="<?= htmlspecialchars($siteProfile['logo_url'] ?? '/assets/img/logo.png') ?>" alt="<?= htmlspecialchars($siteProfile['alias'] ?? $siteProfile['name'] ?? 'Igreja') ?>">
+                <?= htmlspecialchars($siteProfile['alias'] ?? $siteProfile['name'] ?? 'Igreja') ?>
             </a>
             <a href="/" class="btn btn-outline-dark rounded-pill px-3">
                 <i class="fas fa-arrow-left me-2"></i>Voltar ao Início
@@ -422,9 +457,9 @@ $totalAmens = (int)($stats['total_amens'] ?? 0);
             <div class="hero-shell">
                 <div class="row g-4 align-items-end">
                     <div class="col-lg-8">
-                        <span class="hero-badge"><i class="fas fa-hands-praying"></i> Mural de Oracao</span>
-                        <h1 class="hero-title">Compartilhe seu pedido e permita que a igreja ore com voce.</h1>
-                        <p class="hero-copy">Qualquer pessoa pode enviar um pedido, mesmo sem login, informando o nome ou marcando como anonimo. A comunidade pode acompanhar e responder com uma maozinha de Amem.</p>
+                        <span class="hero-badge"><i class="fas fa-hands-praying"></i> Mural de Oração</span>
+                        <h1 class="hero-title">Compartilhe seu pedido e permita que a igreja ore com você.</h1>
+                        <p class="hero-copy">Compartilhe seu pedido de oração e permita que a igreja caminhe em fé com você. Se preferir, você também pode enviar de forma anônima e receber o carinho da comunidade em oração.</p>
                     </div>
                     <div class="col-lg-4">
                         <div class="prayer-stat-grid">
@@ -434,7 +469,7 @@ $totalAmens = (int)($stats['total_amens'] ?? 0);
                             </div>
                             <div class="prayer-stat-card">
                                 <strong><?= $totalAmens ?></strong>
-                                <span>Amens registrados</span>
+                                <span>Améns registrados</span>
                             </div>
                         </div>
                     </div>
@@ -449,7 +484,7 @@ $totalAmens = (int)($stats['total_amens'] ?? 0);
                 <div class="col-lg-4">
                     <div class="prayer-panel" id="pedido-form">
                         <h2 class="panel-title">Enviar Pedido</h2>
-                        <p class="panel-subtitle">Escreva com calma. Seu pedido pode aparecer com seu nome ou de forma anonima.</p>
+                        <p class="panel-subtitle">Escreva com calma. Seu pedido pode aparecer com seu nome ou de forma anônima.</p>
 
                         <?php if (isset($_SESSION['success']) || isset($_SESSION['error'])): ?>
                             <div class="flash-wrap">
@@ -480,12 +515,12 @@ $totalAmens = (int)($stats['total_amens'] ?? 0);
                                 <div class="form-check">
                                     <input class="form-check-input" type="checkbox" value="1" id="prayerAnonymous" name="is_anonymous">
                                     <label class="form-check-label" for="prayerAnonymous">
-                                        Publicar como anonimo
+                                        Publicar como anônimo
                                     </label>
                                 </div>
                             </div>
                             <div class="col-12">
-                                <label for="prayerMessage" class="field-label">Pedido de oracao</label>
+                                <label for="prayerMessage" class="field-label">Pedido de oração</label>
                                 <textarea class="form-control" id="prayerMessage" name="message" maxlength="3000" placeholder="Escreva aqui o seu pedido..."></textarea>
                             </div>
                             <div class="col-12 d-grid">
@@ -497,7 +532,7 @@ $totalAmens = (int)($stats['total_amens'] ?? 0);
 
                         <div class="helper-card">
                             <strong class="d-block mb-1">Como funciona?</strong>
-                            Os pedidos entram no mural e a comunidade pode marcar <strong>Amem</strong> como sinal de fe, apoio e intercessao.
+                            Os pedidos entram no mural e a comunidade pode marcar <strong>Amém</strong> como sinal de fé, apoio e intercessão.
                         </div>
                     </div>
                 </div>
@@ -505,8 +540,8 @@ $totalAmens = (int)($stats['total_amens'] ?? 0);
                 <div class="col-lg-8">
                     <div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-3" id="mural">
                         <div>
-                            <h2 class="panel-title mb-1">Pedidos de Oracao</h2>
-                            <p class="panel-subtitle mb-0">Ore, acompanhe e responda com uma maozinha de Amem.</p>
+                            <h2 class="panel-title mb-1">Pedidos de Oração</h2>
+                            <p class="panel-subtitle mb-0">Ore, acompanhe e responda com uma mãozinha de Amém.</p>
                         </div>
                     </div>
 
@@ -514,18 +549,17 @@ $totalAmens = (int)($stats['total_amens'] ?? 0);
                         <div class="empty-state">
                             <i class="fas fa-dove fa-3x mb-3 text-secondary"></i>
                             <h3 class="h4 text-dark">Nenhum pedido publicado ainda.</h3>
-                            <p class="mb-0">Seja a primeira pessoa a compartilhar um pedido de oracao neste mural.</p>
+                            <p class="mb-0">Seja a primeira pessoa a compartilhar um pedido de oração neste mural.</p>
                         </div>
                     <?php else: ?>
                         <?php foreach ($requests as $request): ?>
                             <?php
                                 $requestId = (int)($request['id'] ?? 0);
                                 $isAnonymous = !empty($request['is_anonymous']);
-                                $displayName = $isAnonymous ? 'Anonimo' : trim((string)($request['name'] ?? ''));
+                                $displayName = $isAnonymous ? 'Anônimo' : trim((string)($request['name'] ?? ''));
                                 if ($displayName === '') {
-                                    $displayName = 'Anonimo';
+                                    $displayName = 'Anônimo';
                                 }
-                                $initial = strtoupper(substr($displayName, 0, 1));
                                 $avatarClass = $isAnonymous ? 'request-avatar is-anonymous' : 'request-avatar';
                                 $hasAmened = isset($amenedLookup[$requestId]);
                                 $createdAt = !empty($request['created_at']) ? strtotime($request['created_at']) : false;
@@ -537,14 +571,14 @@ $totalAmens = (int)($stats['total_amens'] ?? 0);
                                             <?php if ($isAnonymous): ?>
                                                 <i class="fas fa-user-secret"></i>
                                             <?php else: ?>
-                                                <?= htmlspecialchars($initial) ?>
+                                                <i class="fas fa-hands-praying"></i>
                                             <?php endif; ?>
                                         </span>
                                         <div>
                                             <strong><?= htmlspecialchars($displayName) ?></strong>
                                             <span>
                                                 <i class="far fa-clock me-1"></i>
-                                                <?= $createdAt ? date('d/m/Y \a\s H:i', $createdAt) : 'Agora há pouco' ?>
+                                                <?= $createdAt ? date('d/m/Y', $createdAt) . ' às ' . date('H:i', $createdAt) : 'Agora há pouco' ?>
                                             </span>
                                         </div>
                                     </div>
@@ -555,9 +589,10 @@ $totalAmens = (int)($stats['total_amens'] ?? 0);
                                 <div class="request-actions">
                                     <form action="/oracao/amem/<?= $requestId ?>" method="POST" class="amen-form">
                                         <?= csrf_field() ?>
+                                        <input type="hidden" name="page" value="<?= $currentPage ?>">
                                         <button type="submit" class="amen-button<?= $hasAmened ? ' is-checked' : '' ?>"<?= $hasAmened ? ' disabled' : '' ?>>
                                             <i class="fas fa-hands-praying"></i>
-                                            <span><?= $hasAmened ? 'Voce disse Amem' : 'Dizer Amem' ?></span>
+                                            <span><?= $hasAmened ? 'Você disse Amém' : 'Dizer Amém' ?></span>
                                             <span class="amen-count"><?= (int)($request['amen_count'] ?? 0) ?></span>
                                         </button>
                                     </form>
@@ -568,24 +603,26 @@ $totalAmens = (int)($stats['total_amens'] ?? 0);
                                                 <summary><i class="fas fa-pen-to-square me-2"></i>Editar pedido</summary>
                                                 <form action="/oracao/editar/<?= $requestId ?>" method="POST" class="moderation-inline-form">
                                                     <?= csrf_field() ?>
+                                                    <input type="hidden" name="page" value="<?= $currentPage ?>">
                                                     <div>
                                                         <label class="field-label">Nome</label>
                                                         <input type="text" class="form-control" name="name" value="<?= htmlspecialchars((string)($request['name'] ?? '')) ?>" maxlength="120">
                                                     </div>
                                                     <div class="form-check">
                                                         <input class="form-check-input" type="checkbox" value="1" id="anonymous-<?= $requestId ?>" name="is_anonymous"<?= $isAnonymous ? ' checked' : '' ?>>
-                                                        <label class="form-check-label" for="anonymous-<?= $requestId ?>">Publicar como anonimo</label>
+                                                        <label class="form-check-label" for="anonymous-<?= $requestId ?>">Publicar como anônimo</label>
                                                     </div>
                                                     <div>
                                                         <label class="field-label">Mensagem</label>
                                                         <textarea class="form-control" name="message" maxlength="3000"><?= htmlspecialchars((string)($request['message'] ?? '')) ?></textarea>
                                                     </div>
-                                                    <button type="submit" class="btn btn-dark rounded-pill">Salvar alteracoes</button>
+                                                    <button type="submit" class="btn btn-dark rounded-pill">Salvar alterações</button>
                                                 </form>
                                             </details>
 
                                             <form action="/oracao/excluir/<?= $requestId ?>" method="POST" onsubmit="return confirm('Deseja realmente excluir este pedido?');">
                                                 <?= csrf_field() ?>
+                                                <input type="hidden" name="page" value="<?= $currentPage ?>">
                                                 <button type="submit" class="btn btn-outline-danger rounded-pill">
                                                     <i class="fas fa-trash-can me-2"></i>Excluir
                                                 </button>
@@ -595,6 +632,23 @@ $totalAmens = (int)($stats['total_amens'] ?? 0);
                                 </div>
                             </article>
                         <?php endforeach; ?>
+                        <?php if ($totalPages > 1): ?>
+                            <nav class="prayer-pagination" aria-label="Paginação do mural de oração">
+                                <ul class="pagination justify-content-center flex-wrap gap-2 mb-0">
+                                    <li class="page-item<?= $currentPage <= 1 ? ' disabled' : '' ?>">
+                                        <a class="page-link" href="/oracao?page=<?= max(1, $currentPage - 1) ?>#mural" aria-label="Página anterior">Anterior</a>
+                                    </li>
+                                    <?php for ($page = 1; $page <= $totalPages; $page++): ?>
+                                        <li class="page-item<?= $page === $currentPage ? ' active' : '' ?>">
+                                            <a class="page-link" href="/oracao?page=<?= $page ?>#mural"><?= $page ?></a>
+                                        </li>
+                                    <?php endfor; ?>
+                                    <li class="page-item<?= $currentPage >= $totalPages ? ' disabled' : '' ?>">
+                                        <a class="page-link" href="/oracao?page=<?= min($totalPages, $currentPage + 1) ?>#mural" aria-label="Próxima página">Próxima</a>
+                                    </li>
+                                </ul>
+                            </nav>
+                        <?php endif; ?>
                     <?php endif; ?>
                 </div>
             </div>
