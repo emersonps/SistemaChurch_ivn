@@ -2980,7 +2980,7 @@ $firstAndLastName = function ($name) {
                 const verseText = devotionalVerseText ? devotionalVerseText.textContent.trim() : '';
                 const verseReference = devotionalVerseReference ? devotionalVerseReference.textContent.trim() : '';
                 const verseTheme = devotionalVerseTheme ? devotionalVerseTheme.textContent.replace('Tema:', '').trim() : '';
-                const churchLabel = <?= json_encode($siteProfile['name'] ?? $siteProfile['alias'] ?? 'Igreja', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;
+                const churchLabel = <?= json_encode($siteProfile['alias'] ?? $siteProfile['name'] ?? 'Igreja', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;
                 if (!verseText && !verseReference) return 'Palavra para o seu coração';
                 return verseText + (verseReference ? ' - ' + verseReference : '') + (verseTheme ? ' | Tema: ' + verseTheme : '') + (churchLabel ? ' | ' + churchLabel : '');
             }
