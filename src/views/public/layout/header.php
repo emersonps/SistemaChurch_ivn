@@ -23,15 +23,16 @@
     <link rel="canonical" href="<?= "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]" ?>">
 
     <!-- Favicon -->
-    <link rel="shortcut icon" href="<?= htmlspecialchars($siteProfile['logo_url'] ?? '/assets/img/logo.png') ?>" type="image/png">
-    <link rel="icon" href="<?= htmlspecialchars($siteProfile['logo_url'] ?? '/assets/img/logo.png') ?>" type="image/png">
+    <link rel="shortcut icon" href="<?= htmlspecialchars(getChurchLogoUrl($siteProfile, true)) ?>" type="image/png">
+    <link rel="icon" href="<?= htmlspecialchars(getChurchLogoUrl($siteProfile, true)) ?>" type="image/png">
+    <link rel="apple-touch-icon" href="<?= htmlspecialchars(getChurchLogoUrl($siteProfile, true)) ?>">
     
     <!-- PWA / Web App Manifest -->
-    <link rel="manifest" href="/manifest.webmanifest">
+    <link rel="manifest" href="<?= htmlspecialchars(getChurchManifestUrl($siteProfile)) ?>">
     <meta name="theme-color" content="#000000">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="<?= htmlspecialchars($siteProfile['alias'] ?? $siteProfile['name'] ?? 'Igreja') ?>">
+    <meta name="apple-mobile-web-app-title" content="<?= htmlspecialchars(getChurchBrandingAlias($siteProfile)) ?>">
 
     <!-- Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">

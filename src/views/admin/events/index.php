@@ -42,9 +42,71 @@ $categories = [
     'convite' => 'Convites Especiais',
     'interno' => 'Internos'
 ];
+$tabTotal = count($categories);
+$hasMultipleCategories = $tabTotal > 1;
 ?>
 
-<ul class="nav nav-tabs mb-3" id="eventTabs" role="tablist">
+<style>
+    @media (max-width: 991.98px) {
+        .event-tabs-carousel {
+            position: relative;
+        }
+        .event-tabs-carousel.multi::before {
+            content: '';
+            position: absolute;
+            inset: 0 0 auto 0;
+            height: 4px;
+            background: linear-gradient(90deg, #0d6efd 0%, #6f42c1 55%, #d4af37 100%);
+            z-index: 2;
+        }
+        .event-tabs-carousel.multi #eventTabsContent {
+            display: flex;
+            gap: 0;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            scroll-behavior: smooth;
+            scrollbar-width: none;
+            padding: .25rem .25rem .35rem;
+        }
+        .event-tabs-carousel.multi #eventTabsContent::-webkit-scrollbar { display: none; }
+        .event-tabs-carousel.multi #eventTabsContent > .tab-pane {
+            display: block !important;
+            flex: 0 0 100%;
+            min-width: 100%;
+            scroll-snap-align: center;
+            opacity: 1 !important;
+            padding: .35rem;
+        }
+        .event-tabs-carousel.multi #eventTabsContent > .tab-pane.fade { transition: none; }
+        .event-pane-card {
+            border-radius: 16px;
+            border: 1px solid rgba(0,0,0,0.08);
+            overflow: hidden;
+            background: #fff;
+        }
+        .event-pane-head {
+            background: linear-gradient(135deg, rgba(13,110,253,0.10), rgba(111,66,193,0.14));
+        }
+        .event-pane-title {
+            font-weight: 900;
+            font-size: 1.05rem;
+            letter-spacing: .01em;
+            color: #1b1b2a;
+        }
+        .event-pane-hint {
+            font-size: .72rem;
+            letter-spacing: .08em;
+            font-weight: 800;
+            color: rgba(0,0,0,0.52);
+            text-transform: uppercase;
+        }
+        .event-pane-hint i {
+            color: #6f42c1;
+        }
+    }
+</style>
+
+<ul class="nav nav-tabs mb-3 d-none d-lg-flex" id="eventTabs" role="tablist">
     <?php 
     $first = true; 
     foreach ($categories as $key => $label): 
@@ -66,15 +128,35 @@ $categories = [
 <!-- DataTables CSS -->
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
 
+<div class="event-tabs-carousel <?= $hasMultipleCategories ? 'multi' : '' ?>">
 <div class="tab-content" id="eventTabsContent">
     <?php 
     $first = true; 
+    $tabStep = 1;
     foreach ($categories as $key => $label): 
         $tabId = 'tab-' . $key;
     ?>
         <div class="tab-pane fade <?= $first ? 'show active' : '' ?>" id="<?= $tabId ?>" role="tabpanel" aria-labelledby="<?= $tabId ?>-btn">
-            <div class="table-responsive p-2">
-                <table class="table table-striped table-hover table-sm datatable" style="width:100%">
+            <div class="event-pane-card">
+                <div class="d-lg-none px-3 py-3 border-bottom event-pane-head">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div class="me-3">
+                            <div class="event-pane-title">
+                                <i class="fas fa-calendar-alt me-2"></i><?= htmlspecialchars($label) ?>
+                            </div>
+                            <?php if ($hasMultipleCategories): ?>
+                                <div class="event-pane-hint mt-1">
+                                    <i class="fas fa-arrows-left-right me-2"></i>Deslize para mudar (<?= $tabStep ?>/<?= $tabTotal ?>)
+                                </div>
+                            <?php endif; ?>
+                        </div>
+                        <?php if ($hasMultipleCategories): ?>
+                            <span class="badge bg-dark"><?= $tabStep ?>/<?= $tabTotal ?></span>
+                        <?php endif; ?>
+                    </div>
+                </div>
+                <div class="table-responsive p-2">
+                    <table class="table table-striped table-hover table-sm datatable" style="width:100%">
                     <thead>
                         <tr>
                             <th>Data/Recorrência</th>
@@ -146,9 +228,11 @@ $categories = [
                         <?php endforeach; ?>
                     </tbody>
                 </table>
+                </div>
             </div>
         </div>
-    <?php $first = false; endforeach; ?>
+    <?php $first = false; $tabStep++; endforeach; ?>
+</div>
 </div>
 
 <?php include __DIR__ . '/../../layout/footer.php'; ?>
@@ -161,7 +245,9 @@ $categories = [
     $(document).ready(function () {
         $('.datatable').DataTable({
             language: {
-                url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/pt-BR.json'
+                url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/pt-BR.json',
+                search: '',
+                searchPlaceholder: 'Pesquisar...'
             },
             order: [[0, 'asc']], // Ordenar pela data
             pageLength: 10,
@@ -194,6 +280,23 @@ $categories = [
                 var tab = new bootstrap.Tab(tabTrigger);
                 tab.show();
             }
+        }
+
+        const carousel = document.querySelector('.event-tabs-carousel.multi #eventTabsContent');
+        if (carousel) {
+            let raf = 0;
+            const adjust = () => {
+                if (!$.fn.dataTable) return;
+                $.fn.dataTable.tables({ visible: true, api: true }).columns.adjust();
+            };
+            carousel.addEventListener('scroll', function () {
+                if (raf) return;
+                raf = requestAnimationFrame(function () {
+                    raf = 0;
+                    adjust();
+                });
+            }, { passive: true });
+            window.addEventListener('resize', adjust);
         }
     });
 </script>

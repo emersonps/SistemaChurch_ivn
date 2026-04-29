@@ -7,11 +7,11 @@
 <div class="card mb-4 bg-light">
     <div class="card-body py-2">
         <form class="row g-2 align-items-end" method="GET">
-            <div class="col-md-3">
+            <div class="col-6 col-md-3">
                 <label class="form-label small mb-0">Data Início</label>
                 <input type="date" name="start_date" class="form-control form-control-sm" value="<?= $_GET['start_date'] ?? '' ?>">
             </div>
-            <div class="col-md-3">
+            <div class="col-6 col-md-3">
                 <label class="form-label small mb-0">Data Fim</label>
                 <input type="date" name="end_date" class="form-control form-control-sm" value="<?= $_GET['end_date'] ?? '' ?>">
             </div>

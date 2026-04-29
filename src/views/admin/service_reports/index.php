@@ -20,9 +20,71 @@ foreach ($reports as $r) {
     $groupedReports[$congregationName][] = $r;
 }
 ksort($groupedReports);
+$tabTotal = count($groupedReports);
+$hasMultipleCongregations = $tabTotal > 1;
 ?>
 
-<ul class="nav nav-tabs mb-3" id="reportTabs" role="tablist">
+<style>
+    @media (max-width: 991.98px) {
+        .service-report-tabs-carousel {
+            position: relative;
+        }
+        .service-report-tabs-carousel.multi::before {
+            content: '';
+            position: absolute;
+            inset: 0 0 auto 0;
+            height: 4px;
+            background: linear-gradient(90deg, #0dcaf0 0%, #0d6efd 55%, #d4af37 100%);
+            z-index: 2;
+        }
+        .service-report-tabs-carousel.multi #reportTabsContent {
+            display: flex;
+            gap: 0;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            scroll-behavior: smooth;
+            scrollbar-width: none;
+            padding: .25rem .25rem .35rem;
+        }
+        .service-report-tabs-carousel.multi #reportTabsContent::-webkit-scrollbar { display: none; }
+        .service-report-tabs-carousel.multi #reportTabsContent > .tab-pane {
+            display: block !important;
+            flex: 0 0 100%;
+            min-width: 100%;
+            scroll-snap-align: center;
+            opacity: 1 !important;
+            padding: .35rem;
+        }
+        .service-report-tabs-carousel.multi #reportTabsContent > .tab-pane.fade { transition: none; }
+        .service-report-pane-card {
+            border-radius: 16px;
+            border: 1px solid rgba(0,0,0,0.08);
+            overflow: hidden;
+            background: #fff;
+        }
+        .service-report-pane-head {
+            background: linear-gradient(135deg, rgba(13,202,240,0.16), rgba(13,110,253,0.10));
+        }
+        .service-report-pane-title {
+            font-weight: 900;
+            font-size: 1.05rem;
+            letter-spacing: .01em;
+            color: #0d2b3a;
+        }
+        .service-report-pane-hint {
+            font-size: .72rem;
+            letter-spacing: .08em;
+            font-weight: 800;
+            color: rgba(0,0,0,0.52);
+            text-transform: uppercase;
+        }
+        .service-report-pane-hint i {
+            color: #0d6efd;
+        }
+    }
+</style>
+
+<ul class="nav nav-tabs mb-3 d-none d-lg-flex" id="reportTabs" role="tablist">
     <?php $first = true; foreach ($groupedReports as $congregationName => $items): 
         $tabId = 'tab-' . md5($congregationName);
     ?>
@@ -38,13 +100,32 @@ ksort($groupedReports);
 <!-- DataTables CSS -->
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
 
+<div class="service-report-tabs-carousel <?= $hasMultipleCongregations ? 'multi' : '' ?>">
 <div class="tab-content" id="reportTabsContent">
-    <?php $first = true; foreach ($groupedReports as $congregationName => $items): 
+    <?php $first = true; $tabStep = 1; foreach ($groupedReports as $congregationName => $items): 
         $tabId = 'tab-' . md5($congregationName);
     ?>
         <div class="tab-pane fade <?= $first ? 'show active' : '' ?>" id="<?= $tabId ?>" role="tabpanel" aria-labelledby="<?= $tabId ?>-tab">
-            <div class="table-responsive p-2">
-                <table class="table table-striped table-hover table-sm datatable" style="width:100%">
+            <div class="service-report-pane-card">
+                <div class="d-lg-none px-3 py-3 border-bottom service-report-pane-head">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div class="me-3">
+                            <div class="service-report-pane-title">
+                                <i class="fas fa-church me-2"></i><?= htmlspecialchars($congregationName) ?>
+                            </div>
+                            <?php if ($hasMultipleCongregations): ?>
+                                <div class="service-report-pane-hint mt-1">
+                                    <i class="fas fa-arrows-left-right me-2"></i>Deslize para mudar (<?= $tabStep ?>/<?= $tabTotal ?>)
+                                </div>
+                            <?php endif; ?>
+                        </div>
+                        <?php if ($hasMultipleCongregations): ?>
+                            <span class="badge bg-dark"><?= $tabStep ?>/<?= $tabTotal ?></span>
+                        <?php endif; ?>
+                    </div>
+                </div>
+                <div class="table-responsive p-2">
+                    <table class="table table-striped table-hover table-sm datatable" style="width:100%">
                     <thead>
                         <tr>
                             <th>Data</th>
@@ -83,9 +164,11 @@ ksort($groupedReports);
                         <?php endforeach; ?>
                     </tbody>
                 </table>
+                </div>
             </div>
         </div>
-    <?php $first = false; endforeach; ?>
+    <?php $first = false; $tabStep++; endforeach; ?>
+</div>
 </div>
 
 <?php if (empty($groupedReports)): ?>
@@ -124,6 +207,23 @@ ksort($groupedReports);
         $('button[data-bs-toggle="tab"]').on('shown.bs.tab', function (e) {
             $.fn.dataTable.tables({ visible: true, api: true }).columns.adjust();
         });
+
+        const carousel = document.querySelector('.service-report-tabs-carousel.multi #reportTabsContent');
+        if (carousel) {
+            let raf = 0;
+            const adjust = () => {
+                if (!$.fn.dataTable) return;
+                $.fn.dataTable.tables({ visible: true, api: true }).columns.adjust();
+            };
+            carousel.addEventListener('scroll', function () {
+                if (raf) return;
+                raf = requestAnimationFrame(function () {
+                    raf = 0;
+                    adjust();
+                });
+            }, { passive: true });
+            window.addEventListener('resize', adjust);
+        }
     });
 </script>
 <!-- Visitors Modal -->

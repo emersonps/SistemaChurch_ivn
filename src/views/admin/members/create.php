@@ -4,301 +4,457 @@
     <h1 class="h2">Novo Membro</h1>
 </div>
 
-<form action="/admin/members/create" method="POST" enctype="multipart/form-data" class="row g-3">
+<style>
+    @media (max-width: 767.98px) {
+        .member-form-sticky-actions {
+            position: sticky;
+            top: 0;
+            z-index: 1020;
+        }
+        .member-form-step-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: .4rem;
+            padding: .25rem .6rem;
+            border-radius: 999px;
+            font-weight: 900;
+            letter-spacing: .08em;
+            font-size: .72rem;
+            background: rgba(179,0,0,0.10);
+            color: #b30000;
+            border: 1px solid rgba(179,0,0,0.18);
+            white-space: nowrap;
+        }
+        .member-form-hint {
+            font-size: .75rem;
+            font-weight: 800;
+            letter-spacing: .02em;
+            color: rgba(0,0,0,0.55);
+            white-space: nowrap;
+        }
+        .member-form-hint i { color: #b30000; }
+        .member-form-progress {
+            height: 6px;
+            background: rgba(0,0,0,0.08);
+            border-radius: 999px;
+            overflow: hidden;
+        }
+        .member-form-progress > div {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #ff2a7a 0%, #b30000 52%, #d4af37 100%);
+        }
+        .member-form-carousel-shell {
+            position: relative;
+        }
+        .member-form-carousel-shell::before {
+            content: '';
+            position: absolute;
+            inset: 0 0 auto 0;
+            height: 4px;
+            background: linear-gradient(90deg, #ff2a7a 0%, #b30000 52%, #d4af37 100%);
+            z-index: 2;
+        }
+        .member-form-carousel {
+            display: flex;
+            gap: 0;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            scroll-behavior: smooth;
+            scrollbar-width: none;
+        }
+        .member-form-carousel::-webkit-scrollbar { display: none; }
+        .member-form-slide {
+            flex: 0 0 100%;
+            min-width: 100%;
+            scroll-snap-align: center;
+            padding: .35rem;
+        }
+        .member-form-slide .row {
+            margin-left: 0;
+            margin-right: 0;
+        }
+        .member-form-slide .row > [class*="col-"] {
+            padding-left: calc(var(--bs-gutter-x) * .5);
+            padding-right: calc(var(--bs-gutter-x) * .5);
+        }
+        .member-form-slide-title {
+            font-weight: 900;
+            font-size: 1.1rem;
+            letter-spacing: .01em;
+            color: #2d1a21;
+        }
+        .member-form-slide-head {
+            border-radius: 16px;
+            border: 1px solid rgba(0,0,0,0.08);
+            background: linear-gradient(135deg, rgba(179,0,0,0.10), rgba(212,175,55,0.16));
+            padding: .75rem .85rem;
+        }
+        .member-form-slide-step {
+            font-weight: 900;
+            letter-spacing: .08em;
+            font-size: .72rem;
+            color: rgba(0,0,0,0.58);
+            white-space: nowrap;
+        }
+    }
+</style>
+
+<form action="/admin/members/create" method="POST" enctype="multipart/form-data" class="member-create-form app-form-with-bottom-actions" id="memberCreateForm">
     <?= csrf_field() ?>
-    <!-- Dados Pessoais -->
-    <h4 class="mb-3 text-primary border-bottom pb-2">Dados Pessoais</h4>
-
-    <div class="col-md-12 mb-3">
-        <label class="form-label">Foto do Membro</label>
-        <div class="d-flex gap-3 align-items-start">
-            <div class="text-center">
-                <img id="photoPreview" src="https://via.placeholder.com/150" class="img-thumbnail mb-2" style="width: 150px; height: 150px; object-fit: cover;">
-                <input type="file" class="form-control form-control-sm" name="photo" id="photoInput" accept="image/*">
+    <div class="member-form-sticky-actions d-md-none bg-white border rounded-3 shadow-sm mb-2 px-2 py-2">
+        <div class="d-flex justify-content-between align-items-center gap-2">
+            <div class="d-flex align-items-center gap-2">
+                <span class="member-form-step-chip">ETAPA <span id="memberFormStepIndicator">1/3</span></span>
+                <span class="member-form-hint"><i class="fas fa-arrows-left-right me-1"></i>Deslize</span>
             </div>
-            <div class="d-flex flex-column gap-2">
-                <button type="button" class="btn btn-outline-primary btn-sm" id="btnWebcam">
-                    <i class="fas fa-camera"></i> Tirar Foto com Webcam
-                </button>
-                <div id="webcamContainer" style="display:none;" class="border p-2 rounded">
-                    <video id="webcamVideo" width="320" height="240" autoplay></video>
-                    <canvas id="webcamCanvas" width="320" height="240" style="display:none;"></canvas>
-                    <div class="mt-2">
-                        <button type="button" class="btn btn-success btn-sm" id="btnCapture">Capturar</button>
-                        <button type="button" class="btn btn-secondary btn-sm" id="btnCancelWebcam">Cancelar</button>
+        </div>
+        <div class="member-form-progress mt-2">
+            <div id="memberFormProgressBar"></div>
+        </div>
+    </div>
+
+    <div class="member-form-carousel-shell">
+    <div class="member-form-carousel" id="memberFormCarousel">
+        <div class="member-form-slide">
+            <div class="row g-3">
+                <div class="col-12">
+                    <div class="member-form-slide-head mb-2">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="member-form-slide-title text-primary" data-step-title>Dados Pessoais</div>
+                            <div class="member-form-slide-step">1/3</div>
+                        </div>
                     </div>
                 </div>
-                <input type="hidden" name="webcam_photo" id="webcamPhotoData">
-            </div>
-        </div>
-    </div>
-    
-    <div class="col-md-6">
-        <label class="form-label">Nome Completo *</label>
-        <input type="text" class="form-control" name="name" required>
-    </div>
-    <div class="col-md-3">
-        <label class="form-label">Data de Nascimento *</label>
-        <input type="date" class="form-control" name="birth_date" required>
-    </div>
-    <div class="col-md-3">
-        <label class="form-label">Sexo</label>
-        <select class="form-select" name="gender">
-            <option value="">Selecione...</option>
-            <option value="M">Masculino</option>
-            <option value="F">Feminino</option>
-        </select>
-    </div>
-    
-    <div class="col-md-3">
-        <label class="form-label">CPF *</label>
-        <input type="text" class="form-control" name="cpf" placeholder="000.000.000-00" required>
-    </div>
-    <div class="col-md-3">
-        <label class="form-label">Identidade (RG)</label>
-        <input type="text" class="form-control" name="rg">
-    </div>
-    <div class="col-md-3">
-        <label class="form-label">Estado Civil</label>
-        <select class="form-select" name="marital_status">
-            <option value="">Selecione...</option>
-            <option value="Solteiro(a)">Solteiro(a)</option>
-            <option value="Casado(a)">Casado(a)</option>
-            <option value="Divorciado(a)">Divorciado(a)</option>
-            <option value="Viúvo(a)">Viúvo(a)</option>
-            <option value="Separado(a)">Separado(a)</option>
-        </select>
-    </div>
-    <div class="col-md-3">
-        <label class="form-label">Nacionalidade</label>
-        <input type="text" class="form-control" name="nationality" value="Brasileira">
-    </div>
-    
-    <div class="col-md-4">
-        <label class="form-label">Natural de (Cidade/Estado) *</label>
-        <input type="text" class="form-control" name="birthplace" required>
-    </div>
-    <div class="col-md-4">
-        <label class="form-label">Profissão</label>
-        <input type="text" class="form-control" name="profession">
-    </div>
-    <div class="col-md-4">
-        <label class="form-label">Quantidade de Filhos</label>
-        <input type="number" class="form-control" name="children_count" min="0" value="0">
-    </div>
 
-    <div class="col-md-6">
-        <label class="form-label">Nome do Pai</label>
-        <input type="text" class="form-control" name="father_name">
-    </div>
-    <div class="col-md-6">
-        <label class="form-label">Nome da Mãe *</label>
-        <input type="text" class="form-control" name="mother_name" required>
-    </div>
-
-    <!-- Contato e Endereço -->
-    <h4 class="mb-3 mt-4 text-primary border-bottom pb-2">Contato e Endereço</h4>
-
-    <div class="col-md-4">
-        <label class="form-label">Telefone (WhatsApp) *</label>
-        <input type="text" class="form-control" name="phone" placeholder="(00) 00000-0000" required>
-    </div>
-    <div class="col-md-4">
-        <label class="form-label">Email</label>
-        <input type="email" class="form-control" name="email">
-    </div>
-    <div class="col-md-4">
-        <label class="form-label">CEP</label>
-        <input type="text" class="form-control" name="zip_code" id="zip_code" placeholder="00000-000">
-    </div>
-
-    <div class="col-md-6">
-        <label class="form-label">Endereço (Rua) *</label>
-        <input type="text" class="form-control" name="address" required>
-    </div>
-    <div class="col-md-2">
-        <label class="form-label">Número *</label>
-        <input type="text" class="form-control" name="address_number" required>
-    </div>
-    <div class="col-md-4">
-        <label class="form-label">Bairro *</label>
-        <input type="text" class="form-control" name="neighborhood" required>
-    </div>
-    
-    <div class="col-md-4">
-        <label class="form-label">Complemento</label>
-        <input type="text" class="form-control" name="complement">
-    </div>
-    <div class="col-md-4">
-        <label class="form-label">Ponto de Referência</label>
-        <input type="text" class="form-control" name="reference_point">
-    </div>
-    <div class="col-md-2">
-        <label class="form-label">Estado *</label>
-        <select class="form-select" name="state" id="state" required>
-            <option value="">UF</option>
-            <option value="AC">AC</option><option value="AL">AL</option><option value="AP">AP</option>
-            <option value="AM">AM</option><option value="BA">BA</option><option value="CE">CE</option>
-            <option value="DF">DF</option><option value="ES">ES</option><option value="GO">GO</option>
-            <option value="MA">MA</option><option value="MT">MT</option><option value="MS">MS</option>
-            <option value="MG">MG</option><option value="PA">PA</option><option value="PB">PB</option>
-            <option value="PR">PR</option><option value="PE">PE</option><option value="PI">PI</option>
-            <option value="RJ">RJ</option><option value="RN">RN</option><option value="RS">RS</option>
-            <option value="RO">RO</option><option value="RR">RR</option><option value="IVN">IVN</option>
-            <option value="SP">SP</option><option value="SE">SE</option><option value="TO">TO</option>
-        </select>
-    </div>
-    <div class="col-md-2">
-        <label class="form-label">Cidade *</label>
-        <input type="text" class="form-control" name="city" id="city" required>
-    </div>
-
-    <!-- Dados Eclesiásticos -->
-    <h4 class="mb-3 mt-4 text-primary border-bottom pb-2">Dados Eclesiásticos</h4>
-
-    <div class="col-md-4">
-        <label class="form-label">Congregação *</label>
-        <select class="form-select" name="congregation_id" required>
-            <?php foreach ($congregations as $c): ?>
-                <option value="<?= $c['id'] ?>"><?= htmlspecialchars($c['name']) ?></option>
-            <?php endforeach; ?>
-        </select>
-    </div>
-    <div class="col-md-4">
-        <label class="form-label">Cargo *</label>
-        <div class="input-group">
-            <select class="form-select" name="role" id="roleSelect" required>
-                <option value="">Carregando...</option>
-            </select>
-            <button type="button" class="btn btn-outline-secondary" id="btnAddRole" title="Adicionar novo cargo">
-                <i class="fas fa-plus"></i>
-            </button>
-            <button type="button" class="btn btn-outline-secondary" id="btnEditRole" title="Editar cargo selecionado">
-                <i class="fas fa-edit"></i>
-            </button>
-            <button type="button" class="btn btn-outline-danger" id="btnDeleteRole" title="Excluir cargo selecionado">
-                <i class="fas fa-trash"></i>
-            </button>
-        </div>
-    </div>
-    <div class="col-md-4">
-        <label class="form-label">Situação do Membro *</label>
-        <select class="form-select" name="status" id="memberStatus" required>
-            <option value="active">Ativo (Congregando)</option>
-            <option value="inactive">Inativo (Desligado/Saiu)</option>
-        </select>
-    </div>
-
-    <div class="col-md-4">
-        <label class="form-label">Forma de Ingresso *</label>
-        <select class="form-select" name="admission_method" id="admissionMethod" required>
-            <option value="">Selecione...</option>
-            <option value="Aclamação">Aclamação — recebido pela igreja sem carta de transferência</option>
-            <option value="Transferido">Transferido — recebido com carta de transferência de outra igreja</option>
-            <option value="Batismo">Batismo — novo convertido recebido após batismo</option>
-            <option value="Congregado">Congregado — passou a congregar sem transferência formal</option>
-        </select>
-        <div id="admissionHelp" class="form-text">Selecione a forma de ingresso do membro.</div>
-    </div>
-    <div class="col-md-4">
-        <label class="form-label">Data de Aceite/Entrada</label>
-        <input type="date" class="form-control" name="admission_date" value="<?= date('Y-m-d') ?>">
-    </div>
-    <div class="col-md-4">
-        <label class="form-label">Origem (Igreja Anterior)</label>
-        <input type="text" class="form-control" name="church_origin">
-    </div>
-    
-    <div class="col-12" id="transferLetterBox" style="display:none">
-        <div class="card mt-2">
-            <div class="card-body">
-                <h6 class="mb-2">Carta de Transferência</h6>
-                <div class="row g-3">
-                    <div class="col-md-6">
-                        <label class="form-label">Importar Arquivo</label>
-                        <input type="file" class="form-control" name="transfer_letter" accept="image/*,application/pdf">
-                        <small class="text-muted">Aceita imagem ou PDF.</small>
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label">Capturar com Webcam</label>
-                        <div>
-                            <button type="button" class="btn btn-outline-secondary btn-sm" id="btnTransferWebcam"><i class="fas fa-camera"></i> Capturar Imagem</button>
+                <div class="col-md-12 mb-3">
+                    <label class="form-label">Foto do Membro</label>
+                    <div class="row g-2">
+                        <div class="col-12 text-center">
+                            <img id="photoPreview" src="https://via.placeholder.com/150" class="img-thumbnail" style="width: 150px; height: 150px; object-fit: cover;">
                         </div>
-                        <div id="transferWebcamContainer" style="display:none;" class="border p-2 rounded mt-2">
-                            <div id="transferVideoWrap" style="position:relative; display:inline-block; overflow:hidden;">
-                                <video id="transferWebcamVideo" width="640" height="480" autoplay style="position:absolute; left:0; top:0;"></video>
-                                <div id="transferGuide" style="position:absolute; border:2px dashed #ffc107;"></div>
-                            </div>
-                            <canvas id="transferWebcamCanvas" width="600" height="848" style="display:none;"></canvas>
-                            <div class="mt-2">
-                                <button type="button" class="btn btn-success btn-sm" id="btnTransferCapture">Capturar</button>
-                                <button type="button" class="btn btn-secondary btn-sm" id="btnTransferCancel">Cancelar</button>
-                            </div>
+                        <div class="col-12">
+                            <input type="file" class="form-control form-control-sm" name="photo" id="photoInput" accept="image/*">
                         </div>
-                        <input type="hidden" name="transfer_letter_webcam" id="transferLetterWebcamData">
-                        <img id="transferPreviewImage" class="img-thumbnail mt-2" style="width: 150px; height: 212px; object-fit: cover; display:none;">
+                        <div class="col-12">
+                            <button type="button" class="btn btn-outline-primary btn-sm w-100" id="btnWebcam">
+                                <i class="fas fa-camera"></i> Tirar Foto com Webcam
+                            </button>
+                        </div>
+                        <div class="col-12">
+                            <div id="webcamContainer" style="display:none;" class="border p-2 rounded">
+                                <video id="webcamVideo" autoplay style="max-width: 100%; height: auto;"></video>
+                                <canvas id="webcamCanvas" width="320" height="240" style="display:none;"></canvas>
+                                <div class="mt-2 d-flex gap-2">
+                                    <button type="button" class="btn btn-success btn-sm flex-fill" id="btnCapture">Capturar</button>
+                                    <button type="button" class="btn btn-secondary btn-sm flex-fill" id="btnCancelWebcam">Cancelar</button>
+                                </div>
+                            </div>
+                            <input type="hidden" name="webcam_photo" id="webcamPhotoData">
+                        </div>
                     </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <label class="form-label">Nome Completo *</label>
+                    <input type="text" class="form-control" name="name" required>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Data de Nascimento *</label>
+                    <input type="date" class="form-control" name="birth_date" required>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Sexo</label>
+                    <select class="form-select" name="gender">
+                        <option value="">Selecione...</option>
+                        <option value="M">Masculino</option>
+                        <option value="F">Feminino</option>
+                    </select>
+                </div>
+                
+                <div class="col-md-3">
+                    <label class="form-label">CPF *</label>
+                    <input type="text" class="form-control" name="cpf" placeholder="000.000.000-00" required>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Identidade (RG)</label>
+                    <input type="text" class="form-control" name="rg">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Estado Civil</label>
+                    <select class="form-select" name="marital_status">
+                        <option value="">Selecione...</option>
+                        <option value="Solteiro(a)">Solteiro(a)</option>
+                        <option value="Casado(a)">Casado(a)</option>
+                        <option value="Divorciado(a)">Divorciado(a)</option>
+                        <option value="Viúvo(a)">Viúvo(a)</option>
+                        <option value="Separado(a)">Separado(a)</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Nacionalidade</label>
+                    <input type="text" class="form-control" name="nationality" value="Brasileira">
+                </div>
+                
+                <div class="col-md-4">
+                    <label class="form-label">Natural de (Cidade/Estado) *</label>
+                    <input type="text" class="form-control" name="birthplace" required>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Profissão</label>
+                    <input type="text" class="form-control" name="profession">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Quantidade de Filhos</label>
+                    <input type="number" class="form-control" name="children_count" min="0" value="0">
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Nome do Pai</label>
+                    <input type="text" class="form-control" name="father_name">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Nome da Mãe *</label>
+                    <input type="text" class="form-control" name="mother_name" required>
                 </div>
             </div>
         </div>
-    </div>
 
-    <div class="col-md-3">
-        <div class="form-check mt-4">
-            <input class="form-check-input" type="checkbox" id="isBaptized" name="is_baptized" value="1">
-            <label class="form-check-label fw-bold" for="isBaptized">Batizado nas Águas?</label>
-        </div>
-    </div>
-    <div class="col-md-3" id="baptismDateDiv" style="display:none;">
-        <label class="form-label">Data de Batismo</label>
-        <input type="date" class="form-control" name="baptism_date">
-    </div>
-    
-    <div class="col-md-3">
-        <div class="form-check mt-4">
-            <input class="form-check-input" type="checkbox" name="is_tither" value="1">
-            <label class="form-check-label fw-bold">Dizimista?</label>
-        </div>
-        <div class="form-check mt-2">
-            <input class="form-check-input" type="checkbox" name="is_ebd_teacher" value="1">
-            <label class="form-check-label text-primary fw-bold">Professor de EBD?</label>
-        </div>
-    </div>
-    
-    <div class="col-md-12 mt-3">
-        <h5 class="text-secondary border-bottom pb-2">Status Espiritual</h5>
-    </div>
-    
-    <div class="col-md-3">
-        <div class="form-check mt-4">
-            <input class="form-check-input" type="checkbox" name="is_new_convert" value="1" id="isNewConvert">
-            <label class="form-check-label fw-bold" for="isNewConvert">Novo Convertido?</label>
-        </div>
-    </div>
-    
-    <div class="col-md-3">
-        <label class="form-label">Data de Aceitação (Jesus)</label>
-        <input type="date" class="form-control" name="accepted_jesus_at">
-    </div>
-    
-    <div class="col-md-3">
-        <label class="form-label">Data de Reconciliação</label>
-        <input type="date" class="form-control" name="reconciled_at">
-    </div>
+        <div class="member-form-slide">
+            <div class="row g-3">
+                <div class="col-12">
+                    <div class="member-form-slide-head mb-2">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="member-form-slide-title text-primary" data-step-title>Contato e Endereço</div>
+                            <div class="member-form-slide-step">2/3</div>
+                        </div>
+                    </div>
+                </div>
 
-    <div class="col-md-3" id="exitDateDiv">
-        <label class="form-label">Data de Saída (Opcional)</label>
-        <input type="date" class="form-control" name="exit_date">
-    </div>
+                <div class="col-md-4">
+                    <label class="form-label">Telefone (WhatsApp) *</label>
+                    <input type="text" class="form-control" name="phone" placeholder="(00) 00000-0000" required>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Email</label>
+                    <input type="email" class="form-control" name="email">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">CEP</label>
+                    <input type="text" class="form-control" name="zip_code" id="zip_code" placeholder="00000-000">
+                </div>
 
-    <div class="col-12 text-end">
-        <button type="submit" class="btn btn-primary px-4">Salvar Membro</button>
-        <a href="/admin/members" class="btn btn-outline-secondary px-4">Cancelar</a>
+                <div class="col-md-6">
+                    <label class="form-label">Endereço (Rua) *</label>
+                    <input type="text" class="form-control" name="address" required>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Número *</label>
+                    <input type="text" class="form-control" name="address_number" required>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Bairro *</label>
+                    <input type="text" class="form-control" name="neighborhood" required>
+                </div>
+                
+                <div class="col-md-4">
+                    <label class="form-label">Complemento</label>
+                    <input type="text" class="form-control" name="complement">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Ponto de Referência</label>
+                    <input type="text" class="form-control" name="reference_point">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Estado *</label>
+                    <select class="form-select" name="state" id="state" required>
+                        <option value="">UF</option>
+                        <option value="AC">AC</option><option value="AL">AL</option><option value="AP">AP</option>
+                        <option value="AM">AM</option><option value="BA">BA</option><option value="CE">CE</option>
+                        <option value="DF">DF</option><option value="ES">ES</option><option value="GO">GO</option>
+                        <option value="MA">MA</option><option value="MT">MT</option><option value="MS">MS</option>
+                        <option value="MG">MG</option><option value="PA">PA</option><option value="PB">PB</option>
+                        <option value="PR">PR</option><option value="PE">PE</option><option value="PI">PI</option>
+                        <option value="RJ">RJ</option><option value="RN">RN</option><option value="RS">RS</option>
+                        <option value="RO">RO</option><option value="RR">RR</option><option value="IVN">IVN</option>
+                        <option value="SP">SP</option><option value="SE">SE</option><option value="TO">TO</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Cidade *</label>
+                    <input type="text" class="form-control" name="city" id="city" required>
+                </div>
+            </div>
+        </div>
+
+        <div class="member-form-slide">
+            <div class="row g-3">
+                <div class="col-12">
+                    <div class="member-form-slide-head mb-2">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="member-form-slide-title text-primary" data-step-title>Dados Eclesiásticos</div>
+                            <div class="member-form-slide-step">3/3</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label">Congregação *</label>
+                    <select class="form-select" name="congregation_id" required>
+                        <?php foreach ($congregations as $c): ?>
+                            <option value="<?= $c['id'] ?>"><?= htmlspecialchars($c['name']) ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Cargo *</label>
+                    <div class="input-group">
+                        <select class="form-select" name="role" id="roleSelect" required>
+                            <option value="">Carregando...</option>
+                        </select>
+                        <button type="button" class="btn btn-outline-secondary" id="btnAddRole" title="Adicionar novo cargo">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary" id="btnEditRole" title="Editar cargo selecionado">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button type="button" class="btn btn-outline-danger" id="btnDeleteRole" title="Excluir cargo selecionado">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Situação do Membro *</label>
+                    <select class="form-select" name="status" id="memberStatus" required>
+                        <option value="active">Ativo (Congregando)</option>
+                        <option value="inactive">Inativo (Desligado/Saiu)</option>
+                    </select>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label">Forma de Ingresso *</label>
+                    <select class="form-select" name="admission_method" id="admissionMethod" required>
+                        <option value="">Selecione...</option>
+                        <option value="Aclamação">Aclamação — recebido pela igreja sem carta de transferência</option>
+                        <option value="Transferido">Transferido — recebido com carta de transferência de outra igreja</option>
+                        <option value="Batismo">Batismo — novo convertido recebido após batismo</option>
+                        <option value="Congregado">Congregado — passou a congregar sem transferência formal</option>
+                    </select>
+                    <div id="admissionHelp" class="form-text">Selecione a forma de ingresso do membro.</div>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Data de Aceite/Entrada</label>
+                    <input type="date" class="form-control" name="admission_date" value="<?= date('Y-m-d') ?>">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Origem (Igreja Anterior)</label>
+                    <input type="text" class="form-control" name="church_origin">
+                </div>
+                
+                <div class="col-12" id="transferLetterBox" style="display:none">
+                    <div class="card mt-2">
+                        <div class="card-body">
+                            <h6 class="mb-2">Carta de Transferência</h6>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">Importar Arquivo</label>
+                                    <input type="file" class="form-control" name="transfer_letter" accept="image/*,application/pdf">
+                                    <small class="text-muted">Aceita imagem ou PDF.</small>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Capturar com Webcam</label>
+                                    <div>
+                                        <button type="button" class="btn btn-outline-secondary btn-sm" id="btnTransferWebcam"><i class="fas fa-camera"></i> Capturar Imagem</button>
+                                    </div>
+                                    <div id="transferWebcamContainer" style="display:none;" class="border p-2 rounded mt-2">
+                                        <div id="transferVideoWrap" style="position:relative; display:inline-block; overflow:hidden;">
+                                            <video id="transferWebcamVideo" width="640" height="480" autoplay style="position:absolute; left:0; top:0;"></video>
+                                            <div id="transferGuide" style="position:absolute; border:2px dashed #ffc107;"></div>
+                                        </div>
+                                        <canvas id="transferWebcamCanvas" width="600" height="848" style="display:none;"></canvas>
+                                        <div class="mt-2">
+                                            <button type="button" class="btn btn-success btn-sm" id="btnTransferCapture">Capturar</button>
+                                            <button type="button" class="btn btn-secondary btn-sm" id="btnTransferCancel">Cancelar</button>
+                                        </div>
+                                    </div>
+                                    <input type="hidden" name="transfer_letter_webcam" id="transferLetterWebcamData">
+                                    <img id="transferPreviewImage" class="img-thumbnail mt-2" style="width: 150px; height: 212px; object-fit: cover; display:none;">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="form-check mt-4">
+                        <input class="form-check-input" type="checkbox" id="isBaptized" name="is_baptized" value="1">
+                        <label class="form-check-label fw-bold" for="isBaptized">Batizado nas Águas?</label>
+                    </div>
+                </div>
+                <div class="col-md-3" id="baptismDateDiv" style="display:none;">
+                    <label class="form-label">Data de Batismo</label>
+                    <input type="date" class="form-control" name="baptism_date">
+                </div>
+                
+                <div class="col-md-3">
+                    <div class="form-check mt-4">
+                        <input class="form-check-input" type="checkbox" name="is_tither" value="1">
+                        <label class="form-check-label fw-bold">Dizimista?</label>
+                    </div>
+                    <div class="form-check mt-2">
+                        <input class="form-check-input" type="checkbox" name="is_ebd_teacher" value="1">
+                        <label class="form-check-label text-primary fw-bold">Professor de EBD?</label>
+                    </div>
+                </div>
+                
+                <div class="col-md-12 mt-3">
+                    <h5 class="text-secondary border-bottom pb-2">Status Espiritual</h5>
+                </div>
+                
+                <div class="col-md-3">
+                    <div class="form-check mt-4">
+                        <input class="form-check-input" type="checkbox" name="is_new_convert" value="1" id="isNewConvert">
+                        <label class="form-check-label fw-bold" for="isNewConvert">Novo Convertido?</label>
+                    </div>
+                </div>
+                
+                <div class="col-md-3">
+                    <label class="form-label">Data de Aceitação (Jesus)</label>
+                    <input type="date" class="form-control" name="accepted_jesus_at">
+                </div>
+                
+                <div class="col-md-3">
+                    <label class="form-label">Data de Reconciliação</label>
+                    <input type="date" class="form-control" name="reconciled_at">
+                </div>
+
+                <div class="col-md-3" id="exitDateDiv">
+                    <label class="form-label">Data de Saída (Opcional)</label>
+                    <input type="date" class="form-control" name="exit_date">
+                </div>
+
+                <div class="col-12 text-end d-none d-md-block">
+                    <button type="submit" class="btn btn-primary px-4">Salvar Membro</button>
+                    <a href="/admin/members" class="btn btn-outline-secondary px-4">Cancelar</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+    <div class="member-form-bottom-actions app-form-bottom-actions d-lg-none">
+        <div class="row g-2">
+            <div class="col-6">
+                <button type="submit" class="btn btn-primary w-100">Salvar</button>
+            </div>
+            <div class="col-6">
+                <a href="/admin/members" class="btn btn-outline-secondary w-100">Cancelar</a>
+            </div>
+        </div>
     </div>
 </form>
 
 <script>
-document.querySelector('form').addEventListener('submit', function(e) {
+document.getElementById('memberCreateForm').addEventListener('submit', function(e) {
     let isValid = true;
     const requiredFields = this.querySelectorAll('[required]');
     
@@ -311,6 +467,15 @@ document.querySelector('form').addEventListener('submit', function(e) {
             field.classList.add('is-invalid');
             if (isValid) {
                 // Foca apenas no primeiro campo inválido
+                const carousel = document.getElementById('memberFormCarousel');
+                const slide = field.closest('.member-form-slide');
+                if (carousel && slide) {
+                    const slides = Array.from(carousel.querySelectorAll('.member-form-slide'));
+                    const idx = slides.indexOf(slide);
+                    if (idx >= 0) {
+                        carousel.scrollTo({ left: carousel.clientWidth * idx, behavior: 'smooth' });
+                    }
+                }
                 field.focus();
                 isValid = false;
                 
@@ -354,6 +519,30 @@ function loadRoles(selectedRole = null) {
 // Carregar cargos ao iniciar
 document.addEventListener('DOMContentLoaded', function() {
     loadRoles();
+
+    const carousel = document.getElementById('memberFormCarousel');
+    const stepEl = document.getElementById('memberFormStepIndicator');
+    const progressEl = document.getElementById('memberFormProgressBar');
+    const slides = carousel ? Array.from(carousel.querySelectorAll('.member-form-slide')) : [];
+
+    function setStep(activeIndex) {
+        const total = slides.length || 1;
+        const index = Math.min(Math.max(activeIndex, 0), total - 1);
+        if (stepEl) stepEl.textContent = (index + 1) + '/' + total;
+        if (progressEl) progressEl.style.width = (((index + 1) / total) * 100) + '%';
+    }
+
+    function onScroll() {
+        if (!carousel) return;
+        const w = carousel.clientWidth || 1;
+        const idx = Math.round(carousel.scrollLeft / w);
+        setStep(idx);
+    }
+
+    if (carousel && slides.length > 0) {
+        setStep(0);
+        carousel.addEventListener('scroll', onScroll, { passive: true });
+    }
 });
 
 // Adicionar Novo Cargo

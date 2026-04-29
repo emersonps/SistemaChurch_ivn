@@ -62,26 +62,32 @@ header("X-Frame-Options: SAMEORIGIN");
 header("X-XSS-Protection: 1; mode=block");
 header("Referrer-Policy: strict-origin-when-cross-origin");
 
-if ($uri == '/manifest.webmanifest') {
+if ($uri == '/manifest.webmanifest' || $uri == '/manifest.json') {
     $siteProfile = getChurchSiteProfileSettings();
+    $appName = getChurchBrandingAlias($siteProfile);
+    $logoUrl = getChurchLogoUrl($siteProfile, true);
     header('Content-Type: application/manifest+json; charset=utf-8');
+    header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+    header('Pragma: no-cache');
     echo json_encode([
-        'name' => ($siteProfile['alias'] ?? 'IVN') . ' - ' . ($siteProfile['name'] ?? 'Igreja Vida Nova'),
-        'short_name' => $siteProfile['alias'] ?? 'IVN',
+        'name' => $appName,
+        'short_name' => $appName,
+        'id' => '/',
         'start_url' => '/',
+        'scope' => '/',
         'display' => 'standalone',
-        'background_color' => '#000000',
-        'theme_color' => '#000000',
-        'description' => 'Aplicativo oficial da ' . ($siteProfile['alias'] ?? 'IVN'),
+        'background_color' => '#ffffff',
+        'theme_color' => '#ffffff',
+        'description' => 'Aplicativo da igreja',
         'icons' => [
             [
-                'src' => $siteProfile['logo_url'] ?? '/assets/img/logo.png',
+                'src' => $logoUrl,
                 'sizes' => '192x192',
                 'type' => 'image/png',
                 'purpose' => 'any'
             ],
             [
-                'src' => $siteProfile['logo_url'] ?? '/assets/img/logo.png',
+                'src' => $logoUrl,
                 'sizes' => '512x512',
                 'type' => 'image/png',
                 'purpose' => 'any'
@@ -579,6 +585,13 @@ elseif ($uri == '/admin/studies/create') {
 }
 elseif (preg_match('#^/admin/studies/delete/(\d+)$#', $uri, $matches)) {
     (new StudyController())->delete($matches[1]);
+}
+elseif (preg_match('#^/admin/studies/edit/(\d+)$#', $uri, $matches)) {
+    if ($method == 'POST') {
+        (new StudyController())->update($matches[1]);
+    } else {
+        (new StudyController())->edit($matches[1]);
+    }
 }
 elseif ($uri == '/portal/studies') {
     (new StudyController())->portalIndex();

@@ -7,19 +7,7 @@ class AuthController {
             if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'developer') {
                 redirect('/developer/dashboard');
             } else {
-                $rbac = require __DIR__ . '/../../config/rbac.php';
-                $role = $_SESSION['user_role'] ?? 'guest';
-                $rolePerms = $rbac['roles'][$role]['permissions'] ?? [];
-                
-                if (in_array('dashboard.view', $rolePerms) || in_array('admin.manage', $rolePerms)) {
-                    redirect('/admin/dashboard');
-                } elseif (in_array('financial.view', $rolePerms) || in_array('financial.manage', $rolePerms)) {
-                    redirect('/admin/financial/bank-accounts');
-                } elseif (in_array('members.view', $rolePerms)) {
-                    redirect('/admin/members');
-                } else {
-                    redirect('/admin/dashboard');
-                }
+                redirect('/admin/dashboard');
             }
         }
         view('admin/login');
@@ -48,20 +36,7 @@ class AuthController {
             if ($user['role'] === 'developer') {
                 redirect('/developer/dashboard');
             } else {
-                // Verificar qual a primeira página que ele tem acesso se não puder ver o dashboard
-                $rbac = require __DIR__ . '/../../config/rbac.php';
-                $rolePerms = $rbac['roles'][$user['role']]['permissions'] ?? [];
-                
-                if (in_array('dashboard.view', $rolePerms) || in_array('admin.manage', $rolePerms)) {
-                    redirect('/admin/dashboard');
-                } elseif (in_array('financial.view', $rolePerms) || in_array('financial.manage', $rolePerms)) {
-                    redirect('/admin/financial/bank-accounts');
-                } elseif (in_array('members.view', $rolePerms)) {
-                    redirect('/admin/members');
-                } else {
-                    // Fallback genérico (se bater no dashboard e for bloqueado, o helpers.php joga pro logout)
-                    redirect('/admin/dashboard');
-                }
+                redirect('/admin/dashboard');
             }
             
         } else {

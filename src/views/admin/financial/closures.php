@@ -20,9 +20,71 @@ foreach ($closures as $fc) {
     $groupedClosures[$congregationName][] = $fc;
 }
 ksort($groupedClosures);
+$tabTotal = count($groupedClosures);
+$hasMultipleCongregations = $tabTotal > 1;
 ?>
 
-<ul class="nav nav-tabs mb-3" id="closureTabs" role="tablist">
+<style>
+    @media (max-width: 991.98px) {
+        .closure-tabs-carousel {
+            position: relative;
+        }
+        .closure-tabs-carousel.multi::before {
+            content: '';
+            position: absolute;
+            inset: 0 0 auto 0;
+            height: 4px;
+            background: linear-gradient(90deg, #198754 0%, #0d6efd 55%, #d4af37 100%);
+            z-index: 2;
+        }
+        .closure-tabs-carousel.multi #closureTabsContent {
+            display: flex;
+            gap: 0;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            scroll-behavior: smooth;
+            scrollbar-width: none;
+            padding: .25rem .25rem .35rem;
+        }
+        .closure-tabs-carousel.multi #closureTabsContent::-webkit-scrollbar { display: none; }
+        .closure-tabs-carousel.multi #closureTabsContent > .tab-pane {
+            display: block !important;
+            flex: 0 0 100%;
+            min-width: 100%;
+            scroll-snap-align: center;
+            opacity: 1 !important;
+            padding: .35rem;
+        }
+        .closure-tabs-carousel.multi #closureTabsContent > .tab-pane.fade { transition: none; }
+        .closure-pane-card {
+            border-radius: 16px;
+            border: 1px solid rgba(0,0,0,0.08);
+            overflow: hidden;
+            background: #fff;
+        }
+        .closure-pane-head {
+            background: linear-gradient(135deg, rgba(25,135,84,0.14), rgba(13,110,253,0.10));
+        }
+        .closure-pane-title {
+            font-weight: 900;
+            font-size: 1.05rem;
+            letter-spacing: .01em;
+            color: #0b2a1b;
+        }
+        .closure-pane-hint {
+            font-size: .72rem;
+            letter-spacing: .08em;
+            font-weight: 800;
+            color: rgba(0,0,0,0.52);
+            text-transform: uppercase;
+        }
+        .closure-pane-hint i {
+            color: #198754;
+        }
+    }
+</style>
+
+<ul class="nav nav-tabs mb-3 d-none d-lg-flex" id="closureTabs" role="tablist">
     <?php $first = true; foreach ($groupedClosures as $congregationName => $items): 
         $tabId = 'tab-' . md5($congregationName);
     ?>
@@ -35,13 +97,32 @@ ksort($groupedClosures);
     <?php $first = false; endforeach; ?>
 </ul>
 
+<div class="closure-tabs-carousel <?= $hasMultipleCongregations ? 'multi' : '' ?>">
 <div class="tab-content" id="closureTabsContent">
-    <?php $first = true; foreach ($groupedClosures as $congregationName => $items): 
+    <?php $first = true; $tabStep = 1; foreach ($groupedClosures as $congregationName => $items): 
         $tabId = 'tab-' . md5($congregationName);
     ?>
         <div class="tab-pane fade <?= $first ? 'show active' : '' ?>" id="<?= $tabId ?>" role="tabpanel" aria-labelledby="<?= $tabId ?>-tab">
-            <div class="table-responsive">
-                <table class="table table-striped table-hover table-sm">
+            <div class="closure-pane-card">
+                <div class="d-lg-none px-3 py-3 border-bottom closure-pane-head">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div class="me-3">
+                            <div class="closure-pane-title">
+                                <i class="fas fa-church me-2"></i><?= htmlspecialchars($congregationName) ?>
+                            </div>
+                            <?php if ($hasMultipleCongregations): ?>
+                                <div class="closure-pane-hint mt-1">
+                                    <i class="fas fa-arrows-left-right me-2"></i>Deslize para mudar (<?= $tabStep ?>/<?= $tabTotal ?>)
+                                </div>
+                            <?php endif; ?>
+                        </div>
+                        <?php if ($hasMultipleCongregations): ?>
+                            <span class="badge bg-dark"><?= $tabStep ?>/<?= $tabTotal ?></span>
+                        <?php endif; ?>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover table-sm">
                     <thead>
                         <tr>
                             <th>Período</th>
@@ -80,9 +161,11 @@ ksort($groupedClosures);
                         <?php endforeach; ?>
                     </tbody>
                 </table>
+                </div>
             </div>
         </div>
-    <?php $first = false; endforeach; ?>
+    <?php $first = false; $tabStep++; endforeach; ?>
+</div>
 </div>
 
 <?php if (empty($groupedClosures)): ?>

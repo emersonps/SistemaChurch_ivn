@@ -4,7 +4,7 @@
     <h1 class="h2">Nova Saída</h1>
 </div>
 
-<form action="/admin/expenses/store" method="POST" class="row g-3">
+<form action="/admin/expenses/store" method="POST" class="row g-3 app-form-with-bottom-actions">
     <?= csrf_field() ?>
     <div class="col-md-6">
         <label class="form-label">Descrição</label>
@@ -84,9 +84,20 @@
         <textarea class="form-control" name="notes" rows="3"></textarea>
     </div>
 
-    <div class="col-12 mt-4">
-        <button type="submit" class="btn btn-danger">Registrar Saída</button>
-        <a href="/admin/expenses" class="btn btn-secondary">Cancelar</a>
+    <div class="col-12 mt-4 text-end d-none d-lg-block">
+        <button type="submit" class="btn btn-primary px-4">Salvar</button>
+        <a href="/admin/expenses" class="btn btn-outline-secondary px-4">Cancelar</a>
+    </div>
+
+    <div class="col-12 app-form-bottom-actions d-lg-none">
+        <div class="row g-2">
+            <div class="col-6">
+                <button type="submit" class="btn btn-primary w-100">Salvar</button>
+            </div>
+            <div class="col-6">
+                <a href="/admin/expenses" class="btn btn-outline-secondary w-100">Cancelar</a>
+            </div>
+        </div>
     </div>
 </form>
 

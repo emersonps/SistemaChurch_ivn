@@ -452,18 +452,19 @@ function registerSystemPaymentExpense($month, $amount = null) {
         if ($amount === null) {
             $amount = 59.99;
         }
-        $stmtHqType = $db->query("SELECT id FROM congregations WHERE type = 'headquarters' LIMIT 1");
+        $hqId = null;
+        $stmtHqType = $db->query("SELECT id FROM congregations WHERE LOWER(type) IN ('headquarters', 'sede', 'matriz', 'principal') ORDER BY id ASC LIMIT 1");
         if ($row = $stmtHqType->fetch()) {
             $hqId = $row['id'];
         }
         if (!$hqId) {
-            $stmtHqName = $db->query("SELECT id FROM congregations WHERE name LIKE '%Sede%' OR name LIKE '%Matriz%' LIMIT 1");
+            $stmtHqName = $db->query("SELECT id FROM congregations WHERE name LIKE '%Sede%' OR name LIKE '%Matriz%' OR name LIKE '%Mãe%' OR name LIKE '%Mae%' ORDER BY id ASC LIMIT 1");
             if ($row = $stmtHqName->fetch()) {
                 $hqId = $row['id'];
             }
         }
         if (!$hqId) {
-            $stmtAny = $db->query("SELECT id FROM congregations LIMIT 1");
+            $stmtAny = $db->query("SELECT id FROM congregations ORDER BY id ASC LIMIT 1");
             if ($row = $stmtAny->fetch()) {
                 $hqId = $row['id'];
             }
@@ -590,6 +591,100 @@ function getChurchSocialIconOptions() {
         'linkedin' => ['label' => 'LinkedIn', 'icon' => 'fab fa-linkedin'],
         'x-twitter' => ['label' => 'X / Twitter', 'icon' => 'fab fa-x-twitter'],
     ];
+}
+
+function appendVersionToUrl($url, $version) {
+    $url = trim((string)$url);
+    if ($url === '') {
+        return '';
+    }
+
+    $separator = strpos($url, '?') === false ? '?' : '&';
+    return $url . $separator . 'v=' . rawurlencode((string)$version);
+}
+
+function resolvePublicPathFromUrl($url) {
+    $url = trim((string)$url);
+    if ($url === '') {
+        return null;
+    }
+
+    $path = parse_url($url, PHP_URL_PATH);
+    if (!is_string($path) || $path === '' || $path[0] !== '/') {
+        return null;
+    }
+
+    $candidate = dirname(__DIR__) . '/public' . str_replace('/', DIRECTORY_SEPARATOR, $path);
+    return file_exists($candidate) ? $candidate : null;
+}
+
+function getChurchBrandingName($siteProfile = null) {
+    if (!is_array($siteProfile)) {
+        $siteProfile = getChurchSiteProfileSettings();
+    }
+
+    $name = trim((string)($siteProfile['name'] ?? ''));
+    if ($name !== '') {
+        return $name;
+    }
+
+    $alias = trim((string)($siteProfile['alias'] ?? ''));
+    return $alias !== '' ? $alias : 'Igreja';
+}
+
+function getChurchBrandingAlias($siteProfile = null) {
+    if (!is_array($siteProfile)) {
+        $siteProfile = getChurchSiteProfileSettings();
+    }
+
+    $alias = trim((string)($siteProfile['alias'] ?? ''));
+    if ($alias !== '') {
+        return $alias;
+    }
+
+    return getChurchBrandingName($siteProfile);
+}
+
+function getChurchBrandingVersion($siteProfile = null) {
+    if (!is_array($siteProfile)) {
+        $siteProfile = getChurchSiteProfileSettings();
+    }
+
+    $logoUrl = trim((string)($siteProfile['logo_url'] ?? '/assets/img/logo.png'));
+    $logoPath = resolvePublicPathFromUrl($logoUrl);
+    $logoMtime = $logoPath ? (string)filemtime($logoPath) : 'remote';
+
+    return substr(sha1(
+        getChurchBrandingName($siteProfile) . '|' .
+        getChurchBrandingAlias($siteProfile) . '|' .
+        $logoUrl . '|' .
+        $logoMtime
+    ), 0, 12);
+}
+
+function getChurchLogoUrl($siteProfile = null, $versioned = false) {
+    if (!is_array($siteProfile)) {
+        $siteProfile = getChurchSiteProfileSettings();
+    }
+
+    $logoUrl = trim((string)($siteProfile['logo_url'] ?? '/assets/img/logo.png'));
+    if ($logoUrl === '') {
+        $logoUrl = '/assets/img/logo.png';
+    }
+
+    if (!$versioned) {
+        return $logoUrl;
+    }
+
+    return appendVersionToUrl($logoUrl, getChurchBrandingVersion($siteProfile));
+}
+
+function getChurchManifestUrl($siteProfile = null) {
+    if (!is_array($siteProfile)) {
+        $siteProfile = getChurchSiteProfileSettings();
+    }
+
+    return appendVersionToUrl('/manifest.webmanifest', getChurchBrandingVersion($siteProfile));
 }
 
 function getChurchSiteProfileSettings() {

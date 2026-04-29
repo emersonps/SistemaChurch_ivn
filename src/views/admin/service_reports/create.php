@@ -9,7 +9,7 @@
     </div>
 </div>
 
-<form action="/admin/service_reports/create" method="POST" id="reportForm">
+<form action="/admin/service_reports/create" method="POST" id="reportForm" class="app-form-with-bottom-actions">
     <?= csrf_field() ?>
     
     <!-- Dados Gerais -->
@@ -130,8 +130,20 @@
         <textarea class="form-control" id="notes" name="notes" rows="3"></textarea>
     </div>
 
-    <div class="d-grid gap-2 d-md-flex justify-content-md-end mb-5">
-        <button type="submit" class="btn btn-primary btn-lg"><i class="fas fa-save me-2"></i>Salvar Relatório</button>
+    <div class="text-end d-none d-lg-block mb-5">
+        <button type="submit" class="btn btn-primary px-4">Salvar</button>
+        <a href="/admin/service_reports" class="btn btn-outline-secondary px-4">Cancelar</a>
+    </div>
+
+    <div class="app-form-bottom-actions d-lg-none">
+        <div class="row g-2">
+            <div class="col-6">
+                <button type="submit" class="btn btn-primary w-100">Salvar</button>
+            </div>
+            <div class="col-6">
+                <a href="/admin/service_reports" class="btn btn-outline-secondary w-100">Cancelar</a>
+            </div>
+        </div>
     </div>
 
 </form>

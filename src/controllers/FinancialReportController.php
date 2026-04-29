@@ -18,6 +18,60 @@ class FinancialReportController {
         }
         return false;
     }
+
+    private function normalizeDateYmd($value, $defaultYmd) {
+        if ($value === null || $value === '') {
+            return $defaultYmd;
+        }
+
+        $value = trim((string)$value);
+        if ($value === '') {
+            return $defaultYmd;
+        }
+
+        $formats = ['Y-m-d', 'd/m/Y', 'd-m-Y', 'Y/m/d'];
+        foreach ($formats as $format) {
+            $dt = DateTimeImmutable::createFromFormat($format, $value);
+            if ($dt && $dt->format($format) === $value) {
+                return $dt->format('Y-m-d');
+            }
+        }
+
+        $ts = strtotime($value);
+        if ($ts !== false) {
+            return date('Y-m-d', $ts);
+        }
+
+        return $defaultYmd;
+    }
+
+    private function resolveDateRangeYmd() {
+        $defaultStart = date('Y-m-01');
+        $defaultEnd = date('Y-m-t');
+
+        $startYmd = $this->normalizeDateYmd($_GET['start_date'] ?? null, $defaultStart);
+        $endYmd = $this->normalizeDateYmd($_GET['end_date'] ?? null, $defaultEnd);
+
+        $start = new DateTimeImmutable($startYmd);
+        $end = new DateTimeImmutable($endYmd);
+
+        if ($end < $start) {
+            $startYear = (int)$start->format('Y');
+            $endYear = (int)$end->format('Y');
+            $startMd = (int)$start->format('md');
+            $endMd = (int)$end->format('md');
+
+            if ($startYear === $endYear && $endMd < $startMd) {
+                $end = $end->modify('+1 year');
+            } else {
+                $tmp = $start;
+                $start = $end;
+                $end = $tmp;
+            }
+        }
+
+        return [$start->format('Y-m-d'), $end->format('Y-m-d')];
+    }
     
     public function index() {
         requirePermission('financial.view');
@@ -26,8 +80,7 @@ class FinancialReportController {
         $hasExpenseAccountableField = $this->tableHasColumn($db, 'expenses', 'is_accountable');
         
         // Default Filters
-        $start_date = $_GET['start_date'] ?? date('Y-m-01');
-        $end_date = $_GET['end_date'] ?? date('Y-m-t');
+        [$start_date, $end_date] = $this->resolveDateRangeYmd();
         $congregation_id = $_GET['congregation_id'] ?? null;
         
         // Scope Check
@@ -128,8 +181,7 @@ class FinancialReportController {
         $hasAccountableField = $this->tableHasColumn($db, 'tithes', 'is_accountable');
         $hasExpenseAccountableField = $this->tableHasColumn($db, 'expenses', 'is_accountable');
         
-        $start_date = $_GET['start_date'] ?? date('Y-m-01');
-        $end_date = $_GET['end_date'] ?? date('Y-m-t');
+        [$start_date, $end_date] = $this->resolveDateRangeYmd();
         $congregation_id = $_GET['congregation_id'] ?? null;
         
         if (!empty($_SESSION['user_congregation_id'])) {

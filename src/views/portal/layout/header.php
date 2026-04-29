@@ -4,12 +4,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portal do Membro - <?= htmlspecialchars($siteProfile['alias'] ?? 'IVN') ?></title>
+    <title>Portal do Membro - <?= htmlspecialchars(getChurchBrandingName($siteProfile)) ?></title>
     <!-- Favicon -->
-    <link rel="icon" type="image/png" href="<?= htmlspecialchars($siteProfile['logo_url'] ?? '/assets/img/logo.png') ?>?v=1">
-    <link rel="apple-touch-icon" href="<?= htmlspecialchars($siteProfile['logo_url'] ?? '/assets/img/logo.png') ?>?v=1">
+    <link rel="icon" type="image/png" href="<?= htmlspecialchars(getChurchLogoUrl($siteProfile, true)) ?>">
+    <link rel="apple-touch-icon" href="<?= htmlspecialchars(getChurchLogoUrl($siteProfile, true)) ?>">
     <!-- PWA / Web App Manifest -->
-    <link rel="manifest" href="/manifest.webmanifest">
+    <link rel="manifest" href="<?= htmlspecialchars(getChurchManifestUrl($siteProfile)) ?>">
     <meta name="theme-color" content="#dc3545">
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -38,7 +38,7 @@
         <div class="collapse navbar-collapse justify-content-end">
             <ul class="navbar-nav">
                 <li class="nav-item">
-                    <span class="nav-link text-white">Olá, <?= htmlspecialchars($_SESSION['member_name']) ?></span>
+                    <span class="nav-link text-white">Olá, <?= htmlspecialchars($_SESSION['member_name']) ?> <span class="badge bg-light text-danger ms-2">Membro</span></span>
                 </li>
                 <li class="nav-item"><a class="nav-link" href="/portal/logout"><i class="fas fa-sign-out-alt"></i> Sair</a></li>
             </ul>

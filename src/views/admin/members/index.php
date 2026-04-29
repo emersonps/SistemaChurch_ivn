@@ -51,9 +51,83 @@ foreach ($members as $member) {
     $groupedMembers[$congregationName][] = $member;
 }
 ksort($groupedMembers); // Ordenar abas alfabeticamente
+$hasMultipleCongregations = count($groupedMembers) > 1;
 ?>
 
-<ul class="nav nav-tabs mb-3" id="memberTabs" role="tablist">
+<style>
+    @media (max-width: 991.98px) {
+        .member-tabs-carousel {
+            position: relative;
+        }
+        .member-tabs-carousel.multi::before {
+            content: '';
+            position: absolute;
+            inset: 0 0 auto 0;
+            height: 4px;
+            background: linear-gradient(90deg, #ff2a7a 0%, #b30000 52%, #d4af37 100%);
+            z-index: 2;
+        }
+        .member-tabs-carousel.multi #memberTabsContent {
+            display: flex;
+            gap: 0;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            scroll-behavior: smooth;
+            scrollbar-width: none;
+            padding: .25rem .25rem .35rem;
+        }
+        .member-tabs-carousel.multi #memberTabsContent::-webkit-scrollbar { display: none; }
+        .member-tabs-carousel.multi #memberTabsContent > .tab-pane {
+            display: block !important;
+            flex: 0 0 100%;
+            min-width: 100%;
+            scroll-snap-align: center;
+            opacity: 1 !important;
+            padding: .35rem;
+        }
+        .member-tabs-carousel.multi #memberTabsContent > .tab-pane.fade { transition: none; }
+        .member-pane-card {
+            border-radius: 16px;
+            border: 1px solid rgba(0,0,0,0.08);
+            overflow: hidden;
+            background: #fff;
+        }
+        .member-pane-head {
+            background: linear-gradient(135deg, rgba(179,0,0,0.10), rgba(212,175,55,0.16));
+        }
+        .member-pane-title {
+            font-weight: 900;
+            font-size: 1.05rem;
+            letter-spacing: .01em;
+            color: #2d1a21;
+        }
+        .member-pane-hint {
+            font-size: .72rem;
+            letter-spacing: .08em;
+            font-weight: 800;
+            color: rgba(0,0,0,0.52);
+            text-transform: uppercase;
+        }
+        .member-pane-hint i {
+            color: #b30000;
+        }
+        .dataTables_wrapper .dataTables_filter {
+            width: 100%;
+            text-align: left;
+            margin: .25rem 0 .5rem;
+        }
+        .dataTables_wrapper .dataTables_filter label {
+            width: 100%;
+            margin: 0;
+        }
+        .dataTables_wrapper .dataTables_filter input {
+            width: 100% !important;
+            margin-left: 0 !important;
+        }
+    }
+</style>
+
+<ul class="nav nav-tabs mb-3 d-none d-lg-flex" id="memberTabs" role="tablist">
     <?php $first = true; foreach ($groupedMembers as $congregationName => $congregationMembers): 
         $tabId = 'tab-' . md5($congregationName);
     ?>
@@ -69,6 +143,7 @@ ksort($groupedMembers); // Ordenar abas alfabeticamente
 <!-- DataTables CSS -->
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
 
+<div class="member-tabs-carousel <?= $hasMultipleCongregations ? 'multi' : '' ?>">
 <div class="tab-content" id="memberTabsContent">
     <?php 
     $first = true;
@@ -77,6 +152,22 @@ ksort($groupedMembers); // Ordenar abas alfabeticamente
         $tabId = 'tab-' . md5($congregationName);
     ?>
     <div class="tab-pane fade <?= $first ? 'show active' : '' ?>" id="<?= $tabId ?>" role="tabpanel" aria-labelledby="<?= $tabId ?>-tab">
+        <div class="member-pane-card">
+            <div class="d-lg-none px-3 py-3 border-bottom member-pane-head">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div class="me-3">
+                        <div class="member-pane-title">
+                            <i class="fas fa-church me-2"></i><?= htmlspecialchars($congregationName) ?>
+                        </div>
+                        <?php if ($hasMultipleCongregations): ?>
+                            <div class="member-pane-hint mt-1">
+                                <i class="fas fa-arrows-left-right me-2"></i>Deslize aqui para mudar
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                    <span class="badge bg-dark"><?= count($congregationMembers) ?></span>
+                </div>
+            </div>
         <div class="table-responsive p-2">
             <table class="table table-striped table-hover table-sm datatable" style="width:100%">
                 <thead class="table-light">
@@ -136,11 +227,13 @@ ksort($groupedMembers); // Ordenar abas alfabeticamente
                 </tbody>
             </table>
         </div>
+        </div>
     </div>
     <?php 
         $first = false; 
     endforeach; 
     ?>
+</div>
 </div>
 
 <?php include __DIR__ . '/../../layout/footer.php'; ?>
@@ -153,7 +246,9 @@ ksort($groupedMembers); // Ordenar abas alfabeticamente
     $(document).ready(function () {
         $('.datatable').DataTable({
             language: {
-                url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/pt-BR.json'
+                url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/pt-BR.json',
+                search: '',
+                    searchPlaceholder: 'Pesquisar...'
             },
             order: [[1, 'asc']], // Ordenar pelo Nome (coluna 1)
             pageLength: 10,
@@ -168,6 +263,10 @@ ksort($groupedMembers); // Ordenar abas alfabeticamente
                 { orderable: false, targets: [0, 5] } // Não ordenar por Foto (0) e Ações (5)
             ]
         });
+
+        $('.dataTables_wrapper .dataTables_filter input')
+            .addClass('form-control-lg border-primary shadow-sm')
+            .attr('aria-label', 'Buscar por registros');
         
         // Ajustar colunas ao mudar de aba
         $('button[data-bs-toggle="tab"]').on('shown.bs.tab', function (e) {

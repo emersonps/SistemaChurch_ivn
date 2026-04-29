@@ -13,6 +13,7 @@ if ($driver === 'sqlite') {
         description TEXT,
         file_path TEXT NOT NULL,
         congregation_id INTEGER,
+        created_by INTEGER,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (congregation_id) REFERENCES congregations(id)
     )";
@@ -24,6 +25,7 @@ if ($driver === 'sqlite') {
         description TEXT,
         file_path VARCHAR(255) NOT NULL,
         congregation_id INT,
+        created_by INT,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (congregation_id) REFERENCES congregations(id)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4";

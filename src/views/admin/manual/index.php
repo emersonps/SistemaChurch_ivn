@@ -39,6 +39,45 @@
     .nav-pills .nav-link i {
         width: 25px;
     }
+    @media (max-width: 991.98px) {
+        #manualContent {
+            display: flex;
+            gap: 0;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            scroll-behavior: smooth;
+            scrollbar-width: none;
+            padding: .25rem .25rem .35rem;
+        }
+        #manualContent::-webkit-scrollbar { display: none; }
+        #manualContent > .tab-pane {
+            display: block !important;
+            flex: 0 0 100%;
+            min-width: 100%;
+            scroll-snap-align: center;
+            opacity: 1 !important;
+            padding: 1rem 1rem 1.25rem;
+        }
+        #manualContent > .tab-pane.fade { transition: none; }
+        .manual-carousel-indicator {
+            border-radius: 14px;
+            border: 1px solid rgba(0,0,0,0.08);
+            overflow: hidden;
+            background: linear-gradient(135deg, rgba(13,110,253,0.10), rgba(212,175,55,0.14));
+        }
+        .manual-carousel-title {
+            font-weight: 900;
+            letter-spacing: .01em;
+            color: #1b1b2a;
+        }
+        .manual-carousel-hint {
+            font-size: .72rem;
+            letter-spacing: .08em;
+            font-weight: 800;
+            color: rgba(0,0,0,0.52);
+            text-transform: uppercase;
+        }
+    }
 </style>
 
 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
@@ -52,7 +91,7 @@
 
 <div class="row">
     <!-- Menu Lateral do Manual -->
-    <div class="col-md-3 mb-4">
+    <div class="col-lg-3 mb-4 d-none d-lg-block">
         <div class="list-group nav-pills" id="manualTabs" role="tablist">
             <?php 
             $first = true;
@@ -76,7 +115,16 @@
     </div>
 
     <!-- Conteúdo do Manual -->
-    <div class="col-md-9">
+    <div class="col-lg-9">
+        <div class="manual-carousel-indicator d-lg-none mb-2 p-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="manual-carousel-title text-primary" id="manualCarouselTitle">Manual</div>
+                <span class="badge bg-dark" id="manualCarouselStep">1/1</span>
+            </div>
+            <div class="manual-carousel-hint mt-1">
+                <i class="fas fa-arrows-left-right me-2"></i>Deslize para mudar de seção
+            </div>
+        </div>
         <div class="tab-content bg-white p-4 rounded shadow-sm border" id="manualContent">
             
             <!-- Introdução -->
@@ -647,3 +695,52 @@
 </div>
 
 <?php include __DIR__ . '/../../layout/footer.php'; ?>
+
+<script>
+    (function () {
+        const carousel = document.getElementById('manualContent');
+        const titleEl = document.getElementById('manualCarouselTitle');
+        const stepEl = document.getElementById('manualCarouselStep');
+        if (!carousel || !titleEl || !stepEl) return;
+
+        const panes = Array.from(carousel.querySelectorAll(':scope > .tab-pane'));
+        if (panes.length === 0) return;
+
+        const total = panes.length;
+        const titleById = {};
+        const tabButtons = Array.from(document.querySelectorAll('#manualTabs [data-bs-target]'));
+        tabButtons.forEach((btn) => {
+            const target = btn.getAttribute('data-bs-target');
+            if (!target) return;
+            const id = target.replace('#', '');
+            titleById[id] = (btn.textContent || '').trim();
+        });
+
+        const clampIndex = (i) => Math.max(0, Math.min(i, total - 1));
+        const getIndex = () => {
+            const w = carousel.clientWidth || 1;
+            return clampIndex(Math.round(carousel.scrollLeft / w));
+        };
+
+        const render = (i) => {
+            const pane = panes[i];
+            const paneId = pane ? pane.id : '';
+            const title = titleById[paneId] || (paneId || 'Manual');
+            titleEl.textContent = title;
+            stepEl.textContent = (i + 1) + '/' + total;
+        };
+
+        let raf = 0;
+        const onScroll = () => {
+            if (raf) return;
+            raf = requestAnimationFrame(() => {
+                raf = 0;
+                render(getIndex());
+            });
+        };
+
+        carousel.addEventListener('scroll', onScroll, { passive: true });
+        window.addEventListener('resize', () => render(getIndex()));
+        render(getIndex());
+    })();
+</script>

@@ -19,10 +19,10 @@ if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'developer') {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= htmlspecialchars($siteProfile['name'] ?? 'Igreja Vida Nova') ?></title>
     <!-- Favicon -->
-    <link rel="icon" type="image/png" href="<?= htmlspecialchars($siteProfile['logo_url'] ?? '/assets/img/logo.png') ?>?v=1">
-    <link rel="apple-touch-icon" href="<?= htmlspecialchars($siteProfile['logo_url'] ?? '/assets/img/logo.png') ?>?v=1">
+    <link rel="icon" type="image/png" href="<?= htmlspecialchars(getChurchLogoUrl($siteProfile, true)) ?>">
+    <link rel="apple-touch-icon" href="<?= htmlspecialchars(getChurchLogoUrl($siteProfile, true)) ?>">
     <!-- PWA / Web App Manifest -->
-    <link rel="manifest" href="/manifest.webmanifest">
+    <link rel="manifest" href="<?= htmlspecialchars(getChurchManifestUrl($siteProfile)) ?>">
     <meta name="theme-color" content="#b30000">
     
     <!-- Bootstrap 5 CDN -->
@@ -43,12 +43,109 @@ if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'developer') {
         .text-primary { color: #b30000 !important; }
         .btn-primary { background-color: #b30000; border-color: #b30000; }
         .btn-primary:hover { background-color: #800000; border-color: #800000; }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .btn > i,
+        .btn > span {
+            line-height: 1;
+        }
         .sidebar-brand-logo { max-height: 42px; max-width: 100%; object-fit: contain; }
+        .mobile-launcher { }
+        .dataTables_wrapper .dataTables_filter {
+            width: 100%;
+            text-align: left;
+            float: none;
+            margin-bottom: .5rem;
+        }
+        .dataTables_wrapper .dataTables_length {
+            margin-bottom: .5rem;
+        }
+        .dataTables_wrapper .row {
+            --bs-gutter-y: .5rem;
+        }
+        .dataTables_wrapper .dataTables_filter label {
+            width: 100%;
+            margin: 0;
+        }
+        .dataTables_wrapper .dataTables_filter input {
+            width: 100% !important;
+            margin-left: 0 !important;
+        }
+        @keyframes menuCornerGlow {
+            0% { box-shadow: 0 0 0 rgba(255,255,255,0); border-color: rgba(255,255,255,.65); }
+            50% { box-shadow: 0 0 0 4px rgba(255,255,255,.25), 0 0 18px rgba(255,255,255,.45); border-color: rgba(255,255,255,1); }
+            100% { box-shadow: 0 0 0 rgba(255,255,255,0); border-color: rgba(255,255,255,.65); }
+        }
+        .menu-attention-glow {
+            animation: menuCornerGlow 1.05s ease-in-out 0s 4;
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .menu-attention-glow { animation: none; }
+        }
+        @media (max-width: 991.98px) {
+            .app-form-bottom-actions {
+                position: fixed;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                z-index: 1020;
+                background: #fff;
+                border-top: 1px solid rgba(0,0,0,0.12);
+                padding: .75rem .75rem calc(.75rem + env(safe-area-inset-bottom));
+            }
+            .app-form-with-bottom-actions {
+                padding-bottom: calc(86px + env(safe-area-inset-bottom));
+            }
+            .d-flex.justify-content-between.flex-wrap.flex-md-nowrap.align-items-center.pt-3.pb-2.mb-3.border-bottom > .btn-toolbar {
+                width: 100%;
+                display: flex;
+                gap: .5rem;
+            }
+            .d-flex.justify-content-between.flex-wrap.flex-md-nowrap.align-items-center.pt-3.pb-2.mb-3.border-bottom > .btn-toolbar .btn {
+                flex: 1 1 0;
+                width: 100%;
+                justify-content: center;
+            }
+        }
+        @media (max-width: 767.98px) {
+            body.mobile-launcher-page .app-page-content { display: none; }
+            .dataTables_wrapper .dataTables_paginate .pagination {
+                flex-wrap: nowrap;
+                justify-content: center;
+                gap: .25rem;
+                white-space: nowrap;
+            }
+            .dataTables_wrapper .dataTables_paginate {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+            .dataTables_wrapper .dataTables_paginate .page-link {
+                padding: .3rem .45rem;
+                font-size: .85rem;
+            }
+            .dataTables_wrapper .dataTables_paginate .page-item:first-child .page-link,
+            .dataTables_wrapper .dataTables_paginate .page-item:last-child .page-link {
+                padding-left: .6rem;
+                padding-right: .6rem;
+            }
+        }
     </style>
 </head>
-<body>
-<?php if (isLoggedIn() && (strpos($_SERVER['REQUEST_URI'], '/admin') === 0 || strpos($_SERVER['REQUEST_URI'], '/developer') === 0)): ?>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4 d-md-none">
+<?php
+$currentUri = $_SERVER['REQUEST_URI'] ?? '';
+$isAdminOrDevArea = isLoggedIn() && (strpos($currentUri, '/admin') === 0 || strpos($currentUri, '/developer') === 0);
+$isAdminArea = isLoggedIn() && strpos($currentUri, '/admin') === 0;
+$isMobileLauncherPage = $isAdminArea && (($_GET['launcher'] ?? '') === '1');
+$bodyClass = $isMobileLauncherPage ? 'mobile-launcher-page' : '';
+$mobileHomeHref = strpos($currentUri, '/developer') === 0 ? '/developer/dashboard' : '/admin';
+$mobileLauncherHref = '/admin?launcher=1';
+?>
+<body class="<?= htmlspecialchars($bodyClass) ?>">
+<?php if ($isAdminOrDevArea): ?>
+    <nav class="navbar navbar-dark bg-primary mb-2 d-md-none">
         <div class="container-fluid">
             <?php 
             $navTitle = ($siteProfile['alias'] ?? 'IVN') . ' Admin';
@@ -56,137 +153,15 @@ if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'developer') {
                 $navTitle = ($siteProfile['alias'] ?? 'IVN') . ' Secretaria';
             }
             ?>
-            <a class="navbar-brand" href="/admin"><?= $navTitle ?></a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav">
-                    <!-- Principal -->
-                    <?php if (hasPermission('dashboard.view')): ?>
-                        <li class="nav-item"><a class="nav-link <?= $_SERVER['REQUEST_URI'] === '/admin' || $_SERVER['REQUEST_URI'] === '/admin/' ? 'active' : '' ?>" href="/admin"><i class="fas fa-home me-2"></i> Painel</a></li>
-                    <?php endif; ?>
-                    
-                    <!-- Secretaria -->
-                    <?php if (hasPermission('members.view')): ?>
-                        <li class="nav-item"><a class="nav-link <?= strpos($_SERVER['REQUEST_URI'], '/admin/members') !== false ? 'active' : '' ?>" href="/admin/members"><i class="fas fa-users me-2"></i> Membros</a></li>
-                    <?php endif; ?>
-                    
-                    <?php if (hasPermission('congregations.view')): ?>
-                        <li class="nav-item"><a class="nav-link <?= strpos($_SERVER['REQUEST_URI'], '/admin/congregations') !== false ? 'active' : '' ?>" href="/admin/congregations"><i class="fas fa-church me-2"></i> Congregações</a></li>
-                    <?php endif; ?>
-                    
-                    <?php if (hasPermission('events.view')): ?>
-                        <li class="nav-item"><a class="nav-link <?= strpos($_SERVER['REQUEST_URI'], '/admin/events') !== false ? 'active' : '' ?>" href="/admin/events"><i class="fas fa-calendar-alt me-2"></i> Eventos / Cultos</a></li>
-                    <?php endif; ?>
-                    
-                    <?php if (hasPermission('service_reports.view')): ?>
-                        <li class="nav-item"><a class="nav-link <?= strpos($_SERVER['REQUEST_URI'], '/admin/service_reports') !== false ? 'active' : '' ?>" href="/admin/service_reports"><i class="fas fa-clipboard-list me-2"></i> Relatórios de Culto</a></li>
-                    <?php endif; ?>
-                    
-                    <?php if (hasPermission('general_reports.view')): ?>
-                        <li class="nav-item"><a class="nav-link <?= strpos($_SERVER['REQUEST_URI'], '/admin/reports/general') !== false ? 'active' : '' ?>" href="/admin/reports/general"><i class="fas fa-chart-pie me-2"></i> Estatísticas Gerais</a></li>
-                    <?php endif; ?>
-
-                    <?php if (hasPermission('signatures.view') || hasPermission('signatures.manage')): ?>
-                        <li class="nav-item"><a class="nav-link <?= strpos($_SERVER['REQUEST_URI'], '/admin/signatures') !== false ? 'active' : '' ?>" href="/admin/signatures"><i class="fas fa-file-signature me-2"></i> Assinaturas</a></li>
-                    <?php endif; ?>
-
-                    <?php if (hasPermission('groups.view') || hasPermission('groups.manage')): ?>
-                        <li class="nav-item"><a class="nav-link <?= strpos($_SERVER['REQUEST_URI'], '/admin/groups') !== false ? 'active' : '' ?>" href="/admin/groups"><i class="fas fa-users-cog me-2"></i> Grupos/Células</a></li>
-                    <?php endif; ?>
-
-                    <?php if (hasPermission('gallery.view')): ?>
-                        <li class="nav-item"><a class="nav-link <?= strpos($_SERVER['REQUEST_URI'], '/admin/gallery') !== false ? 'active' : '' ?>" href="/admin/gallery"><i class="fas fa-images me-2"></i> Galeria</a></li>
-                    <?php endif; ?>
-                    
-                    <?php if (hasPermission('banners.view')): ?>
-                        <li class="nav-item"><a class="nav-link <?= strpos($_SERVER['REQUEST_URI'], '/admin/banners') !== false ? 'active' : '' ?>" href="/admin/banners"><i class="fas fa-image me-2"></i> Banners</a></li>
-                    <?php endif; ?>
-
-                    <!-- Financeiro -->
-                    <?php if (hasPermission('financial.view')): ?>
-                        <li class="nav-item"><a class="nav-link <?= strpos($_SERVER['REQUEST_URI'], '/admin/tithes') !== false ? 'active' : '' ?>" href="/admin/tithes"><i class="fas fa-hand-holding-usd me-2"></i> Entradas</a></li>
-                        <li class="nav-item"><a class="nav-link <?= strpos($_SERVER['REQUEST_URI'], '/admin/expenses') !== false ? 'active' : '' ?>" href="/admin/expenses"><i class="fas fa-file-invoice-dollar me-2"></i> Saídas</a></li>
-                        <li class="nav-item"><a class="nav-link <?= strpos($_SERVER['REQUEST_URI'], '/admin/financial/report') !== false ? 'active' : '' ?>" href="/admin/financial/report"><i class="fas fa-chart-line me-2"></i> Relatório Financeiro</a></li>
-                        <li class="nav-item"><a class="nav-link <?= strpos($_SERVER['REQUEST_URI'], '/admin/financial/closures') !== false ? 'active' : '' ?>" href="/admin/financial/closures"><i class="fas fa-lock me-2"></i> Fechamentos</a></li>
-                    <?php endif; ?>
-                    
-                    <!-- Ensino -->
-                    <?php if (hasPermission('ebd.view') || hasPermission('ebd.manage')): ?>
-                        <li class="nav-item"><a class="nav-link <?= strpos($_SERVER['REQUEST_URI'], '/admin/ebd') !== false ? 'active' : '' ?>" href="/admin/ebd/classes"><i class="fas fa-book-open me-2"></i> Escola Bíblica (EBD)</a></li>
-                    <?php endif; ?>
-                    
-                    <?php if (hasPermission('studies.view')): ?>
-                        <li class="nav-item"><a class="nav-link <?= strpos($_SERVER['REQUEST_URI'], '/admin/studies') !== false ? 'active' : '' ?>" href="/admin/studies"><i class="fas fa-book me-2"></i> Estudos</a></li>
-                    <?php endif; ?>
-                    
-                    <!-- Configurações -->
-                    <?php if (hasPermission('users.manage')): ?>
-                    <li class="nav-item">
-                        <a class="nav-link <?= strpos($_SERVER['REQUEST_URI'], '/admin/users') !== false || strpos($_SERVER['REQUEST_URI'], '/admin/permissions') !== false ? 'active' : '' ?> d-flex align-items-center justify-content-between" href="#submenuUsuariosMobile" data-bs-toggle="collapse" aria-expanded="<?= strpos($_SERVER['REQUEST_URI'], '/admin/users') !== false || strpos($_SERVER['REQUEST_URI'], '/admin/permissions') !== false ? 'true' : 'false' ?>">
-                            <span><i class="fas fa-users-cog me-2"></i> Contas/Usuários</span>
-                            <i class="fas fa-chevron-down submenu-icon"></i>
-                        </a>
-                        <ul class="collapse list-unstyled ms-3 <?= strpos($_SERVER['REQUEST_URI'], '/admin/users') !== false || strpos($_SERVER['REQUEST_URI'], '/admin/permissions') !== false ? 'show' : '' ?>" id="submenuUsuariosMobile">
-                            <li><a class="nav-link <?= strpos($_SERVER['REQUEST_URI'], '/admin/users') !== false && strpos($_SERVER['REQUEST_URI'], 'permissions') === false ? 'active text-primary' : '' ?>" href="/admin/users"><i class="fas fa-user ms-2"></i> Usuários</a></li>
-                            <?php if (hasPermission('permissions.manage') || (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'developer')): ?>
-                            <li><a class="nav-link <?= strpos($_SERVER['REQUEST_URI'], '/admin/permissions') !== false ? 'active text-primary' : '' ?>" href="/admin/permissions"><i class="fas fa-key ms-2"></i> Permissões (RBAC)</a></li>
-                            <?php endif; ?>
-                        </ul>
-                    </li>
-                    <?php endif; ?>
-                    
-                    <?php if (hasPermission('settings.view')): ?>
-                    <li class="nav-item">
-                        <a class="nav-link <?= strpos($_SERVER['REQUEST_URI'], '/admin/settings') !== false || strpos($_SERVER['REQUEST_URI'], '/admin/site-settings') !== false ? 'active' : '' ?> d-flex align-items-center justify-content-between" href="#submenuSettings" data-bs-toggle="collapse" aria-expanded="<?= strpos($_SERVER['REQUEST_URI'], '/admin/settings') !== false || strpos($_SERVER['REQUEST_URI'], '/admin/site-settings') !== false ? 'true' : 'false' ?>">
-                            <span><i class="fas fa-cogs me-2"></i> Configurações</span>
-                            <i class="fas fa-chevron-down submenu-icon"></i>
-                        </a>
-                        <ul class="collapse list-unstyled ms-3 <?= strpos($_SERVER['REQUEST_URI'], '/admin/settings') !== false || strpos($_SERVER['REQUEST_URI'], '/admin/site-settings') !== false ? 'show' : '' ?>" id="submenuSettings">
-                            <?php if (hasPermission('settings.layout.view')): ?>
-                            <li><a class="nav-link <?= strpos($_SERVER['REQUEST_URI'], '/admin/site-settings') !== false ? 'active text-primary' : '' ?>" href="/admin/site-settings"><i class="fas fa-paint-roller ms-2"></i> Layout do Site</a></li>
-                            <?php endif; ?>
-                            <?php if (hasPermission('settings.card.view')): ?>
-                            <li><a class="nav-link <?= strpos($_SERVER['REQUEST_URI'], '/admin/settings/card-layout') !== false ? 'active text-primary' : '' ?>" href="/admin/settings/card-layout"><i class="fas fa-id-card ms-2"></i> Modelo Carteirinha</a></li>
-                            <?php endif; ?>
-                            <?php if (hasPermission('settings.system.view')): ?>
-                            <li><a class="nav-link <?= strpos($_SERVER['REQUEST_URI'], '/admin/settings') !== false && strpos($_SERVER['REQUEST_URI'], 'card-layout') === false && strpos($_SERVER['REQUEST_URI'], 'site-settings') === false ? 'active text-primary' : '' ?>" href="/admin/settings"><i class="fas fa-sliders-h ms-2"></i> Sistema Geral</a></li>
-                            <?php endif; ?>
-                        </ul>
-                    </li>
-                    <?php endif; ?>
-                    
-                    <?php if (hasPermission('system_payments.view')): ?>
-                        <li class="nav-item"><a class="nav-link <?= strpos($_SERVER['REQUEST_URI'], '/admin/system-payments') !== false ? 'active' : '' ?>" href="/admin/system-payments"><i class="fas fa-credit-card me-2"></i> Pagamento Sistema</a></li>
-                    <?php endif; ?>
-                    
-                    <?php 
-                    $isDev = false;
-                    if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'developer') {
-                        $isDev = true;
-                    } elseif (isset($_SESSION['user_id'])) {
-                        try {
-                            $db = (new Database())->connect();
-                            $stmt = $db->prepare("SELECT role FROM users WHERE id = ?");
-                            $stmt->execute([$_SESSION['user_id']]);
-                            $role = $stmt->fetchColumn();
-                            if ($role === 'developer') {
-                                $isDev = true;
-                                $_SESSION['user_role'] = 'developer';
-                            }
-                        } catch (Exception $e) {}
-                    }
-                    if ($isDev): 
-                    ?>
-                    <li class="nav-item"><a class="nav-link text-warning" href="/migrate.php" target="_blank"><i class="fas fa-database me-2"></i> Atualizar Banco</a></li>
-                    <?php endif; ?>
-
-                    <li class="nav-item"><a class="nav-link <?= strpos($_SERVER['REQUEST_URI'], '/admin/manual') !== false ? 'active' : '' ?>" href="/admin/manual"><i class="fas fa-question-circle me-2"></i> Manual</a></li>
-                    <li class="nav-item"><a class="nav-link <?= strpos($_SERVER['REQUEST_URI'], '/admin/change-password') !== false ? 'active' : '' ?>" href="/admin/change-password"><i class="fas fa-key me-2"></i> Mudar Senha</a></li>
-                    <li class="nav-item"><a class="nav-link text-danger" href="/admin/logout"><i class="fas fa-sign-out-alt me-2"></i> Sair</a></li>
-                </ul>
-            </div>
+            <?php if (!$isMobileLauncherPage): ?>
+                <a class="btn btn-sm btn-outline-light me-2 menu-attention-glow" href="<?= htmlspecialchars($mobileLauncherHref) ?>">
+                    <i class="fas fa-th-large me-1"></i> Menu
+                </a>
+            <?php endif; ?>
+            <a class="navbar-brand flex-grow-1" href="<?= htmlspecialchars($mobileHomeHref) ?>"><?= htmlspecialchars($navTitle) ?></a>
+            <a class="btn btn-sm btn-outline-light" href="/admin/logout">
+                <i class="fas fa-sign-out-alt"></i>
+            </a>
         </div>
     </nav>
     
@@ -489,7 +464,127 @@ if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'developer') {
                     </ul>
                 </div>
             </nav>
-            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-2 py-md-4">
+                <?php
+                $loggedUserName = $_SESSION['user_name'] ?? $_SESSION['username'] ?? '';
+                $loggedUserRole = $_SESSION['user_role'] ?? '';
+                ?>
+                <div class="d-none d-md-flex justify-content-end mb-1">
+                    <span class="small text-muted">
+                        Usuário: <strong><?= htmlspecialchars((string)$loggedUserName) ?></strong>
+                        <span class="ms-2 badge bg-secondary"><?= htmlspecialchars((string)$loggedUserRole) ?></span>
+                    </span>
+                </div>
+
+                <?php if ($isMobileLauncherPage): ?>
+                    <div class="d-md-none mb-3">
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <div class="small text-muted">
+                                        Usuário: <strong><?= htmlspecialchars((string)$loggedUserName) ?></strong>
+                                        <?php if ((string)$loggedUserRole !== ''): ?>
+                                            <span class="ms-2 badge bg-secondary"><?= htmlspecialchars((string)$loggedUserRole) ?></span>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+
+                                <div class="mobile-launcher">
+                                    <?php if (hasPermission('dashboard.view')): ?>
+                                        <div class="text-muted small fw-bold mb-2">Principal</div>
+                                        <div class="row g-2 mb-3">
+                                            <div class="col-6">
+                                                <a class="btn btn-primary btn-sm w-100" href="<?= htmlspecialchars($mobileHomeHref) ?>">
+                                                    <i class="fas fa-home me-2"></i>Painel
+                                                </a>
+                                            </div>
+                                        </div>
+                                    <?php endif; ?>
+
+                                    <?php if (hasPermission('members.view') || hasPermission('congregations.view') || hasPermission('events.view') || hasPermission('service_reports.view') || hasPermission('general_reports.view') || hasPermission('signatures.view') || hasPermission('signatures.manage') || hasPermission('groups.view') || hasPermission('groups.manage') || hasPermission('gallery.view') || hasPermission('banners.view')): ?>
+                                        <div class="text-muted small fw-bold mb-2">Secretaria</div>
+                                        <div class="row g-2 mb-3">
+                                            <?php if (hasPermission('members.view')): ?>
+                                                <div class="col-6"><a class="btn btn-primary btn-sm w-100" href="/admin/members"><i class="fas fa-users me-2"></i>Membros</a></div>
+                                            <?php endif; ?>
+                                            <?php if (hasPermission('congregations.view')): ?>
+                                                <div class="col-6"><a class="btn btn-primary btn-sm w-100" href="/admin/congregations"><i class="fas fa-church me-2"></i>Congregações</a></div>
+                                            <?php endif; ?>
+                                            <?php if (hasPermission('events.view') || hasPermission('events.manage')): ?>
+                                                <div class="col-6"><a class="btn btn-primary btn-sm w-100" href="/admin/events"><i class="fas fa-calendar-alt me-2"></i>Eventos</a></div>
+                                            <?php endif; ?>
+                                            <?php if (hasPermission('service_reports.view')): ?>
+                                                <div class="col-6"><a class="btn btn-primary btn-sm w-100" href="/admin/service_reports"><i class="fas fa-clipboard-list me-2"></i>Relatórios</a></div>
+                                            <?php endif; ?>
+                                            <?php if (hasPermission('general_reports.view')): ?>
+                                                <div class="col-6"><a class="btn btn-primary btn-sm w-100" href="/admin/reports/general"><i class="fas fa-chart-pie me-2"></i>Estatísticas</a></div>
+                                            <?php endif; ?>
+                                            <?php if (hasPermission('signatures.view') || hasPermission('signatures.manage')): ?>
+                                                <div class="col-6"><a class="btn btn-primary btn-sm w-100" href="/admin/signatures"><i class="fas fa-file-signature me-2"></i>Assinaturas</a></div>
+                                            <?php endif; ?>
+                                            <?php if (hasPermission('groups.view') || hasPermission('groups.manage')): ?>
+                                                <div class="col-6"><a class="btn btn-primary btn-sm w-100" href="/admin/groups"><i class="fas fa-users-cog me-2"></i>Grupos</a></div>
+                                            <?php endif; ?>
+                                            <?php if (hasPermission('gallery.view')): ?>
+                                                <div class="col-6"><a class="btn btn-primary btn-sm w-100" href="/admin/gallery"><i class="fas fa-images me-2"></i>Galeria</a></div>
+                                            <?php endif; ?>
+                                            <?php if (hasPermission('banners.view')): ?>
+                                                <div class="col-6"><a class="btn btn-primary btn-sm w-100" href="/admin/banners"><i class="fas fa-image me-2"></i>Banners</a></div>
+                                            <?php endif; ?>
+                                        </div>
+                                    <?php endif; ?>
+
+                                    <?php if (hasPermission('financial.view')): ?>
+                                        <div class="text-muted small fw-bold mb-2">Financeiro</div>
+                                        <div class="row g-2 mb-3">
+                                            <div class="col-6"><a class="btn btn-primary btn-sm w-100" href="/admin/tithes"><i class="fas fa-hand-holding-usd me-2"></i>Entradas</a></div>
+                                            <div class="col-6"><a class="btn btn-primary btn-sm w-100" href="/admin/expenses"><i class="fas fa-file-invoice-dollar me-2"></i>Saídas</a></div>
+                                            <div class="col-6"><a class="btn btn-primary btn-sm w-100" href="/admin/financial/report"><i class="fas fa-chart-line me-2"></i>Relatório</a></div>
+                                            <div class="col-6"><a class="btn btn-primary btn-sm w-100" href="/admin/financial/closures"><i class="fas fa-lock me-2"></i>Fechamentos</a></div>
+                                        </div>
+                                    <?php endif; ?>
+
+                                    <?php if (hasPermission('ebd.view') || hasPermission('ebd.manage') || hasPermission('studies.view')): ?>
+                                        <div class="text-muted small fw-bold mb-2">Ensino</div>
+                                        <div class="row g-2 mb-3">
+                                            <?php if (hasPermission('ebd.view') || hasPermission('ebd.manage')): ?>
+                                                <div class="col-6"><a class="btn btn-primary btn-sm w-100" href="/admin/ebd/classes"><i class="fas fa-book-open me-2"></i>EBD</a></div>
+                                            <?php endif; ?>
+                                            <?php if (hasPermission('studies.view')): ?>
+                                                <div class="col-6"><a class="btn btn-primary btn-sm w-100" href="/admin/studies"><i class="fas fa-book me-2"></i>Estudos</a></div>
+                                            <?php endif; ?>
+                                        </div>
+                                    <?php endif; ?>
+
+                                    <div class="text-muted small fw-bold mb-2">Sistema</div>
+                                    <div class="row g-2">
+                                        <?php if (hasPermission('users.manage')): ?>
+                                            <div class="col-6"><a class="btn btn-primary btn-sm w-100" href="/admin/users"><i class="fas fa-user me-2"></i>Usuários</a></div>
+                                        <?php endif; ?>
+                                        <?php if (hasPermission('permissions.manage') || (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'developer')): ?>
+                                            <div class="col-6"><a class="btn btn-primary btn-sm w-100" href="/admin/permissions"><i class="fas fa-key me-2"></i>Permissões</a></div>
+                                        <?php endif; ?>
+                                        <?php if (hasPermission('settings.system.view')): ?>
+                                            <div class="col-6"><a class="btn btn-primary btn-sm w-100" href="/admin/settings"><i class="fas fa-sliders-h me-2"></i>Sistema</a></div>
+                                        <?php endif; ?>
+                                        <?php if (hasPermission('settings.layout.view')): ?>
+                                            <div class="col-6"><a class="btn btn-primary btn-sm w-100" href="/admin/site-settings"><i class="fas fa-paint-roller me-2"></i>Layout</a></div>
+                                        <?php endif; ?>
+                                        <?php if (hasPermission('settings.card.view')): ?>
+                                            <div class="col-6"><a class="btn btn-primary btn-sm w-100" href="/admin/settings/card-layout"><i class="fas fa-id-card me-2"></i>Carteirinha</a></div>
+                                        <?php endif; ?>
+                                        <?php if (hasPermission('system_payments.view')): ?>
+                                            <div class="col-6"><a class="btn btn-primary btn-sm w-100" href="/admin/system-payments"><i class="fas fa-credit-card me-2"></i>Mensalidade</a></div>
+                                        <?php endif; ?>
+                                        <div class="col-6"><a class="btn btn-primary btn-sm w-100" href="/admin/manual"><i class="fas fa-question-circle me-2"></i>Manual</a></div>
+                                        <div class="col-6"><a class="btn btn-primary btn-sm w-100" href="/admin/change-password"><i class="fas fa-key me-2"></i>Senha</a></div>
+                                        <div class="col-12"><a class="btn btn-danger w-100" href="/admin/logout"><i class="fas fa-sign-out-alt me-2"></i>Sair</a></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                <?php endif; ?>
             
             <!-- System Payment Alert Modal Logic -->
             <?php
@@ -640,6 +735,7 @@ if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'developer') {
                 }
             }
             ?>
+            <div class="app-page-content">
 <?php else: // Member/Public View ?>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
         <div class="container">

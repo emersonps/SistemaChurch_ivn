@@ -13,7 +13,7 @@
     <div class="col-md-8 offset-md-2">
         <div class="card shadow-sm">
             <div class="card-body">
-                <form action="/admin/groups/create" method="POST">
+                <form action="/admin/groups/create" method="POST" class="app-form-with-bottom-actions">
                     <?= csrf_field() ?>
                     <div class="mb-3">
                         <label class="form-label">Nome do Grupo *</label>
@@ -85,8 +85,20 @@
                         <textarea name="description" class="form-control" rows="3"></textarea>
                     </div>
 
-                    <div class="d-grid gap-2">
-                        <button type="submit" class="btn btn-primary">Salvar Grupo</button>
+                    <div class="text-end d-none d-lg-block">
+                        <button type="submit" class="btn btn-primary px-4">Salvar</button>
+                        <a href="/admin/groups" class="btn btn-outline-secondary px-4">Cancelar</a>
+                    </div>
+
+                    <div class="app-form-bottom-actions d-lg-none">
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <button type="submit" class="btn btn-primary w-100">Salvar</button>
+                            </div>
+                            <div class="col-6">
+                                <a href="/admin/groups" class="btn btn-outline-secondary w-100">Cancelar</a>
+                            </div>
+                        </div>
                     </div>
                 </form>
             </div>

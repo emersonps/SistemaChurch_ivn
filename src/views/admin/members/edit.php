@@ -4,7 +4,7 @@
     <h1 class="h2">Editar</h1>
 </div>
 
-<form action="/admin/members/edit/<?= $member['id'] ?>" method="POST" enctype="multipart/form-data" class="row g-3">
+<form action="/admin/members/edit/<?= $member['id'] ?>" method="POST" enctype="multipart/form-data" class="row g-3 app-form-with-bottom-actions">
     <?= csrf_field() ?>
     <!-- Dados Pessoais -->
     <h4 class="mb-3 text-primary border-bottom pb-2">Dados Pessoais</h4>
@@ -322,9 +322,20 @@
         <input type="date" class="form-control" name="exit_date" value="<?= !empty($member['exit_date']) ? date('Y-m-d', strtotime($member['exit_date'])) : '' ?>">
     </div>
 
-    <div class="col-12 text-end">
-        <button type="submit" class="btn btn-primary px-4">Salvar Alterações</button>
-        <a href="/admin/members/show/<?= $member['id'] ?>" class="btn btn-outline-secondary px-4">Voltar para a Ficha</a>
+    <div class="col-12 text-end d-none d-lg-block">
+        <button type="submit" class="btn btn-primary px-4">Salvar</button>
+        <a href="/admin/members/show/<?= $member['id'] ?>" class="btn btn-outline-secondary px-4">Cancelar</a>
+    </div>
+
+    <div class="col-12 app-form-bottom-actions d-lg-none">
+        <div class="row g-2">
+            <div class="col-6">
+                <button type="submit" class="btn btn-primary w-100">Salvar</button>
+            </div>
+            <div class="col-6">
+                <a href="/admin/members/show/<?= $member['id'] ?>" class="btn btn-outline-secondary w-100">Cancelar</a>
+            </div>
+        </div>
     </div>
 </form>
 

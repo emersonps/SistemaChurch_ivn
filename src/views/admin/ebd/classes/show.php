@@ -75,7 +75,72 @@
     <!-- Alunos -->
     <div class="col-md-8">
         <!-- Abas -->
-        <ul class="nav nav-tabs mb-3" id="myTab" role="tablist">
+        <?php $tabTotal = 2; ?>
+        <style>
+            @media (max-width: 991.98px) {
+                .ebd-class-tabs-carousel {
+                    position: relative;
+                }
+                .ebd-class-tabs-carousel.multi::before {
+                    content: '';
+                    position: absolute;
+                    inset: 0 0 auto 0;
+                    height: 4px;
+                    background: linear-gradient(90deg, #0d6efd 0%, #6610f2 55%, #d4af37 100%);
+                    z-index: 2;
+                }
+                .ebd-class-tabs-carousel.multi #myTabContent {
+                    display: flex;
+                    gap: 0;
+                    overflow-x: auto;
+                    scroll-snap-type: x mandatory;
+                    scroll-behavior: smooth;
+                    scrollbar-width: none;
+                    padding: .25rem .25rem .35rem;
+                }
+                .ebd-class-tabs-carousel.multi #myTabContent::-webkit-scrollbar { display: none; }
+                .ebd-class-tabs-carousel.multi #myTabContent > .tab-pane {
+                    display: block !important;
+                    flex: 0 0 100%;
+                    min-width: 100%;
+                    scroll-snap-align: center;
+                    opacity: 1 !important;
+                    padding: .35rem;
+                }
+                .ebd-class-tabs-carousel.multi #myTabContent > .tab-pane.fade { transition: none; }
+                .ebd-class-pane-head {
+                    border-radius: 16px 16px 0 0;
+                    border: 1px solid rgba(0,0,0,0.08);
+                    border-bottom: 0;
+                    background: linear-gradient(135deg, rgba(13,110,253,0.10), rgba(102,16,242,0.12));
+                    padding: .9rem 1rem;
+                }
+                .ebd-class-pane-title {
+                    font-weight: 900;
+                    font-size: 1.05rem;
+                    letter-spacing: .01em;
+                    color: #1b1b2a;
+                }
+                .ebd-class-pane-hint {
+                    font-size: .72rem;
+                    letter-spacing: .08em;
+                    font-weight: 800;
+                    color: rgba(0,0,0,0.52);
+                    text-transform: uppercase;
+                }
+                .ebd-class-pane-hint i {
+                    color: #6610f2;
+                }
+                .ebd-class-pane-body {
+                    border-radius: 0 0 16px 16px;
+                    border: 1px solid rgba(0,0,0,0.08);
+                    overflow: hidden;
+                    background: #fff;
+                }
+            }
+        </style>
+
+        <ul class="nav nav-tabs mb-3 d-none d-lg-flex" id="myTab" role="tablist">
             <li class="nav-item" role="presentation">
                 <button class="nav-link active" id="students-tab" data-bs-toggle="tab" data-bs-target="#students" type="button" role="tab">Alunos (<?= count($students) ?>)</button>
             </li>
@@ -84,9 +149,20 @@
             </li>
         </ul>
         
+        <div class="ebd-class-tabs-carousel multi">
         <div class="tab-content" id="myTabContent">
             <!-- Aba Alunos -->
             <div class="tab-pane fade show active" id="students" role="tabpanel">
+                <div class="d-lg-none ebd-class-pane-head">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div class="me-3">
+                            <div class="ebd-class-pane-title"><i class="fas fa-user-graduate me-2"></i>Alunos</div>
+                            <div class="ebd-class-pane-hint mt-1"><i class="fas fa-arrows-left-right me-2"></i>Deslize para mudar (1/<?= $tabTotal ?>)</div>
+                        </div>
+                        <span class="badge bg-dark">1/<?= $tabTotal ?></span>
+                    </div>
+                </div>
+                <div class="ebd-class-pane-body">
                 <div class="card shadow-sm border-0">
                     <div class="card-header bg-white d-flex justify-content-between align-items-center">
                         <h6 class="mb-0">Lista de Alunos</h6>
@@ -146,10 +222,21 @@
                         </table>
                     </div>
                 </div>
+                </div>
             </div>
 
             <!-- Aba Aulas -->
             <div class="tab-pane fade" id="lessons" role="tabpanel">
+                <div class="d-lg-none ebd-class-pane-head">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div class="me-3">
+                            <div class="ebd-class-pane-title"><i class="fas fa-calendar-check me-2"></i>Histórico de Aulas</div>
+                            <div class="ebd-class-pane-hint mt-1"><i class="fas fa-arrows-left-right me-2"></i>Deslize para mudar (2/<?= $tabTotal ?>)</div>
+                        </div>
+                        <span class="badge bg-dark">2/<?= $tabTotal ?></span>
+                    </div>
+                </div>
+                <div class="ebd-class-pane-body">
                 <div class="card shadow-sm border-0">
                     <div class="table-responsive">
                         <table class="table table-hover align-middle mb-0">
@@ -192,7 +279,9 @@
                         </table>
                     </div>
                 </div>
+                </div>
             </div>
+        </div>
         </div>
     </div>
 </div>

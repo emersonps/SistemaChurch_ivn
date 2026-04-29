@@ -9,6 +9,11 @@
     <div class="col-md-6">
         <label class="form-label">Nome da Congregação</label>
         <input type="text" class="form-control" name="name" value="<?= htmlspecialchars($congregation['name']) ?>" required>
+        <?php $type = strtolower((string)($congregation['type'] ?? '')); $isHq = in_array($type, ['headquarters', 'sede', 'matriz', 'principal'], true); ?>
+        <div class="form-check mt-2">
+            <input class="form-check-input" type="checkbox" name="is_headquarters" value="1" id="isHeadquartersEdit" <?= $isHq ? 'checked' : '' ?>>
+            <label class="form-check-label" for="isHeadquartersEdit">Igreja principal (Sede/Matriz)</label>
+        </div>
     </div>
     <div class="col-md-6">
         <label class="form-label">Dirigente</label>

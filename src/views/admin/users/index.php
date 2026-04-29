@@ -2,12 +2,7 @@
 
 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
     <h1 class="h2">Gerenciar Usuários</h1>
-    <div class="btn-toolbar mb-2 mb-md-0 gap-2">
-        <?php if (in_array(($_SESSION['user_role'] ?? ''), ['admin', 'developer'], true)): ?>
-        <a href="/admin/users/password-by-cpf" class="btn btn-sm btn-outline-warning">
-            <i class="fas fa-unlock-alt me-1"></i> Redefinir Senha por CPF
-        </a>
-        <?php endif; ?>
+    <div class="btn-toolbar mb-2 mb-md-0">
         <a href="/admin/users/create" class="btn btn-sm btn-primary">
             <i class="fas fa-plus"></i> Novo Usuário
         </a>
@@ -18,8 +13,7 @@
     <table class="table table-striped table-sm">
         <thead>
             <tr>
-                <th>Usuário (Login)</th>
-                <th>Nome Vinculado</th>
+                <th>Usuário</th>
                 <th>Função (Role)</th>
                 <th>Criado em</th>
                 <th>Ações</th>
@@ -28,14 +22,7 @@
         <tbody>
             <?php foreach ($users as $u): ?>
                 <tr>
-                    <td><span class="fw-bold"><?= htmlspecialchars($u['username']) ?></span></td>
-                    <td>
-                        <?php if (!empty($u['linked_members'])): ?>
-                            <span class="text-primary"><?= htmlspecialchars($u['linked_members']) ?></span>
-                        <?php else: ?>
-                            <span class="text-muted fst-italic">Não vinculado</span>
-                        <?php endif; ?>
-                    </td>
+                    <td><?= htmlspecialchars($u['username']) ?></td>
                     <td>
                         <?php 
                             $roleLabel = $u['role'];

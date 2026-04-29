@@ -36,11 +36,11 @@
                 <label class="form-label small mb-0">Membro</label>
                 <input type="text" name="member_name" class="form-control form-control-sm" value="<?= htmlspecialchars($_GET['member_name'] ?? '') ?>" placeholder="Nome...">
             </div>
-            <div class="col-md-2">
+            <div class="col-6 col-md-2">
                 <label class="form-label small mb-0">Data Início</label>
                 <input type="date" name="start_date" class="form-control form-control-sm" value="<?= $_GET['start_date'] ?? '' ?>">
             </div>
-            <div class="col-md-2">
+            <div class="col-6 col-md-2">
                 <label class="form-label small mb-0">Data Fim</label>
                 <input type="date" name="end_date" class="form-control form-control-sm" value="<?= $_GET['end_date'] ?? '' ?>">
             </div>
@@ -81,9 +81,71 @@ if (isset($tithesByCongregation['Sede'])) {
     unset($tithesByCongregation['Sede']);
     $tithesByCongregation = array_merge(['Sede' => $sede], $tithesByCongregation);
 }
+$tabTotal = count($tithesByCongregation);
+$hasMultipleCongregations = $tabTotal > 1;
 ?>
 
-<ul class="nav nav-tabs mb-3" id="titheTabs" role="tablist">
+<style>
+    @media (max-width: 991.98px) {
+        .tithe-tabs-carousel {
+            position: relative;
+        }
+        .tithe-tabs-carousel.multi::before {
+            content: '';
+            position: absolute;
+            inset: 0 0 auto 0;
+            height: 4px;
+            background: linear-gradient(90deg, #0d6efd 0%, #198754 55%, #d4af37 100%);
+            z-index: 2;
+        }
+        .tithe-tabs-carousel.multi #titheTabsContent {
+            display: flex;
+            gap: 0;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            scroll-behavior: smooth;
+            scrollbar-width: none;
+            padding: .25rem .25rem .35rem;
+        }
+        .tithe-tabs-carousel.multi #titheTabsContent::-webkit-scrollbar { display: none; }
+        .tithe-tabs-carousel.multi #titheTabsContent > .tab-pane {
+            display: block !important;
+            flex: 0 0 100%;
+            min-width: 100%;
+            scroll-snap-align: center;
+            opacity: 1 !important;
+            padding: .35rem;
+        }
+        .tithe-tabs-carousel.multi #titheTabsContent > .tab-pane.fade { transition: none; }
+        .tithe-pane-card {
+            border-radius: 16px;
+            border: 1px solid rgba(0,0,0,0.08);
+            overflow: hidden;
+            background: #fff;
+        }
+        .tithe-pane-head {
+            background: linear-gradient(135deg, rgba(13,110,253,0.12), rgba(25,135,84,0.14));
+        }
+        .tithe-pane-title {
+            font-weight: 900;
+            font-size: 1.05rem;
+            letter-spacing: .01em;
+            color: #0b2a1b;
+        }
+        .tithe-pane-hint {
+            font-size: .72rem;
+            letter-spacing: .08em;
+            font-weight: 800;
+            color: rgba(0,0,0,0.52);
+            text-transform: uppercase;
+        }
+        .tithe-pane-hint i {
+            color: #198754;
+        }
+    }
+</style>
+
+<ul class="nav nav-tabs mb-3 d-none d-lg-flex" id="titheTabs" role="tablist">
     <?php 
     $active = true;
     if (empty($tithesByCongregation)) {
@@ -109,9 +171,11 @@ if (isset($tithesByCongregation['Sede'])) {
 <!-- DataTables CSS -->
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
 
+<div class="tithe-tabs-carousel <?= $hasMultipleCongregations ? 'multi' : '' ?>">
 <div class="tab-content" id="titheTabsContent">
     <?php 
     $active = true;
+    $tabStep = 1;
     if (empty($tithesByCongregation)) {
         echo '<div class="tab-pane fade show active p-3 text-center text-muted">Nenhum registro encontrado.</div>';
     }
@@ -120,8 +184,26 @@ if (isset($tithesByCongregation['Sede'])) {
         $slug = md5($congName);
     ?>
     <div class="tab-pane fade <?= $active ? 'show active' : '' ?>" id="content-<?= $slug ?>" role="tabpanel">
-        <div class="table-responsive p-2">
-            <table class="table table-striped table-hover table-sm datatable" style="width:100%">
+        <div class="tithe-pane-card">
+            <div class="d-lg-none px-3 py-3 border-bottom tithe-pane-head">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div class="me-3">
+                        <div class="tithe-pane-title">
+                            <i class="fas fa-church me-2"></i><?= htmlspecialchars($congName) ?>
+                        </div>
+                        <?php if ($hasMultipleCongregations): ?>
+                            <div class="tithe-pane-hint mt-1">
+                                <i class="fas fa-arrows-left-right me-2"></i>Deslize para mudar (<?= $tabStep ?>/<?= $tabTotal ?>)
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                    <?php if ($hasMultipleCongregations): ?>
+                        <span class="badge bg-dark"><?= $tabStep ?>/<?= $tabTotal ?></span>
+                    <?php endif; ?>
+                </div>
+            </div>
+            <div class="table-responsive p-2">
+                <table class="table table-striped table-hover table-sm datatable" style="width:100%">
                 <thead class="table-light">
                     <tr>
                         <th>Data</th>
@@ -175,12 +257,15 @@ if (isset($tithesByCongregation['Sede'])) {
                     <?php endforeach; ?>
                 </tbody>
             </table>
+            </div>
         </div>
     </div>
     <?php 
         $active = false; // Apenas o primeiro é ativo
+        $tabStep++;
     endforeach; 
     ?>
+</div>
 </div>
 
 <!-- Modal do Recibo -->
@@ -248,5 +333,22 @@ if (isset($tithesByCongregation['Sede'])) {
         $('button[data-bs-toggle="tab"]').on('shown.bs.tab', function (e) {
             $.fn.dataTable.tables({ visible: true, api: true }).columns.adjust();
         });
+
+        const carousel = document.querySelector('.tithe-tabs-carousel.multi #titheTabsContent');
+        if (carousel) {
+            let raf = 0;
+            const adjust = () => {
+                if (!$.fn.dataTable) return;
+                $.fn.dataTable.tables({ visible: true, api: true }).columns.adjust();
+            };
+            carousel.addEventListener('scroll', function () {
+                if (raf) return;
+                raf = requestAnimationFrame(function () {
+                    raf = 0;
+                    adjust();
+                });
+            }, { passive: true });
+            window.addEventListener('resize', adjust);
+        }
     });
 </script>

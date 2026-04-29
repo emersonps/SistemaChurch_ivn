@@ -4,14 +4,14 @@
     <h1 class="h2">Nova Classe EBD</h1>
     <div class="btn-toolbar mb-2 mb-md-0">
         <a href="/admin/ebd/classes" class="btn btn-sm btn-outline-secondary">
-            <i class="fas fa-arrow-left"></i> Voltar
+            <i class="fas fa-arrow-left me-1"></i> Voltar
         </a>
     </div>
 </div>
 
 <div class="row">
     <div class="col-md-8 offset-md-2">
-        <form action="/admin/ebd/classes/create" method="POST" class="needs-validation" novalidate>
+        <form action="/admin/ebd/classes/create" method="POST" class="needs-validation app-form-with-bottom-actions" novalidate>
             <?= csrf_field() ?>
             <div class="card shadow-sm border-0">
                 <div class="card-body">
@@ -49,10 +49,21 @@
                         <div class="form-text">Selecione se a classe for específica de uma congregação.</div>
                     </div>
                 </div>
-                <div class="card-footer bg-light text-end">
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save me-1"></i> Salvar Classe
-                    </button>
+            </div>
+
+            <div class="mt-3 text-end d-none d-lg-block">
+                <button type="submit" class="btn btn-primary px-4">Salvar</button>
+                <a href="/admin/ebd/classes" class="btn btn-outline-secondary px-4">Cancelar</a>
+            </div>
+
+            <div class="app-form-bottom-actions d-lg-none">
+                <div class="row g-2">
+                    <div class="col-6">
+                        <button type="submit" class="btn btn-primary w-100">Salvar</button>
+                    </div>
+                    <div class="col-6">
+                        <a href="/admin/ebd/classes" class="btn btn-outline-secondary w-100">Cancelar</a>
+                    </div>
                 </div>
             </div>
         </form>

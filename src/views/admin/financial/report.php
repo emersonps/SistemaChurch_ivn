@@ -14,11 +14,11 @@
 <div class="card mb-4 d-print-none">
     <div class="card-body">
         <form class="row g-3" method="GET">
-            <div class="col-md-3">
+            <div class="col-6 col-md-3">
                 <label class="form-label">Data Início</label>
                 <input type="date" name="start_date" class="form-control" value="<?= $filters['start_date'] ?>">
             </div>
-            <div class="col-md-3">
+            <div class="col-6 col-md-3">
                 <label class="form-label">Data Fim</label>
                 <input type="date" name="end_date" class="form-control" value="<?= $filters['end_date'] ?>">
             </div>

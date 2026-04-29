@@ -10,8 +10,8 @@ $totalFinancialFormatted = 'R$ ' . number_format($total_financial, 2, ',', '.');
     <h1 class="h2">Painel</h1>
     <div class="btn-toolbar mb-2 mb-md-0">
         <?php if ($canToggleFinancialValues): ?>
-            <button type="button" class="btn btn-sm btn-outline-secondary me-2" id="toggle-dashboard-values">
-                <i class="fas fa-eye me-1"></i><span>Exibir valores</span>
+            <button type="button" class="btn btn-sm btn-outline-secondary me-2 px-2" id="toggle-dashboard-values" title="Exibir valores" aria-label="Exibir valores">
+                <i class="fas fa-eye"></i>
             </button>
         <?php endif; ?>
         <form class="d-flex align-items-center" method="GET">
@@ -35,7 +35,107 @@ $totalFinancialFormatted = 'R$ ' . number_format($total_financial, 2, ',', '.');
     </div>
 </div>
 
-<div class="row">
+<style>
+    @media (max-width: 767.98px) {
+        .dashboard-cards-carousel {
+            position: relative;
+        }
+        .dashboard-cards-carousel::before {
+            content: '';
+            position: absolute;
+            inset: 0 0 auto 0;
+            height: 4px;
+            background: linear-gradient(90deg, #ff2a7a 0%, #b30000 52%, #d4af37 100%);
+            z-index: 2;
+        }
+        .dashboard-cards-track {
+            display: flex;
+            gap: 0;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            scroll-behavior: smooth;
+            scrollbar-width: none;
+            padding: .25rem .25rem .35rem;
+        }
+        .dashboard-cards-track::-webkit-scrollbar {
+            display: none;
+        }
+        .dashboard-cards-slide {
+            flex: 0 0 100%;
+            min-width: 100%;
+            scroll-snap-align: center;
+            padding: .35rem;
+        }
+        .dashboard-cards-slide .card {
+            border-radius: 16px;
+        }
+    }
+</style>
+
+<div class="dashboard-cards-carousel d-md-none mb-2">
+    <div class="px-2 pt-2">
+        <div class="d-flex justify-content-between align-items-center">
+            <span class="text-muted small">Dashboard</span>
+            <span class="text-muted small"><i class="fas fa-arrows-left-right me-1"></i>Deslize para o lado</span>
+        </div>
+    </div>
+    <div class="dashboard-cards-track">
+        <div class="dashboard-cards-slide">
+            <div class="card bg-primary text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-uppercase mb-1">Total Membros</h6>
+                            <h2 class="mb-0"><?= $members_count ?></h2>
+                        </div>
+                        <i class="fas fa-users fa-2x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="dashboard-cards-slide">
+            <div class="card bg-success text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-uppercase mb-1">Dízimos (<?= $selected_month ?>/<?= $selected_year ?>)</h6>
+                            <h2 class="mb-0 sensitive-dashboard-value" data-value="<?= htmlspecialchars($tithesSumFormatted) ?>"><?= $canToggleFinancialValues ? 'R$ ••••••' : $tithesSumFormatted ?></h2>
+                        </div>
+                        <i class="fas fa-hand-holding-usd fa-2x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="dashboard-cards-slide">
+            <div class="card bg-info text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-uppercase mb-1">Ofertas (<?= $selected_month ?>/<?= $selected_year ?>)</h6>
+                            <h2 class="mb-0 sensitive-dashboard-value" data-value="<?= htmlspecialchars($offeringsSumFormatted) ?>"><?= $canToggleFinancialValues ? 'R$ ••••••' : $offeringsSumFormatted ?></h2>
+                        </div>
+                        <i class="fas fa-donate fa-2x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="dashboard-cards-slide">
+            <div class="card bg-secondary text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-uppercase mb-1">Total Geral</h6>
+                            <h2 class="mb-0 sensitive-dashboard-value" data-value="<?= htmlspecialchars($totalFinancialFormatted) ?>"><?= $canToggleFinancialValues ? 'R$ ••••••' : $totalFinancialFormatted ?></h2>
+                        </div>
+                        <i class="fas fa-chart-line fa-2x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row d-none d-md-flex">
     <div class="col-md-3 mb-4">
         <div class="card bg-primary text-white h-100">
             <div class="card-body">
@@ -99,7 +199,6 @@ $totalFinancialFormatted = 'R$ ' . number_format($total_financial, 2, ',', '.');
             return;
         }
 
-        var label = toggleButton.querySelector('span');
         var icon = toggleButton.querySelector('i');
         var storageKey = 'dashboard_financial_values_visible_' + <?= (int)($_SESSION['user_id'] ?? 0) ?>;
         var isVisible = localStorage.getItem(storageKey) === '1';
@@ -108,8 +207,10 @@ $totalFinancialFormatted = 'R$ ' . number_format($total_financial, 2, ',', '.');
             valueNodes.forEach(function (node) {
                 node.textContent = isVisible ? node.dataset.value : 'R$ ••••••';
             });
-            label.textContent = isVisible ? 'Ocultar valores' : 'Exibir valores';
-            icon.className = isVisible ? 'fas fa-eye-slash me-1' : 'fas fa-eye me-1';
+            var title = isVisible ? 'Ocultar valores' : 'Exibir valores';
+            toggleButton.setAttribute('title', title);
+            toggleButton.setAttribute('aria-label', title);
+            icon.className = isVisible ? 'fas fa-eye-slash' : 'fas fa-eye';
         }
 
         toggleButton.addEventListener('click', function () {

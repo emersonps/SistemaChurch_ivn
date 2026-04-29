@@ -3,4 +3,6 @@ database/*.sqlite
 tmp/
 public/uploads/*
 !public/uploads/.gitkeep
+public/assets/uploads/*
+storage/backups/*
 config/database.php

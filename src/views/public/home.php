@@ -22,11 +22,13 @@ $firstAndLastName = function ($name) {
     <title><?= htmlspecialchars(($siteProfile['alias'] ?? 'Igreja') . ' - ' . ($siteProfile['name'] ?? 'Nossa Igreja')) ?></title>
 
     <!-- Favicon -->
-    <link rel="shortcut icon" href="<?= htmlspecialchars($siteProfile['logo_url'] ?? '/assets/img/logo.png') ?>" type="image/png">
-    <link rel="icon" href="<?= htmlspecialchars($siteProfile['logo_url'] ?? '/assets/img/logo.png') ?>" type="image/png">
+    <link rel="shortcut icon" href="<?= htmlspecialchars(getChurchLogoUrl($siteProfile, true)) ?>" type="image/png">
+    <link rel="icon" href="<?= htmlspecialchars(getChurchLogoUrl($siteProfile, true)) ?>" type="image/png">
+    <link rel="apple-touch-icon" href="<?= htmlspecialchars(getChurchLogoUrl($siteProfile, true)) ?>">
     <!-- PWA / Web App Manifest -->
-    <link rel="manifest" href="/manifest.json">
+    <link rel="manifest" href="<?= htmlspecialchars(getChurchManifestUrl($siteProfile)) ?>">
     <meta name="theme-color" content="#b30000">
+    <meta name="apple-mobile-web-app-title" content="<?= htmlspecialchars(getChurchBrandingAlias($siteProfile)) ?>">
 
     <!-- Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">

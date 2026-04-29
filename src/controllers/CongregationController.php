@@ -65,8 +65,8 @@ class CongregationController {
         }
         $service_schedule = !empty($schedule) ? json_encode($schedule) : null;
         
-        // Default type to 'congregation' for new entries unless specified otherwise
-        $type = 'congregation'; 
+        $isHeadquarters = !empty($_POST['is_headquarters']) && $_POST['is_headquarters'] === '1';
+        $type = $isHeadquarters ? 'headquarters' : 'congregation';
         
         $photo = null;
         // Check for photo upload
@@ -92,6 +92,9 @@ class CongregationController {
         }
         $db->beginTransaction();
         try {
+            if ($isHeadquarters) {
+                $db->exec("UPDATE congregations SET type = 'congregation' WHERE LOWER(type) IN ('headquarters', 'sede', 'matriz', 'principal')");
+            }
             $hasCnpj = $this->tableHasColumn($db, 'congregations', 'cnpj');
             $hasLeaderId = $this->tableHasColumn($db, 'congregations', 'leader_member_id');
             if ($hasCnpj && $hasLeaderId) {
@@ -186,6 +189,8 @@ class CongregationController {
             }
         }
         $service_schedule = !empty($schedule) ? json_encode($schedule) : null;
+        $isHeadquarters = !empty($_POST['is_headquarters']) && $_POST['is_headquarters'] === '1';
+        $type = $isHeadquarters ? 'headquarters' : 'congregation';
         
         // Check for new photo
         if (isset($_FILES['photo']) && $_FILES['photo']['error'] == 0) {
@@ -202,20 +207,23 @@ class CongregationController {
 
         $db->beginTransaction();
         try {
+            if ($isHeadquarters) {
+                $db->exec("UPDATE congregations SET type = 'congregation' WHERE id != " . (int)$id . " AND LOWER(type) IN ('headquarters', 'sede', 'matriz', 'principal')");
+            }
             $hasCnpj = $this->tableHasColumn($db, 'congregations', 'cnpj');
             $hasLeaderId = $this->tableHasColumn($db, 'congregations', 'leader_member_id');
             if ($hasCnpj && $hasLeaderId) {
-                $stmt = $db->prepare("UPDATE congregations SET name=?, opening_date=?, leader_name=?, leader_member_id=?, address=?, phone=?, email=?, cnpj=?, zip_code=?, city=?, state=?, service_schedule=? WHERE id=?");
-                $stmt->execute([$name, $opening_date, $leader_name, $leader_member_id, $address, $phone, $email, $cnpj, $zip_code, $city, $state, $service_schedule, $id]);
+                $stmt = $db->prepare("UPDATE congregations SET name=?, opening_date=?, leader_name=?, leader_member_id=?, address=?, phone=?, email=?, cnpj=?, type=?, zip_code=?, city=?, state=?, service_schedule=? WHERE id=?");
+                $stmt->execute([$name, $opening_date, $leader_name, $leader_member_id, $address, $phone, $email, $cnpj, $type, $zip_code, $city, $state, $service_schedule, $id]);
             } elseif ($hasLeaderId) {
-                $stmt = $db->prepare("UPDATE congregations SET name=?, opening_date=?, leader_name=?, leader_member_id=?, address=?, phone=?, email=?, zip_code=?, city=?, state=?, service_schedule=? WHERE id=?");
-                $stmt->execute([$name, $opening_date, $leader_name, $leader_member_id, $address, $phone, $email, $zip_code, $city, $state, $service_schedule, $id]);
+                $stmt = $db->prepare("UPDATE congregations SET name=?, opening_date=?, leader_name=?, leader_member_id=?, address=?, phone=?, email=?, type=?, zip_code=?, city=?, state=?, service_schedule=? WHERE id=?");
+                $stmt->execute([$name, $opening_date, $leader_name, $leader_member_id, $address, $phone, $email, $type, $zip_code, $city, $state, $service_schedule, $id]);
             } elseif ($hasCnpj) {
-                $stmt = $db->prepare("UPDATE congregations SET name=?, opening_date=?, leader_name=?, address=?, phone=?, email=?, cnpj=?, zip_code=?, city=?, state=?, service_schedule=? WHERE id=?");
-                $stmt->execute([$name, $opening_date, $leader_name, $address, $phone, $email, $cnpj, $zip_code, $city, $state, $service_schedule, $id]);
+                $stmt = $db->prepare("UPDATE congregations SET name=?, opening_date=?, leader_name=?, address=?, phone=?, email=?, cnpj=?, type=?, zip_code=?, city=?, state=?, service_schedule=? WHERE id=?");
+                $stmt->execute([$name, $opening_date, $leader_name, $address, $phone, $email, $cnpj, $type, $zip_code, $city, $state, $service_schedule, $id]);
             } else {
-                $stmt = $db->prepare("UPDATE congregations SET name=?, opening_date=?, leader_name=?, address=?, phone=?, email=?, zip_code=?, city=?, state=?, service_schedule=? WHERE id=?");
-                $stmt->execute([$name, $opening_date, $leader_name, $address, $phone, $email, $zip_code, $city, $state, $service_schedule, $id]);
+                $stmt = $db->prepare("UPDATE congregations SET name=?, opening_date=?, leader_name=?, address=?, phone=?, email=?, type=?, zip_code=?, city=?, state=?, service_schedule=? WHERE id=?");
+                $stmt->execute([$name, $opening_date, $leader_name, $address, $phone, $email, $type, $zip_code, $city, $state, $service_schedule, $id]);
             }
             
             if ($leader_member_id && $transfer_leader) {

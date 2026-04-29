@@ -4,11 +4,15 @@
     <h1 class="h2">Nova Congregação</h1>
 </div>
 
-<form action="/admin/congregations/create" method="POST" enctype="multipart/form-data" class="row g-3" autocomplete="off">
+<form action="/admin/congregations/create" method="POST" enctype="multipart/form-data" class="row g-3 app-form-with-bottom-actions" autocomplete="off">
     <?= csrf_field() ?>
     <div class="col-md-6">
         <label class="form-label">Nome da Congregação</label>
         <input type="text" class="form-control" name="name" required placeholder="Ex: Congregação Vale da Bênção" autocomplete="off">
+        <div class="form-check mt-2">
+            <input class="form-check-input" type="checkbox" name="is_headquarters" value="1" id="isHeadquartersCreate">
+            <label class="form-check-label" for="isHeadquartersCreate">Igreja principal (Sede/Matriz)</label>
+        </div>
     </div>
     <div class="col-md-6">
         <label class="form-label">Dirigente</label>
@@ -91,9 +95,20 @@
         <button type="button" class="btn btn-success btn-sm mt-2" id="add-schedule"><i class="fas fa-plus"></i> Adicionar Horário</button>
     </div>
 
-    <div class="col-12 mt-4">
-        <button type="submit" class="btn btn-primary">Salvar</button>
-        <a href="/admin/congregations" class="btn btn-secondary">Cancelar</a>
+    <div class="col-12 mt-4 text-end d-none d-lg-block">
+        <button type="submit" class="btn btn-primary px-4">Salvar</button>
+        <a href="/admin/congregations" class="btn btn-outline-secondary px-4">Cancelar</a>
+    </div>
+
+    <div class="col-12 app-form-bottom-actions d-lg-none">
+        <div class="row g-2">
+            <div class="col-6">
+                <button type="submit" class="btn btn-primary w-100">Salvar</button>
+            </div>
+            <div class="col-6">
+                <a href="/admin/congregations" class="btn btn-outline-secondary w-100">Cancelar</a>
+            </div>
+        </div>
     </div>
 </form>
 

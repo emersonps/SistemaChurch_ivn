@@ -4,7 +4,7 @@
     <h1 class="h2">Novo Evento</h1>
 </div>
 
-<form action="/admin/events/create" method="POST" class="row g-3" enctype="multipart/form-data">
+<form action="/admin/events/create" method="POST" class="row g-3 app-form-with-bottom-actions" enctype="multipart/form-data">
     <?= csrf_field() ?>
     <div class="col-md-6">
         <label class="form-label">Título</label>
@@ -133,9 +133,20 @@
         </div>
     </div>
 
-    <div class="col-12 mt-4">
-        <button type="submit" class="btn btn-primary">Salvar Evento</button>
-        <a href="/admin/events" class="btn btn-secondary">Cancelar</a>
+    <div class="col-12 mt-4 text-end d-none d-lg-block">
+        <button type="submit" class="btn btn-primary px-4">Salvar</button>
+        <a href="/admin/events" class="btn btn-outline-secondary px-4">Cancelar</a>
+    </div>
+
+    <div class="col-12 app-form-bottom-actions d-lg-none">
+        <div class="row g-2">
+            <div class="col-6">
+                <button type="submit" class="btn btn-primary w-100">Salvar</button>
+            </div>
+            <div class="col-6">
+                <a href="/admin/events" class="btn btn-outline-secondary w-100">Cancelar</a>
+            </div>
+        </div>
     </div>
 </form>
 

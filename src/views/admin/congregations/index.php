@@ -29,7 +29,13 @@
         <tbody>
             <?php foreach ($congregations as $c): ?>
                 <tr>
-                    <td><?= htmlspecialchars($c['name']) ?></td>
+                    <?php $type = strtolower((string)($c['type'] ?? '')); $isHq = in_array($type, ['headquarters', 'sede', 'matriz', 'principal'], true); ?>
+                    <td>
+                        <?= htmlspecialchars($c['name']) ?>
+                        <?php if ($isHq): ?>
+                            <span class="badge bg-primary ms-2">Principal</span>
+                        <?php endif; ?>
+                    </td>
                     <td><?= htmlspecialchars($c['leader_name'] ?? 'N/A') ?></td>
                     <td><?= htmlspecialchars($c['phone'] ?? 'N/A') ?></td>
                     <td><?= $c['opening_date'] ? date('d/m/Y', strtotime($c['opening_date'])) : 'N/A' ?></td>
