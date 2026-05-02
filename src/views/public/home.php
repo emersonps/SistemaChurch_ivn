@@ -3021,6 +3021,8 @@ $firstAndLastName = function ($name) {
         <?php include __DIR__ . '/layout/footer.php'; ?>
     </section>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
     <script>
         // Fechar menu mobile automaticamente ao clicar em um link (Específico para Home que não usa o footer padrão de admin)
         document.addEventListener('DOMContentLoaded', function() {

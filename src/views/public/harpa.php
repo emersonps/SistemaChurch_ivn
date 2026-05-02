@@ -596,6 +596,7 @@ $hymnsJson = json_encode($hymns, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES
                                     <div class="placeholder-card">
                                         <h3>Pronto para o louvor</h3>
                                         <p>Abra um hino para visualizar as páginas e conduzir a igreja com clareza.</p>
+                                        <div class="mt-3" id="placeholderActions"></div>
                                     </div>
                                 </div>
                                 <iframe class="stage-iframe" id="viewer" title="Harpa Cristã" allowfullscreen style="display:none;"></iframe>
@@ -636,6 +637,7 @@ $hymnsJson = json_encode($hymns, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES
             download: document.getElementById('btnDownload'),
             viewer: document.getElementById('viewer'),
             placeholder: document.getElementById('placeholder'),
+            placeholderActions: document.getElementById('placeholderActions'),
             stageBody: document.getElementById('stageBody'),
             toastEl: document.getElementById('toast'),
             toastBody: document.getElementById('toastBody')
@@ -691,6 +693,57 @@ $hymnsJson = json_encode($hymns, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES
             return `https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(absoluteUrl)}`;
         }
 
+        function escapeHtml(value) {
+            return (value || '').toString()
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        function isOfficeEmbedAvailable() {
+            if (!baseUrl) return false;
+            try {
+                const url = new URL(baseUrl);
+                const host = (url.hostname || '').toLowerCase();
+                if (!host) return false;
+                if (host === 'localhost' || host === '127.0.0.1') return false;
+                if (/^127\./.test(host)) return false;
+                if (/^10\./.test(host)) return false;
+                if (/^192\.168\./.test(host)) return false;
+                const m = host.match(/^172\.(\d+)\./);
+                if (m) {
+                    const second = Number(m[1] || 0);
+                    if (second >= 16 && second <= 31) return false;
+                }
+                return true;
+            } catch (e) {
+                return false;
+            }
+        }
+
+        function showLocalPreviewFallback(h, openUrl, downloadUrl) {
+            elements.viewer.style.display = 'none';
+            elements.viewer.removeAttribute('src');
+            elements.placeholder.style.display = 'flex';
+            if (elements.placeholderActions) {
+                elements.placeholderActions.innerHTML =
+                    `<div class="d-grid gap-2">` +
+                    `<a class="btn btn-cta btn-lg" target="_blank" rel="noopener noreferrer" href="${escapeHtml(openUrl)}">` +
+                    `<i class="fas fa-play me-2"></i>Abrir o hino` +
+                    `</a>` +
+                    `<a class="btn btn-outline-success btn-lg" target="_blank" rel="noopener noreferrer" href="${escapeHtml(downloadUrl)}">` +
+                    `<i class="fas fa-download me-2"></i>Baixar o PowerPoint` +
+                    `</a>` +
+                    `<div style="color: rgba(255,255,255,.72); font-weight: 600; font-size: .92rem;">` +
+                    `Para “folhear” dentro da página, use um domínio público (não localhost).` +
+                    `</div>` +
+                    `</div>`;
+            }
+            showToast('Modo local: use Abrir/Baixar para abrir no dispositivo.');
+        }
+
         function setActiveByNumber(number) {
             const idx = state.filtered.findIndex(h => Number(h.number) === Number(number));
             if (idx === -1) return false;
@@ -715,9 +768,16 @@ $hymnsJson = json_encode($hymns, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES
             elements.newTab.href = absolutePpt;
             elements.download.href = absoluteDownload;
 
-            elements.placeholder.style.display = 'none';
-            elements.viewer.style.display = 'block';
-            elements.viewer.src = embed;
+            if (!isOfficeEmbedAvailable()) {
+                showLocalPreviewFallback(h, absolutePpt, absoluteDownload);
+            } else {
+                elements.placeholder.style.display = 'none';
+                if (elements.placeholderActions) {
+                    elements.placeholderActions.innerHTML = '';
+                }
+                elements.viewer.style.display = 'block';
+                elements.viewer.src = embed;
+            }
 
             elements.stageBody.classList.remove('flip');
             void elements.stageBody.offsetWidth;

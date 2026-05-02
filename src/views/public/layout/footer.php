@@ -27,15 +27,40 @@
             <p class="mb-0 small text-gold">&copy; <?= date('Y') ?> <?= htmlspecialchars($siteProfile['alias'] ?? $siteProfile['name'] ?? 'Igreja') ?>. Todos os direitos reservados.</p>
         </div>
     </footer>
-
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
-    <!-- JSON-LD Structured Data -->
-    <?php if (isset($jsonld)): ?>
-    <script type="application/ld+json">
-    <?= json_encode($jsonld, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT); ?>
-    </script>
-    <?php endif; ?>
-</body>
-</html>
+    <a href="/harpa" class="harpa-fab" aria-label="Abrir Harpa Cristã" title="Harpa Cristã">
+        <i class="fas fa-music"></i>
+        <span class="label">Harpa Cristã</span>
+    </a>
+    <style>
+        .harpa-fab {
+            position: fixed;
+            right: 18px;
+            bottom: 18px;
+            z-index: 1200;
+            display: inline-flex;
+            align-items: center;
+            gap: .55rem;
+            padding: .72rem 1rem;
+            border-radius: 999px;
+            text-decoration: none;
+            background: linear-gradient(135deg, rgba(255,42,122,1) 0%, rgba(212,175,55,1) 100%);
+            color: #090a15;
+            font-weight: 900;
+            box-shadow: 0 14px 32px rgba(0,0,0,0.22);
+            transition: transform .15s ease, box-shadow .15s ease, filter .15s ease;
+        }
+        .harpa-fab:hover {
+            color: #090a15;
+            filter: brightness(1.02);
+            transform: translateY(-2px);
+            box-shadow: 0 18px 40px rgba(0,0,0,0.28);
+        }
+        .harpa-fab .label {
+            display: none;
+        }
+        @media (min-width: 768px) {
+            .harpa-fab .label {
+                display: inline;
+            }
+        }
+    </style>
