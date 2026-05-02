@@ -235,14 +235,33 @@ elseif ($uri == '/harpa/letra') {
             echo json_encode(['error' => 'Hino não encontrado.'], JSON_UNESCAPED_UNICODE);
             exit;
         }
+
+        $lyrics = trim((string)($row['lyrics'] ?? ''));
+        if ($lyrics === '') {
+            http_response_code(404);
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode(['error' => 'Letra não disponível.'], JSON_UNESCAPED_UNICODE);
+            exit;
+        }
+
+        $isDeveloper = false;
+        if (isset($_SESSION['user_role']) && ($_SESSION['user_role'] === 'admin' || $_SESSION['user_role'] === 'developer')) {
+            $isDeveloper = true;
+        } elseif (function_exists('hasPermission') && hasPermission('developer.access')) {
+            $isDeveloper = true;
+        }
+
         header('Content-Type: application/json; charset=utf-8');
-        echo json_encode([
+        $payload = [
             'number' => (int)($row['hymn_number'] ?? 0),
             'title' => (string)($row['title'] ?? ''),
-            'lyrics' => (string)($row['lyrics'] ?? ''),
-            'status' => (string)($row['extract_status'] ?? ''),
-            'error' => (string)($row['extract_error'] ?? ''),
-        ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+            'lyrics' => $lyrics,
+        ];
+        if ($isDeveloper) {
+            $payload['status'] = (string)($row['extract_status'] ?? '');
+            $payload['error'] = (string)($row['extract_error'] ?? '');
+        }
+        echo json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
         exit;
     } catch (Throwable $e) {
         http_response_code(500);

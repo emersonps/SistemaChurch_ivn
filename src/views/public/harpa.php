@@ -711,15 +711,8 @@ $hymnsJson = json_encode($hymns, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES
                 }
                 const data = await res.json();
                 const lyrics = (data && typeof data.lyrics === 'string') ? data.lyrics.trim() : '';
-                const status = (data && typeof data.status === 'string') ? data.status : '';
-                const err = (data && typeof data.error === 'string') ? data.error : '';
 
                 if (!lyrics) {
-                    if (status && status !== 'ok') {
-                        showToast(err ? `Letra indisponível: ${err}` : 'Letra indisponível.');
-                    } else {
-                        showToast('Letra ainda não disponível para este hino.');
-                    }
                     target.lyrics.style.display = 'none';
                     target.placeholder.style.display = 'block';
                     return;
