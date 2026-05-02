@@ -16,6 +16,8 @@ function parseArgs(array $argv) {
         'targets' => [],
         'dry_run' => false,
         'verbose' => false,
+        'watch' => false,
+        'interval' => 2,
     ];
 
     foreach ($argv as $i => $raw) {
@@ -23,12 +25,23 @@ function parseArgs(array $argv) {
             continue;
         }
 
+        if ($raw === '--watch') {
+            $args['watch'] = true;
+            continue;
+        }
         if ($raw === '--dry-run') {
             $args['dry_run'] = true;
             continue;
         }
         if ($raw === '--verbose') {
             $args['verbose'] = true;
+            continue;
+        }
+        if (strpos($raw, '--interval=') === 0) {
+            $value = (int)substr($raw, strlen('--interval='));
+            if ($value > 0) {
+                $args['interval'] = $value;
+            }
             continue;
         }
         if (strpos($raw, '--root=') === 0) {
@@ -44,6 +57,112 @@ function parseArgs(array $argv) {
     }
 
     return $args;
+}
+
+function collectSourceFiles($sourceDir, array $includes) {
+    $sourceDir = normalizePath($sourceDir);
+    $files = [];
+
+    foreach ($includes as $item) {
+        if (strpos($item, '*') !== false) {
+            $glob = glob($sourceDir . '/' . $item) ?: [];
+            foreach ($glob as $path) {
+                $path = normalizePath($path);
+                if (is_file($path)) {
+                    $files[] = substr($path, strlen($sourceDir) + 1);
+                }
+            }
+            continue;
+        }
+
+        $files = array_merge($files, iterFiles($sourceDir, $item));
+    }
+
+    $files = array_values(array_unique($files));
+    sort($files);
+    return $files;
+}
+
+function snapshotHash($sourceDir, array $relativeFiles) {
+    $sourceDir = normalizePath($sourceDir);
+    $parts = [];
+
+    foreach ($relativeFiles as $rel) {
+        $src = $sourceDir . '/' . $rel;
+        if (!is_file($src)) {
+            continue;
+        }
+
+        $mtime = @filemtime($src);
+        $size = @filesize($src);
+        $parts[] = $rel . '|' . (string)$mtime . '|' . (string)$size;
+    }
+
+    return hash('sha1', implode("\n", $parts));
+}
+
+function syncFilesToTargets($sourceDir, array $targets, array $sourceFiles, array $args) {
+    $sourceDir = normalizePath($sourceDir);
+    $copied = 0;
+    $skipped = 0;
+    $errors = 0;
+
+    foreach ($targets as $targetDir) {
+        $targetDir = normalizePath($targetDir);
+        if (!is_dir($targetDir)) {
+            if (!empty($args['verbose'])) {
+                fwrite(STDERR, "[skip] Alvo não é diretório: {$targetDir}" . PHP_EOL);
+            }
+            continue;
+        }
+
+        echo "==> Sincronizando para: {$targetDir}" . PHP_EOL;
+
+        foreach ($sourceFiles as $rel) {
+            $src = $sourceDir . '/' . $rel;
+            $dst = $targetDir . '/' . $rel;
+
+            if (!is_file($src)) {
+                continue;
+            }
+
+            if (filesAreEqual($src, $dst)) {
+                $skipped++;
+                continue;
+            }
+
+            $dstDir = dirname($dst);
+            if (!is_dir($dstDir)) {
+                if (empty($args['dry_run']) && !mkdir($dstDir, 0777, true) && !is_dir($dstDir)) {
+                    $errors++;
+                    fwrite(STDERR, "[erro] Falha ao criar pasta: {$dstDir}" . PHP_EOL);
+                    continue;
+                }
+            }
+
+            if (!empty($args['verbose'])) {
+                echo (!empty($args['dry_run']) ? "[dry] " : "") . "{$rel}" . PHP_EOL;
+            }
+
+            if (empty($args['dry_run'])) {
+                if (!copy($src, $dst)) {
+                    $errors++;
+                    fwrite(STDERR, "[erro] Falha ao copiar: {$rel}" . PHP_EOL);
+                    continue;
+                }
+            }
+
+            $copied++;
+        }
+    }
+
+    echo PHP_EOL;
+    echo "Concluído." . PHP_EOL;
+    echo "- Atualizados: {$copied}" . PHP_EOL;
+    echo "- Iguais (pulados): {$skipped}" . PHP_EOL;
+    echo "- Erros: {$errors}" . PHP_EOL;
+
+    return $errors > 0 ? 2 : 0;
 }
 
 function listTargetsFromRoot($rootDir, $excludeDirName) {
@@ -195,84 +314,43 @@ $includes = [
     'harpa_crista',
 ];
 
-$sourceFiles = [];
-foreach ($includes as $item) {
-    if (strpos($item, '*') !== false) {
-        $glob = glob($sourceDir . '/' . $item) ?: [];
-        foreach ($glob as $path) {
-            $path = normalizePath($path);
-            if (is_file($path)) {
-                $sourceFiles[] = substr($path, strlen($sourceDir) + 1);
-            }
-        }
-        continue;
-    }
-    $sourceFiles = array_merge($sourceFiles, iterFiles($sourceDir, $item));
-}
-$sourceFiles = array_values(array_unique($sourceFiles));
-sort($sourceFiles);
+$sourceFiles = collectSourceFiles($sourceDir, $includes);
 
 if (count($sourceFiles) === 0) {
     fail('Nenhum arquivo encontrado para sincronizar. Verifique os caminhos de include.');
 }
 
-$copied = 0;
-$skipped = 0;
-$errors = 0;
+$exitCode = syncFilesToTargets($sourceDir, $targets, $sourceFiles, $args);
+if (empty($args['watch'])) {
+    exit($exitCode);
+}
 
-foreach ($targets as $targetDir) {
-    $targetDir = normalizePath($targetDir);
-    if (!is_dir($targetDir)) {
-        if ($args['verbose']) {
-            fwrite(STDERR, "[skip] Alvo não é diretório: {$targetDir}" . PHP_EOL);
-        }
+$interval = (int)($args['interval'] ?? 2);
+if ($interval <= 0) {
+    $interval = 2;
+}
+
+$lastHash = snapshotHash($sourceDir, $sourceFiles);
+echo PHP_EOL;
+echo "Modo watch ativo. Intervalo: {$interval}s" . PHP_EOL;
+echo "Observando alterações em: {$sourceDir}" . PHP_EOL;
+
+while (true) {
+    sleep($interval);
+
+    $currentFiles = collectSourceFiles($sourceDir, $includes);
+    $currentHash = snapshotHash($sourceDir, $currentFiles);
+    if ($currentHash === $lastHash) {
         continue;
     }
 
-    echo "==> Sincronizando para: {$targetDir}" . PHP_EOL;
+    $lastHash = $currentHash;
+    $sourceFiles = $currentFiles;
 
-    foreach ($sourceFiles as $rel) {
-        $src = $sourceDir . '/' . $rel;
-        $dst = $targetDir . '/' . $rel;
-
-        if (!is_file($src)) {
-            continue;
-        }
-
-        if (filesAreEqual($src, $dst)) {
-            $skipped++;
-            continue;
-        }
-
-        $dstDir = dirname($dst);
-        if (!is_dir($dstDir)) {
-            if (!$args['dry_run'] && !mkdir($dstDir, 0777, true) && !is_dir($dstDir)) {
-                $errors++;
-                fwrite(STDERR, "[erro] Falha ao criar pasta: {$dstDir}" . PHP_EOL);
-                continue;
-            }
-        }
-
-        if ($args['verbose']) {
-            echo ($args['dry_run'] ? "[dry] " : "") . "{$rel}" . PHP_EOL;
-        }
-
-        if (!$args['dry_run']) {
-            if (!copy($src, $dst)) {
-                $errors++;
-                fwrite(STDERR, "[erro] Falha ao copiar: {$rel}" . PHP_EOL);
-                continue;
-            }
-        }
-
-        $copied++;
+    echo PHP_EOL;
+    echo "[" . date('Y-m-d H:i:s') . "] Alterações detectadas. Sincronizando..." . PHP_EOL;
+    $exitCode = syncFilesToTargets($sourceDir, $targets, $sourceFiles, $args);
+    if ($exitCode !== 0) {
+        echo "[" . date('Y-m-d H:i:s') . "] Sincronização finalizada com erros (código {$exitCode})." . PHP_EOL;
     }
 }
-
-echo PHP_EOL;
-echo "Concluído." . PHP_EOL;
-echo "- Atualizados: {$copied}" . PHP_EOL;
-echo "- Iguais (pulados): {$skipped}" . PHP_EOL;
-echo "- Erros: {$errors}" . PHP_EOL;
-
-exit($errors > 0 ? 2 : 0);
