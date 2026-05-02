@@ -139,22 +139,45 @@ elseif ($uri == '/harpa/hino') {
     }
 
     $targetPath = null;
-    $entries = scandir($harpaDirReal);
-    foreach ($entries as $entry) {
-        if (!is_string($entry) || $entry === '.' || $entry === '..') {
-            continue;
+    try {
+        $db = (new Database())->connect();
+        $stmt = $db->prepare("SELECT file_name, pptx_file_name FROM harpa_hymns WHERE hymn_number = ? LIMIT 1");
+        $stmt->execute([$num]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (is_array($row)) {
+            $candidateName = (string)($row['pptx_file_name'] ?? '');
+            if ($candidateName === '') {
+                $candidateName = (string)($row['file_name'] ?? '');
+            }
+            if ($candidateName !== '') {
+                $candidate = $harpaDirReal . DIRECTORY_SEPARATOR . $candidateName;
+                $candidateReal = realpath($candidate);
+                if ($candidateReal && strpos($candidateReal, $harpaDirReal) === 0 && is_file($candidateReal)) {
+                    $targetPath = $candidateReal;
+                }
+            }
         }
+    } catch (Throwable $e) {
+    }
 
-        if (!preg_match('/\.(pptx?)$/i', $entry)) {
-            continue;
-        }
+    if (!$targetPath) {
+        $entries = scandir($harpaDirReal);
+        foreach ($entries as $entry) {
+            if (!is_string($entry) || $entry === '.' || $entry === '..') {
+                continue;
+            }
 
-        if (preg_match('/^' . preg_quote((string)$num, '/') . '\s*-\s*.*\.(pptx?)$/i', $entry)) {
-            $candidate = $harpaDirReal . DIRECTORY_SEPARATOR . $entry;
-            $candidateReal = realpath($candidate);
-            if ($candidateReal && strpos($candidateReal, $harpaDirReal) === 0 && is_file($candidateReal)) {
-                $targetPath = $candidateReal;
-                break;
+            if (!preg_match('/\.(pptx?)$/i', $entry)) {
+                continue;
+            }
+
+            if (preg_match('/^' . preg_quote((string)$num, '/') . '\s*-\s*.*\.(pptx?)$/i', $entry)) {
+                $candidate = $harpaDirReal . DIRECTORY_SEPARATOR . $entry;
+                $candidateReal = realpath($candidate);
+                if ($candidateReal && strpos($candidateReal, $harpaDirReal) === 0 && is_file($candidateReal)) {
+                    $targetPath = $candidateReal;
+                    break;
+                }
             }
         }
     }
@@ -185,7 +208,53 @@ elseif ($uri == '/harpa/hino') {
     readfile($targetPath);
     exit;
 }
+elseif ($uri == '/harpa/letra') {
+    $num = (int)($_GET['n'] ?? $_GET['num'] ?? $_GET['numero'] ?? 0);
+    if ($num <= 0) {
+        http_response_code(400);
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode(['error' => 'Número inválido.'], JSON_UNESCAPED_UNICODE);
+        exit;
+    }
+
+    try {
+        $db = (new Database())->connect();
+        $row = null;
+        try {
+            $stmt = $db->prepare("SELECT hymn_number, title, lyrics, extract_status, extract_error FROM harpa_hymns WHERE hymn_number = ? LIMIT 1");
+            $stmt->execute([$num]);
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (Throwable $e) {
+            $stmt = $db->prepare("SELECT hymn_number, title, '' as lyrics, '' as extract_status, '' as extract_error FROM harpa_hymns WHERE hymn_number = ? LIMIT 1");
+            $stmt->execute([$num]);
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        }
+        if (!$row) {
+            http_response_code(404);
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode(['error' => 'Hino não encontrado.'], JSON_UNESCAPED_UNICODE);
+            exit;
+        }
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode([
+            'number' => (int)($row['hymn_number'] ?? 0),
+            'title' => (string)($row['title'] ?? ''),
+            'lyrics' => (string)($row['lyrics'] ?? ''),
+            'status' => (string)($row['extract_status'] ?? ''),
+            'error' => (string)($row['extract_error'] ?? ''),
+        ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        exit;
+    } catch (Throwable $e) {
+        http_response_code(500);
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode(['error' => 'Erro ao consultar letra.'], JSON_UNESCAPED_UNICODE);
+        exit;
+    }
+}
 // Migration Manager Routes (Priority)
+elseif ($uri == '/developer/harpa/sync') {
+    (new HarpaController())->sync();
+}
 elseif ($uri == '/developer/migrations') {
     (new MigrationController())->index();
 }

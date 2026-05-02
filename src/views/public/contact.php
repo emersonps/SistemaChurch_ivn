@@ -489,6 +489,11 @@ $testimonials = [
         .harpa-fab .label {
             display: none;
         }
+        @media (max-width: 575.98px) {
+            .harpa-fab {
+                bottom: 86px;
+            }
+        }
         @media (min-width: 768px) {
             .harpa-fab .label {
                 display: inline;

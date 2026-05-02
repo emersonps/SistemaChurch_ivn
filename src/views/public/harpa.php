@@ -3,48 +3,24 @@ $siteProfile = getChurchSiteProfileSettings();
 $brand = getChurchBrandingName($siteProfile);
 $alias = getChurchBrandingAlias($siteProfile);
 $logoUrl = getChurchLogoUrl($siteProfile, true);
-
-$scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
-$host = (string)($_SERVER['HTTP_HOST'] ?? '');
-$baseUrl = $host !== '' ? ($scheme . '://' . $host) : '';
-
-$harpaDir = dirname(__DIR__, 3) . DIRECTORY_SEPARATOR . 'harpa_crista';
 $hymns = [];
-if (is_dir($harpaDir)) {
-    $entries = scandir($harpaDir);
-    foreach ($entries as $entry) {
-        if (!is_string($entry) || $entry === '.' || $entry === '..') {
-            continue;
+try {
+    $db = (new Database())->connect();
+    $rows = $db->query("SELECT hymn_number as number, title FROM harpa_hymns ORDER BY hymn_number ASC")->fetchAll(PDO::FETCH_ASSOC);
+    if (is_array($rows) && count($rows) > 0) {
+        foreach ($rows as $r) {
+            $num = (int)($r['number'] ?? 0);
+            if ($num <= 0) {
+                continue;
+            }
+            $hymns[] = [
+                'number' => $num,
+                'title' => (string)($r['title'] ?? ''),
+            ];
         }
-
-        if (!preg_match('/\.(pptx?)$/i', $entry)) {
-            continue;
-        }
-
-        if (!preg_match('/^(\d+)\s*-\s*(.*?)\.(pptx?)$/i', $entry, $m)) {
-            continue;
-        }
-
-        $num = (int)($m[1] ?? 0);
-        if ($num <= 0) {
-            continue;
-        }
-
-        $title = trim((string)($m[2] ?? ''));
-        if ($title === '' || $title === '-') {
-            $title = 'Hino sem título';
-        }
-
-        $hymns[] = [
-            'number' => $num,
-            'title' => $title,
-        ];
     }
+} catch (Throwable $e) {
 }
-
-usort($hymns, function ($a, $b) {
-    return ($a['number'] ?? 0) <=> ($b['number'] ?? 0);
-});
 
 $defaultNum = (int)($_GET['n'] ?? $_GET['num'] ?? 0);
 $hymnsJson = json_encode($hymns, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
@@ -82,6 +58,9 @@ $hymnsJson = json_encode($hymns, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES
                 radial-gradient(circle at 55% 115%, rgba(139,21,56,.26), transparent 44%),
                 linear-gradient(135deg, var(--bg0) 0%, var(--bg1) 45%, var(--bg0) 100%);
             min-height:100vh;
+        }
+        main{
+            padding-top: 1.2rem;
         }
         .topbar{
             position:sticky;
@@ -160,43 +139,6 @@ $hymnsJson = json_encode($hymns, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES
             28%{transform:rotate(25deg) translateX(260%);opacity:0;}
             100%{transform:rotate(25deg) translateX(260%);opacity:0;}
         }
-        .hero{
-            padding:2.6rem 0 1.1rem;
-        }
-        .hero-shell{
-            border-radius:28px;
-            padding:2rem;
-            background:linear-gradient(135deg, rgba(255,255,255,.10), rgba(255,255,255,.04));
-            border:1px solid rgba(255,255,255,.14);
-            box-shadow:var(--shadow);
-            position:relative;
-            overflow:hidden;
-        }
-        .hero-shell::before{
-            content:"";
-            position:absolute;
-            inset:-2px;
-            border-radius:30px;
-            background:linear-gradient(120deg, rgba(255,42,122,.40), rgba(212,175,55,.40), rgba(255,255,255,.22));
-            filter:blur(18px);
-            opacity:.55;
-            z-index:-1;
-        }
-        .hero-kicker{
-            display:inline-flex;
-            align-items:center;
-            gap:.55rem;
-            padding:.42rem .8rem;
-            border-radius:999px;
-            background:rgba(255,255,255,.08);
-            border:1px solid rgba(255,255,255,.14);
-            color:rgba(255,255,255,.92);
-            font-size:.78rem;
-            font-weight:800;
-            text-transform:uppercase;
-            letter-spacing:.04em;
-            margin-bottom:1rem;
-        }
         .hero-title{
             font-weight:900;
             line-height:1.05;
@@ -215,8 +157,13 @@ $hymnsJson = json_encode($hymns, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES
             gap:1rem;
             padding-bottom:2.2rem;
         }
+        .panel-list{order:1;}
+        .panel-reader{order:2;}
         @media (max-width: 992px){
             .grid{grid-template-columns:1fr;}
+            .panel-reader{order:1;}
+            .panel-list{order:2;}
+            .panel-reader{display:none;}
         }
         .panel{
             background:var(--panel);
@@ -311,23 +258,6 @@ $hymnsJson = json_encode($hymns, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES
             padding:7px;
             object-fit:contain;
         }
-        .input-wrap{
-            display:flex;
-            gap:.6rem;
-        }
-        .input-wrap .form-control{
-            border-radius:14px;
-            background:rgba(255,255,255,.08);
-            border:1px solid rgba(255,255,255,.14);
-            color:var(--ink);
-            font-weight:700;
-        }
-        .input-wrap .form-control:focus{
-            background:rgba(255,255,255,.10);
-            border-color:rgba(212,175,55,.55);
-            box-shadow:0 0 0 .2rem rgba(212,175,55,.12);
-            color:var(--ink);
-        }
         .list-shell{
             border-radius:18px;
             border:1px solid rgba(255,255,255,.12);
@@ -406,13 +336,13 @@ $hymnsJson = json_encode($hymns, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES
             color:var(--muted);
             white-space:nowrap;
         }
-        .stage{
+        .reader{
             border-radius:20px;
             border:1px solid rgba(255,255,255,.12);
             background:rgba(0,0,0,.18);
             overflow:hidden;
         }
-        .stage-top{
+        .reader-top{
             padding:.85rem .95rem;
             display:flex;
             align-items:center;
@@ -422,35 +352,34 @@ $hymnsJson = json_encode($hymns, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES
             background:rgba(255,255,255,.04);
             flex-wrap:wrap;
         }
-        .stage-title{
+        .reader-title{
             margin:0;
             font-weight:900;
             font-size:1.05rem;
         }
-        .stage-sub{
+        .reader-sub{
             margin:0;
             color:var(--muted);
             font-size:.84rem;
         }
-        .stage-actions{
+        .reader-actions{
             display:flex;
             gap:.45rem;
             flex-wrap:wrap;
         }
-        .stage-actions .btn{
+        .reader-actions .btn{
             border-radius:999px;
             font-weight:800;
             border-color:rgba(255,255,255,.14);
         }
-        .stage-body{
+        .reader-body{
             position:relative;
-            height:min(70vh, 680px);
             background:
                 radial-gradient(circle at 15% 15%, rgba(255,42,122,.14), transparent 36%),
                 radial-gradient(circle at 85% 20%, rgba(212,175,55,.12), transparent 42%),
                 linear-gradient(180deg, rgba(255,255,255,.03), rgba(0,0,0,.18));
         }
-        .stage-body.flip{
+        .reader-body.flip{
             animation:pageFlip .55s ease;
         }
         @keyframes pageFlip{
@@ -458,36 +387,58 @@ $hymnsJson = json_encode($hymns, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES
             45%{transform:perspective(1200px) rotateY(-22deg);}
             100%{transform:perspective(1200px) rotateY(0deg);}
         }
-        .stage-iframe{
-            width:100%;
-            height:100%;
-            border:0;
-            display:block;
+        .reader-content{
+            padding: 1.05rem 1rem 1.2rem;
         }
-        .stage-placeholder{
-            position:absolute;
-            inset:0;
-            display:flex;
-            align-items:center;
-            justify-content:center;
-            padding:1.2rem;
-            text-align:center;
-        }
-        .placeholder-card{
+        .reader-card{
             border-radius:22px;
             background:rgba(255,255,255,.06);
             border:1px solid rgba(255,255,255,.12);
             box-shadow:0 18px 50px rgba(0,0,0,.35);
-            padding:1.3rem;
-            max-width:520px;
+            padding:1.15rem 1.1rem;
         }
-        .placeholder-card h3{
-            font-weight:900;
-            margin:0 0 .55rem 0;
+        .reader-meta{
+            color: var(--muted);
+            font-weight: 750;
+            letter-spacing: .01em;
         }
-        .placeholder-card p{
-            margin:0;
-            color:var(--muted);
+        .lyrics{
+            --fontSize: 1.1rem;
+            --lineHeight: 1.75;
+            margin: .85rem auto 0;
+            max-width: 50rem;
+            padding: 1.05rem 1.05rem;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            background: rgba(0,0,0,.16);
+            color: rgba(255,255,255,.94);
+            font-weight: 650;
+            font-size: var(--fontSize);
+            line-height: var(--lineHeight);
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+        .lyrics.compact{--lineHeight:1.55;}
+        .lyrics.large{--fontSize:1.28rem;}
+        .lyrics.xlarge{--fontSize:1.45rem;}
+        @media (max-width: 576px){
+            .lyrics{padding:.95rem .95rem;}
+        }
+        .hymn-modal .modal-content{
+            background:rgba(6,8,18,.96);
+            border:1px solid rgba(255,255,255,.12);
+            color:var(--ink);
+            border-radius:20px;
+            overflow:hidden;
+        }
+        .hymn-modal .modal-header,
+        .hymn-modal .modal-footer{
+            border-color:rgba(255,255,255,.10);
+            background:rgba(255,255,255,.04);
+        }
+        .hymn-modal .btn-close{
+            filter: invert(1);
+            opacity:.75;
         }
         .toast-container{
             position:fixed;
@@ -520,26 +471,10 @@ $hymnsJson = json_encode($hymns, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES
         </div>
     </header>
 
-    <section class="hero">
-        <div class="container">
-            <div class="hero-shell">
-                <span class="hero-kicker"><i class="fas fa-music"></i> Repertório • Escolha pelo número</span>
-                <h1 class="hero-title">Escolha o hino e “folheie” como um livro</h1>
-                <p class="hero-copy">
-                    Digite o número do hino ou selecione na lista. A apresentação abre em formato de slides, perfeita para cantar e acompanhar na igreja.
-                </p>
-                <div class="mt-4 input-wrap">
-                    <input type="number" min="1" step="1" class="form-control form-control-lg" id="hymnNumber" placeholder="Digite o número do hino (ex: 23)" inputmode="numeric" value="<?= $defaultNum > 0 ? htmlspecialchars((string)$defaultNum) : '' ?>">
-                    <button class="btn btn-cta btn-lg px-4" id="btnOpen"><i class="fas fa-book-open me-2"></i>Abrir</button>
-                </div>
-            </div>
-        </div>
-    </section>
-
     <main>
         <div class="container">
             <div class="grid">
-                <section class="panel">
+                <section class="panel panel-list">
                     <div class="panel-head">
                         <div>
                             <h2 class="panel-title mb-1">Lista de Hinos</h2>
@@ -548,15 +483,6 @@ $hymnsJson = json_encode($hymns, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES
                         <span class="badge rounded-pill text-bg-warning text-dark fw-bold px-3 py-2"><i class="fas fa-harp me-2"></i>Harpa</span>
                     </div>
                     <div class="panel-body">
-                        <div class="cover mb-3">
-                            <img src="<?= htmlspecialchars($logoUrl) ?>" alt="<?= htmlspecialchars($alias) ?>" class="cover-logo">
-                            <div class="cover-inner">
-                                <div class="cover-badge"><i class="fas fa-microphone-lines"></i> Estilo cantor cristão</div>
-                                <h3 class="cover-title">Harpa Cristã</h3>
-                                <p class="cover-meta">Selecione o hino e conduza o louvor com agilidade.</p>
-                            </div>
-                        </div>
-
                         <div class="list-shell">
                             <div class="list-top">
                                 <i class="fas fa-magnifying-glass text-warning"></i>
@@ -567,39 +493,38 @@ $hymnsJson = json_encode($hymns, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES
                     </div>
                 </section>
 
-                <section class="panel">
+                <section class="panel panel-reader">
                     <div class="panel-head">
                         <div>
-                            <h2 class="panel-title mb-1">Palco</h2>
+                            <h2 class="panel-title mb-1">Leitura</h2>
                             <p class="panel-sub" id="nowPlaying">Abra um hino para começar</p>
                         </div>
-                        <div class="stage-actions">
+                        <div class="reader-actions">
                             <button class="btn btn-outline-light btn-sm" id="btnPrev"><i class="fas fa-chevron-left me-2"></i>Anterior</button>
                             <button class="btn btn-outline-light btn-sm" id="btnNext">Próximo<i class="fas fa-chevron-right ms-2"></i></button>
-                            <a class="btn btn-outline-warning btn-sm" id="btnNewTab" target="_blank" rel="noopener noreferrer"><i class="fas fa-up-right-from-square me-2"></i>Abrir</a>
-                            <a class="btn btn-outline-success btn-sm" id="btnDownload" target="_blank" rel="noopener noreferrer"><i class="fas fa-download me-2"></i>Baixar</a>
+                            <button class="btn btn-outline-warning btn-sm" id="btnFont"><i class="fas fa-font me-2"></i>Tamanho</button>
+                            <button class="btn btn-outline-success btn-sm" id="btnLine"><i class="fas fa-align-left me-2"></i>Linhas</button>
                         </div>
                     </div>
                     <div class="panel-body p-0">
-                        <div class="stage">
-                            <div class="stage-top">
+                        <div class="reader">
+                            <div class="reader-top">
                                 <div>
-                                    <div class="stage-title" id="stageTitle">Harpa Cristã</div>
-                                    <div class="stage-sub" id="stageSub">Escolha um hino na lista ou digite o número</div>
+                                    <div class="reader-title" id="stageTitle">Harpa Cristã</div>
+                                    <div class="reader-sub" id="stageSub">Escolha um hino na lista ou digite o número</div>
                                 </div>
                                 <div class="d-flex align-items-center gap-2 flex-wrap">
                                     <span class="badge rounded-pill text-bg-light text-dark fw-bold px-3 py-2" id="badgeNumber" style="display:none;"></span>
                                 </div>
                             </div>
-                            <div class="stage-body" id="stageBody">
-                                <div class="stage-placeholder" id="placeholder">
-                                    <div class="placeholder-card">
-                                        <h3>Pronto para o louvor</h3>
-                                        <p>Abra um hino para visualizar as páginas e conduzir a igreja com clareza.</p>
-                                        <div class="mt-3" id="placeholderActions"></div>
+                            <div class="reader-body" id="stageBody">
+                                <div class="reader-content">
+                                    <div class="reader-card" id="placeholder">
+                                        <h3 style="font-weight:900;" class="mb-2">Pronto para o louvor</h3>
+                                        <div class="reader-meta">Abra um hino para ler a letra com conforto no celular.</div>
                                     </div>
+                                    <div class="lyrics" id="lyricsText" style="display:none;"></div>
                                 </div>
-                                <iframe class="stage-iframe" id="viewer" title="Harpa Cristã" allowfullscreen style="display:none;"></iframe>
                             </div>
                         </div>
                     </div>
@@ -607,6 +532,46 @@ $hymnsJson = json_encode($hymns, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES
             </div>
         </div>
     </main>
+
+    <div class="modal fade hymn-modal" id="hymnModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-fullscreen-sm-down modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="d-flex align-items-start gap-3 flex-wrap">
+                        <div>
+                            <div class="reader-title" id="modalTitle">Harpa Cristã</div>
+                            <div class="reader-sub" id="modalSub">Selecione um hino</div>
+                        </div>
+                        <span class="badge rounded-pill text-bg-light text-dark fw-bold px-3 py-2" id="modalBadge" style="display:none;"></span>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                </div>
+                <div class="modal-body p-0">
+                    <div class="reader-body" id="modalReaderBody">
+                        <div class="reader-content">
+                            <div class="reader-card" id="modalPlaceholder">
+                                <h3 style="font-weight:900;" class="mb-2">Pronto para o louvor</h3>
+                                <div class="reader-meta">Abrindo a letra...</div>
+                            </div>
+                            <div class="lyrics" id="modalLyrics" style="display:none;"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <div class="d-flex align-items-center justify-content-between w-100 gap-2 flex-wrap">
+                        <div class="d-flex gap-2 flex-wrap">
+                            <button class="btn btn-outline-light btn-sm" id="modalPrev"><i class="fas fa-chevron-left me-2"></i>Anterior</button>
+                            <button class="btn btn-outline-light btn-sm" id="modalNext">Próximo<i class="fas fa-chevron-right ms-2"></i></button>
+                        </div>
+                        <div class="d-flex gap-2 flex-wrap">
+                            <button class="btn btn-outline-warning btn-sm" id="modalFont"><i class="fas fa-font me-2"></i>Tamanho</button>
+                            <button class="btn btn-outline-success btn-sm" id="modalLine"><i class="fas fa-align-left me-2"></i>Linhas</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div class="toast-container">
         <div class="toast align-items-center" role="alert" aria-live="assertive" aria-atomic="true" id="toast">
@@ -620,35 +585,86 @@ $hymnsJson = json_encode($hymns, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         const hymns = <?= $hymnsJson ?: '[]' ?>;
-        const baseUrl = <?= json_encode($baseUrl, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) ?>;
 
         const elements = {
             list: document.getElementById('hymnList'),
             filter: document.getElementById('filter'),
-            number: document.getElementById('hymnNumber'),
-            open: document.getElementById('btnOpen'),
             prev: document.getElementById('btnPrev'),
             next: document.getElementById('btnNext'),
+            font: document.getElementById('btnFont'),
+            line: document.getElementById('btnLine'),
             nowPlaying: document.getElementById('nowPlaying'),
             stageTitle: document.getElementById('stageTitle'),
             stageSub: document.getElementById('stageSub'),
             badgeNumber: document.getElementById('badgeNumber'),
-            newTab: document.getElementById('btnNewTab'),
-            download: document.getElementById('btnDownload'),
-            viewer: document.getElementById('viewer'),
             placeholder: document.getElementById('placeholder'),
-            placeholderActions: document.getElementById('placeholderActions'),
             stageBody: document.getElementById('stageBody'),
+            lyricsText: document.getElementById('lyricsText'),
+            modalEl: document.getElementById('hymnModal'),
+            modalTitle: document.getElementById('modalTitle'),
+            modalSub: document.getElementById('modalSub'),
+            modalBadge: document.getElementById('modalBadge'),
+            modalReaderBody: document.getElementById('modalReaderBody'),
+            modalPlaceholder: document.getElementById('modalPlaceholder'),
+            modalLyrics: document.getElementById('modalLyrics'),
+            modalPrev: document.getElementById('modalPrev'),
+            modalNext: document.getElementById('modalNext'),
+            modalFont: document.getElementById('modalFont'),
+            modalLine: document.getElementById('modalLine'),
             toastEl: document.getElementById('toast'),
             toastBody: document.getElementById('toastBody')
         };
 
         const toast = bootstrap.Toast.getOrCreateInstance(elements.toastEl, { delay: 2400 });
+        const hymnModal = elements.modalEl ? bootstrap.Modal.getOrCreateInstance(elements.modalEl) : null;
+        const mediaMobile = window.matchMedia('(max-width: 992px)');
 
         const state = {
             currentIndex: -1,
-            filtered: hymns.slice()
+            filtered: hymns.slice(),
+            fontSizeMode: localStorage.getItem('harpa_font') || 'normal',
+            lineMode: localStorage.getItem('harpa_line') || 'normal'
         };
+
+        function applyReaderPrefs(targetLyrics) {
+            const lyricsEl = targetLyrics || elements.lyricsText;
+            lyricsEl.classList.remove('large', 'xlarge', 'compact');
+            if (state.fontSizeMode === 'large') lyricsEl.classList.add('large');
+            if (state.fontSizeMode === 'xlarge') lyricsEl.classList.add('xlarge');
+            if (state.lineMode === 'compact') lyricsEl.classList.add('compact');
+        }
+
+        function isMobile() {
+            return !!hymnModal && mediaMobile.matches;
+        }
+
+        function getReaderTarget() {
+            if (isMobile()) {
+                return {
+                    title: elements.modalTitle,
+                    sub: elements.modalSub,
+                    badge: elements.modalBadge,
+                    placeholder: elements.modalPlaceholder,
+                    lyrics: elements.modalLyrics,
+                    body: elements.modalReaderBody
+                };
+            }
+            return {
+                title: elements.stageTitle,
+                sub: elements.stageSub,
+                badge: elements.badgeNumber,
+                placeholder: elements.placeholder,
+                lyrics: elements.lyricsText,
+                body: elements.stageBody
+            };
+        }
+
+        function animateFlip(targetBody) {
+            if (!targetBody) return;
+            targetBody.classList.remove('flip');
+            void targetBody.offsetWidth;
+            targetBody.classList.add('flip');
+        }
 
         function normalizeText(value) {
             return (value || '')
@@ -683,65 +699,41 @@ $hymnsJson = json_encode($hymns, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES
             toast.show();
         }
 
-        function getAbsoluteHymnUrl(number, download) {
-            const path = `/harpa/hino?n=${encodeURIComponent(number)}${download ? '&download=1' : ''}`;
-            if (baseUrl) return baseUrl + path;
-            return path;
-        }
-
-        function getOfficeEmbedUrl(absoluteUrl) {
-            return `https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(absoluteUrl)}`;
-        }
-
-        function escapeHtml(value) {
-            return (value || '').toString()
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;')
-                .replace(/'/g, '&#039;');
-        }
-
-        function isOfficeEmbedAvailable() {
-            if (!baseUrl) return false;
+        async function loadLyrics(number) {
+            const target = getReaderTarget();
             try {
-                const url = new URL(baseUrl);
-                const host = (url.hostname || '').toLowerCase();
-                if (!host) return false;
-                if (host === 'localhost' || host === '127.0.0.1') return false;
-                if (/^127\./.test(host)) return false;
-                if (/^10\./.test(host)) return false;
-                if (/^192\.168\./.test(host)) return false;
-                const m = host.match(/^172\.(\d+)\./);
-                if (m) {
-                    const second = Number(m[1] || 0);
-                    if (second >= 16 && second <= 31) return false;
+                const url = `/harpa/letra?n=${encodeURIComponent(number)}`;
+                const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
+                if (!res.ok) {
+                    target.lyrics.style.display = 'none';
+                    target.placeholder.style.display = 'block';
+                    return;
                 }
-                return true;
-            } catch (e) {
-                return false;
-            }
-        }
+                const data = await res.json();
+                const lyrics = (data && typeof data.lyrics === 'string') ? data.lyrics.trim() : '';
+                const status = (data && typeof data.status === 'string') ? data.status : '';
+                const err = (data && typeof data.error === 'string') ? data.error : '';
 
-        function showLocalPreviewFallback(h, openUrl, downloadUrl) {
-            elements.viewer.style.display = 'none';
-            elements.viewer.removeAttribute('src');
-            elements.placeholder.style.display = 'flex';
-            if (elements.placeholderActions) {
-                elements.placeholderActions.innerHTML =
-                    `<div class="d-grid gap-2">` +
-                    `<a class="btn btn-cta btn-lg" target="_blank" rel="noopener noreferrer" href="${escapeHtml(openUrl)}">` +
-                    `<i class="fas fa-play me-2"></i>Abrir o hino` +
-                    `</a>` +
-                    `<a class="btn btn-outline-success btn-lg" target="_blank" rel="noopener noreferrer" href="${escapeHtml(downloadUrl)}">` +
-                    `<i class="fas fa-download me-2"></i>Baixar o PowerPoint` +
-                    `</a>` +
-                    `<div style="color: rgba(255,255,255,.72); font-weight: 600; font-size: .92rem;">` +
-                    `Para “folhear” dentro da página, use um domínio público (não localhost).` +
-                    `</div>` +
-                    `</div>`;
+                if (!lyrics) {
+                    if (status && status !== 'ok') {
+                        showToast(err ? `Letra indisponível: ${err}` : 'Letra indisponível.');
+                    } else {
+                        showToast('Letra ainda não disponível para este hino.');
+                    }
+                    target.lyrics.style.display = 'none';
+                    target.placeholder.style.display = 'block';
+                    return;
+                }
+
+                target.placeholder.style.display = 'none';
+                target.lyrics.style.display = 'block';
+                target.lyrics.textContent = lyrics;
+                applyReaderPrefs(target.lyrics);
+            } catch (e) {
+                const target = getReaderTarget();
+                target.lyrics.style.display = 'none';
+                target.placeholder.style.display = 'block';
             }
-            showToast('Modo local: use Abrir/Baixar para abrir no dispositivo.');
         }
 
         function setActiveByNumber(number) {
@@ -756,32 +748,25 @@ $hymnsJson = json_encode($hymns, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES
             state.currentIndex = index;
             const h = state.filtered[index];
 
-            const absolutePpt = getAbsoluteHymnUrl(h.number, false);
-            const absoluteDownload = getAbsoluteHymnUrl(h.number, true);
-            const embed = getOfficeEmbedUrl(absolutePpt);
-
             elements.nowPlaying.textContent = `Agora: Hino ${h.number}`;
             elements.stageTitle.textContent = `Hino ${h.number}`;
             elements.stageSub.textContent = h.title;
             elements.badgeNumber.style.display = '';
             elements.badgeNumber.textContent = `#${h.number}`;
-            elements.newTab.href = absolutePpt;
-            elements.download.href = absoluteDownload;
 
-            if (!isOfficeEmbedAvailable()) {
-                showLocalPreviewFallback(h, absolutePpt, absoluteDownload);
-            } else {
-                elements.placeholder.style.display = 'none';
-                if (elements.placeholderActions) {
-                    elements.placeholderActions.innerHTML = '';
-                }
-                elements.viewer.style.display = 'block';
-                elements.viewer.src = embed;
+            if (isMobile()) {
+                elements.modalTitle.textContent = `Hino ${h.number}`;
+                elements.modalSub.textContent = h.title;
+                elements.modalBadge.style.display = '';
+                elements.modalBadge.textContent = `#${h.number}`;
+                elements.modalPlaceholder.style.display = 'block';
+                elements.modalLyrics.style.display = 'none';
+                hymnModal.show();
             }
 
-            elements.stageBody.classList.remove('flip');
-            void elements.stageBody.offsetWidth;
-            elements.stageBody.classList.add('flip');
+            loadLyrics(h.number);
+
+            animateFlip(getReaderTarget().body);
 
             renderList();
             const activeEl = elements.list.querySelector(`.hymn-item[data-index="${index}"]`);
@@ -816,17 +801,6 @@ $hymnsJson = json_encode($hymns, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES
             openByIndex(Number(item.dataset.index));
         });
 
-        elements.open.addEventListener('click', () => {
-            const n = Number(elements.number.value || 0);
-            if (!n) return showToast('Digite um número válido.');
-            if (!setActiveByNumber(n)) return showToast('Hino não encontrado na lista.');
-        });
-
-        elements.number.addEventListener('keydown', (e) => {
-            if (e.key !== 'Enter') return;
-            elements.open.click();
-        });
-
         elements.filter.addEventListener('input', () => {
             applyFilter();
         });
@@ -843,6 +817,34 @@ $hymnsJson = json_encode($hymns, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES
             if (state.currentIndex >= state.filtered.length - 1) return showToast('Você já está no último hino da lista atual.');
             openByIndex(state.currentIndex + 1);
         });
+
+        if (elements.modalPrev) {
+            elements.modalPrev.addEventListener('click', () => elements.prev.click());
+        }
+        if (elements.modalNext) {
+            elements.modalNext.addEventListener('click', () => elements.next.click());
+        }
+
+        elements.font.addEventListener('click', () => {
+            const order = ['normal', 'large', 'xlarge'];
+            const idx = order.indexOf(state.fontSizeMode);
+            state.fontSizeMode = order[(idx + 1) % order.length];
+            localStorage.setItem('harpa_font', state.fontSizeMode);
+            applyReaderPrefs(getReaderTarget().lyrics);
+        });
+
+        elements.line.addEventListener('click', () => {
+            state.lineMode = state.lineMode === 'compact' ? 'normal' : 'compact';
+            localStorage.setItem('harpa_line', state.lineMode);
+            applyReaderPrefs(getReaderTarget().lyrics);
+        });
+
+        if (elements.modalFont) {
+            elements.modalFont.addEventListener('click', () => elements.font.click());
+        }
+        if (elements.modalLine) {
+            elements.modalLine.addEventListener('click', () => elements.line.click());
+        }
 
         renderList();
 
