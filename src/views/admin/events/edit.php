@@ -4,6 +4,36 @@
     <h1 class="h2">Editar Evento</h1>
 </div>
 
+<style>
+    .event-date-row .weekday-label {
+        min-height: 1.2em;
+        white-space: nowrap;
+    }
+</style>
+
+<?php
+$eventDatesSeed = [];
+if (!empty($event['event_dates'])) {
+    $decoded = json_decode((string)$event['event_dates'], true);
+    if (is_array($decoded)) {
+        foreach ($decoded as $dt) {
+            $dt = trim((string)$dt);
+            if ($dt === '' || strtotime($dt) === false) continue;
+            $eventDatesSeed[] = [
+                'date' => date('Y-m-d', strtotime($dt)),
+                'time' => date('H:i', strtotime($dt))
+            ];
+        }
+    }
+}
+if (empty($eventDatesSeed) && !empty($event['event_date']) && strtotime($event['event_date']) !== false && strpos((string)$event['event_date'], '1970-01-01') !== 0) {
+    $eventDatesSeed[] = [
+        'date' => date('Y-m-d', strtotime($event['event_date'])),
+        'time' => date('H:i', strtotime($event['event_date']))
+    ];
+}
+?>
+
 <form action="/admin/events/edit/<?= $event['id'] ?>" method="POST" class="row g-3 app-form-with-bottom-actions" enctype="multipart/form-data">
     <?= csrf_field() ?>
     <div class="col-md-6">
@@ -26,37 +56,10 @@
             <label class="form-check-label" for="removeBanner">Remover banner</label>
         </div>
     </div>
-    <div class="col-md-3">
-        <label class="form-label">Data (Evento Único)</label>
-        <input type="date" class="form-control" name="event_date_only" value="<?= $event['event_date'] ? date('Y-m-d', strtotime($event['event_date'])) : '' ?>">
-        <small class="text-muted">Se preenchido, ignora dias da semana</small>
-    </div>
-    <div class="col-md-3">
-        <label class="form-label">Horário Início</label>
-        <input type="time" class="form-control" name="event_time_only" value="<?= $event['event_date'] ? date('H:i', strtotime($event['event_date'])) : '' ?>">
-        <small class="text-muted">Horário do culto/evento</small>
-    </div>
-    <div class="col-md-3">
-        <label class="form-label">Horário Término</label>
-        <input type="time" class="form-control" name="end_time" value="<?= $event['end_time'] ?? '' ?>">
-        <small class="text-muted">Opcional</small>
-    </div>
-    <div class="col-md-12">
-        <label class="form-label">Dias da Semana (Recorrente)</label>
-        <div class="d-flex gap-3 flex-wrap">
-            <?php 
-                $days = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
-                $selected_days = !empty($event['recurring_days']) ? json_decode($event['recurring_days'], true) : [];
-                // Fallback para caso não seja JSON válido (ex: string antiga)
-                if (!is_array($selected_days)) $selected_days = [];
-            ?>
-            <?php foreach ($days as $day): ?>
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="recurring_days[]" value="<?= $day ?>" id="edit_<?= $day ?>" <?= in_array($day, $selected_days) ? 'checked' : '' ?>>
-                    <label class="form-check-label" for="edit_<?= $day ?>"><?= $day ?></label>
-                </div>
-            <?php endforeach; ?>
-        </div>
+    <div class="col-12">
+        <label class="form-label">Datas</label>
+        <div id="eventDatesContainer" class="d-grid gap-2"></div>
+        <div class="form-text">Adicione uma ou mais datas para o mesmo evento.</div>
     </div>
     <div class="col-md-3">
         <label class="form-label">Tipo</label>
@@ -177,32 +180,98 @@
         }
     });
 
-    // Marcar o dia da semana automaticamente ao selecionar a data
-    document.querySelector('input[name="event_date_only"]').addEventListener('change', function() {
-        if (this.value) {
-            // Desmarcar todas as checkboxes primeiro
-            var checkboxes = document.querySelectorAll('input[name="recurring_days[]"]');
-            checkboxes.forEach(function(cb) {
-                cb.checked = false;
-            });
+    (function () {
+        var seed = <?= json_encode($eventDatesSeed, JSON_UNESCAPED_UNICODE) ?>;
+        var container = document.getElementById('eventDatesContainer');
+        if (!container) return;
 
-            // Criar data forçando o fuso horário local para evitar problemas de fuso no JS
-            var dateParts = this.value.split('-');
-            var date = new Date(dateParts[0], dateParts[1] - 1, dateParts[2]);
-            
-            var dayOfWeek = date.getDay(); // 0 (Dom) a 6 (Sab)
-            
-            // Mapeamento dos IDs das checkboxes
-            var dayIds = ['dom', 'seg', 'ter', 'qua', 'qui', 'sex', 'sab'];
-            var targetId = dayIds[dayOfWeek];
-            
-            // Marcar a checkbox correspondente
-            var checkbox = document.getElementById(targetId);
-            if (checkbox) {
-                checkbox.checked = true;
-            }
+        var week = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
+
+        function getWeekdayLabel(dateValue) {
+            if (!dateValue) return '';
+            var parts = String(dateValue).split('-');
+            if (parts.length !== 3) return '';
+            var d = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+            return week[d.getDay()] || '';
         }
-    });
+
+        function renumber() {
+            var rows = container.querySelectorAll('.event-date-row');
+            rows.forEach(function (row, idx) {
+                row.dataset.index = String(idx);
+                var dateInput = row.querySelector('input[type="date"]');
+                var timeInput = row.querySelector('input[type="time"]');
+                if (dateInput) dateInput.name = 'event_dates[' + idx + '][date]';
+                if (timeInput) timeInput.name = 'event_dates[' + idx + '][time]';
+            });
+            rows.forEach(function (row) {
+                var del = row.querySelector('.btn-remove-date');
+                if (del) del.disabled = rows.length <= 1;
+            });
+        }
+
+        function updateWeekday(row) {
+            var dateInput = row.querySelector('input[type="date"]');
+            var label = row.querySelector('.weekday-label');
+            if (!dateInput || !label) return;
+            var text = getWeekdayLabel(dateInput.value);
+            label.textContent = text || '';
+        }
+
+        function addRow(initial) {
+            var idx = container.querySelectorAll('.event-date-row').length;
+            var row = document.createElement('div');
+            row.className = 'event-date-row row g-2 align-items-start';
+            row.dataset.index = String(idx);
+            row.innerHTML = `
+                <div class="col-6 col-md-3">
+                    <label class="form-label mb-1">Data</label>
+                    <input type="date" class="form-control" name="event_dates[${idx}][date]">
+                    <div class="form-text weekday-label"></div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <label class="form-label mb-1">Horário</label>
+                    <input type="time" class="form-control" name="event_dates[${idx}][time]">
+                </div>
+                <div class="col-12 col-md-2 d-flex gap-2 align-self-end">
+                    <button type="button" class="btn btn-outline-primary btn-add-date" title="Adicionar outra data">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                    <button type="button" class="btn btn-outline-danger btn-remove-date" title="Remover esta data">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            `;
+            container.appendChild(row);
+
+            var dateInput = row.querySelector('input[type="date"]');
+            var timeInput = row.querySelector('input[type="time"]');
+            if (initial && dateInput) dateInput.value = initial.date || '';
+            if (initial && timeInput) timeInput.value = initial.time || '';
+
+            row.querySelector('.btn-add-date').addEventListener('click', function () {
+                addRow();
+                renumber();
+            });
+            row.querySelector('.btn-remove-date').addEventListener('click', function () {
+                row.remove();
+                renumber();
+            });
+            if (dateInput) {
+                dateInput.addEventListener('change', function () {
+                    updateWeekday(row);
+                });
+                updateWeekday(row);
+            }
+            renumber();
+        }
+
+        if (Array.isArray(seed) && seed.length) {
+            seed.forEach(function (s) { addRow(s); });
+        } else {
+            addRow();
+        }
+    })();
 
 
     const typeSelect = document.querySelector('select[name="type"]');

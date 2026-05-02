@@ -44,6 +44,7 @@ $categories = [
 ];
 $tabTotal = count($categories);
 $hasMultipleCategories = $tabTotal > 1;
+$now = new DateTimeImmutable('now');
 ?>
 
 <style>
@@ -170,25 +171,21 @@ $hasMultipleCategories = $tabTotal > 1;
                         <?php foreach ($groupedEvents[$key] as $e): ?>
                             <tr>
                                 <td>
-                                    <?php 
-                                        if (!empty($e['event_date']) && strpos($e['event_date'], '1970-01-01') === false) {
-                                            // Data normal
-                                            echo '<span class="d-none">' . $e['event_date'] . '</span>'; // Para ordenação correta
-                                            echo date('d/m/Y', strtotime($e['event_date']));
-                                            if (!empty($e['event_date']) && strpos($e['event_date'], ':') !== false) {
-                                                echo ' ' . date('H:i', strtotime($e['event_date']));
-                                            }
-                                        } elseif (!empty($e['recurring_days'])) {
-                                            // Recorrente
-                                            $days = json_decode($e['recurring_days'], true);
-                                            echo '<span class="d-none">9999-99-99</span>'; // Para jogar recorrentes para o fim ou topo
-                                            echo '<span class="badge bg-info text-dark">' . implode(', ', $days) . '</span>';
-                                            if (!empty($e['event_date']) && strpos($e['event_date'], ':') !== false) {
-                                                echo ' ' . date('H:i', strtotime($e['event_date']));
-                                            }
-                                        } else {
-                                            echo '<span class="d-none">9999-99-99</span>Indefinido';
+                                    <?php
+                                    $dateBadges = eventGetDateBadges($e);
+                                    $next = eventNextOccurrence($e, $now);
+                                    $sortKey = $next ? $next->format('Y-m-d H:i:s') : (($dateBadges[0]['raw'] ?? '') !== '' ? date('Y-m-d H:i:s', strtotime($dateBadges[0]['raw'])) : '9999-99-99 99:99:99');
+                                    echo '<span class="d-none">' . htmlspecialchars($sortKey) . '</span>';
+
+                                    if (empty($dateBadges)) {
+                                        echo 'Indefinido';
+                                    } else {
+                                        $primary = $next ? $next->format('d/m/Y H:i') : ($dateBadges[0]['date'] . ' ' . $dateBadges[0]['time']);
+                                        echo '<div class="fw-bold">' . htmlspecialchars($primary) . '</div>';
+                                        if (count($dateBadges) > 1) {
+                                            echo '<div class="small text-muted">+ ' . (count($dateBadges) - 1) . ' datas</div>';
                                         }
+                                    }
                                     ?>
                                 </td>
                                 <td>
@@ -209,8 +206,8 @@ $hasMultipleCategories = $tabTotal > 1;
                                     </a>
                                     <?php if (
                                         strtolower($e['type'] ?? '') === 'culto' 
-                                        || (!empty($e['recurring_days'])) 
-                                        || (strtotime($e['event_date']) >= strtotime('today'))
+                                        || (!empty($e['recurring_days']))
+                                        || eventHasFutureOccurrence($e, $now)
                                     ): ?>
                                     <a href="/admin/events/toggle/<?= $e['id'] ?>" class="btn btn-sm btn-outline-<?= ($e['status'] ?? 'active') == 'active' ? 'warning' : 'success' ?>" title="<?= ($e['status'] ?? 'active') == 'active' ? 'Desativar' : 'Ativar' ?>">
                                         <i class="fas fa-power-off"></i>

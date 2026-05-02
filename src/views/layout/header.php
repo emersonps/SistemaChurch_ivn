@@ -586,6 +586,109 @@ $mobileLauncherHref = '/admin?launcher=1';
                     </div>
                 <?php endif; ?>
             
+            <?php
+            if (isLoggedIn() && $isAdminArea && function_exists('hasPermission') && hasPermission('members.view')) {
+                $forceTodayBirthdayModal = !empty($_SESSION['show_today_birthdays_modal']);
+                unset($_SESSION['show_today_birthdays_modal']);
+                $todayBirthdays = [];
+                try {
+                    $db = (new Database())->connect();
+                    $driver = $db->getAttribute(PDO::ATTR_DRIVER_NAME);
+                    $today_month = date('m');
+                    $today_day = date('d');
+                    if ($driver === 'sqlite') {
+                        $date_format_m = "strftime('%m', birth_date)";
+                        $date_format_d = "strftime('%d', birth_date)";
+                    } else {
+                        $date_format_m = "DATE_FORMAT(birth_date, '%m')";
+                        $date_format_d = "DATE_FORMAT(birth_date, '%d')";
+                    }
+                    $sql = "SELECT * FROM members WHERE $date_format_m = '$today_month' AND $date_format_d = '$today_day'";
+                    $congregation_id = $_SESSION['user_congregation_id'] ?? null;
+                    if ($congregation_id) {
+                        $sql .= " AND congregation_id = " . (int)$congregation_id;
+                    }
+                    $todayBirthdays = $db->query($sql)->fetchAll(PDO::FETCH_ASSOC);
+                } catch (Exception $e) {
+                    $todayBirthdays = [];
+                }
+            }
+            ?>
+
+            <?php if (!empty($todayBirthdays ?? [])): ?>
+                <div class="modal fade" id="todayBirthdaysModal" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered modal-lg">
+                        <div class="modal-content border-0 shadow-lg">
+                            <div class="modal-header border-0">
+                                <h5 class="modal-title text-warning">
+                                    <i class="fas fa-birthday-cake me-2"></i> Aniversariantes de Hoje
+                                </h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body pt-0">
+                                <ul class="list-group list-group-flush">
+                                    <?php foreach (($todayBirthdays ?? []) as $b): ?>
+                                        <?php $memberName = (string)($b['name'] ?? ''); ?>
+                                        <?php
+                                        $parts = preg_split('/\s+/', trim($memberName));
+                                        $memberShort = $memberName;
+                                        if (is_array($parts) && count($parts) >= 2) {
+                                            $memberShort = $parts[0] . ' ' . $parts[count($parts) - 1];
+                                        } elseif (is_array($parts) && count($parts) === 1) {
+                                            $memberShort = $parts[0];
+                                        }
+                                        ?>
+                                        <li class="list-group-item d-flex justify-content-between align-items-center bg-light border-start border-warning border-4">
+                                            <div class="fw-semibold text-truncate me-2" style="min-width: 0;">
+                                                <span class="d-inline d-sm-none"><?= htmlspecialchars($memberShort) ?></span>
+                                                <span class="d-none d-sm-inline"><?= htmlspecialchars($memberName) ?></span>
+                                                <span class="badge bg-warning text-dark ms-2">Hoje!</span>
+                                            </div>
+                                            <div class="d-flex align-items-center gap-2 flex-shrink-0">
+                                                <span class="badge bg-info rounded-pill">
+                                                    <?= date('d/m', strtotime($b['birth_date'])) ?>
+                                                </span>
+                                                <a class="btn btn-sm btn-outline-success" href="/admin/dashboard?birthday_card=<?= urlencode($memberName) ?>" title="Gerar Cartão">
+                                                    <i class="fas fa-gift"></i>
+                                                </a>
+                                            </div>
+                                        </li>
+                                    <?php endforeach; ?>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <script>
+                    document.addEventListener('DOMContentLoaded', function () {
+                        var modalEl = document.getElementById('todayBirthdaysModal');
+                        if (!modalEl) return;
+                        var force = <?= !empty($forceTodayBirthdayModal ?? false) ? 'true' : 'false' ?>;
+                        var key = 'today_birthdays_modal_shown_' + <?= (int)($_SESSION['user_id'] ?? 0) ?> + '_' + '<?= date('Y-m-d') ?>';
+                        if (!force) {
+                            if (localStorage.getItem(key) === '1') return;
+                            localStorage.setItem(key, '1');
+                        }
+
+                        var tries = 0;
+                        function tryShow() {
+                            tries++;
+                            if (window.bootstrap && bootstrap.Modal) {
+                                try {
+                                    new bootstrap.Modal(modalEl).show();
+                                } catch (e) {
+                                }
+                                return;
+                            }
+                            if (tries < 80) {
+                                setTimeout(tryShow, 50);
+                            }
+                        }
+                        tryShow();
+                    });
+                </script>
+            <?php endif; ?>
+
             <!-- System Payment Alert Modal Logic -->
             <?php
             // Simple logic to check if we need to show the modal (only on admin pages)

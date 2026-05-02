@@ -86,6 +86,41 @@ $firstAndLastName = function ($name) {
             color: white;
         }
 
+        .btn-cta {
+            position: relative;
+            overflow: hidden;
+            border: 0;
+            border-radius: 999px;
+            background: linear-gradient(135deg, rgba(255,42,122,1) 0%, rgba(212,175,55,1) 100%);
+            color: #090a15 !important;
+            font-weight: 800;
+            box-shadow: 0 14px 32px rgba(0,0,0,0.16);
+            transition: transform .15s ease, filter .15s ease, box-shadow .15s ease;
+        }
+        .btn-cta:hover {
+            filter: brightness(1.02);
+            transform: translateY(-1px);
+            box-shadow: 0 18px 42px rgba(0,0,0,0.20);
+        }
+        .btn-cta::after {
+            content: "";
+            position: absolute;
+            top: -30%;
+            left: -30%;
+            width: 60%;
+            height: 160%;
+            background: rgba(255,255,255,0.35);
+            transform: rotate(25deg) translateX(-140%);
+            animation: ctaShimmer 3.2s ease-in-out infinite;
+            pointer-events: none;
+        }
+        @keyframes ctaShimmer {
+            0% { transform: rotate(25deg) translateX(-140%); opacity: 0; }
+            12% { opacity: 0.35; }
+            28% { transform: rotate(25deg) translateX(260%); opacity: 0; }
+            100% { transform: rotate(25deg) translateX(260%); opacity: 0; }
+        }
+
         .hero-section .btn-outline-light {
             border: 2px solid rgba(255,255,255,0.8) !important;
             color: white !important;
@@ -103,13 +138,14 @@ $firstAndLastName = function ($name) {
 
         /* Navbar */
         .navbar {
-            background-color: rgba(0, 0, 0, 0.95) !important; /* Dark background to make gold pop */
-            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            background-color: rgba(255, 255, 255, 0.96) !important;
+            box-shadow: 0 2px 14px rgba(0,0,0,0.08);
             padding: 15px 0;
+            border-bottom: 1px solid rgba(0,0,0,0.06);
         }
         .navbar-brand {
             font-weight: 700;
-            color: white !important;
+            color: rgba(15,18,28,0.92) !important;
             font-size: 1.5rem;
             display: flex;
             align-items: center;
@@ -120,15 +156,49 @@ $firstAndLastName = function ($name) {
             width: auto;
         }
         .nav-link {
-            color: rgba(255,255,255,0.8) !important;
+            color: rgba(15,18,28,0.72) !important;
             font-weight: 500;
             text-transform: uppercase;
             font-size: 0.9rem;
             letter-spacing: 1px;
             transition: color 0.3s;
+            position: relative;
         }
         .nav-link:hover, .nav-link.active {
             color: var(--primary-gold) !important;
+        }
+        .nav-link.active {
+            font-weight: 800;
+        }
+        .nav-link.active::after {
+            content: "";
+            position: absolute;
+            left: 14%;
+            right: 14%;
+            bottom: -10px;
+            height: 2px;
+            border-radius: 999px;
+            background: var(--primary-gold);
+        }
+
+        .floating-faith-toggle,
+        .floating-faith-action {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .floating-faith-toggle::after,
+        .floating-faith-action::after {
+            content: "";
+            position: absolute;
+            top: -30%;
+            left: -30%;
+            width: 60%;
+            height: 160%;
+            background: rgba(255,255,255,0.24);
+            transform: rotate(25deg) translateX(-140%);
+            animation: ctaShimmer 3.2s ease-in-out infinite;
+            pointer-events: none;
         }
         
         /* Hero Section */
@@ -1863,11 +1933,12 @@ $firstAndLastName = function ($name) {
 <body>
 
     <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg fixed-top">
+    <nav class="navbar navbar-expand-lg fixed-top navbar-light">
         <div class="container">
-            <a class="navbar-brand" href="#">
+            <a class="navbar-brand" href="#inicio">
                 <!-- Placeholder para a logo -->
                 <img src="<?= htmlspecialchars($siteProfile['logo_url'] ?? '/assets/img/logo.png') ?>" alt="<?= htmlspecialchars($siteProfile['alias'] ?? $siteProfile['name'] ?? 'Igreja') ?>" onerror="this.style.display='none'">
+                <span class="d-inline d-md-none"><?= htmlspecialchars($siteProfile['alias'] ?? $siteProfile['name'] ?? 'Igreja') ?></span>
                 <span class="d-none d-md-inline"><?= htmlspecialchars($siteProfile['alias'] ?? $siteProfile['name'] ?? 'Igreja') ?></span>
             </a>
             <button class="navbar-toggler bg-gold" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -1875,17 +1946,14 @@ $firstAndLastName = function ($name) {
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto align-items-center">
-                    <li class="nav-item"><a class="nav-link active" href="#">Início</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#sobre">Sobre</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="#inicio">Início</a></li>
+                    <li class="nav-item"><a class="btn btn-cta btn-sm px-3 text-nowrap" href="/oracao"><i class="fas fa-hands-praying me-2"></i>Oração</a></li>
                     <li class="nav-item"><a class="nav-link" href="#cultos">Cultos</a></li>
                     <li class="nav-item"><a class="nav-link" href="#eventos">Eventos</a></li>
                     <li class="nav-item"><a class="nav-link" href="#convites">Convites</a></li>
                     <li class="nav-item"><a class="nav-link" href="#congregacoes">Congregações</a></li>
                     <li class="nav-item"><a class="nav-link" href="/galeria">Galeria</a></li>
                     <li class="nav-item"><a class="nav-link" href="#contato">Contato</a></li>
-                    <li class="nav-item">
-                        <a class="nav-link text-nowrap" href="/portal/login"><i class="fas fa-user-circle me-1"></i> Área do Membro</a>
-                    </li>
                     <li class="nav-item">
                         <a class="btn btn-outline-gold ms-lg-3 px-4 rounded-pill text-nowrap" href="/admin/login">Área Administrativa</a>
                     </li>
@@ -1903,7 +1971,7 @@ $firstAndLastName = function ($name) {
                     <h1 class="display-3 hero-title mb-3">Bem-vindo à<br><span class="hero-highlight"><?= htmlspecialchars($siteProfile['name'] ?? 'Nossa Igreja') ?></span></h1>
                     <p class="lead mb-4 fs-4">Uma igreja comprometida com a Palavra de Deus e o amor ao próximo.</p>
                     <div class="hero-actions">
-                        <a href="/portal/login" class="btn btn-hero-secondary"><i class="fas fa-user me-2"></i> Área do Membro</a>
+                        <a href="/portal/login" class="btn btn-cta"><i class="fas fa-user me-2"></i> Área do Membro</a>
                     </div>
                 </div>
                 <div class="col-lg-5">
@@ -2303,6 +2371,7 @@ $firstAndLastName = function ($name) {
                                                             </div>
                                                         <?php endif; ?>
                                                         <p class="culto-item-description"><?= htmlspecialchars($culto['description'] ?: 'Participe conosco e acompanhe a programação desta congregação.') ?></p>
+                                                        <div class="small fw-bold text-gold mt-2">Esperamos por você!</div>
                                                         <?php if (!empty($culto['location']) && $culto['location'] !== $congregacao): ?>
                                                             <div class="culto-item-location mt-3">
                                                                 <i class="fas fa-location-dot"></i>
@@ -2394,30 +2463,47 @@ $firstAndLastName = function ($name) {
                                                             <div class="d-flex justify-content-between align-items-start">
                                                                 <div>
                                                                     <h5 class="card-title fw-bold text-dark"><?= htmlspecialchars($evento['title']) ?></h5>
-                                                                    <h6 class="card-subtitle mb-2 text-muted mt-2">
-                                                                        <?php
-                                                                            $is_valid_date = !empty($evento['event_date']) && strpos($evento['event_date'], '1970-01-01') === false;
-                                                                            $recurring = !empty($evento['recurring_days']) ? json_decode($evento['recurring_days'], true) : [];
-                                                                            $end_time = !empty($evento['end_time']) ? $evento['end_time'] : '';
-                                                                            $event_time = !empty($evento['event_date']) ? date('H:i', strtotime($evento['event_date'])) : '';
-                                                                            $time_display = $event_time . ($end_time ? ' às ' . $end_time : '');
-                                                                        ?>
-                                                                        <?php if ($is_valid_date): ?>
-                                                                            <i class="far fa-calendar-alt me-1 text-gold"></i> <?= date('d/m/Y', strtotime($evento['event_date'])) ?>
-                                                                            <i class="far fa-clock ms-2 me-1 text-gold"></i> <?= $time_display ?>
-                                                                        <?php elseif (!empty($recurring)): ?>
-                                                                            <i class="fas fa-redo me-1 text-gold"></i> <?= implode(', ', $recurring) ?>
-                                                                            <?php if (!empty($evento['event_date'])): ?>
-                                                                                <i class="far fa-clock ms-2 me-1 text-gold"></i> <?= $time_display ?>
+                                                                    <?php $dateBadges = eventGetDateBadges($evento); ?>
+                                                                    <?php if (empty($dateBadges)): ?>
+                                                                        <?php if (!empty($evento['recurring_days'])): ?>
+                                                                            <?php $recurring = json_decode($evento['recurring_days'], true); ?>
+                                                                            <?php if (is_array($recurring) && !empty($recurring)): ?>
+                                                                                <div class="mt-2 d-flex flex-wrap gap-2">
+                                                                                    <span class="badge bg-light text-dark border">
+                                                                                        <i class="fas fa-redo me-1 text-gold"></i> <?= htmlspecialchars(implode(', ', $recurring)) ?>
+                                                                                    </span>
+                                                                                </div>
+                                                                            <?php else: ?>
+                                                                                <h6 class="card-subtitle mb-2 text-muted mt-2">
+                                                                                    <i class="far fa-calendar-alt me-1 text-gold"></i> Data a confirmar
+                                                                                </h6>
                                                                             <?php endif; ?>
                                                                         <?php else: ?>
-                                                                            <i class="far fa-calendar-alt me-1 text-gold"></i> Data a confirmar
+                                                                            <h6 class="card-subtitle mb-2 text-muted mt-2">
+                                                                                <i class="far fa-calendar-alt me-1 text-gold"></i> Data a confirmar
+                                                                            </h6>
                                                                         <?php endif; ?>
-                                                                    </h6>
+                                                                    <?php else: ?>
+                                                                        <div class="mt-2 d-flex flex-wrap gap-2">
+                                                                            <?php foreach ($dateBadges as $b): ?>
+                                                                                <span class="d-inline-flex align-items-center gap-2 flex-nowrap" style="white-space:nowrap;">
+                                                                                    <span class="badge rounded-pill bg-gold text-dark shadow-sm text-nowrap">
+                                                                                        <i class="far fa-calendar-alt me-1"></i><?= htmlspecialchars(($b['weekday'] ?? '') . ' • ' . ($b['date'] ?? '')) ?>
+                                                                                    </span>
+                                                                                    <?php if (!empty($b['time'])): ?>
+                                                                                        <span class="badge rounded-pill bg-gold text-dark shadow-sm text-nowrap">
+                                                                                            <i class="far fa-clock me-1"></i><?= htmlspecialchars($b['time']) ?>
+                                                                                        </span>
+                                                                                    <?php endif; ?>
+                                                                                </span>
+                                                                            <?php endforeach; ?>
+                                                                        </div>
+                                                                    <?php endif; ?>
                                                                 </div>
                                                                 <span class="badge rounded-pill bg-primary text-white"><?= ucfirst($evento['type']) ?></span>
                                                             </div>
                                                             <p class="card-text mt-3 text-secondary"><?= htmlspecialchars($evento['description']) ?></p>
+                                                            <div class="small fw-bold text-gold mt-2">Esperamos por você!</div>
                                                             <?php if (!empty($evento['location']) && $evento['location'] !== $congregacao): ?>
                                                                 <p class="card-text mt-3 pt-3 border-top"><small class="text-muted"><i class="fas fa-map-marker-alt text-danger me-1"></i> <?= htmlspecialchars($evento['location']) ?></small></p>
                                                             <?php endif; ?>
@@ -2521,23 +2607,27 @@ $firstAndLastName = function ($name) {
                                                             <h5 class="card-title fw-bold text-dark mb-3"><?= htmlspecialchars($convite['title']) ?></h5>
 
                                                             <div class="mb-3">
-                                                                <?php
-                                                                    $is_valid_date = !empty($convite['event_date']) && strpos($convite['event_date'], '1970-01-01') === false;
-                                                                    $event_time = !empty($convite['event_date']) ? date('H:i', strtotime($convite['event_date'])) : '';
-                                                                ?>
-                                                                <?php if ($is_valid_date): ?>
-                                                                    <p class="mb-1 text-gold fw-bold fs-5">
-                                                                        <i class="far fa-calendar-alt me-2"></i> <?= date('d/m/Y', strtotime($convite['event_date'])) ?>
-                                                                    </p>
-                                                                    <p class="mb-0 text-muted">
-                                                                        <i class="far fa-clock me-2"></i> <?= $event_time ?>
-                                                                    </p>
-                                                                <?php else: ?>
+                                                                <?php $dateBadges = eventGetDateBadges($convite); ?>
+                                                                <?php if (empty($dateBadges)): ?>
                                                                     <p class="mb-0 text-gold fw-bold">Data a confirmar</p>
+                                                                <?php else: ?>
+                                                                    <?php foreach ($dateBadges as $idx => $b): ?>
+                                                                        <?php if ($idx === 0): ?>
+                                                                            <p class="mb-1 text-gold fw-bold fs-5">
+                                                                                <i class="far fa-calendar-alt me-2"></i> <?= htmlspecialchars($b['date']) ?>
+                                                                                <span class="ms-2 text-muted fw-normal fs-6"><i class="far fa-clock me-2"></i><?= htmlspecialchars($b['time']) ?></span>
+                                                                            </p>
+                                                                        <?php else: ?>
+                                                                            <p class="mb-1 text-muted small">
+                                                                                <?= htmlspecialchars($b['weekday']) ?> • <?= htmlspecialchars($b['date']) ?> <?= htmlspecialchars($b['time']) ?>
+                                                                            </p>
+                                                                        <?php endif; ?>
+                                                                    <?php endforeach; ?>
                                                                 <?php endif; ?>
                                                             </div>
 
                                                             <p class="card-text text-muted small mb-4"><?= htmlspecialchars($convite['description']) ?></p>
+                                                            <div class="small fw-bold text-gold mt-2">Esperamos por você!</div>
 
                                                             <?php if (!empty($convite['location'])): ?>
                                                                 <div class="d-inline-block border rounded-pill px-3 py-1 bg-light text-muted small">
@@ -2927,8 +3017,9 @@ $firstAndLastName = function ($name) {
         </div>
     </div>
 
-    <!-- Footer -->
-    <?php include __DIR__ . '/layout/footer.php'; ?>
+    <section id="contato">
+        <?php include __DIR__ . '/layout/footer.php'; ?>
+    </section>
 
     <script>
         // Fechar menu mobile automaticamente ao clicar em um link (Específico para Home que não usa o footer padrão de admin)
@@ -3150,6 +3241,18 @@ $firstAndLastName = function ($name) {
                 }
             }
 
+            function openDevotionalModal() {
+                if (!devotionalModal || typeof bootstrap === 'undefined' || !bootstrap.Modal) return;
+                bootstrap.Modal.getOrCreateInstance(devotionalModal).show();
+            }
+
+            try {
+                const searchParams = new URLSearchParams(window.location.search || '');
+                if (searchParams.get('devocional') === '1' || window.location.hash === '#devocional' || window.location.pathname === '/devocional') {
+                    openDevotionalModal();
+                }
+            } catch (error) {}
+
             countdownBlocks.forEach(function(block) {
                 const targetValue = block.getAttribute('data-countdown');
                 if (!targetValue) return;
@@ -3321,6 +3424,106 @@ $firstAndLastName = function ($name) {
                     });
                 });
             }
+
+            const scrollMenuLinks = Array.from(document.querySelectorAll('.navbar-collapse a.nav-link[href^="#"]'));
+            const linkBySectionId = new Map();
+            scrollMenuLinks.forEach(function(link) {
+                const href = link.getAttribute('href') || '';
+                const sectionId = href.startsWith('#') ? decodeURIComponent(href.slice(1)) : '';
+                if (!sectionId) return;
+                linkBySectionId.set(sectionId, link);
+            });
+
+            function setActiveMenu(sectionId) {
+                scrollMenuLinks.forEach(function(link) {
+                    const isActive = link === linkBySectionId.get(sectionId);
+                    link.classList.toggle('active', isActive);
+                    if (isActive) {
+                        link.setAttribute('aria-current', 'true');
+                    } else {
+                        link.removeAttribute('aria-current');
+                    }
+                });
+            }
+
+            const scrollSections = Array.from(linkBySectionId.keys())
+                .map(function(id) { return document.getElementById(id); })
+                .filter(Boolean);
+
+            if (scrollSections.length && 'IntersectionObserver' in window) {
+                const observer = new IntersectionObserver(function(entries) {
+                    entries.forEach(function(entry) {
+                        if (entry.isIntersecting && entry.target && entry.target.id) {
+                            setActiveMenu(entry.target.id);
+                        }
+                    });
+                }, { root: null, threshold: 0.2, rootMargin: '-72px 0px -70% 0px' });
+
+                scrollSections.forEach(function(section) { observer.observe(section); });
+            }
+
+            function getNavbarHeight() {
+                const navbar = document.querySelector('.navbar');
+                return navbar ? (navbar.offsetHeight || 0) : 0;
+            }
+
+            function updateActiveMenuByScroll() {
+                if (!scrollSections.length) return;
+                const probeY = getNavbarHeight() + 12;
+                let current = null;
+
+                for (let i = 0; i < scrollSections.length; i++) {
+                    const section = scrollSections[i];
+                    const rect = section.getBoundingClientRect();
+                    if (rect.top <= probeY && rect.bottom > probeY) {
+                        current = section;
+                        break;
+                    }
+                }
+
+                if (!current) {
+                    for (let i = scrollSections.length - 1; i >= 0; i--) {
+                        const section = scrollSections[i];
+                        const rect = section.getBoundingClientRect();
+                        if (rect.top <= probeY) {
+                            current = section;
+                            break;
+                        }
+                    }
+                }
+
+                if (current && current.id && linkBySectionId.has(current.id)) {
+                    setActiveMenu(current.id);
+                }
+            }
+
+            let scrollSpyRaf = 0;
+            function requestScrollSpyUpdate() {
+                if (scrollSpyRaf) return;
+                scrollSpyRaf = window.requestAnimationFrame(function() {
+                    scrollSpyRaf = 0;
+                    updateActiveMenuByScroll();
+                });
+            }
+
+            window.addEventListener('scroll', requestScrollSpyUpdate, { passive: true });
+            window.addEventListener('resize', requestScrollSpyUpdate);
+            requestScrollSpyUpdate();
+
+            window.addEventListener('hashchange', function() {
+                const id = (window.location.hash || '').replace(/^#/, '');
+                if (!id) return;
+                if (linkBySectionId.has(id)) {
+                    setActiveMenu(id);
+                }
+            });
+
+            (function() {
+                const initialId = (window.location.hash || '').replace(/^#/, '') || 'inicio';
+                if (linkBySectionId.has(initialId)) {
+                    setActiveMenu(initialId);
+                }
+            })();
         });
     </script>
 </body>

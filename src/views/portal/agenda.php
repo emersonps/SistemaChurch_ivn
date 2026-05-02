@@ -38,12 +38,27 @@
                         <?php endif; ?>
                     </div>
                     
-                    <h6 class="text-muted mb-3">
-                        <i class="far fa-clock me-1"></i> <?= date('d/m/Y H:i', strtotime($e['event_date'])) ?>
-                        <?php if (!empty($e['end_time'])): ?>
-                            - <?= date('H:i', strtotime($e['end_time'])) ?>
+                    <?php $dateBadges = eventGetDateBadges($e); ?>
+                    <div class="text-muted mb-3">
+                        <i class="far fa-clock me-1"></i>
+                        <?php if (empty($dateBadges)): ?>
+                            <span>Data a confirmar</span>
+                        <?php else: ?>
+                            <div class="d-flex flex-wrap gap-2 mt-1">
+                                <?php foreach ($dateBadges as $b): ?>
+                                    <?php
+                                    $badgeText = ($b['weekday'] ?? '') . ' • ' . ($b['date'] ?? '');
+                                    if (!empty($b['time'])) {
+                                        $badgeText .= ' ' . $b['time'];
+                                    }
+                                    ?>
+                                    <span class="badge bg-light text-dark border">
+                                        <?= htmlspecialchars(trim($badgeText)) ?>
+                                    </span>
+                                <?php endforeach; ?>
+                            </div>
                         <?php endif; ?>
-                    </h6>
+                    </div>
 
                     <?php if (!empty($e['location'])): ?>
                         <p class="mb-2"><i class="fas fa-map-marker-alt me-2 text-secondary"></i> <?= htmlspecialchars($e['location']) ?></p>
@@ -59,12 +74,6 @@
                         </div>
                     <?php endif; ?>
                     
-                    <?php if (!empty($e['recurring_days'])): ?>
-                        <div class="mt-2 pt-2 border-top">
-                            <small class="text-muted">Recorrente: <?= implode(', ', json_decode($e['recurring_days'], true)) ?></small>
-                        </div>
-                    <?php endif; ?>
-
                     <?php if (!empty($e['banner_path'])): ?>
                         <div class="mt-3">
                             <button type="button" class="btn btn-sm btn-outline-danger w-100" data-bs-toggle="modal" data-bs-target="#bannerModal" data-img-src="<?= htmlspecialchars($e['banner_path']) ?>" data-title="<?= htmlspecialchars($e['title']) ?>">

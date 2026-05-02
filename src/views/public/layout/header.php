@@ -96,6 +96,41 @@
             color: #000;
         }
 
+        .btn-cta {
+            position: relative;
+            overflow: hidden;
+            border: 0;
+            border-radius: 999px;
+            background: linear-gradient(135deg, rgba(255,42,122,1) 0%, rgba(212,175,55,1) 100%);
+            color: #090a15 !important;
+            font-weight: 800;
+            box-shadow: 0 14px 32px rgba(0,0,0,0.16);
+            transition: transform .15s ease, filter .15s ease, box-shadow .15s ease;
+        }
+        .btn-cta:hover {
+            filter: brightness(1.02);
+            transform: translateY(-1px);
+            box-shadow: 0 18px 42px rgba(0,0,0,0.20);
+        }
+        .btn-cta::after {
+            content: "";
+            position: absolute;
+            top: -30%;
+            left: -30%;
+            width: 60%;
+            height: 160%;
+            background: rgba(255,255,255,0.35);
+            transform: rotate(25deg) translateX(-140%);
+            animation: ctaShimmer 3.2s ease-in-out infinite;
+            pointer-events: none;
+        }
+        @keyframes ctaShimmer {
+            0% { transform: rotate(25deg) translateX(-140%); opacity: 0; }
+            12% { opacity: 0.35; }
+            28% { transform: rotate(25deg) translateX(260%); opacity: 0; }
+            100% { transform: rotate(25deg) translateX(260%); opacity: 0; }
+        }
+
         /* Hero Buttons Customization */
         .hero-section .btn {
             padding: 12px 35px;
@@ -249,7 +284,7 @@
         <div class="container">
             <a class="navbar-brand d-flex align-items-center" href="/">
                 <img src="<?= htmlspecialchars($siteProfile['logo_url'] ?? '/assets/img/logo.png') ?>" alt="<?= htmlspecialchars($siteProfile['alias'] ?? $siteProfile['name'] ?? 'Igreja') ?>" height="50" class="me-2">
-                <span class="d-none d-md-block fw-bold"><?= htmlspecialchars($siteProfile['alias'] ?? $siteProfile['name'] ?? 'Igreja') ?></span>
+                <span class="fw-bold"><?= htmlspecialchars($siteProfile['alias'] ?? $siteProfile['name'] ?? 'Igreja') ?></span>
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
@@ -263,7 +298,6 @@
                     <li class="nav-item"><a class="nav-link" href="/#convites">Convites</a></li>
                     <li class="nav-item"><a class="nav-link" href="/#congregacoes">Congregações</a></li>
                     <li class="nav-item"><a class="nav-link" href="/#contato">Contato</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/portal/login"><i class="fas fa-user me-1"></i> Área do Membro</a></li>
                 </ul>
             </div>
         </div>

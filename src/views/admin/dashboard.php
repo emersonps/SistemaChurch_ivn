@@ -411,6 +411,19 @@ $totalFinancialFormatted = 'R$ ' . number_format($total_financial, 2, ',', '.');
         new bootstrap.Modal(document.getElementById('birthdayModal')).show();
     }
 
+    document.addEventListener('DOMContentLoaded', function () {
+        try {
+            var params = new URLSearchParams(window.location.search);
+            var name = params.get('birthday_card');
+            if (!name) return;
+            openBirthdayCard(name);
+            params.delete('birthday_card');
+            var next = window.location.pathname + (params.toString() ? ('?' + params.toString()) : '') + window.location.hash;
+            window.history.replaceState({}, document.title, next);
+        } catch (e) {
+        }
+    });
+
     function shareWhatsApp() {
         const message = `🎉 *Parabéns, ${currentMemberName}!* 🎉\n\nNeste dia especial, louvamos a Deus pela sua vida! Que o Senhor continue te abençoando grandemente.\n\n"O Senhor te abençoe e te guarde..." (Nm 6:24)\n\nCom carinho,\n*Família <?= addslashes($siteProfile['alias'] ?? 'IVN') ?>*`;
         const url = `https://wa.me/?text=${encodeURIComponent(message)}`;

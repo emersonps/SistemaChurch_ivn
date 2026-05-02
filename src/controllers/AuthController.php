@@ -2,11 +2,25 @@
 // src/controllers/AuthController.php
 
 class AuthController {
+    private function isMobileRequest(): bool {
+        $ua = $_SERVER['HTTP_USER_AGENT'] ?? '';
+        if ($ua === '') return false;
+        $ua = strtolower($ua);
+        return strpos($ua, 'mobile') !== false
+            || strpos($ua, 'android') !== false
+            || strpos($ua, 'iphone') !== false
+            || strpos($ua, 'ipad') !== false
+            || strpos($ua, 'ipod') !== false;
+    }
+
     public function showLogin() {
         if (isset($_SESSION['user_id'])) {
             if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'developer') {
                 redirect('/developer/dashboard');
             } else {
+                if ($this->isMobileRequest()) {
+                    redirect('/admin?launcher=1');
+                }
                 redirect('/admin/dashboard');
             }
         }
@@ -36,6 +50,10 @@ class AuthController {
             if ($user['role'] === 'developer') {
                 redirect('/developer/dashboard');
             } else {
+                $_SESSION['show_today_birthdays_modal'] = 1;
+                if ($this->isMobileRequest()) {
+                    redirect('/admin?launcher=1');
+                }
                 redirect('/admin/dashboard');
             }
             

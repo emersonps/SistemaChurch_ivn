@@ -55,7 +55,18 @@
                     <tbody>
                         <?php foreach ($events as $e): ?>
                             <tr>
-                                <td><?= date('d/m/Y H:i', strtotime($e['event_date'])) ?></td>
+                                <td>
+                                    <?php
+                                    $now = new DateTimeImmutable('now');
+                                    $next = eventNextOccurrence($e, $now);
+                                    $dateBadges = eventGetDateBadges($e);
+                                    $primary = $next ? $next->format('d/m/Y H:i') : (!empty($dateBadges) ? ($dateBadges[0]['date'] . ' ' . $dateBadges[0]['time']) : '-');
+                                    ?>
+                                    <div class="fw-bold"><?= htmlspecialchars($primary) ?></div>
+                                    <?php if (count($dateBadges) > 1): ?>
+                                        <div class="small text-muted">+ <?= count($dateBadges) - 1 ?> datas</div>
+                                    <?php endif; ?>
+                                </td>
                                 <td class="fw-bold"><?= htmlspecialchars($e['title']) ?></td>
                                 <td><?= htmlspecialchars($e['location']) ?></td>
                                 <td>
@@ -100,7 +111,7 @@
                     <div class="alert alert-warning text-center">
                         <i class="fas fa-exclamation-triangle mb-2 fa-2x"></i>
                         <p class="mb-0">Não há eventos disponíveis para ativar a lista de presença no momento.</p>
-                        <small class="text-muted">Certifique-se de que existem eventos cadastrados nos últimos 30 dias que ainda não têm lista ativa.</small>
+                        <small class="text-muted">Cadastre um evento com data futura e tente novamente.</small>
                     </div>
                 <?php else: ?>
                     <div class="list-group">
@@ -109,7 +120,17 @@
                                 <div>
                                     <div class="fw-bold"><?= htmlspecialchars($ae['title']) ?></div>
                                     <small class="text-muted">
-                                        <?= date('d/m/Y H:i', strtotime($ae['event_date'])) ?> - <?= htmlspecialchars($ae['location']) ?>
+                                        <?php
+                                        $now = new DateTimeImmutable('now');
+                                        $next = eventNextOccurrence($ae, $now);
+                                        $dateBadges = eventGetDateBadges($ae);
+                                        $primary = $next ? $next->format('d/m/Y H:i') : (!empty($dateBadges) ? ($dateBadges[0]['date'] . ' ' . $dateBadges[0]['time']) : '-');
+                                        ?>
+                                        <?= htmlspecialchars($primary) ?>
+                                        <?php if (count($dateBadges) > 1): ?>
+                                            <span class="ms-1 badge bg-light text-dark border">+<?= count($dateBadges) - 1 ?> datas</span>
+                                        <?php endif; ?>
+                                        - <?= htmlspecialchars($ae['location']) ?>
                                     </small>
                                 </div>
                                 <i class="fas fa-chevron-right text-muted"></i>

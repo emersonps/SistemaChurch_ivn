@@ -111,6 +111,80 @@ if ($method === 'POST' && strpos($uri, '/admin') === 0) {
 if ($uri == '/' || $uri == '/home') {
     (new HomeController())->index();
 } 
+elseif ($uri == '/devocional') {
+    (new HomeController())->index();
+}
+elseif ($uri == '/contato') {
+    view('public/contact');
+}
+elseif ($uri == '/harpa' || $uri == '/harpa-crista') {
+    view('public/harpa');
+}
+elseif ($uri == '/harpa/hino') {
+    $num = (int)($_GET['n'] ?? $_GET['num'] ?? $_GET['numero'] ?? 0);
+    if ($num <= 0) {
+        http_response_code(400);
+        header('Content-Type: text/plain; charset=utf-8');
+        echo 'Número inválido.';
+        exit;
+    }
+
+    $harpaDir = dirname(__DIR__) . '/harpa_crista';
+    $harpaDirReal = realpath($harpaDir);
+    if (!$harpaDirReal || !is_dir($harpaDirReal)) {
+        http_response_code(404);
+        header('Content-Type: text/plain; charset=utf-8');
+        echo 'Diretório indisponível.';
+        exit;
+    }
+
+    $targetPath = null;
+    $entries = scandir($harpaDirReal);
+    foreach ($entries as $entry) {
+        if (!is_string($entry) || $entry === '.' || $entry === '..') {
+            continue;
+        }
+
+        if (!preg_match('/\.(pptx?)$/i', $entry)) {
+            continue;
+        }
+
+        if (preg_match('/^' . preg_quote((string)$num, '/') . '\s*-\s*.*\.(pptx?)$/i', $entry)) {
+            $candidate = $harpaDirReal . DIRECTORY_SEPARATOR . $entry;
+            $candidateReal = realpath($candidate);
+            if ($candidateReal && strpos($candidateReal, $harpaDirReal) === 0 && is_file($candidateReal)) {
+                $targetPath = $candidateReal;
+                break;
+            }
+        }
+    }
+
+    if (!$targetPath) {
+        http_response_code(404);
+        header('Content-Type: text/plain; charset=utf-8');
+        echo 'Hino não encontrado.';
+        exit;
+    }
+
+    $ext = strtolower((string)pathinfo($targetPath, PATHINFO_EXTENSION));
+    $mime = 'application/octet-stream';
+    if ($ext === 'ppt') {
+        $mime = 'application/vnd.ms-powerpoint';
+    } elseif ($ext === 'pptx') {
+        $mime = 'application/vnd.openxmlformats-officedocument.presentationml.presentation';
+    }
+
+    $forceDownload = isset($_GET['download']) && (string)$_GET['download'] === '1';
+    $disposition = $forceDownload ? 'attachment' : 'inline';
+
+    header('Content-Type: ' . $mime);
+    header('Content-Length: ' . filesize($targetPath));
+    header('Content-Disposition: ' . $disposition . '; filename="' . basename($targetPath) . '"');
+    header('Cache-Control: public, max-age=86400');
+    header('Pragma: public');
+    readfile($targetPath);
+    exit;
+}
 // Migration Manager Routes (Priority)
 elseif ($uri == '/developer/migrations') {
     (new MigrationController())->index();

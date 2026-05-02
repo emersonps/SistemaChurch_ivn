@@ -38,7 +38,11 @@ if (!empty($internalEvents)):
                                     <span class="badge bg-warning text-dark me-2">Interno</span>
                                     <strong><?= htmlspecialchars($e['title']) ?></strong>
                                     <small class="text-muted ms-2">
-                                        <i class="far fa-clock"></i> <?= date('d/m/Y H:i', strtotime($e['event_date'])) ?>
+                                        <?php $dateBadges = eventGetDateBadges($e); ?>
+                                        <i class="far fa-clock"></i> <?= htmlspecialchars($e['_next_occurrence'] ?? ($dateBadges[0]['date'] ?? '') . ' ' . ($dateBadges[0]['time'] ?? '')) ?>
+                                        <?php if (count($dateBadges) > 1): ?>
+                                            <span class="ms-1 badge bg-light text-dark border">+<?= count($dateBadges) - 1 ?> datas</span>
+                                        <?php endif; ?>
                                         <?php if (!empty($e['location'])): ?> | <i class="fas fa-map-marker-alt"></i> <?= htmlspecialchars($e['location']) ?><?php endif; ?>
                                     </small>
                                 </div>
@@ -104,7 +108,11 @@ if (!empty($internalEvents)):
                                     <?php endif; ?>
                                 </div>
                                 <small class="text-muted">
-                                    <i class="far fa-clock"></i> <?= date('d/m/Y H:i', strtotime($e['event_date'])) ?>
+                                    <?php $dateBadges = eventGetDateBadges($e); ?>
+                                    <i class="far fa-clock"></i> <?= htmlspecialchars($e['_next_occurrence'] ?? ($dateBadges[0]['date'] ?? '') . ' ' . ($dateBadges[0]['time'] ?? '')) ?>
+                                    <?php if (count($dateBadges) > 1): ?>
+                                        <span class="ms-1 badge bg-light text-dark border">+<?= count($dateBadges) - 1 ?> datas</span>
+                                    <?php endif; ?>
                                     <?php if($e['location']): ?> | <i class="fas fa-map-marker-alt"></i> <?= htmlspecialchars($e['location']) ?><?php endif; ?>
                                 </small>
                             </li>

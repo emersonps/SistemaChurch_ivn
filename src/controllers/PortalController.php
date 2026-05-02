@@ -33,7 +33,6 @@ class PortalController {
         $member_id = $_SESSION['member_id'];
         
         $db = (new Database())->connect();
-        $current_date_sql = ($db->getAttribute(PDO::ATTR_DRIVER_NAME) === 'sqlite') ? "date('now')" : "CURDATE()";
         
         // Member Data
         $member = $db->query("SELECT m.*, c.name as congregation_name FROM members m LEFT JOIN congregations c ON m.congregation_id = c.id WHERE m.id = $member_id")->fetch();
@@ -44,8 +43,7 @@ class PortalController {
         // Next Events (General or Congregation specific, include internos permitidos)
         $congregation_id = $member['congregation_id'];
         $sql_events = "SELECT * FROM events 
-                       WHERE event_date >= $current_date_sql 
-                       AND COALESCE(status, 'active') = 'active'
+                       WHERE COALESCE(status, 'active') = 'active'
                        AND (
                             (LOWER(type) != 'interno' AND (congregation_id IS NULL OR congregation_id = ?))
                             OR (LOWER(type) = 'interno' AND (
@@ -53,10 +51,27 @@ class PortalController {
                                 OR EXISTS(SELECT 1 FROM event_allowed_congregations ac WHERE ac.event_id = events.id AND ac.congregation_id = ?)
                             ))
                        )
-                       ORDER BY event_date ASC LIMIT 5";
+                       ORDER BY created_at DESC";
         $stmt = $db->prepare($sql_events);
         $stmt->execute([$congregation_id, $member_id, $congregation_id]);
         $next_events = $stmt->fetchAll();
+        $now = new DateTimeImmutable('now');
+        $next_events = array_values(array_filter($next_events, function ($e) use ($now) {
+            return eventHasFutureOccurrence($e, $now);
+        }));
+        usort($next_events, function ($a, $b) use ($now) {
+            $na = eventNextOccurrence($a, $now);
+            $nb = eventNextOccurrence($b, $now);
+            $ta = $na ? $na->getTimestamp() : PHP_INT_MAX;
+            $tb = $nb ? $nb->getTimestamp() : PHP_INT_MAX;
+            return $ta <=> $tb;
+        });
+        $next_events = array_slice($next_events, 0, 5);
+        foreach ($next_events as &$evt) {
+            $n = eventNextOccurrence($evt, $now);
+            $evt['_next_occurrence'] = $n ? $n->format('d/m/Y H:i') : '';
+        }
+        unset($evt);
         
         // Recent Studies
         $sql_studies = "SELECT * FROM studies 
@@ -322,24 +337,17 @@ class PortalController {
         $this->requireMemberLogin();
         $db = (new Database())->connect();
         $member_id = $_SESSION['member_id'];
-        
-        // Auto-disable expired events (Clean up) - Same logic as EventController
-        try {
-            $now = date('Y-m-d H:i:s');
-            $db->prepare("UPDATE events SET status = 'inactive' WHERE type != 'culto' AND event_date < ? AND event_date > '1971-01-01' AND status = 'active'")->execute([$now]);
-        } catch (Exception $e) {}
-
-        $current_date_sql = ($db->getAttribute(PDO::ATTR_DRIVER_NAME) === 'sqlite') ? "date('now')" : "CURDATE()";
+        $now = new DateTimeImmutable('now');
         
         $stmtMember = $db->prepare("SELECT congregation_id FROM members WHERE id = ?");
         $stmtMember->execute([$member_id]);
         $congregation_id = $stmtMember->fetchColumn();
 
-        // Get future ACTIVE events: only those that are global (NULL) or match the user's congregation
+        // Get ACTIVE events: only those that are global (NULL) or match the user's congregation
         $sql = "SELECT e.*, c.name as congregation_name 
                 FROM events e 
                 LEFT JOIN congregations c ON e.congregation_id = c.id
-                WHERE e.event_date >= $current_date_sql AND COALESCE(e.status, 'active') = 'active'
+                WHERE COALESCE(e.status, 'active') = 'active'
                 AND (
                     (LOWER(e.type) != 'interno' AND (e.congregation_id IS NULL OR e.congregation_id = ?))
                     OR (LOWER(e.type) = 'interno' AND (
@@ -347,11 +355,30 @@ class PortalController {
                         OR EXISTS(SELECT 1 FROM event_allowed_congregations ac WHERE ac.event_id = e.id AND ac.congregation_id = ?)
                     ))
                 )
-                ORDER BY e.event_date ASC";
+                ORDER BY e.created_at DESC";
                 
         $stmt = $db->prepare($sql);
         $stmt->execute([$congregation_id, $member_id, $congregation_id]);
         $events = $stmt->fetchAll();
+
+        $events = array_values(array_filter($events, function ($e) use ($now) {
+            return eventHasFutureOccurrence($e, $now);
+        }));
+
+        foreach ($events as &$evt) {
+            $n = eventNextOccurrence($evt, $now);
+            $evt['_next_occurrence_ts'] = $n ? $n->getTimestamp() : PHP_INT_MAX;
+        }
+        unset($evt);
+
+        usort($events, function ($a, $b) {
+            $ca = (string)($a['congregation_name'] ?? $a['location'] ?? '');
+            $cb = (string)($b['congregation_name'] ?? $b['location'] ?? '');
+            if ($ca !== $cb) {
+                return strcmp($ca, $cb);
+            }
+            return ($a['_next_occurrence_ts'] ?? PHP_INT_MAX) <=> ($b['_next_occurrence_ts'] ?? PHP_INT_MAX);
+        });
         
         view('portal/agenda', ['events' => $events]);
     }

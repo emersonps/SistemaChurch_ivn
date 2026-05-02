@@ -921,3 +921,143 @@ function normalizePermissionSelection(array $selectedPermissions) {
 
     return array_keys($selectedMap);
 }
+
+function eventDateWeekdayName($dateValue) {
+    $timestamp = strtotime((string)$dateValue);
+    if ($timestamp === false) {
+        return '';
+    }
+    $map = [
+        'Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'
+    ];
+    return $map[(int)date('w', $timestamp)] ?? '';
+}
+
+function eventParseDateTime($dateValue) {
+    $timestamp = strtotime((string)$dateValue);
+    if ($timestamp === false) {
+        return null;
+    }
+    return (new DateTimeImmutable())->setTimestamp($timestamp);
+}
+
+function eventGetDateTimes(array $event) {
+    $itemsByKey = [];
+
+    $push = function ($raw) use (&$itemsByKey) {
+        $raw = trim((string)$raw);
+        if ($raw === '' || strtotime($raw) === false) {
+            return;
+        }
+
+        $hasTime = (bool)preg_match('/\b\d{1,2}:\d{2}\b/', $raw);
+        $date = date('Y-m-d', strtotime($raw));
+        $time = date('H:i', strtotime($raw));
+        $key = $hasTime ? ($date . ' ' . $time) : $date;
+
+        if (!isset($itemsByKey[$key])) {
+            $itemsByKey[$key] = $key;
+        }
+    };
+
+    $eventDates = trim((string)($event['event_dates'] ?? ''));
+    if ($eventDates !== '') {
+        $decoded = json_decode($eventDates, true);
+        if (is_array($decoded)) {
+            foreach ($decoded as $dt) {
+                $push($dt);
+            }
+        }
+    }
+
+    $eventDate = trim((string)($event['event_date'] ?? ''));
+    if ($eventDate !== '' && strpos($eventDate, '1970-01-01') !== 0) {
+        $push($eventDate);
+    }
+
+    $items = array_values($itemsByKey);
+    usort($items, function ($a, $b) {
+        return strtotime($a) <=> strtotime($b);
+    });
+
+    return $items;
+}
+
+function eventGetDateBadges(array $event) {
+    $items = eventGetDateTimes($event);
+    $out = [];
+    foreach ($items as $dt) {
+        $hasTime = (bool)preg_match('/\b\d{1,2}:\d{2}\b/', (string)$dt);
+        $time = $hasTime ? date('H:i', strtotime($dt)) : '';
+        if ($time === '00:00') {
+            $time = '';
+        }
+        $out[] = [
+            'raw' => $dt,
+            'date' => date('d/m/Y', strtotime($dt)),
+            'time' => $time,
+            'weekday' => eventDateWeekdayName($dt),
+        ];
+    }
+    return $out;
+}
+
+function eventNextOccurrence(array $event, $now = null) {
+    $now = $now instanceof DateTimeImmutable ? $now : new DateTimeImmutable('now');
+
+    $items = eventGetDateTimes($event);
+    foreach ($items as $dt) {
+        $parsed = eventParseDateTime($dt);
+        if ($parsed && $parsed >= $now) {
+            return $parsed;
+        }
+    }
+
+    $recurring = trim((string)($event['recurring_days'] ?? ''));
+    if ($recurring !== '') {
+        $days = json_decode($recurring, true);
+        if (is_array($days) && !empty($days)) {
+            $map = [
+                'Domingo' => 0,
+                'Segunda' => 1,
+                'Terça' => 2,
+                'Terca' => 2,
+                'Quarta' => 3,
+                'Quinta' => 4,
+                'Sexta' => 5,
+                'Sábado' => 6,
+                'Sabado' => 6,
+            ];
+            $allowed = [];
+            foreach ($days as $d) {
+                $d = trim((string)$d);
+                if ($d === '') continue;
+                if (isset($map[$d])) $allowed[$map[$d]] = true;
+            }
+
+            if (!empty($allowed)) {
+                $timeValue = '19:30';
+                $timeFromEvent = trim((string)($event['event_date'] ?? ''));
+                if ($timeFromEvent !== '' && strtotime($timeFromEvent) !== false) {
+                    $timeValue = date('H:i', strtotime($timeFromEvent));
+                }
+
+                [$hour, $minute] = array_pad(explode(':', $timeValue), 2, '00');
+                for ($i = 0; $i <= 14; $i++) {
+                    $candidate = $now->modify('+' . $i . ' day')->setTime((int)$hour, (int)$minute);
+                    if (!empty($allowed[(int)$candidate->format('w')])) {
+                        if ($candidate >= $now) {
+                            return $candidate;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    return null;
+}
+
+function eventHasFutureOccurrence(array $event, $now = null) {
+    return eventNextOccurrence($event, $now) instanceof DateTimeImmutable;
+}

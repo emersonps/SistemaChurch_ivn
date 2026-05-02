@@ -3,7 +3,18 @@
 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
     <div>
         <h1 class="h2">Lista de Presença</h1>
-        <p class="text-muted mb-0">Evento: <strong><?= htmlspecialchars($event['title']) ?></strong> (<?= date('d/m/Y', strtotime($event['event_date'])) ?>)</p>
+        <?php
+        $now = new DateTimeImmutable('now');
+        $next = eventNextOccurrence($event, $now);
+        $dateBadges = eventGetDateBadges($event);
+        $primary = $next ? $next->format('d/m/Y H:i') : (!empty($dateBadges) ? ($dateBadges[0]['date'] . ' ' . $dateBadges[0]['time']) : '-');
+        ?>
+        <p class="text-muted mb-0">
+            Evento: <strong><?= htmlspecialchars($event['title']) ?></strong> (<?= htmlspecialchars($primary) ?>)
+            <?php if (count($dateBadges) > 1): ?>
+                <span class="ms-1 badge bg-light text-dark border">+<?= count($dateBadges) - 1 ?> datas</span>
+            <?php endif; ?>
+        </p>
     </div>
     <div class="btn-toolbar mb-2 mb-md-0">
         <a href="/admin/events/attendance/print/<?= $event['id'] ?>" target="_blank" class="btn btn-sm btn-outline-dark me-2">

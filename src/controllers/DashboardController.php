@@ -89,6 +89,20 @@ class DashboardController {
             if ($congregation_id) $birthdays_sql .= " AND congregation_id = $congregation_id";
             $birthdays = $db->query($birthdays_sql)->fetchAll();
         }
+        
+        $today_birthdays = [];
+        if (hasPermission('members.view')) {
+            $today_month = date('m');
+            $today_day = date('d');
+            if ($driver === 'sqlite') {
+                $date_format_d = "strftime('%d', birth_date)";
+            } else {
+                $date_format_d = "DATE_FORMAT(birth_date, '%d')";
+            }
+            $today_birthdays_sql = "SELECT * FROM members WHERE $date_format_m = '$today_month' AND $date_format_d = '$today_day'";
+            if ($congregation_id) $today_birthdays_sql .= " AND congregation_id = $congregation_id";
+            $today_birthdays = $db->query($today_birthdays_sql)->fetchAll();
+        }
 
         // Stats by Congregation
         // Note: This query calculates member count (total) and financial sum (filtered by date)
@@ -125,7 +139,8 @@ class DashboardController {
             'selected_year' => $selected_year,
             'congregation_stats' => $congregation_stats,
             'next_events' => $next_events,
-            'birthdays' => $birthdays
+            'birthdays' => $birthdays,
+            'today_birthdays' => $today_birthdays
         ]);
     }
 }

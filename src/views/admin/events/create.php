@@ -4,6 +4,13 @@
     <h1 class="h2">Novo Evento</h1>
 </div>
 
+<style>
+    .event-date-row .weekday-label {
+        min-height: 1.2em;
+        white-space: nowrap;
+    }
+</style>
+
 <form action="/admin/events/create" method="POST" class="row g-3 app-form-with-bottom-actions" enctype="multipart/form-data">
     <?= csrf_field() ?>
     <div class="col-md-6">
@@ -15,54 +22,10 @@
         <input type="file" class="form-control" name="banner" accept="image/*">
         <small class="text-muted">Recomendado: Formato JPG/PNG</small>
     </div>
-    <div class="col-md-3">
-        <label class="form-label">Data (Evento Único)</label>
-        <input type="date" class="form-control" name="event_date_only">
-        <small class="text-muted">Se preenchido, ignora dias da semana</small>
-    </div>
-    <div class="col-md-3">
-        <label class="form-label">Horário Início</label>
-        <input type="time" class="form-control" name="event_time_only">
-        <small class="text-muted">Horário do culto/evento</small>
-    </div>
-    <div class="col-md-3">
-        <label class="form-label">Horário Término</label>
-        <input type="time" class="form-control" name="end_time">
-        <small class="text-muted">Opcional</small>
-    </div>
-    <div class="col-md-12">
-        <label class="form-label">Dias da Semana (Recorrente)</label>
-        <div class="d-flex gap-3 flex-wrap">
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" name="recurring_days[]" value="Domingo" id="dom">
-                <label class="form-check-label" for="dom">Domingo</label>
-            </div>
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" name="recurring_days[]" value="Segunda" id="seg">
-                <label class="form-check-label" for="seg">Segunda</label>
-            </div>
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" name="recurring_days[]" value="Terça" id="ter">
-                <label class="form-check-label" for="ter">Terça</label>
-            </div>
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" name="recurring_days[]" value="Quarta" id="qua">
-                <label class="form-check-label" for="qua">Quarta</label>
-            </div>
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" name="recurring_days[]" value="Quinta" id="qui">
-                <label class="form-check-label" for="qui">Quinta</label>
-            </div>
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" name="recurring_days[]" value="Sexta" id="sex">
-                <label class="form-check-label" for="sex">Sexta</label>
-            </div>
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" name="recurring_days[]" value="Sábado" id="sab">
-                <label class="form-check-label" for="sab">Sábado</label>
-            </div>
-        </div>
-        <small class="text-muted">Selecione para cultos semanais fixos</small>
+    <div class="col-12">
+        <label class="form-label">Datas</label>
+        <div id="eventDatesContainer" class="d-grid gap-2"></div>
+        <div class="form-text">Adicione uma ou mais datas para o mesmo evento.</div>
     </div>
     <div class="col-md-3">
         <label class="form-label">Tipo</label>
@@ -177,32 +140,93 @@
         }
     });
 
-    // Marcar o dia da semana automaticamente ao selecionar a data
-    document.querySelector('input[name="event_date_only"]').addEventListener('change', function() {
-        if (this.value) {
-            // Desmarcar todas as checkboxes primeiro
-            var checkboxes = document.querySelectorAll('input[name="recurring_days[]"]');
-            checkboxes.forEach(function(cb) {
-                cb.checked = false;
-            });
+    (function () {
+        var container = document.getElementById('eventDatesContainer');
+        if (!container) return;
 
-            // Criar data forçando o fuso horário local para evitar problemas de fuso no JS
-            var dateParts = this.value.split('-');
-            var date = new Date(dateParts[0], dateParts[1] - 1, dateParts[2]);
-            
-            var dayOfWeek = date.getDay(); // 0 (Dom) a 6 (Sab)
-            
-            // Mapeamento dos IDs das checkboxes
-            var dayIds = ['dom', 'seg', 'ter', 'qua', 'qui', 'sex', 'sab'];
-            var targetId = dayIds[dayOfWeek];
-            
-            // Marcar a checkbox correspondente
-            var checkbox = document.getElementById(targetId);
-            if (checkbox) {
-                checkbox.checked = true;
-            }
+        var week = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
+
+        function getWeekdayLabel(dateValue) {
+            if (!dateValue) return '';
+            var parts = String(dateValue).split('-');
+            if (parts.length !== 3) return '';
+            var d = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+            return week[d.getDay()] || '';
         }
-    });
+
+        function renumber() {
+            var rows = container.querySelectorAll('.event-date-row');
+            rows.forEach(function (row, idx) {
+                row.dataset.index = String(idx);
+                var dateInput = row.querySelector('input[type="date"]');
+                var timeInput = row.querySelector('input[type="time"]');
+                if (dateInput) dateInput.name = 'event_dates[' + idx + '][date]';
+                if (timeInput) timeInput.name = 'event_dates[' + idx + '][time]';
+            });
+            rows.forEach(function (row) {
+                var del = row.querySelector('.btn-remove-date');
+                if (del) del.disabled = rows.length <= 1;
+            });
+        }
+
+        function updateWeekday(row) {
+            var dateInput = row.querySelector('input[type="date"]');
+            var label = row.querySelector('.weekday-label');
+            if (!dateInput || !label) return;
+            var text = getWeekdayLabel(dateInput.value);
+            label.textContent = text || '';
+        }
+
+        function addRow(initial) {
+            var idx = container.querySelectorAll('.event-date-row').length;
+            var row = document.createElement('div');
+            row.className = 'event-date-row row g-2 align-items-start';
+            row.dataset.index = String(idx);
+            row.innerHTML = `
+                <div class="col-6 col-md-3">
+                    <label class="form-label mb-1">Data</label>
+                    <input type="date" class="form-control" name="event_dates[${idx}][date]">
+                    <div class="form-text weekday-label"></div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <label class="form-label mb-1">Horário</label>
+                    <input type="time" class="form-control" name="event_dates[${idx}][time]">
+                </div>
+                <div class="col-12 col-md-2 d-flex gap-2 align-self-end">
+                    <button type="button" class="btn btn-outline-primary btn-add-date" title="Adicionar outra data">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                    <button type="button" class="btn btn-outline-danger btn-remove-date" title="Remover esta data">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            `;
+            container.appendChild(row);
+
+            var dateInput = row.querySelector('input[type="date"]');
+            var timeInput = row.querySelector('input[type="time"]');
+            if (initial && dateInput) dateInput.value = initial.date || '';
+            if (initial && timeInput) timeInput.value = initial.time || '';
+
+            row.querySelector('.btn-add-date').addEventListener('click', function () {
+                addRow();
+                renumber();
+            });
+            row.querySelector('.btn-remove-date').addEventListener('click', function () {
+                row.remove();
+                renumber();
+            });
+            if (dateInput) {
+                dateInput.addEventListener('change', function () {
+                    updateWeekday(row);
+                });
+                updateWeekday(row);
+            }
+            renumber();
+        }
+
+        addRow();
+    })();
 
 
     const typeSelect = document.querySelector('select[name="type"]');

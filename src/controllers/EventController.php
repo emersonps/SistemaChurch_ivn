@@ -2,9 +2,53 @@
 // src/controllers/EventController.php
 
 class EventController {
+    private function ensureEventsEventDatesColumn(PDO $db): void {
+        try {
+            $db->query("SELECT event_dates FROM events LIMIT 1")->fetch();
+            return;
+        } catch (Exception $e) {
+        }
+
+        try {
+            $db->exec("ALTER TABLE events ADD COLUMN event_dates TEXT NULL");
+        } catch (Exception $e) {
+        }
+    }
+
+    private function buildEventDatesFromPost(): array {
+        $raw = $_POST['event_dates'] ?? null;
+        if (!is_array($raw)) {
+            return [];
+        }
+
+        $items = [];
+        foreach ($raw as $row) {
+            if (!is_array($row)) {
+                continue;
+            }
+            $date = trim((string)($row['date'] ?? ''));
+            $time = trim((string)($row['time'] ?? ''));
+            if ($date === '') {
+                continue;
+            }
+            if ($time === '') {
+                $time = '00:00';
+            }
+            $items[] = $date . ' ' . $time;
+        }
+
+        $items = array_values(array_unique($items));
+        usort($items, function ($a, $b) {
+            return strtotime($a) <=> strtotime($b);
+        });
+
+        return $items;
+    }
+
     public function index() {
         requirePermission('events.view');
         $db = (new Database())->connect();
+        $this->ensureEventsEventDatesColumn($db);
         
         // Auto-disable expired events (Clean up)
         // Checks for non-recurring events that have passed their date
@@ -16,8 +60,19 @@ class EventController {
             // Only for types that are NOT 'culto' (e.g., 'evento', 'convite', 'outro', 'aniversario')
             // AND ensure it's not a generic recurring event (using 1970 date)
             // Fix: We should also check if recurring_days is NULL or empty to not disable recurring events
-            $stmtUpdate = $db->prepare("UPDATE events SET status = 'inactive' WHERE type != 'culto' AND (recurring_days IS NULL OR recurring_days = '[]') AND event_date < ? AND event_date > '1971-01-01' AND status = 'active'");
+            $stmtUpdate = $db->prepare("UPDATE events SET status = 'inactive' WHERE type != 'culto' AND (recurring_days IS NULL OR recurring_days = '[]') AND (event_dates IS NULL OR event_dates = '' OR event_dates = '[]') AND event_date < ? AND event_date > '1971-01-01' AND status = 'active'");
             $stmtUpdate->execute([$now]);
+
+            $stmtMulti = $db->query("SELECT id, event_dates, event_date, recurring_days, end_time, type, status FROM events WHERE status = 'active' AND type != 'culto' AND event_dates IS NOT NULL AND event_dates != '' AND event_dates != '[]'");
+            $rows = $stmtMulti ? $stmtMulti->fetchAll(PDO::FETCH_ASSOC) : [];
+            if (!empty($rows)) {
+                $nowDt = new DateTimeImmutable('now');
+                foreach ($rows as $row) {
+                    if (!eventHasFutureOccurrence($row, $nowDt)) {
+                        $db->prepare("UPDATE events SET status = 'inactive' WHERE id = ?")->execute([$row['id']]);
+                    }
+                }
+            }
         } catch (Exception $e) {
             // Ignore errors here, just a cleanup task
         }
@@ -102,7 +157,10 @@ class EventController {
         }
         
         $event_date = null;
-        if (!empty($_POST['event_date_only'])) {
+        $eventDates = $this->buildEventDatesFromPost();
+        if (!empty($eventDates)) {
+            $event_date = $eventDates[0];
+        } elseif (!empty($_POST['event_date_only'])) {
             $date = $_POST['event_date_only'];
             $time = !empty($_POST['event_time_only']) ? $_POST['event_time_only'] : '00:00';
             $event_date = $date . ' ' . $time;
@@ -110,8 +168,8 @@ class EventController {
              $event_date = '1970-01-01 ' . $_POST['event_time_only'];
         }
 
-        $recurring_days = isset($_POST['recurring_days']) ? json_encode($_POST['recurring_days']) : null;
-        $end_time = !empty($_POST['end_time']) ? $_POST['end_time'] : null;
+        $recurring_days = null;
+        $end_time = null;
         $type = $_POST['type'];
         
         // New Fields
@@ -143,8 +201,15 @@ class EventController {
         $stmtFindCong->execute([$location]);
         $congregation_id = $stmtFindCong->fetchColumn() ?: null;
 
-        $stmt = $db->prepare("INSERT INTO events (title, description, event_date, location, type, status, recurring_days, end_time, banner_path, address, contact_email, contact_phone, congregation_id) VALUES (?, ?, ?, ?, ?, 'active', ?, ?, ?, ?, ?, ?, ?)");
-        $stmt->execute([$title, $description, $event_date, $location, $type, $recurring_days, $end_time, $banner_path, $address, $contact_email, $contact_phone, $congregation_id]);
+        $eventDatesJson = !empty($eventDates) ? json_encode($eventDates, JSON_UNESCAPED_UNICODE) : null;
+        $this->ensureEventsEventDatesColumn($db);
+        try {
+            $stmt = $db->prepare("INSERT INTO events (title, description, event_date, event_dates, location, type, status, recurring_days, end_time, banner_path, address, contact_email, contact_phone, congregation_id) VALUES (?, ?, ?, ?, ?, ?, 'active', ?, ?, ?, ?, ?, ?, ?)");
+            $stmt->execute([$title, $description, $event_date, $eventDatesJson, $location, $type, $recurring_days, $end_time, $banner_path, $address, $contact_email, $contact_phone, $congregation_id]);
+        } catch (Exception $e) {
+            $stmt = $db->prepare("INSERT INTO events (title, description, event_date, location, type, status, recurring_days, end_time, banner_path, address, contact_email, contact_phone, congregation_id) VALUES (?, ?, ?, ?, ?, 'active', ?, ?, ?, ?, ?, ?, ?)");
+            $stmt->execute([$title, $description, $event_date, $location, $type, $recurring_days, $end_time, $banner_path, $address, $contact_email, $contact_phone, $congregation_id]);
+        }
         
         $eventId = $db->lastInsertId();
         if (strtolower($type) === 'interno' && $eventId) {
@@ -262,7 +327,10 @@ class EventController {
         $description = $_POST['description'];
         
         $event_date = null;
-        if (!empty($_POST['event_date_only'])) {
+        $eventDates = $this->buildEventDatesFromPost();
+        if (!empty($eventDates)) {
+            $event_date = $eventDates[0];
+        } elseif (!empty($_POST['event_date_only'])) {
             $date = $_POST['event_date_only'];
             $time = !empty($_POST['event_time_only']) ? $_POST['event_time_only'] : '00:00';
             $event_date = $date . ' ' . $time;
@@ -270,8 +338,8 @@ class EventController {
              $event_date = '1970-01-01 ' . $_POST['event_time_only'];
         }
 
-        $recurring_days = isset($_POST['recurring_days']) ? json_encode($_POST['recurring_days']) : null;
-        $end_time = !empty($_POST['end_time']) ? $_POST['end_time'] : null;
+        $recurring_days = null;
+        $end_time = null;
         $location = $_POST['location'];
         $type = $_POST['type'];
         $status = $_POST['status'];
@@ -331,15 +399,35 @@ class EventController {
             }
         }
         
-        if ($banner_path) {
-            $stmt = $db->prepare("UPDATE events SET title=?, description=?, event_date=?, location=?, type=?, status=?, recurring_days=?, end_time=?, banner_path=?, address=?, contact_email=?, contact_phone=?, congregation_id=? WHERE id=?");
-            $stmt->execute([$title, $description, $event_date, $location, $type, $status, $recurring_days, $end_time, $banner_path, $address, $contact_email, $contact_phone, $congregation_id, $id]);
-        } elseif ($removeBanner) {
-            $stmt = $db->prepare("UPDATE events SET title=?, description=?, event_date=?, location=?, type=?, status=?, recurring_days=?, end_time=?, banner_path=NULL, address=?, contact_email=?, contact_phone=?, congregation_id=? WHERE id=?");
-            $stmt->execute([$title, $description, $event_date, $location, $type, $status, $recurring_days, $end_time, $address, $contact_email, $contact_phone, $congregation_id, $id]);
-        } else {
-            $stmt = $db->prepare("UPDATE events SET title=?, description=?, event_date=?, location=?, type=?, status=?, recurring_days=?, end_time=?, address=?, contact_email=?, contact_phone=?, congregation_id=? WHERE id=?");
-            $stmt->execute([$title, $description, $event_date, $location, $type, $status, $recurring_days, $end_time, $address, $contact_email, $contact_phone, $congregation_id, $id]);
+        $eventDatesJson = !empty($eventDates) ? json_encode($eventDates, JSON_UNESCAPED_UNICODE) : null;
+        $this->ensureEventsEventDatesColumn($db);
+        $baseSql = "UPDATE events SET title=?, description=?, event_date=?, event_dates=?, location=?, type=?, status=?, recurring_days=?, end_time=?, ";
+        $tailWithBanner = "banner_path=?, address=?, contact_email=?, contact_phone=?, congregation_id=? WHERE id=?";
+        $tailWithoutBanner = "address=?, contact_email=?, contact_phone=?, congregation_id=? WHERE id=?";
+        $tailRemoveBanner = "banner_path=NULL, address=?, contact_email=?, contact_phone=?, congregation_id=? WHERE id=?";
+
+        try {
+            if ($banner_path) {
+                $stmt = $db->prepare($baseSql . $tailWithBanner);
+                $stmt->execute([$title, $description, $event_date, $eventDatesJson, $location, $type, $status, $recurring_days, $end_time, $banner_path, $address, $contact_email, $contact_phone, $congregation_id, $id]);
+            } elseif ($removeBanner) {
+                $stmt = $db->prepare($baseSql . $tailRemoveBanner);
+                $stmt->execute([$title, $description, $event_date, $eventDatesJson, $location, $type, $status, $recurring_days, $end_time, $address, $contact_email, $contact_phone, $congregation_id, $id]);
+            } else {
+                $stmt = $db->prepare($baseSql . $tailWithoutBanner);
+                $stmt->execute([$title, $description, $event_date, $eventDatesJson, $location, $type, $status, $recurring_days, $end_time, $address, $contact_email, $contact_phone, $congregation_id, $id]);
+            }
+        } catch (Exception $e) {
+            if ($banner_path) {
+                $stmt = $db->prepare("UPDATE events SET title=?, description=?, event_date=?, location=?, type=?, status=?, recurring_days=?, end_time=?, banner_path=?, address=?, contact_email=?, contact_phone=?, congregation_id=? WHERE id=?");
+                $stmt->execute([$title, $description, $event_date, $location, $type, $status, $recurring_days, $end_time, $banner_path, $address, $contact_email, $contact_phone, $congregation_id, $id]);
+            } elseif ($removeBanner) {
+                $stmt = $db->prepare("UPDATE events SET title=?, description=?, event_date=?, location=?, type=?, status=?, recurring_days=?, end_time=?, banner_path=NULL, address=?, contact_email=?, contact_phone=?, congregation_id=? WHERE id=?");
+                $stmt->execute([$title, $description, $event_date, $location, $type, $status, $recurring_days, $end_time, $address, $contact_email, $contact_phone, $congregation_id, $id]);
+            } else {
+                $stmt = $db->prepare("UPDATE events SET title=?, description=?, event_date=?, location=?, type=?, status=?, recurring_days=?, end_time=?, address=?, contact_email=?, contact_phone=?, congregation_id=? WHERE id=?");
+                $stmt->execute([$title, $description, $event_date, $location, $type, $status, $recurring_days, $end_time, $address, $contact_email, $contact_phone, $congregation_id, $id]);
+            }
         }
         
         if (strtolower($type) === 'interno') {
@@ -410,9 +498,10 @@ class EventController {
     public function toggleStatus($id) {
         requirePermission('events.manage');
         $db = (new Database())->connect();
+        $this->ensureEventsEventDatesColumn($db);
         
         // RBAC: Allow toggle for cultos e recorrentes; block apenas eventos passados não recorrentes
-        $stmtCheck = $db->prepare("SELECT event_date, type, recurring_days FROM events WHERE id = ?");
+        $stmtCheck = $db->prepare("SELECT event_date, event_dates, type, recurring_days FROM events WHERE id = ?");
         $stmtCheck->execute([$id]);
         $row = $stmtCheck->fetch(PDO::FETCH_ASSOC);
         $eventDate = $row['event_date'] ?? null;
@@ -420,7 +509,8 @@ class EventController {
         $recurringDays = $row['recurring_days'] ?? null;
         
         $isRecurring = !empty($recurringDays) && $recurringDays !== '[]';
-        if ($type !== 'culto' && !$isRecurring && $eventDate && strtotime($eventDate) < strtotime('today')) {
+        $now = new DateTimeImmutable('now');
+        if ($type !== 'culto' && !$isRecurring && !eventHasFutureOccurrence($row, $now) && $eventDate && strtotime($eventDate) < strtotime('today')) {
             // Event is in the past, prevent toggle
             $_SESSION['error'] = "Não é possível alterar o status de eventos passados.";
             redirect('/admin/events');
@@ -440,6 +530,7 @@ class EventController {
     public function attendanceList() {
         requirePermission('events.view');
         $db = (new Database())->connect();
+        $this->ensureEventsEventDatesColumn($db);
         
         $congregationId = $_SESSION['user_congregation_id'] ?? null;
         
@@ -461,10 +552,20 @@ class EventController {
         $stmt = $db->prepare($sql);
         $stmt->execute($params);
         $events = $stmt->fetchAll();
+
+        $now = new DateTimeImmutable('now');
+        foreach ($events as &$evt) {
+            $n = eventNextOccurrence($evt, $now);
+            $evt['_next_occurrence_ts'] = $n ? $n->getTimestamp() : PHP_INT_MAX;
+        }
+        unset($evt);
+        usort($events, function ($a, $b) {
+            return ($b['_next_occurrence_ts'] ?? 0) <=> ($a['_next_occurrence_ts'] ?? 0);
+        });
         
         // Fetch all future/recent events that DON'T have attendance list yet, for the "Select Event" modal
         // We use LOWER(type) to ensure case-insensitivity
-        $sqlAvailable = "SELECT id, title, event_date, location FROM events WHERE (has_attendance_list = 0 OR has_attendance_list IS NULL) AND LOWER(type) = 'evento'";
+        $sqlAvailable = "SELECT id, title, event_date, event_dates, location, recurring_days FROM events WHERE (has_attendance_list = 0 OR has_attendance_list IS NULL) AND LOWER(type) = 'evento' AND COALESCE(status, 'active') = 'active'";
         $paramsAvailable = [];
         
         if ($congregationId) {
@@ -472,18 +573,22 @@ class EventController {
             $paramsAvailable[] = $congregationId;
             $paramsAvailable[] = $congregationId;
         }
-        
-        // Remove the 30 days limitation to ensure ALL 'evento' types appear, or at least expand it to 1 year back
-        // The user specifically requested: "Todos os eventos que ainda nao passaram da data (EVENTOS APENAS)"
-        // However, if an event is happening today, its time might be in the past (e.g. 10:00 AM, and it's 11:00 AM now).
-        // Let's ensure anything from the current day onwards is visible, regardless of hours.
-        $todayStart = date('Y-m-d 00:00:00');
-        $sqlAvailable .= " AND event_date >= ? ORDER BY event_date ASC";
-        $paramsAvailable[] = $todayStart;
+        $sqlAvailable .= " ORDER BY created_at DESC";
         
         $stmtAvail = $db->prepare($sqlAvailable);
         $stmtAvail->execute($paramsAvailable);
         $availableEvents = $stmtAvail->fetchAll();
+
+        $availableEvents = array_values(array_filter($availableEvents, function ($e) use ($now) {
+            return eventHasFutureOccurrence($e, $now);
+        }));
+        usort($availableEvents, function ($a, $b) use ($now) {
+            $na = eventNextOccurrence($a, $now);
+            $nb = eventNextOccurrence($b, $now);
+            $ta = $na ? $na->getTimestamp() : PHP_INT_MAX;
+            $tb = $nb ? $nb->getTimestamp() : PHP_INT_MAX;
+            return $ta <=> $tb;
+        });
         
         view('admin/events/attendance_list', ['events' => $events, 'availableEvents' => $availableEvents]);
     }

@@ -19,8 +19,7 @@ class HomeController {
             SELECT * FROM events 
             WHERE type = 'convite' 
             AND (status = 'active' OR status IS NULL) 
-            ORDER BY event_date ASC 
-            LIMIT 6
+            ORDER BY event_date ASC
         ")->fetchAll();
 
         // Buscar Eventos por Congregação (EXCETO culto, convite e interno)
@@ -30,6 +29,29 @@ class HomeController {
             AND (status = 'active' OR status IS NULL) 
             ORDER BY event_date ASC
         ")->fetchAll();
+
+        $now = new DateTimeImmutable('now');
+        $convites = array_values(array_filter($convites, function ($e) use ($now) {
+            return eventHasFutureOccurrence($e, $now);
+        }));
+        $eventos = array_values(array_filter($eventos, function ($e) use ($now) {
+            return eventHasFutureOccurrence($e, $now);
+        }));
+        usort($convites, function ($a, $b) use ($now) {
+            $na = eventNextOccurrence($a, $now);
+            $nb = eventNextOccurrence($b, $now);
+            $ta = $na ? $na->getTimestamp() : PHP_INT_MAX;
+            $tb = $nb ? $nb->getTimestamp() : PHP_INT_MAX;
+            return $ta <=> $tb;
+        });
+        usort($eventos, function ($a, $b) use ($now) {
+            $na = eventNextOccurrence($a, $now);
+            $nb = eventNextOccurrence($b, $now);
+            $ta = $na ? $na->getTimestamp() : PHP_INT_MAX;
+            $tb = $nb ? $nb->getTimestamp() : PHP_INT_MAX;
+            return $ta <=> $tb;
+        });
+        $convites = array_slice($convites, 0, 6);
 
         // Buscar Congregações (mostrando todas)
         $congregacoes = $db->query("SELECT * FROM congregations ORDER BY name ASC")->fetchAll();
@@ -247,6 +269,15 @@ class HomeController {
     }
 
     private function resolveUpcomingEventOccurrence(array $event, DateTimeImmutable $now) {
+        $eventDatesRaw = trim((string)($event['event_dates'] ?? ''));
+        if ($eventDatesRaw !== '') {
+            $next = eventNextOccurrence($event, $now);
+            if ($next instanceof DateTimeImmutable) {
+                return $next;
+            }
+            return false;
+        }
+
         $eventDate = trim((string)($event['event_date'] ?? ''));
         $endTime = trim((string)($event['end_time'] ?? ''));
 
