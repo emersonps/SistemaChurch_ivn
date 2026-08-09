@@ -319,25 +319,11 @@ class TitheController {
         }
 
         // Assinaturas associadas ao documento "receipt" (Recibos de Dízimos e Ofertas)
-        $signatures = $db->query("SELECT * FROM signatures WHERE document_types LIKE '%receipt%'")->fetchAll();
-
-        $pastorSignature = null;
-        $treasurerSignature = null;
-
-        foreach ($signatures as $sig) {
-            $role = strtolower($sig['role_label']);
-            if (strpos($role, 'pastor') !== false && !$pastorSignature) {
-                $pastorSignature = $sig;
-            }
-            if ((strpos($role, 'tesoureiro') !== false || strpos($role, 'tesouraria') !== false) && !$treasurerSignature) {
-                $treasurerSignature = $sig;
-            }
-        }
+        $receiptSignatures = $db->query("SELECT * FROM signatures WHERE document_types LIKE '%receipt%'")->fetchAll();
 
         view('admin/tithes/receipt', [
             'tithe' => $tithe,
-            'pastorSignature' => $pastorSignature,
-            'treasurerSignature' => $treasurerSignature
+            'receiptSignatures' => $receiptSignatures
         ]);
     }
 

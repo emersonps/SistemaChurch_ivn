@@ -144,28 +144,18 @@
             </div>
             
             <div class="receipt-signature">
-                <?php if ($pastorSignature || $treasurerSignature): ?>
-                    <div class="d-flex justify-content-around" style="margin-top: 20px;">
-                        <?php if ($pastorSignature): ?>
+                <?php if (!empty($receiptSignatures)): ?>
+                    <div class="d-flex justify-content-around flex-wrap" style="margin-top: 20px; gap: 15px;">
+                        <?php foreach ($receiptSignatures as $sig): ?>
                             <div class="text-center">
-                                <?php if (!empty($pastorSignature['image_path'])): ?>
-                                    <img src="/uploads/signatures/<?= htmlspecialchars($pastorSignature['image_path']) ?>" style="max-height: 45px; max-width: 140px;" alt="Assinatura Pastor"><br>
+                                <?php if (!empty($sig['image_path'])): ?>
+                                    <img src="/uploads/signatures/<?= htmlspecialchars($sig['image_path']) ?>" style="max-height: 45px; max-width: 140px;" alt="Assinatura"><br>
                                 <?php endif; ?>
                                 <span style="display:inline-block; border-top: 1px solid #000; padding-top: 3px; font-size: 11px; min-width: 160px;">
-                                    <?= htmlspecialchars($pastorSignature['name'] ?? 'Pastor') ?>
+                                    <?= htmlspecialchars($sig['name'] ?? $sig['role_label']) ?>
                                 </span>
                             </div>
-                        <?php endif; ?>
-                        <?php if ($treasurerSignature): ?>
-                            <div class="text-center">
-                                <?php if (!empty($treasurerSignature['image_path'])): ?>
-                                    <img src="/uploads/signatures/<?= htmlspecialchars($treasurerSignature['image_path']) ?>" style="max-height: 45px; max-width: 140px;" alt="Assinatura Tesoureiro"><br>
-                                <?php endif; ?>
-                                <span style="display:inline-block; border-top: 1px solid #000; padding-top: 3px; font-size: 11px; min-width: 160px;">
-                                    <?= htmlspecialchars($treasurerSignature['name'] ?? 'Tesouraria') ?>
-                                </span>
-                            </div>
-                        <?php endif; ?>
+                        <?php endforeach; ?>
                     </div>
                 <?php else: ?>
                     <p>___________________________________<br>Tesouraria</p>
@@ -213,28 +203,18 @@
             </div>
             
             <div class="receipt-signature">
-                <?php if ($pastorSignature || $treasurerSignature): ?>
-                    <div class="d-flex justify-content-around" style="margin-top: 20px;">
-                        <?php if ($pastorSignature): ?>
+                <?php if (!empty($receiptSignatures)): ?>
+                    <div class="d-flex justify-content-around flex-wrap" style="margin-top: 20px; gap: 15px;">
+                        <?php foreach ($receiptSignatures as $sig): ?>
                             <div class="text-center">
-                                <?php if (!empty($pastorSignature['image_path'])): ?>
-                                    <img src="/uploads/signatures/<?= htmlspecialchars($pastorSignature['image_path']) ?>" style="max-height: 45px; max-width: 140px;" alt="Assinatura Pastor"><br>
+                                <?php if (!empty($sig['image_path'])): ?>
+                                    <img src="/uploads/signatures/<?= htmlspecialchars($sig['image_path']) ?>" style="max-height: 45px; max-width: 140px;" alt="Assinatura"><br>
                                 <?php endif; ?>
                                 <span style="display:inline-block; border-top: 1px solid #000; padding-top: 3px; font-size: 11px; min-width: 160px;">
-                                    <?= htmlspecialchars($pastorSignature['name'] ?? 'Pastor') ?>
+                                    <?= htmlspecialchars($sig['name'] ?? $sig['role_label']) ?>
                                 </span>
                             </div>
-                        <?php endif; ?>
-                        <?php if ($treasurerSignature): ?>
-                            <div class="text-center">
-                                <?php if (!empty($treasurerSignature['image_path'])): ?>
-                                    <img src="/uploads/signatures/<?= htmlspecialchars($treasurerSignature['image_path']) ?>" style="max-height: 45px; max-width: 140px;" alt="Assinatura Tesoureiro"><br>
-                                <?php endif; ?>
-                                <span style="display:inline-block; border-top: 1px solid #000; padding-top: 3px; font-size: 11px; min-width: 160px;">
-                                    <?= htmlspecialchars($treasurerSignature['name'] ?? 'Tesouraria') ?>
-                                </span>
-                            </div>
-                        <?php endif; ?>
+                        <?php endforeach; ?>
                     </div>
                 <?php else: ?>
                     <p>___________________________________<br>Tesouraria</p>
