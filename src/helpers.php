@@ -720,6 +720,7 @@ function getChurchSiteProfileSettings() {
         'name' => getSystemSetting('church_name', 'Igreja Vida Nova'),
         'alias' => getSystemSetting('church_alias', 'IVN'),
         'logo_url' => getSystemSetting('church_logo_url', '/assets/img/logo.png'),
+        'address' => getSystemSetting('church_address', ''),
         'phone' => getSystemSetting('church_phone', '+55 (92) 99386-6290'),
         'email' => getSystemSetting('church_email', 'contato@ivn.com.br'),
         'about_text' => getSystemSetting(

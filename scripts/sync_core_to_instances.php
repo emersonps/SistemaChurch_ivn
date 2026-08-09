@@ -175,6 +175,10 @@ function listTargetsFromRoot($rootDir, $excludeDirName) {
         if ($entry === $excludeDirName) {
             continue;
         }
+        if ($entry === 'SistemaChurch_Central') {
+            // O projeto Central é um app diferente (servidor de sincronização) e não deve receber os arquivos das instâncias.
+            continue;
+        }
         if (strpos($entry, 'SistemaChurch_') !== 0) {
             continue;
         }

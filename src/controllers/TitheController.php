@@ -5,8 +5,7 @@ class TitheController {
     private function tableHasColumn(PDO $db, $table, $column) {
         $driver = $db->getAttribute(PDO::ATTR_DRIVER_NAME);
         if ($driver === 'mysql') {
-            $stmt = $db->prepare("SHOW COLUMNS FROM `$table` LIKE ?");
-            $stmt->execute([$column]);
+            $stmt = $db->query("SHOW COLUMNS FROM `$table` LIKE '$column'");
             return (bool)$stmt->fetch();
         } else {
             $stmt = $db->query("PRAGMA table_info($table)");
@@ -296,7 +295,7 @@ class TitheController {
         }
 
         $db = (new Database())->connect();
-        $stmt = $db->prepare("SELECT t.*, m.name as member_name, m.phone, c.name as congregation_name 
+        $stmt = $db->prepare("SELECT t.*, COALESCE(m.name, t.giver_name) as member_name, m.phone, c.name as congregation_name 
                               FROM tithes t 
                               LEFT JOIN members m ON t.member_id = m.id 
                               LEFT JOIN congregations c ON t.congregation_id = c.id
@@ -319,7 +318,27 @@ class TitheController {
             }
         }
 
-        view('admin/tithes/receipt', ['tithe' => $tithe]);
+        // Assinaturas associadas ao documento "receipt" (Recibos de Dízimos e Ofertas)
+        $signatures = $db->query("SELECT * FROM signatures WHERE document_types LIKE '%receipt%'")->fetchAll();
+
+        $pastorSignature = null;
+        $treasurerSignature = null;
+
+        foreach ($signatures as $sig) {
+            $role = strtolower($sig['role_label']);
+            if (strpos($role, 'pastor') !== false && !$pastorSignature) {
+                $pastorSignature = $sig;
+            }
+            if ((strpos($role, 'tesoureiro') !== false || strpos($role, 'tesouraria') !== false) && !$treasurerSignature) {
+                $treasurerSignature = $sig;
+            }
+        }
+
+        view('admin/tithes/receipt', [
+            'tithe' => $tithe,
+            'pastorSignature' => $pastorSignature,
+            'treasurerSignature' => $treasurerSignature
+        ]);
     }
 
     public function edit($id) {

@@ -48,6 +48,7 @@ class GlobalSettingsController {
         $churchLogoUrl = $this->handleLogoUpload($instanceId, $instance, $this->getSetting($instanceId, 'church_logo_url', ''));
         $phone = trim((string)($_POST['church_phone'] ?? ''));
         $email = trim((string)($_POST['church_email'] ?? ''));
+        $address = trim((string)($_POST['church_address'] ?? ''));
         $about = trim((string)($_POST['church_about_text'] ?? ''));
         $socialLinks = $this->buildSocialLinks($_POST);
 
@@ -56,6 +57,7 @@ class GlobalSettingsController {
         $this->saveSetting($instanceId, 'church_logo_url', $churchLogoUrl);
         $this->saveSetting($instanceId, 'church_phone', $phone);
         $this->saveSetting($instanceId, 'church_email', $email);
+        $this->saveSetting($instanceId, 'church_address', $address);
         $this->saveSetting($instanceId, 'church_about_text', $about);
         $this->saveSetting($instanceId, 'church_social_links', json_encode($socialLinks, JSON_UNESCAPED_UNICODE));
 
@@ -83,6 +85,7 @@ class GlobalSettingsController {
             'church_logo_url' => $this->normalizeStoredLogoUrl($this->getSetting($instanceId, 'church_logo_url', '')),
             'church_phone' => $this->getSetting($instanceId, 'church_phone', ''),
             'church_email' => $this->getSetting($instanceId, 'church_email', ''),
+            'church_address' => $this->getSetting($instanceId, 'church_address', ''),
             'church_about_text' => $this->getSetting($instanceId, 'church_about_text', ''),
             'socials' => $socials
         ];
@@ -1052,6 +1055,11 @@ $files['src/views/admin/global_settings/index.php'] = <<<'PHP'
                                 <label class="form-label">E-mail da igreja</label>
                                 <input type="email" name="church_email" class="form-control" value="<?= htmlspecialchars($form['church_email'] ?? '') ?>">
                             </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Endereço da igreja</label>
+                            <input type="text" name="church_address" class="form-control" value="<?= htmlspecialchars($form['church_address'] ?? '') ?>" placeholder="Ex: Rua Exemplo, 123 - Centro - Manaus/AM">
+                            <div class="form-text">Endereço completo que aparecerá nos recibos.</div>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Texto "Quem Somos"</label>

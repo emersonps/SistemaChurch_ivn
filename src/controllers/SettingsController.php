@@ -19,13 +19,17 @@ class SettingsController {
         requirePermission('settings.view'); // You might want a settings.manage permission, but using .view for now
         $db = (new Database())->connect();
         
-        $keys = ['whatsapp_api_url', 'whatsapp_api_instance', 'whatsapp_api_token'];
+        $keys = [
+            'whatsapp_api_url', 'whatsapp_api_instance', 'whatsapp_api_token',
+            'church_name', 'church_alias', 'church_address',
+            'church_phone', 'church_email', 'church_logo_url'
+        ];
         
-        $stmt = $db->prepare("UPDATE settings SET setting_value = ? WHERE setting_key = ?");
+        $stmt = $db->prepare("INSERT INTO settings (setting_key, setting_value) VALUES (?, ?) ON DUPLICATE KEY UPDATE setting_value = VALUES(setting_value)");
         
         foreach ($keys as $key) {
             if (isset($_POST[$key])) {
-                $stmt->execute([$_POST[$key], $key]);
+                $stmt->execute([$key, $_POST[$key]]);
             }
         }
         

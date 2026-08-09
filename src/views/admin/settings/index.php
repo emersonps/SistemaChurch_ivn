@@ -13,6 +13,48 @@
 
 <div class="row">
     <div class="col-md-8">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-white">
+                <h5 class="mb-0"><i class="fas fa-church text-primary me-2"></i> Informações da Igreja</h5>
+            </div>
+            <div class="card-body">
+                <p class="text-muted small">Estas informações são exibidas no site, nos recibos de dízimos/ofertas e em outros documentos.</p>
+                
+                <form action="/admin/settings/store" method="POST">
+                    <?= csrf_field() ?>
+                    <div class="row">
+                        <div class="col-md-8 mb-3">
+                            <label class="form-label">Nome da Igreja</label>
+                            <input type="text" class="form-control" name="church_name" value="<?= htmlspecialchars($settings['church_name'] ?? '') ?>" placeholder="Ex: Igreja Vida Nova">
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Sigla</label>
+                            <input type="text" class="form-control" name="church_alias" value="<?= htmlspecialchars($settings['church_alias'] ?? '') ?>" placeholder="Ex: IVN">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Endereço</label>
+                        <input type="text" class="form-control" name="church_address" value="<?= htmlspecialchars($settings['church_address'] ?? '') ?>" placeholder="Ex: Rua Exemplo, 123 - Bairro - Cidade/UF">
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Telefone</label>
+                            <input type="text" class="form-control" name="church_phone" value="<?= htmlspecialchars($settings['church_phone'] ?? '') ?>" placeholder="Ex: +55 (92) 99999-9999">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">E-mail</label>
+                            <input type="email" class="form-control" name="church_email" value="<?= htmlspecialchars($settings['church_email'] ?? '') ?>" placeholder="Ex: contato@igreja.com.br">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">URL da Logo</label>
+                        <input type="text" class="form-control" name="church_logo_url" value="<?= htmlspecialchars($settings['church_logo_url'] ?? '') ?>" placeholder="Ex: /assets/img/logo.png">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Salvar Informações</button>
+                </form>
+            </div>
+        </div>
+
         <div class="card shadow-sm">
             <div class="card-header bg-white">
                 <h5 class="mb-0"><i class="fab fa-whatsapp text-success me-2"></i> Integração WhatsApp (Evolution API)</h5>

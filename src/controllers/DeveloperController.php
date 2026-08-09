@@ -15,8 +15,7 @@ class DeveloperController {
     private function tableHasColumn(PDO $db, $table, $column) {
         $driver = $db->getAttribute(PDO::ATTR_DRIVER_NAME);
         if ($driver === 'mysql') {
-            $stmt = $db->prepare("SHOW COLUMNS FROM `$table` LIKE ?");
-            $stmt->execute([$column]);
+            $stmt = $db->query("SHOW COLUMNS FROM `$table` LIKE '$column'");
             return (bool)$stmt->fetch();
         }
 
