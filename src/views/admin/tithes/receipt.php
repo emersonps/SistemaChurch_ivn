@@ -13,15 +13,15 @@
             padding: 20px;
         }
         .receipt-container {
-            max-width: 900px;
+            max-width: 800px;
             margin: 0 auto;
             background: #fff;
-            padding: 15px;
+            padding: 20px;
         }
         .receipt-copy {
             border: 2px solid #000;
-            padding: 12px;
-            margin-bottom: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
             background: #fff;
             page-break-inside: avoid;
         }
@@ -29,56 +29,56 @@
             margin-bottom: 0;
         }
         .logo-img {
-            max-width: 60px;
-            max-height: 60px;
+            max-width: 80px;
+            max-height: 80px;
             object-fit: contain;
         }
         .receipt-header {
             display: flex;
             align-items: center;
-            gap: 10px;
-            margin-bottom: 10px;
+            gap: 15px;
+            margin-bottom: 15px;
             border-bottom: 2px solid #000;
-            padding-bottom: 10px;
+            padding-bottom: 15px;
         }
         .receipt-title {
-            font-size: 20px;
+            font-size: 24px;
             font-weight: bold;
             text-transform: uppercase;
-            margin: 10px 0;
+            margin: 15px 0;
             text-align: center;
         }
         .receipt-info {
-            margin: 10px 0;
-            font-size: 13px;
+            margin: 15px 0;
+            font-size: 14px;
         }
         .receipt-info p {
-            margin: 3px 0;
+            margin: 5px 0;
         }
         .receipt-amount {
-            font-size: 18px;
+            font-size: 20px;
             font-weight: bold;
             text-align: center;
-            margin: 10px 0;
-            padding: 8px;
+            margin: 15px 0;
+            padding: 10px;
             background: #f8f8f8;
             border: 1px solid #ddd;
         }
         .receipt-signature {
-            margin-top: 20px;
+            margin-top: 30px;
             text-align: center;
         }
         .receipt-signature p {
-            margin-top: 30px;
+            margin-top: 50px;
             border-top: 1px solid #000;
             padding-top: 5px;
-            font-size: 11px;
+            font-size: 12px;
         }
         .copy-label {
-            font-size: 9px;
+            font-size: 10px;
             color: #666;
             text-align: right;
-            margin-bottom: 3px;
+            margin-bottom: 5px;
         }
         @media print {
             body {
@@ -93,40 +93,10 @@
             .receipt-copy {
                 border: 2px solid #000;
                 page-break-inside: avoid;
-                padding: 8px;
-                margin-bottom: 10px;
-            }
-            .logo-img {
-                max-width: 50px;
-                max-height: 50px;
-            }
-            .receipt-header {
-                margin-bottom: 8px;
-                padding-bottom: 8px;
-                gap: 8px;
-            }
-            .receipt-title {
-                font-size: 16px;
-                margin: 8px 0;
-            }
-            .receipt-info {
-                margin: 6px 0;
-                font-size: 11px;
-            }
-            .receipt-info p {
-                margin: 2px 0;
-            }
-            .receipt-amount {
-                font-size: 14px;
-                margin: 8px 0;
-                padding: 6px;
-            }
-            .receipt-signature {
-                margin-top: 15px;
             }
         }
         @page {
-            margin: 8mm;
+            margin: 10mm;
         }
     </style>
 </head>
@@ -174,22 +144,7 @@
             </div>
             
             <div class="receipt-signature">
-                <?php if (!empty($receiptSignatures)): ?>
-                    <div class="d-flex justify-content-around flex-wrap" style="margin-top: 20px; gap: 15px;">
-                        <?php foreach ($receiptSignatures as $sig): ?>
-                            <div class="text-center">
-                                <?php if (!empty($sig['image_path'])): ?>
-                                    <img src="/uploads/signatures/<?= htmlspecialchars($sig['image_path']) ?>" style="max-height: 45px; max-width: 140px;" alt="Assinatura"><br>
-                                <?php endif; ?>
-                                <span style="display:inline-block; border-top: 1px solid #000; padding-top: 3px; font-size: 11px; min-width: 160px;">
-                                    <?= htmlspecialchars($sig['name'] ?? $sig['role_label']) ?>
-                                </span>
-                            </div>
-                        <?php endforeach; ?>
-                    </div>
-                <?php else: ?>
-                    <p>___________________________________<br>Tesouraria</p>
-                <?php endif; ?>
+                <p>___________________________________<br>Tesouraria</p>
             </div>
         </div>
 
@@ -233,22 +188,7 @@
             </div>
             
             <div class="receipt-signature">
-                <?php if (!empty($receiptSignatures)): ?>
-                    <div class="d-flex justify-content-around flex-wrap" style="margin-top: 20px; gap: 15px;">
-                        <?php foreach ($receiptSignatures as $sig): ?>
-                            <div class="text-center">
-                                <?php if (!empty($sig['image_path'])): ?>
-                                    <img src="/uploads/signatures/<?= htmlspecialchars($sig['image_path']) ?>" style="max-height: 45px; max-width: 140px;" alt="Assinatura"><br>
-                                <?php endif; ?>
-                                <span style="display:inline-block; border-top: 1px solid #000; padding-top: 3px; font-size: 11px; min-width: 160px;">
-                                    <?= htmlspecialchars($sig['name'] ?? $sig['role_label']) ?>
-                                </span>
-                            </div>
-                        <?php endforeach; ?>
-                    </div>
-                <?php else: ?>
-                    <p>___________________________________<br>Tesouraria</p>
-                <?php endif; ?>
+                <p>___________________________________<br>Tesouraria</p>
             </div>
         </div>
 

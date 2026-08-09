@@ -593,16 +593,6 @@ function getChurchSocialIconOptions() {
     ];
 }
 
-function getSignatureDocumentTypes() {
-    return [
-        'receipt' => 'Recibo de Dízimos e Ofertas',
-        'member_card' => 'Cartão de Membro',
-        'contribution_receipt' => 'Recibo de Contribuição',
-        'expense_report' => 'Relatório de Despesas',
-        'offering_receipt' => 'Recibo de Ofertas',
-    ];
-}
-
 function appendVersionToUrl($url, $version) {
     $url = trim((string)$url);
     if ($url === '') {

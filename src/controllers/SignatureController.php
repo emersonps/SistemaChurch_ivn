@@ -14,16 +14,12 @@ class SignatureController {
 
     public function store() {
         requirePermission('signatures.manage');
-
+        
         $slug = $_POST['slug']; // Hidden field for existing ones, or new
         $name = $_POST['name'];
         $role_label = $_POST['role_label'];
         $id = $_POST['id'] ?? null;
-
-        // Handle document_types
-        $documentTypes = isset($_POST['document_types']) ? $_POST['document_types'] : [];
-        $documentTypesJson = json_encode($documentTypes);
-
+        
         $db = (new Database())->connect();
         
         // Handle Image Upload
@@ -50,17 +46,17 @@ class SignatureController {
 
         if ($id) {
             // Update
-            $sql = "UPDATE signatures SET name = ?, role_label = ?, document_types = ?";
-            $params = [$name, $role_label, $documentTypesJson];
-
+            $sql = "UPDATE signatures SET name = ?, role_label = ?";
+            $params = [$name, $role_label];
+            
             if ($imagePath) {
                 $sql .= ", image_path = ?";
                 $params[] = $imagePath;
             }
-
+            
             $sql .= " WHERE id = ?";
             $params[] = $id;
-
+            
             $stmt = $db->prepare($sql);
             $stmt->execute($params);
         } else {
@@ -68,7 +64,7 @@ class SignatureController {
             // Slug must be unique
             $baseSlug = strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $role_label)));
             $slug = $baseSlug;
-
+            
             // Verifica duplicidade e incrementa
             $counter = 1;
             while (true) {
@@ -80,7 +76,7 @@ class SignatureController {
                 $slug = $baseSlug . '-' . $counter;
                 $counter++;
             }
-
+            
             // Renomear imagem se o slug mudou
             if ($imagePath && $slug !== $baseSlug) {
                 $oldFilename = $imagePath;
@@ -91,9 +87,9 @@ class SignatureController {
                     $imagePath = $newFilename;
                 }
             }
-
-            $stmt = $db->prepare("INSERT INTO signatures (slug, name, role_label, image_path, document_types) VALUES (?, ?, ?, ?, ?)");
-            $stmt->execute([$slug, $name, $role_label, $imagePath ?? '', $documentTypesJson]);
+            
+            $stmt = $db->prepare("INSERT INTO signatures (slug, name, role_label, image_path) VALUES (?, ?, ?, ?)");
+            $stmt->execute([$slug, $name, $role_label, $imagePath ?? '']);
         }
 
         redirect('/admin/signatures?success=1');

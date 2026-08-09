@@ -318,13 +318,7 @@ class TitheController {
             }
         }
 
-        // Assinaturas associadas ao documento "receipt" (Recibos de Dízimos e Ofertas)
-        $receiptSignatures = $db->query("SELECT * FROM signatures WHERE document_types LIKE '%receipt%'")->fetchAll();
-
-        view('admin/tithes/receipt', [
-            'tithe' => $tithe,
-            'receiptSignatures' => $receiptSignatures
-        ]);
+        view('admin/tithes/receipt', ['tithe' => $tithe]);
     }
 
     public function edit($id) {
