@@ -70,6 +70,22 @@
                                         <input type="file" class="form-control" name="signature_image" accept="image/png, image/jpeg">
                                         <div class="form-text">Recomendado: Imagem PNG com fundo transparente.</div>
                                     </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Documentos que usam esta assinatura</label>
+                                        <?php
+                                            $docTypes = getSignatureDocumentTypes();
+                                            $currentDocTypes = !empty($sig['document_types']) ? json_decode($sig['document_types'], true) : [];
+                                            if (!is_array($currentDocTypes)) $currentDocTypes = [];
+                                        ?>
+                                        <?php foreach ($docTypes as $type => $label): ?>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="document_types[]" value="<?= $type ?>" id="doc_<?= $sig['id'] ?>_<?= $type ?>" <?= in_array($type, $currentDocTypes) ? 'checked' : '' ?>>
+                                                <label class="form-check-label" for="doc_<?= $sig['id'] ?>_<?= $type ?>">
+                                                    <?= htmlspecialchars($label) ?>
+                                                </label>
+                                            </div>
+                                        <?php endforeach; ?>
+                                    </div>
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
@@ -127,6 +143,18 @@
                     <div class="mb-3">
                         <label class="form-label">Imagem da Assinatura</label>
                         <input type="file" class="form-control" name="signature_image" accept="image/png, image/jpeg">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Documentos que usam esta assinatura</label>
+                        <?php $docTypes = getSignatureDocumentTypes(); ?>
+                        <?php foreach ($docTypes as $type => $label): ?>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="document_types[]" value="<?= $type ?>" id="doc_add_<?= $type ?>">
+                                <label class="form-check-label" for="doc_add_<?= $type ?>">
+                                    <?= htmlspecialchars($label) ?>
+                                </label>
+                            </div>
+                        <?php endforeach; ?>
                     </div>
                     <input type="hidden" name="slug" value=""> <!-- Será gerado automaticamente -->
                 </div>
