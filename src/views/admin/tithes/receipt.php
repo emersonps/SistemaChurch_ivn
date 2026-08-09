@@ -13,15 +13,15 @@
             padding: 20px;
         }
         .receipt-container {
-            max-width: 800px;
+            max-width: 900px;
             margin: 0 auto;
             background: #fff;
-            padding: 20px;
+            padding: 15px;
         }
         .receipt-copy {
             border: 2px solid #000;
-            padding: 20px;
-            margin-bottom: 20px;
+            padding: 12px;
+            margin-bottom: 15px;
             background: #fff;
             page-break-inside: avoid;
         }
@@ -29,56 +29,56 @@
             margin-bottom: 0;
         }
         .logo-img {
-            max-width: 80px;
-            max-height: 80px;
+            max-width: 60px;
+            max-height: 60px;
             object-fit: contain;
         }
         .receipt-header {
             display: flex;
             align-items: center;
-            gap: 15px;
-            margin-bottom: 15px;
+            gap: 10px;
+            margin-bottom: 10px;
             border-bottom: 2px solid #000;
-            padding-bottom: 15px;
+            padding-bottom: 10px;
         }
         .receipt-title {
-            font-size: 24px;
+            font-size: 20px;
             font-weight: bold;
             text-transform: uppercase;
-            margin: 15px 0;
+            margin: 10px 0;
             text-align: center;
         }
         .receipt-info {
-            margin: 15px 0;
-            font-size: 14px;
+            margin: 10px 0;
+            font-size: 13px;
         }
         .receipt-info p {
-            margin: 5px 0;
+            margin: 3px 0;
         }
         .receipt-amount {
-            font-size: 20px;
+            font-size: 18px;
             font-weight: bold;
             text-align: center;
-            margin: 15px 0;
-            padding: 10px;
+            margin: 10px 0;
+            padding: 8px;
             background: #f8f8f8;
             border: 1px solid #ddd;
         }
         .receipt-signature {
-            margin-top: 30px;
+            margin-top: 20px;
             text-align: center;
         }
         .receipt-signature p {
-            margin-top: 50px;
+            margin-top: 30px;
             border-top: 1px solid #000;
             padding-top: 5px;
-            font-size: 12px;
+            font-size: 11px;
         }
         .copy-label {
-            font-size: 10px;
+            font-size: 9px;
             color: #666;
             text-align: right;
-            margin-bottom: 5px;
+            margin-bottom: 3px;
         }
         @media print {
             body {
@@ -93,10 +93,40 @@
             .receipt-copy {
                 border: 2px solid #000;
                 page-break-inside: avoid;
+                padding: 8px;
+                margin-bottom: 10px;
+            }
+            .logo-img {
+                max-width: 50px;
+                max-height: 50px;
+            }
+            .receipt-header {
+                margin-bottom: 8px;
+                padding-bottom: 8px;
+                gap: 8px;
+            }
+            .receipt-title {
+                font-size: 16px;
+                margin: 8px 0;
+            }
+            .receipt-info {
+                margin: 6px 0;
+                font-size: 11px;
+            }
+            .receipt-info p {
+                margin: 2px 0;
+            }
+            .receipt-amount {
+                font-size: 14px;
+                margin: 8px 0;
+                padding: 6px;
+            }
+            .receipt-signature {
+                margin-top: 15px;
             }
         }
         @page {
-            margin: 10mm;
+            margin: 8mm;
         }
     </style>
 </head>
