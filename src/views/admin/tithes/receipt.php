@@ -144,7 +144,22 @@
             </div>
             
             <div class="receipt-signature">
-                <p>___________________________________<br>Tesouraria</p>
+                <?php if (!empty($receiptSignatures)): ?>
+                    <div class="d-flex justify-content-around flex-wrap" style="margin-top: 20px; gap: 15px;">
+                        <?php foreach ($receiptSignatures as $sig): ?>
+                            <div class="text-center">
+                                <?php if (!empty($sig['image_path'])): ?>
+                                    <img src="/uploads/signatures/<?= htmlspecialchars($sig['image_path']) ?>" style="max-height: 45px; max-width: 140px;" alt="Assinatura"><br>
+                                <?php endif; ?>
+                                <span style="display:inline-block; border-top: 1px solid #000; padding-top: 3px; font-size: 11px; min-width: 160px;">
+                                    <?= htmlspecialchars($sig['name'] ?? $sig['role_label']) ?>
+                                </span>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                <?php else: ?>
+                    <p>___________________________________<br>Tesouraria</p>
+                <?php endif; ?>
             </div>
         </div>
 
@@ -188,7 +203,22 @@
             </div>
             
             <div class="receipt-signature">
-                <p>___________________________________<br>Tesouraria</p>
+                <?php if (!empty($receiptSignatures)): ?>
+                    <div class="d-flex justify-content-around flex-wrap" style="margin-top: 20px; gap: 15px;">
+                        <?php foreach ($receiptSignatures as $sig): ?>
+                            <div class="text-center">
+                                <?php if (!empty($sig['image_path'])): ?>
+                                    <img src="/uploads/signatures/<?= htmlspecialchars($sig['image_path']) ?>" style="max-height: 45px; max-width: 140px;" alt="Assinatura"><br>
+                                <?php endif; ?>
+                                <span style="display:inline-block; border-top: 1px solid #000; padding-top: 3px; font-size: 11px; min-width: 160px;">
+                                    <?= htmlspecialchars($sig['name'] ?? $sig['role_label']) ?>
+                                </span>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                <?php else: ?>
+                    <p>___________________________________<br>Tesouraria</p>
+                <?php endif; ?>
             </div>
         </div>
 

@@ -66,6 +66,22 @@
                                         <input type="text" class="form-control" name="name" value="<?= htmlspecialchars($sig['name']) ?>" required>
                                     </div>
                                     <div class="mb-3">
+                                        <label class="form-label">Documentos que usam esta assinatura</label>
+                                        <?php
+                                            $docTypes = getSignatureDocumentTypes();
+                                            $currentDocTypes = !empty($sig['document_types']) ? json_decode($sig['document_types'], true) : [];
+                                            if (!is_array($currentDocTypes)) $currentDocTypes = [];
+                                        ?>
+                                        <?php foreach ($docTypes as $type => $label): ?>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="document_types[]" value="<?= $type ?>" id="doc_<?= $sig['id'] ?>_<?= $type ?>" <?= in_array($type, $currentDocTypes) ? 'checked' : '' ?>>
+                                                <label class="form-check-label" for="doc_<?= $sig['id'] ?>_<?= $type ?>">
+                                                    <?= htmlspecialchars($label) ?>
+                                                </label>
+                                            </div>
+                                        <?php endforeach; ?>
+                                    </div>
+                                    <div class="mb-3">
                                         <label class="form-label">Imagem da Assinatura (PNG transparente)</label>
                                         <input type="file" class="form-control" name="signature_image" accept="image/png, image/jpeg">
                                         <div class="form-text">Recomendado: Imagem PNG com fundo transparente.</div>
@@ -123,6 +139,20 @@
                     <div class="mb-3">
                         <label class="form-label">Nome do Responsável</label>
                         <input type="text" class="form-control" name="name" placeholder="Ex: Pb. João da Silva" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Documentos que usam esta assinatura</label>
+                        <?php
+                            $docTypes = getSignatureDocumentTypes();
+                        ?>
+                        <?php foreach ($docTypes as $type => $label): ?>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="document_types[]" value="<?= $type ?>" id="doc_new_<?= $type ?>">
+                                <label class="form-check-label" for="doc_new_<?= $type ?>">
+                                    <?= htmlspecialchars($label) ?>
+                                </label>
+                            </div>
+                        <?php endforeach; ?>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Imagem da Assinatura</label>
