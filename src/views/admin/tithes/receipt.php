@@ -137,6 +137,9 @@
             size: A4;
             margin: 6mm;
         }
+        body.hide-second-via #viaDuplicata {
+            display: none !important;
+        }
     </style>
 </head>
 <body>
@@ -144,7 +147,7 @@
 <div class="container">
     <div class="receipt-container">
         <!-- 1ª Via - Original -->
-        <div class="receipt-copy">
+        <div class="receipt-copy" id="viaOriginal">
             <div class="copy-label">1ª VIA - ORIGINAL</div>
             <div class="receipt-header">
                 <?php if (!empty($siteProfile['logo_url'])): ?>
@@ -203,7 +206,7 @@
         </div>
 
         <!-- 2ª Via - Duplicata -->
-        <div class="receipt-copy">
+        <div class="receipt-copy" id="viaDuplicata">
             <div class="copy-label">2ª VIA - DUPLICATA</div>
             <div class="receipt-header">
                 <?php if (!empty($siteProfile['logo_url'])): ?>
@@ -265,6 +268,10 @@
             <button onclick="window.print()" class="btn btn-primary btn-lg">
                 <i class="fas fa-print"></i> Imprimir Recibo (2 Vias)
             </button>
+
+            <button onclick="printSingleVia()" class="btn btn-outline-primary">
+                <i class="fas fa-file-pdf"></i> Imprimir/Salvar 1 Via (para WhatsApp)
+            </button>
             
             <?php
                 $type = $tithe['type'] ?? 'Dízimo';
@@ -292,6 +299,16 @@
         </div>
     </div>
 </div>
+
+<script>
+function printSingleVia() {
+    document.body.classList.add('hide-second-via');
+    window.print();
+}
+window.addEventListener('afterprint', function () {
+    document.body.classList.remove('hide-second-via');
+});
+</script>
 
 </body>
 </html>
