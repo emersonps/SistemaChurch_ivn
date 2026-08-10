@@ -288,14 +288,6 @@
                 <button class="btn btn-secondary" disabled>Sem telefone cadastrado para WhatsApp</button>
             <?php endif; ?>
             
-            <?php
-            // Check if user is logged in as admin or member
-            $backLink = '/admin/tithes';
-            if (isset($_SESSION['member_id'])) {
-                $backLink = '/portal/financial';
-            }
-            ?>
-            <a href="<?= $backLink ?>" class="btn btn-link">Voltar</a>
         </div>
     </div>
 </div>
