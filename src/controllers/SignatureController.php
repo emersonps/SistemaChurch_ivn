@@ -20,6 +20,10 @@ class SignatureController {
         $role_label = $_POST['role_label'];
         $id = $_POST['id'] ?? null;
         
+        // Handle document_types
+        $documentTypes = $_POST['document_types'] ?? [];
+        $documentTypesJson = json_encode($documentTypes);
+        
         $db = (new Database())->connect();
         
         // Handle Image Upload
@@ -46,8 +50,8 @@ class SignatureController {
 
         if ($id) {
             // Update
-            $sql = "UPDATE signatures SET name = ?, role_label = ?";
-            $params = [$name, $role_label];
+            $sql = "UPDATE signatures SET name = ?, role_label = ?, document_types = ?";
+            $params = [$name, $role_label, $documentTypesJson];
             
             if ($imagePath) {
                 $sql .= ", image_path = ?";
@@ -88,8 +92,8 @@ class SignatureController {
                 }
             }
             
-            $stmt = $db->prepare("INSERT INTO signatures (slug, name, role_label, image_path) VALUES (?, ?, ?, ?)");
-            $stmt->execute([$slug, $name, $role_label, $imagePath ?? '']);
+            $stmt = $db->prepare("INSERT INTO signatures (slug, name, role_label, image_path, document_types) VALUES (?, ?, ?, ?, ?)");
+            $stmt->execute([$slug, $name, $role_label, $imagePath ?? '', $documentTypesJson]);
         }
 
         redirect('/admin/signatures?success=1');
