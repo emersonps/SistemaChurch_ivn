@@ -169,7 +169,7 @@ class EventController {
         }
 
         $recurring_days = !empty($_POST['recurring_days']) ? json_encode($_POST['recurring_days'], JSON_UNESCAPED_UNICODE) : null;
-        $end_time = null;
+        $end_time = !empty($_POST['end_time']) ? $_POST['end_time'] : null;
         $type = $_POST['type'];
         
         // New Fields
@@ -339,7 +339,7 @@ class EventController {
         }
 
         $recurring_days = !empty($_POST['recurring_days']) ? json_encode($_POST['recurring_days'], JSON_UNESCAPED_UNICODE) : null;
-        $end_time = null;
+        $end_time = !empty($_POST['end_time']) ? $_POST['end_time'] : null;
         $location = $_POST['location'];
         $type = $_POST['type'];
         $status = $_POST['status'];

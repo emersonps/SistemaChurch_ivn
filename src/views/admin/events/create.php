@@ -69,7 +69,18 @@
                 <label class="form-check-label" for="sab">Sábado</label>
             </div>
         </div>
-        <small class="text-muted">Selecione para cultos semanais fixos. Deixe "Datas" em branco se não houver uma data específica de início.</small>
+        <small class="text-muted d-block mb-2">Selecione para cultos semanais fixos.</small>
+        <div class="row g-3">
+            <div class="col-md-4">
+                <label class="form-label">Horário do Culto</label>
+                <input type="time" class="form-control" name="event_time_only">
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Horário Término</label>
+                <input type="time" class="form-control" name="end_time">
+                <small class="text-muted">Opcional</small>
+            </div>
+        </div>
     </div>
     <div class="col-md-9">
         <label class="form-label">Local (Congregação ou Outro)</label>

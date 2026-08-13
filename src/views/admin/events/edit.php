@@ -111,7 +111,18 @@ if (!empty($event['recurring_days'])) {
                 <label class="form-check-label" for="sab">Sábado</label>
             </div>
         </div>
-        <small class="text-muted">Selecione para cultos semanais fixos. Deixe "Datas" em branco se não houver uma data específica de início.</small>
+        <small class="text-muted d-block mb-2">Selecione para cultos semanais fixos.</small>
+        <div class="row g-3">
+            <div class="col-md-4">
+                <label class="form-label">Horário do Culto</label>
+                <input type="time" class="form-control" name="event_time_only" value="<?= !empty($event['event_date']) && strtotime($event['event_date']) !== false ? date('H:i', strtotime($event['event_date'])) : '' ?>">
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Horário Término</label>
+                <input type="time" class="form-control" name="end_time" value="<?= htmlspecialchars($event['end_time'] ?? '') ?>">
+                <small class="text-muted">Opcional</small>
+            </div>
+        </div>
     </div>
     <div class="col-md-3">
         <label class="form-label">Status</label>
