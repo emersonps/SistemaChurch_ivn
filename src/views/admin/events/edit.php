@@ -32,6 +32,14 @@ if (empty($eventDatesSeed) && !empty($event['event_date']) && strtotime($event['
         'time' => date('H:i', strtotime($event['event_date']))
     ];
 }
+
+$recurringDaysSelected = [];
+if (!empty($event['recurring_days'])) {
+    $decodedRecurring = json_decode((string)$event['recurring_days'], true);
+    if (is_array($decodedRecurring)) {
+        $recurringDaysSelected = $decodedRecurring;
+    }
+}
 ?>
 
 <form action="/admin/events/edit/<?= $event['id'] ?>" method="POST" class="row g-3 app-form-with-bottom-actions" enctype="multipart/form-data">
@@ -70,6 +78,40 @@ if (empty($eventDatesSeed) && !empty($event['event_date']) && strtotime($event['
             <option value="interno" <?= strtolower($event['type']) == 'interno' ? 'selected' : '' ?>>Interno — reuniões e encontros para grupos fechados</option>
         </select>
         <div id="typeHelp" class="form-text"></div>
+    </div>
+    <div class="col-md-9" id="recurringDaysBox" style="display:none">
+        <label class="form-label">Dias da Semana (Recorrente)</label>
+        <div class="d-flex gap-3 flex-wrap">
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="recurring_days[]" value="Domingo" id="dom" <?= in_array('Domingo', $recurringDaysSelected) ? 'checked' : '' ?>>
+                <label class="form-check-label" for="dom">Domingo</label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="recurring_days[]" value="Segunda" id="seg" <?= in_array('Segunda', $recurringDaysSelected) ? 'checked' : '' ?>>
+                <label class="form-check-label" for="seg">Segunda</label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="recurring_days[]" value="Terça" id="ter" <?= in_array('Terça', $recurringDaysSelected) ? 'checked' : '' ?>>
+                <label class="form-check-label" for="ter">Terça</label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="recurring_days[]" value="Quarta" id="qua" <?= in_array('Quarta', $recurringDaysSelected) ? 'checked' : '' ?>>
+                <label class="form-check-label" for="qua">Quarta</label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="recurring_days[]" value="Quinta" id="qui" <?= in_array('Quinta', $recurringDaysSelected) ? 'checked' : '' ?>>
+                <label class="form-check-label" for="qui">Quinta</label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="recurring_days[]" value="Sexta" id="sex" <?= in_array('Sexta', $recurringDaysSelected) ? 'checked' : '' ?>>
+                <label class="form-check-label" for="sex">Sexta</label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="recurring_days[]" value="Sábado" id="sab" <?= in_array('Sábado', $recurringDaysSelected) ? 'checked' : '' ?>>
+                <label class="form-check-label" for="sab">Sábado</label>
+            </div>
+        </div>
+        <small class="text-muted">Selecione para cultos semanais fixos. Deixe "Datas" em branco se não houver uma data específica de início.</small>
     </div>
     <div class="col-md-3">
         <label class="form-label">Status</label>
@@ -276,11 +318,15 @@ if (empty($eventDatesSeed) && !empty($event['event_date']) && strtotime($event['
 
     const typeSelect = document.querySelector('select[name="type"]');
     const internalBox = document.getElementById('internalOptions');
+    const recurringDaysBox = document.getElementById('recurringDaysBox');
     function toggleInternal() {
         if (String(typeSelect.value).toLowerCase() === 'interno') {
             internalBox.style.display = '';
         } else {
             internalBox.style.display = 'none';
+        }
+        if (recurringDaysBox) {
+            recurringDaysBox.style.display = String(typeSelect.value).toLowerCase() === 'culto' ? '' : 'none';
         }
         const map = {
             'culto': 'Culto: para eventos recorrentes, diários, como cultos semanais.',

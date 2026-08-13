@@ -168,7 +168,7 @@ class EventController {
              $event_date = '1970-01-01 ' . $_POST['event_time_only'];
         }
 
-        $recurring_days = null;
+        $recurring_days = !empty($_POST['recurring_days']) ? json_encode($_POST['recurring_days'], JSON_UNESCAPED_UNICODE) : null;
         $end_time = null;
         $type = $_POST['type'];
         
@@ -338,7 +338,7 @@ class EventController {
              $event_date = '1970-01-01 ' . $_POST['event_time_only'];
         }
 
-        $recurring_days = null;
+        $recurring_days = !empty($_POST['recurring_days']) ? json_encode($_POST['recurring_days'], JSON_UNESCAPED_UNICODE) : null;
         $end_time = null;
         $location = $_POST['location'];
         $type = $_POST['type'];

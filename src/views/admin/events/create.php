@@ -37,6 +37,40 @@
         </select>
         <div id="typeHelp" class="form-text">Culto: para eventos recorrentes, diários, como cultos semanais.</div>
     </div>
+    <div class="col-md-9" id="recurringDaysBox" style="display:none">
+        <label class="form-label">Dias da Semana (Recorrente)</label>
+        <div class="d-flex gap-3 flex-wrap">
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="recurring_days[]" value="Domingo" id="dom">
+                <label class="form-check-label" for="dom">Domingo</label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="recurring_days[]" value="Segunda" id="seg">
+                <label class="form-check-label" for="seg">Segunda</label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="recurring_days[]" value="Terça" id="ter">
+                <label class="form-check-label" for="ter">Terça</label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="recurring_days[]" value="Quarta" id="qua">
+                <label class="form-check-label" for="qua">Quarta</label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="recurring_days[]" value="Quinta" id="qui">
+                <label class="form-check-label" for="qui">Quinta</label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="recurring_days[]" value="Sexta" id="sex">
+                <label class="form-check-label" for="sex">Sexta</label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="recurring_days[]" value="Sábado" id="sab">
+                <label class="form-check-label" for="sab">Sábado</label>
+            </div>
+        </div>
+        <small class="text-muted">Selecione para cultos semanais fixos. Deixe "Datas" em branco se não houver uma data específica de início.</small>
+    </div>
     <div class="col-md-9">
         <label class="form-label">Local (Congregação ou Outro)</label>
         <input type="text" class="form-control" name="location" id="locationInput" list="congregationList" placeholder="Selecione ou digite um local...">
@@ -231,11 +265,15 @@
 
     const typeSelect = document.querySelector('select[name="type"]');
     const internalBox = document.getElementById('internalOptions');
+    const recurringDaysBox = document.getElementById('recurringDaysBox');
     function toggleInternal() {
         if (String(typeSelect.value).toLowerCase() === 'interno') {
             internalBox.style.display = '';
         } else {
             internalBox.style.display = 'none';
+        }
+        if (recurringDaysBox) {
+            recurringDaysBox.style.display = String(typeSelect.value).toLowerCase() === 'culto' ? '' : 'none';
         }
         const map = {
             'culto': 'Culto: para eventos recorrentes, diários, como cultos semanais.',
