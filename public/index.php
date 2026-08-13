@@ -1026,6 +1026,31 @@ elseif (preg_match('#^/admin/banners/delete/(\d+)$#', $uri, $matches)) {
     (new BannerController())->delete($matches[1]);
 }
 
+// Rotas de Doações (PIX)
+elseif ($uri == '/doacao') {
+    (new DonationController())->publicIndex();
+}
+elseif ($uri == '/admin/donations') {
+    (new DonationController())->index();
+}
+elseif ($uri == '/admin/donations/create') {
+    if ($method == 'POST') {
+        (new DonationController())->store();
+    } else {
+        (new DonationController())->create();
+    }
+}
+elseif (preg_match('#^/admin/donations/edit/(\d+)$#', $uri, $matches)) {
+    if ($method == 'POST') {
+        (new DonationController())->update($matches[1]);
+    } else {
+        (new DonationController())->edit($matches[1]);
+    }
+}
+elseif (preg_match('#^/admin/donations/delete/(\d+)$#', $uri, $matches)) {
+    (new DonationController())->delete($matches[1]);
+}
+
 // Portal Routes
 elseif ($uri == '/portal/login') {
     if ($method == 'POST') {
@@ -1043,6 +1068,13 @@ elseif ($uri == '/portal/register') {
 }
 elseif ($uri == '/portal/logout') {
     (new MemberAuthController())->logout();
+}
+elseif ($uri == '/portal/cadastro') {
+    if ($method == 'POST') {
+        (new MemberController())->selfRegisterStore();
+    } else {
+        (new MemberController())->selfRegisterForm();
+    }
 }
 elseif ($uri == '/portal/dashboard' || $uri == '/portal') {
     (new PortalController())->index();

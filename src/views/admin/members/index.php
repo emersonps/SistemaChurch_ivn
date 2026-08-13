@@ -8,6 +8,15 @@
             <i class="fas fa-file-import"></i> Importar Planilha
         </a>
         <?php endif; ?>
+        <?php
+            $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+            $selfRegisterUrl = $scheme . '://' . $_SERVER['HTTP_HOST'] . '/portal/cadastro';
+            $waMessage = "Olá! Para se cadastrar como membro, preencha a ficha de cadastro no link abaixo:\n" . $selfRegisterUrl;
+            $waLink = "https://wa.me/?text=" . urlencode($waMessage);
+        ?>
+        <a href="<?= $waLink ?>" target="_blank" class="btn btn-sm btn-success">
+            <i class="fab fa-whatsapp"></i> Enviar Ficha de Cadastro
+        </a>
         <a href="/admin/members/create" class="btn btn-sm btn-primary">
             <i class="fas fa-plus"></i> Novo Membro
         </a>

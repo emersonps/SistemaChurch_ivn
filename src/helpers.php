@@ -689,6 +689,59 @@ function getChurchLogoUrl($siteProfile = null, $versioned = false) {
     return appendVersionToUrl($logoUrl, getChurchBrandingVersion($siteProfile));
 }
 
+// Monta o payload "BR Code" (EMV) de uma chave PIX estática, com valor livre
+// (o campo de valor é omitido de propósito para que o app do doador peça o valor).
+function buildPixBrCode($pixKey, $merchantName, $merchantCity, $txid = null) {
+    $emvField = function ($id, $value) {
+        $len = str_pad(strlen($value), 2, '0', STR_PAD_LEFT);
+        return $id . $len . $value;
+    };
+
+    $sanitize = function ($value) {
+        $value = preg_replace('/[^A-Za-z0-9 ]/', '', (string)$value);
+        return trim($value);
+    };
+
+    $merchantName = substr($sanitize($merchantName), 0, 25) ?: 'IGREJA';
+    $merchantCity = substr($sanitize($merchantCity), 0, 15) ?: 'BRASIL';
+    $txid = $txid ? substr(preg_replace('/[^A-Za-z0-9]/', '', $txid), 0, 25) : '***';
+
+    $merchantAccountInfo = $emvField('00', 'br.gov.bcb.pix') . $emvField('01', trim($pixKey));
+
+    $payload =
+        $emvField('00', '01') .
+        $emvField('26', $merchantAccountInfo) .
+        $emvField('52', '0000') .
+        $emvField('53', '986') .
+        $emvField('58', 'BR') .
+        $emvField('59', $merchantName) .
+        $emvField('60', $merchantCity) .
+        $emvField('62', $emvField('05', $txid));
+
+    $payload .= '6304';
+    $payload .= crc16Ccitt($payload);
+
+    return $payload;
+}
+
+function crc16Ccitt($payload) {
+    $polynomial = 0x1021;
+    $result = 0xFFFF;
+
+    for ($i = 0; $i < strlen($payload); $i++) {
+        $result ^= (ord($payload[$i]) << 8);
+        for ($j = 0; $j < 8; $j++) {
+            if (($result & 0x8000) !== 0) {
+                $result = (($result << 1) ^ $polynomial) & 0xFFFF;
+            } else {
+                $result = ($result << 1) & 0xFFFF;
+            }
+        }
+    }
+
+    return strtoupper(str_pad(dechex($result), 4, '0', STR_PAD_LEFT));
+}
+
 function getChurchManifestUrl($siteProfile = null) {
     if (!is_array($siteProfile)) {
         $siteProfile = getChurchSiteProfileSettings();

@@ -951,6 +951,72 @@ class MemberController {
         }
     }
     
+    // Formulário público simplificado de auto-cadastro (enviado via WhatsApp)
+    public function selfRegisterForm() {
+        if (isset($_SESSION['member_id'])) {
+            redirect('/portal/dashboard');
+        }
+        $db = (new Database())->connect();
+        $congregations = $db->query("SELECT id, name FROM congregations ORDER BY name ASC")->fetchAll();
+        view('portal/self_register', ['congregations' => $congregations]);
+    }
+
+    public function selfRegisterStore() {
+        $db = (new Database())->connect();
+        $congregations = $db->query("SELECT id, name FROM congregations ORDER BY name ASC")->fetchAll();
+
+        $name = trim($_POST['name'] ?? '');
+        $email = trim($_POST['email'] ?? '');
+        $cpf = preg_replace('/[^0-9]/', '', $_POST['cpf'] ?? '');
+        $birthDateRaw = trim($_POST['birth_date'] ?? '');
+        $address = trim($_POST['address'] ?? '');
+        $phone = trim($_POST['phone'] ?? '');
+        $congregationId = $_POST['congregation_id'] ?? '';
+
+        if ($name === '' || $cpf === '' || $birthDateRaw === '' || empty($congregationId)) {
+            view('portal/self_register', ['congregations' => $congregations, 'error' => 'Preencha todos os campos obrigatórios.', 'old' => $_POST]);
+            return;
+        }
+
+        $ts = strtotime(str_replace('/', '-', $birthDateRaw));
+        if (!$ts) {
+            view('portal/self_register', ['congregations' => $congregations, 'error' => 'Data de nascimento inválida.', 'old' => $_POST]);
+            return;
+        }
+        $birthDateSql = date('Y-m-d', $ts);
+
+        $stmtCong = $db->prepare("SELECT id FROM congregations WHERE id = ?");
+        $stmtCong->execute([$congregationId]);
+        if (!$stmtCong->fetchColumn()) {
+            view('portal/self_register', ['congregations' => $congregations, 'error' => 'Selecione uma congregação válida.', 'old' => $_POST]);
+            return;
+        }
+
+        // Bloquear duplicidade por CPF em qualquer congregação do sistema
+        $stmtCpf = $db->prepare("SELECT id FROM members WHERE REPLACE(REPLACE(REPLACE(cpf, '.', ''), '-', ''), ' ', '') = ?");
+        $stmtCpf->execute([$cpf]);
+        if ($stmtCpf->fetch()) {
+            view('portal/self_register', ['congregations' => $congregations, 'error' => 'Já existe um cadastro com este CPF. Se este é o seu primeiro acesso, clique em "Já sou cadastrado" e crie sua senha.', 'old' => $_POST]);
+            return;
+        }
+
+        // Bloquear duplicidade por e-mail em qualquer congregação do sistema
+        if ($email !== '') {
+            $stmtEmail = $db->prepare("SELECT id FROM members WHERE email IS NOT NULL AND LOWER(email) = LOWER(?)");
+            $stmtEmail->execute([$email]);
+            if ($stmtEmail->fetch()) {
+                view('portal/self_register', ['congregations' => $congregations, 'error' => 'Já existe um cadastro com este e-mail. Se este é o seu primeiro acesso, clique em "Já sou cadastrado" e crie sua senha.', 'old' => $_POST]);
+                return;
+            }
+        }
+
+        $stmt = $db->prepare("INSERT INTO members (name, email, phone, cpf, birth_date, address, congregation_id, status, admission_date, nationality)
+                               VALUES (?, ?, ?, ?, ?, ?, ?, 'active', ?, 'Brasileira')");
+        $stmt->execute([$name, $email ?: null, $phone ?: null, $cpf, $birthDateSql, $address ?: null, $congregationId, date('Y-m-d')]);
+
+        view('portal/self_register_success');
+    }
+
     public function history($memberId) {
         requirePermission('members.manage');
         $db = (new Database())->connect();

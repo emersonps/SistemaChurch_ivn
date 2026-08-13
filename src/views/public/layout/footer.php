@@ -31,11 +31,14 @@
         <i class="fas fa-music"></i>
         <span class="label">Harpa Cristã</span>
     </a>
+    <a href="/doacao" class="donate-fab" aria-label="Fazer uma doação via PIX" title="Doação">
+        <i class="fas fa-hand-holding-heart"></i>
+        <span class="label">Doar</span>
+    </a>
     <style>
-        .harpa-fab {
+        .harpa-fab, .donate-fab {
             position: fixed;
-            right: 18px;
-            bottom: 18px;
+            left: 18px;
             z-index: 1200;
             display: inline-flex;
             align-items: center;
@@ -43,11 +46,22 @@
             padding: .72rem 1rem;
             border-radius: 999px;
             text-decoration: none;
-            background: linear-gradient(135deg, rgba(255,42,122,1) 0%, rgba(212,175,55,1) 100%);
-            color: #090a15;
             font-weight: 900;
             box-shadow: 0 14px 32px rgba(0,0,0,0.22);
             transition: transform .15s ease, box-shadow .15s ease, filter .15s ease;
+        }
+        .harpa-fab {
+            right: 18px;
+            left: auto;
+            bottom: 18px;
+            background: linear-gradient(135deg, rgba(255,42,122,1) 0%, rgba(212,175,55,1) 100%);
+            color: #090a15;
+        }
+        .donate-fab {
+            bottom: 18px;
+            background: linear-gradient(135deg, #ff8a00 0%, #b30000 100%);
+            color: #fff;
+            animation: donateFabPulse 2.6s ease-in-out infinite;
         }
         .harpa-fab:hover {
             color: #090a15;
@@ -55,16 +69,26 @@
             transform: translateY(-2px);
             box-shadow: 0 18px 40px rgba(0,0,0,0.28);
         }
-        .harpa-fab .label {
+        .donate-fab:hover {
+            color: #fff;
+            filter: brightness(1.05);
+            transform: translateY(-2px);
+            box-shadow: 0 18px 40px rgba(0,0,0,0.28);
+        }
+        .harpa-fab .label, .donate-fab .label {
             display: none;
         }
+        @keyframes donateFabPulse {
+            0%, 100% { box-shadow: 0 14px 32px rgba(179,0,0,0.25); }
+            50% { box-shadow: 0 14px 32px rgba(179,0,0,0.55), 0 0 0 6px rgba(179,0,0,0.08); }
+        }
         @media (max-width: 575.98px) {
-            .harpa-fab {
+            .harpa-fab, .donate-fab {
                 bottom: 86px;
             }
         }
         @media (min-width: 768px) {
-            .harpa-fab .label {
+            .harpa-fab .label, .donate-fab .label {
                 display: inline;
             }
         }

@@ -262,6 +262,14 @@ $mobileLauncherHref = '/admin?launcher=1';
                         </li>
                         <?php endif; ?>
 
+                        <?php if (hasPermission('donations.view') || hasPermission('donations.manage')): ?>
+                        <li class="nav-item">
+                            <a class="nav-link <?= strpos($_SERVER['REQUEST_URI'], '/admin/donations') !== false ? 'active' : 'text-dark' ?>" href="/admin/donations">
+                                <i class="fas fa-hand-holding-heart me-2"></i> Doações (PIX)
+                            </a>
+                        </li>
+                        <?php endif; ?>
+
                         <!-- Financeiro -->
                         <?php if (hasPermission('financial.view')): ?>
                         <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-3 mb-1 text-muted text-uppercase small">
@@ -530,6 +538,9 @@ $mobileLauncherHref = '/admin?launcher=1';
                                             <?php endif; ?>
                                             <?php if (hasPermission('banners.view')): ?>
                                                 <div class="col-6"><a class="btn btn-primary btn-sm w-100" href="/admin/banners"><i class="fas fa-image me-2"></i>Banners</a></div>
+                                            <?php endif; ?>
+                                            <?php if (hasPermission('donations.view') || hasPermission('donations.manage')): ?>
+                                                <div class="col-6"><a class="btn btn-primary btn-sm w-100" href="/admin/donations"><i class="fas fa-hand-holding-heart me-2"></i>Doações</a></div>
                                             <?php endif; ?>
                                         </div>
                                     <?php endif; ?>

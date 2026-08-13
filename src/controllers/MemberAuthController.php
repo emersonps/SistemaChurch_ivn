@@ -84,12 +84,7 @@ class MemberAuthController {
         $stmt = $db->prepare("UPDATE members SET password = ? WHERE id = ?");
         $stmt->execute([$hash, $member['id']]);
 
-        // Auto login
-        $_SESSION['member_id'] = $member['id'];
-        $_SESSION['member_name'] = $member['name'];
-        $_SESSION['member_congregation'] = $member['congregation_id'];
-        
-        redirect('/portal/dashboard');
+        view('portal/register_success');
     }
 
     public function logout() {

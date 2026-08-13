@@ -47,9 +47,11 @@ return array (
         35 => 'users.view',
         36 => 'signatures.view',
         37 => 'general_reports.view',
+        38 => 'donations.view',
+        39 => 'donations.manage',
       ),
     ),
-    'secretary' => 
+    'secretary' =>
     array (
       'label' => 'Secretária(o)',
       'permissions' => 
@@ -66,9 +68,11 @@ return array (
         9 => 'groups.manage',
         10 => 'financial.view',
         11 => 'financial.manage',
+        12 => 'donations.view',
+        13 => 'donations.manage',
       ),
     ),
-    'developer' => 
+    'developer' =>
     array (
       'label' => 'Desenvolvedor',
       'permissions' => 
