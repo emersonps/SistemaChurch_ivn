@@ -64,7 +64,7 @@ if (!empty($event['recurring_days'])) {
             <label class="form-check-label" for="removeBanner">Remover banner</label>
         </div>
     </div>
-    <div class="col-12">
+    <div class="col-12" id="eventDatesBox">
         <label class="form-label">Datas</label>
         <div id="eventDatesContainer" class="d-grid gap-2"></div>
         <div class="form-text">Adicione uma ou mais datas para o mesmo evento.</div>
@@ -319,14 +319,19 @@ if (!empty($event['recurring_days'])) {
     const typeSelect = document.querySelector('select[name="type"]');
     const internalBox = document.getElementById('internalOptions');
     const recurringDaysBox = document.getElementById('recurringDaysBox');
+    const eventDatesBox = document.getElementById('eventDatesBox');
     function toggleInternal() {
         if (String(typeSelect.value).toLowerCase() === 'interno') {
             internalBox.style.display = '';
         } else {
             internalBox.style.display = 'none';
         }
+        const isCulto = String(typeSelect.value).toLowerCase() === 'culto';
         if (recurringDaysBox) {
-            recurringDaysBox.style.display = String(typeSelect.value).toLowerCase() === 'culto' ? '' : 'none';
+            recurringDaysBox.style.display = isCulto ? '' : 'none';
+        }
+        if (eventDatesBox) {
+            eventDatesBox.style.display = isCulto ? 'none' : '';
         }
         const map = {
             'culto': 'Culto: para eventos recorrentes, diários, como cultos semanais.',
