@@ -35,8 +35,17 @@ class EbdController {
     // Relatórios da EBD
     public function reports() {
         requirePermission('ebd.view');
+        view('admin/ebd/reports/index', $this->gatherReportStats());
+    }
+
+    public function printReports() {
+        requirePermission('ebd.view');
+        view('admin/ebd/reports/print_ebd', $this->gatherReportStats());
+    }
+
+    private function gatherReportStats() {
         $db = (new Database())->connect();
-        
+
         $cong_id = $_SESSION['user_congregation_id'] ?? null;
         $whereCong = "";
         $params = [];
@@ -157,13 +166,13 @@ class EbdController {
             $cls['attendance_rate'] = ($total_possible > 0) ? round(($cls['total_presence'] / $total_possible) * 100, 1) : 0;
         }
 
-        view('admin/ebd/reports/index', [
+        return [
             'period_stats' => $period_stats,
             'daily_stats' => $daily_stats,
             'classes_stats' => $classes_stats,
             'start_date' => $start_date,
             'end_date' => $end_date
-        ]);
+        ];
     }
 
     // Criar Classe

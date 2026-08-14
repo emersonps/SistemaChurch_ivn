@@ -779,6 +779,9 @@ elseif ($uri == '/admin/ebd/classes') {
 elseif ($uri == '/admin/ebd/reports') {
     (new EbdController())->reports();
 }
+elseif ($uri == '/admin/ebd/reports/print') {
+    (new EbdController())->printReports();
+}
 elseif ($uri == '/admin/ebd/classes/create') {
     if ($method == 'POST') {
         (new EbdController())->storeClass();
