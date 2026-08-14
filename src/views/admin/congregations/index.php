@@ -88,7 +88,7 @@
                             <a href="/admin/congregations/edit/<?= $c['id'] ?>" class="btn btn-sm btn-outline-secondary icon-btn" title="Editar">
                                 <i class="fas fa-edit"></i>
                             </a>
-                            <a href="/admin/congregations/delete/<?= $c['id'] ?>" class="btn btn-sm btn-outline-danger icon-btn" onclick="return confirm('Tem certeza que deseja excluir?')" title="Excluir">
+                            <a href="/admin/congregations/delete/<?= $c['id'] ?>" class="btn btn-sm btn-outline-danger icon-btn btn-delete-congregation" data-name="<?= htmlspecialchars($c['name']) ?>" title="Excluir">
                                 <i class="fas fa-trash"></i>
                             </a>
                         </td>
@@ -98,5 +98,29 @@
         </table>
     </div>
 </div>
+
+<script>
+document.querySelectorAll('.btn-delete-congregation').forEach(function (btn) {
+    btn.addEventListener('click', function (e) {
+        e.preventDefault();
+        const href = btn.getAttribute('href');
+        const name = btn.getAttribute('data-name');
+        Swal.fire({
+            title: 'Excluir congregação?',
+            text: `Tem certeza que deseja excluir "${name}"? Esta ação não pode ser desfeita.`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Sim, excluir',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = href;
+            }
+        });
+    });
+});
+</script>
 
 <?php include __DIR__ . '/../../layout/footer.php'; ?>

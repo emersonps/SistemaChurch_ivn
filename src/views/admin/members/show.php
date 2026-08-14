@@ -30,7 +30,7 @@
         </a>
         <?php endif; ?>
         <?php if (($_SESSION['user_role'] ?? '') === 'admin'): ?>
-        <a href="/admin/members/delete/<?= $member['id'] ?>" class="btn btn-link btn-sm text-danger text-decoration-none ms-1" onclick="return confirm('Tem certeza que deseja excluir este membro?');" title="Excluir membro">
+        <a href="/admin/members/delete/<?= $member['id'] ?>" class="btn btn-link btn-sm text-danger text-decoration-none ms-1 btn-delete-member" data-name="<?= htmlspecialchars($member['name']) ?>" title="Excluir membro">
             <i class="fas fa-trash"></i>
         </a>
         <?php endif; ?>
@@ -400,5 +400,29 @@
     </div>
 </div>
 </div>
+
+<script>
+document.querySelectorAll('.btn-delete-member').forEach(function (btn) {
+    btn.addEventListener('click', function (e) {
+        e.preventDefault();
+        const href = btn.getAttribute('href');
+        const name = btn.getAttribute('data-name');
+        Swal.fire({
+            title: 'Excluir membro?',
+            text: `Tem certeza que deseja excluir "${name}"? Esta ação não pode ser desfeita.`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Sim, excluir',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = href;
+            }
+        });
+    });
+});
+</script>
 
 <?php include __DIR__ . '/../../layout/footer.php'; ?>
