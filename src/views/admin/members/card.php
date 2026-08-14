@@ -2,7 +2,16 @@
 <?php $siteProfile = getChurchSiteProfileSettings(); ?>
 
 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom no-print">
-    <h1 class="h2">Carteirinha do Membro</h1>
+    <div>
+        <nav aria-label="breadcrumb" class="mb-1">
+            <ol class="breadcrumb small mb-0">
+                <li class="breadcrumb-item"><a href="/admin/members" class="text-decoration-none">Membros</a></li>
+                <li class="breadcrumb-item"><a href="/admin/members/show/<?= $member['id'] ?>" class="text-decoration-none"><?= htmlspecialchars($member['name']) ?></a></li>
+                <li class="breadcrumb-item active">Carteirinha</li>
+            </ol>
+        </nav>
+        <h1 class="h3 mb-0">Carteirinha do Membro</h1>
+    </div>
     <div class="btn-toolbar mb-2 mb-md-0">
         <?php if (!empty($systemUser)): ?>
             <div class="me-3 d-flex align-items-center">
@@ -11,17 +20,17 @@
                 </span>
             </div>
         <?php endif; ?>
-        <button id="btnDownload" class="btn btn-sm btn-success me-2">
-            <i class="fas fa-download"></i> Baixar Imagem
+        <button id="btnDownload" class="btn btn-sm btn-success rounded-pill fw-semibold px-3 me-2">
+            <i class="fas fa-download me-1"></i> Baixar Imagem
         </button>
-        <button id="btnWhatsapp" class="btn btn-sm btn-success me-2">
-            <i class="fab fa-whatsapp"></i> Enviar WhatsApp
+        <button id="btnWhatsapp" class="btn btn-sm btn-success rounded-pill fw-semibold px-3 me-2">
+            <i class="fab fa-whatsapp me-1"></i> Enviar WhatsApp
         </button>
-        <button onclick="window.print()" class="btn btn-sm btn-secondary me-2">
-            <i class="fas fa-print"></i> Imprimir
+        <button onclick="window.print()" class="btn btn-sm btn-secondary rounded-pill fw-semibold px-3 me-2">
+            <i class="fas fa-print me-1"></i> Imprimir
         </button>
-        <a href="/admin/members/show/<?= $member['id'] ?>" class="btn btn-sm btn-outline-secondary">
-            <i class="fas fa-arrow-left"></i> Voltar
+        <a href="/admin/members/show/<?= $member['id'] ?>" class="btn btn-sm btn-outline-secondary rounded-pill fw-semibold px-3">
+            <i class="fas fa-arrow-left me-1"></i> Voltar
         </a>
     </div>
 </div>
@@ -253,31 +262,52 @@ document.getElementById('btnDownload').addEventListener('click', function() {
 });
 
 document.getElementById('btnWhatsapp').addEventListener('click', function() {
-    var phone = prompt("Digite o número do WhatsApp (com DDD, apenas números):", "<?= preg_replace('/[^0-9]/', '', $member['phone'] ?? '') ?>");
-    if (phone) {
+    Swal.fire({
+        title: 'Enviar por WhatsApp',
+        input: 'text',
+        inputLabel: 'Número do WhatsApp (com DDD, apenas números)',
+        inputValue: "<?= preg_replace('/[^0-9]/', '', $member['phone'] ?? '') ?>",
+        showCancelButton: true,
+        confirmButtonText: 'Continuar',
+        cancelButtonText: 'Cancelar',
+        inputValidator: (value) => {
+            if (!value) return 'Digite um número de telefone.';
+        }
+    }).then((result) => {
+        if (!result.isConfirmed) return;
+        var phone = result.value;
         generateCardImage(function(canvas) {
             // Force download first
             var link = document.createElement('a');
             link.download = 'carteirinha-<?= $member['id'] ?>.png';
             link.href = canvas.toDataURL("image/png");
             link.click();
-            
-            // Show instruction modal or alert
+
+            // Show instruction modal
             setTimeout(function() {
                 var message = "Olá, segue minha carteirinha digital de membro.";
                 var whatsappUrl = `https://web.whatsapp.com/send?phone=55${phone}&text=${encodeURIComponent(message)}`;
-                
-                if (confirm("A imagem da carteirinha foi baixada para seu dispositivo.\n\nClique em OK para abrir o WhatsApp Web e anexar a imagem manualmente.")) {
-                    window.open(whatsappUrl, '_blank');
-                }
+
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Imagem baixada',
+                    text: 'A imagem da carteirinha foi baixada para seu dispositivo. Clique em "Abrir WhatsApp Web" e anexe a imagem manualmente.',
+                    showCancelButton: true,
+                    confirmButtonText: 'Abrir WhatsApp Web',
+                    cancelButtonText: 'Fechar'
+                }).then((res) => {
+                    if (res.isConfirmed) {
+                        window.open(whatsappUrl, '_blank');
+                    }
+                });
             }, 500);
         });
-    }
+    });
 });
 
 function generateCardImage(callback) {
     // Para capturar frente e verso juntos, vamos capturar o container pai que tem a classe d-flex flex-column
-    var element = document.querySelector(".d-flex.flex-column.align-items-center.mt-4.gap-4");
+    var element = document.querySelector(".d-flex.flex-column.align-items-center.mt-4.gap-0");
     
     // Temporariamente ajustar o estilo para garantir que a imagem gerada fique boa
     const originalGap = element.style.gap;

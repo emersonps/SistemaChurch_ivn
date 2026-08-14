@@ -1,109 +1,245 @@
 <?php include __DIR__ . '/../../layout/header.php'; ?>
 
-<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-    <h1 class="h2">Novo Grupo / Célula</h1>
-    <div class="btn-toolbar mb-2 mb-md-0">
-        <a href="/admin/groups" class="btn btn-sm btn-outline-secondary">
-            <i class="fas fa-arrow-left"></i> Voltar
-        </a>
+<div class="member-form-topbar d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+    <div>
+        <nav aria-label="breadcrumb" class="mb-1">
+            <ol class="breadcrumb small mb-0">
+                <li class="breadcrumb-item"><a href="/admin/groups" class="text-decoration-none">Grupos e Células</a></li>
+                <li class="breadcrumb-item active">Novo</li>
+            </ol>
+        </nav>
+        <h1 class="h3 mb-0">Novo Grupo / Célula</h1>
+    </div>
+    <div class="d-none d-md-flex gap-2">
+        <a href="/admin/groups" class="btn btn-outline-secondary rounded-pill fw-semibold px-3">Cancelar</a>
+        <button type="submit" form="groupCreateForm" class="btn btn-dark rounded-pill fw-semibold px-3">Salvar</button>
     </div>
 </div>
 
+<style>
+    .member-form-topbar {
+        position: sticky;
+        top: 0;
+        z-index: 1030;
+        background: #f8f9fa;
+        padding-bottom: .85rem;
+    }
+    .member-form-card {
+        background: #fff;
+        border: 1px solid rgba(0,0,0,0.08);
+        border-radius: 16px;
+        margin-bottom: 1.25rem;
+        overflow: hidden;
+    }
+    .member-form-card-header {
+        display: flex;
+        align-items: flex-start;
+        gap: .85rem;
+        padding: 1.1rem 1.25rem;
+        border-bottom: 1px solid rgba(0,0,0,0.07);
+        background: #fafafa;
+    }
+    .member-form-badge {
+        flex: 0 0 auto;
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        background: #eef0f2;
+        color: #212529;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 800;
+        font-size: .95rem;
+    }
+    .member-form-card-title {
+        font-weight: 800;
+        font-size: 1.05rem;
+        color: #1a1a1a;
+        line-height: 1.2;
+    }
+    .member-form-card-subtitle {
+        font-size: .82rem;
+        color: #868e96;
+        margin-top: .1rem;
+    }
+    .member-form-card-body { padding: 1.25rem; }
+    .member-form-card-body .form-label {
+        font-weight: 600;
+        font-size: .88rem;
+        color: #343a40;
+    }
+    .member-form-card-body .form-control,
+    .member-form-card-body .form-select {
+        border-radius: 10px;
+        border-color: rgba(0,0,0,0.14);
+        padding: .55rem .8rem;
+    }
+    .member-form-card-body .form-control:focus,
+    .member-form-card-body .form-select:focus {
+        border-color: #b30000;
+        box-shadow: 0 0 0 .2rem rgba(179,0,0,0.12);
+    }
+    .required-mark { color: #dc3545; }
+
+    .member-summary-box .summary-label {
+        font-size: .76rem;
+        color: #868e96;
+        text-transform: uppercase;
+        letter-spacing: .03em;
+    }
+    .member-summary-box .summary-value {
+        font-weight: 700;
+        color: #212529;
+        margin-bottom: .9rem;
+    }
+    .member-summary-box .summary-value.text-muted-value { color: #adb5bd; font-weight: 500; }
+    .member-summary-note {
+        font-size: .8rem;
+        color: #868e96;
+    }
+</style>
+
 <div class="row">
-    <div class="col-md-8 offset-md-2">
-        <div class="card shadow-sm">
-            <div class="card-body">
-                <form action="/admin/groups/create" method="POST" class="app-form-with-bottom-actions">
-                    <?= csrf_field() ?>
-                    <div class="mb-3">
-                        <label class="form-label">Nome do Grupo *</label>
-                        <input type="text" name="name" class="form-control" required placeholder="Ex: Célula Betel">
-                    </div>
-                    
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <label class="form-label">Congregação *</label>
-                            <select name="congregation_id" id="congregationSelect" class="form-select" required>
-                                <option value="">Selecione...</option>
-                                <?php foreach ($congregations as $c): ?>
-                                    <option value="<?= $c['id'] ?>"><?= htmlspecialchars($c['name']) ?></option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Líder *</label>
-                            <select name="leader_id" class="form-select member-select" required>
-                                <option value="">Selecione...</option>
-                                <?php foreach ($members as $m): ?>
-                                    <option value="<?= $m['id'] ?>" data-congregation-id="<?= $m['congregation_id'] ?? '' ?>">
-                                        <?= htmlspecialchars($m['name']) ?> 
-                                        <?= $m['congregation_name'] ? '(' . htmlspecialchars($m['congregation_name']) . ')' : '' ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
-                    </div>
+<div class="col-lg-8">
+<form action="/admin/groups/create" method="POST" class="app-form-with-bottom-actions" id="groupCreateForm">
+    <?= csrf_field() ?>
 
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <label class="form-label">Dia da Reunião *</label>
-                            <select name="meeting_day" class="form-select" required>
-                                <option value="">Selecione...</option>
-                                <option value="Segunda-feira">Segunda-feira</option>
-                                <option value="Terça-feira">Terça-feira</option>
-                                <option value="Quarta-feira">Quarta-feira</option>
-                                <option value="Quinta-feira">Quinta-feira</option>
-                                <option value="Sexta-feira">Sexta-feira</option>
-                                <option value="Sábado">Sábado</option>
-                                <option value="Domingo">Domingo</option>
-                            </select>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Horário *</label>
-                            <input type="time" name="meeting_time" class="form-control" required>
-                        </div>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Endereço *</label>
-                        <input type="text" name="address" class="form-control" placeholder="Rua, Número, Bairro" required>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Anfitrião (Dono da Casa) *</label>
-                        <input type="text" class="form-control" name="host_name" id="hostInput" list="hostList" placeholder="Selecione um membro ou digite o nome..." required>
-                        <datalist id="hostList">
-                            <?php foreach ($members as $m): ?>
-                                <option value="<?= htmlspecialchars($m['name']) ?>" data-id="<?= $m['id'] ?>" data-congregation-id="<?= $m['congregation_id'] ?? '' ?>">
-                            <?php endforeach; ?>
-                        </datalist>
-                        <small class="text-muted">Se a pessoa não for membro, basta digitar o nome dela.</small>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Descrição / Observações</label>
-                        <textarea name="description" class="form-control" rows="3"></textarea>
-                    </div>
-
-                    <div class="text-end d-none d-lg-block">
-                        <button type="submit" class="btn btn-primary px-4">Salvar</button>
-                        <a href="/admin/groups" class="btn btn-outline-secondary px-4">Cancelar</a>
-                    </div>
-
-                    <div class="app-form-bottom-actions d-lg-none">
-                        <div class="row g-2">
-                            <div class="col-6">
-                                <button type="submit" class="btn btn-primary w-100">Salvar</button>
-                            </div>
-                            <div class="col-6">
-                                <a href="/admin/groups" class="btn btn-outline-secondary w-100">Cancelar</a>
-                            </div>
-                        </div>
-                    </div>
-                </form>
+    <!-- 1. Dados do Grupo -->
+    <div class="member-form-card">
+        <div class="member-form-card-header">
+            <div class="member-form-badge">1</div>
+            <div>
+                <div class="member-form-card-title">Dados do Grupo</div>
+                <div class="member-form-card-subtitle">Identificação, congregação e liderança.</div>
+            </div>
+        </div>
+        <div class="member-form-card-body">
+            <div class="row g-3">
+                <div class="col-12">
+                    <label class="form-label">Nome do Grupo <span class="required-mark">*</span></label>
+                    <input type="text" name="name" class="form-control" required placeholder="Ex: Célula Betel">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Congregação <span class="required-mark">*</span></label>
+                    <select name="congregation_id" id="congregationSelect" class="form-select" required>
+                        <option value="">Selecione...</option>
+                        <?php foreach ($congregations as $c): ?>
+                            <option value="<?= $c['id'] ?>"><?= htmlspecialchars($c['name']) ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Líder <span class="required-mark">*</span></label>
+                    <select name="leader_id" class="form-select member-select" required>
+                        <option value="">Selecione...</option>
+                        <?php foreach ($members as $m): ?>
+                            <option value="<?= $m['id'] ?>" data-congregation-id="<?= $m['congregation_id'] ?? '' ?>">
+                                <?= htmlspecialchars($m['name']) ?>
+                                <?= $m['congregation_name'] ? '(' . htmlspecialchars($m['congregation_name']) . ')' : '' ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
             </div>
         </div>
     </div>
+
+    <!-- 2. Encontros -->
+    <div class="member-form-card">
+        <div class="member-form-card-header">
+            <div class="member-form-badge">2</div>
+            <div>
+                <div class="member-form-card-title">Encontros</div>
+                <div class="member-form-card-subtitle">Dia, horário, local e anfitrião.</div>
+            </div>
+        </div>
+        <div class="member-form-card-body">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label">Dia da Reunião <span class="required-mark">*</span></label>
+                    <select name="meeting_day" class="form-select" required>
+                        <option value="">Selecione...</option>
+                        <option value="Segunda-feira">Segunda-feira</option>
+                        <option value="Terça-feira">Terça-feira</option>
+                        <option value="Quarta-feira">Quarta-feira</option>
+                        <option value="Quinta-feira">Quinta-feira</option>
+                        <option value="Sexta-feira">Sexta-feira</option>
+                        <option value="Sábado">Sábado</option>
+                        <option value="Domingo">Domingo</option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Horário <span class="required-mark">*</span></label>
+                    <input type="time" name="meeting_time" class="form-control" required>
+                </div>
+
+                <div class="col-12">
+                    <label class="form-label">Endereço <span class="required-mark">*</span></label>
+                    <input type="text" name="address" class="form-control" placeholder="Rua, Número, Bairro" required>
+                </div>
+
+                <div class="col-12">
+                    <label class="form-label">Anfitrião (Dono da Casa) <span class="required-mark">*</span></label>
+                    <input type="text" class="form-control" name="host_name" id="hostInput" list="hostList" placeholder="Selecione um membro ou digite o nome..." required>
+                    <datalist id="hostList">
+                        <?php foreach ($members as $m): ?>
+                            <option value="<?= htmlspecialchars($m['name']) ?>" data-id="<?= $m['id'] ?>" data-congregation-id="<?= $m['congregation_id'] ?? '' ?>">
+                        <?php endforeach; ?>
+                    </datalist>
+                    <div class="form-text">Se a pessoa não for membro, basta digitar o nome dela.</div>
+                </div>
+
+                <div class="col-12">
+                    <label class="form-label">Descrição / Observações</label>
+                    <textarea name="description" class="form-control" rows="3"></textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-end gap-2 mb-5 d-md-none">
+        <a href="/admin/groups" class="btn btn-outline-secondary px-4">Cancelar</a>
+        <button type="submit" class="btn btn-primary px-4">Salvar</button>
+    </div>
+</form>
+</div>
+
+<div class="col-lg-4">
+    <div class="member-summary-box sticky-top" style="top: 1rem; z-index: 10;">
+        <div class="member-form-card">
+            <div class="member-form-card-body">
+                <div class="fw-bold mb-3">Resumo</div>
+
+                <div class="summary-label">Nome</div>
+                <div class="summary-value text-muted-value" id="summaryName">—</div>
+
+                <div class="summary-label">Congregação</div>
+                <div class="summary-value text-muted-value" id="summaryCongregation">—</div>
+
+                <div class="summary-label">Líder</div>
+                <div class="summary-value text-muted-value" id="summaryLeader">—</div>
+
+                <div class="summary-label">Encontro</div>
+                <div class="summary-value mb-2 text-muted-value" id="summaryMeeting">—</div>
+
+                <hr>
+                <div class="d-flex justify-content-between small text-muted mb-1">
+                    <span>Preenchimento</span>
+                    <span id="summaryProgressPct">0%</span>
+                </div>
+                <div class="progress" style="height: 6px;">
+                    <div class="progress-bar bg-dark" id="summaryProgressBar" style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
+        <div class="member-form-card">
+            <div class="member-form-card-body member-summary-note">
+                Campos marcados com <span class="required-mark">*</span> são obrigatórios.
+            </div>
+        </div>
+    </div>
+</div>
 </div>
 
 <script>
@@ -114,17 +250,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function filterMembers() {
         const selectedCongregationId = congregationSelect.value;
-        
+
         // Filtrar selects normais (Líder)
         memberSelects.forEach(select => {
             const options = Array.from(select.options);
-            
+
             options.forEach(option => {
                 if (option.value === "") return;
 
                 const memberCongregationId = option.getAttribute('data-congregation-id');
                 let shouldShow = false;
-                
+
                 if (!selectedCongregationId) {
                     shouldShow = false; // NÃO mostrar ninguém se não tem congregação selecionada
                 } else {
@@ -141,7 +277,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     option.style.display = 'none';
                     option.disabled = true;
                     option.hidden = true;
-                    
+
                     if (option.selected) {
                         select.value = "";
                     }
@@ -155,7 +291,7 @@ document.addEventListener('DOMContentLoaded', function() {
             datalistOptions.forEach(option => {
                 const memberCongregationId = option.getAttribute('data-congregation-id');
                 let shouldShow = false;
-                
+
                 if (!selectedCongregationId) {
                     shouldShow = false; // Oculta se não tem congregação
                 } else {
@@ -177,6 +313,48 @@ document.addEventListener('DOMContentLoaded', function() {
         congregationSelect.addEventListener('change', filterMembers);
         filterMembers();
     }
+
+    // Painel de resumo lateral
+    const groupForm = document.getElementById('groupCreateForm');
+    const summaryName = document.getElementById('summaryName');
+    const summaryCongregation = document.getElementById('summaryCongregation');
+    const summaryLeader = document.getElementById('summaryLeader');
+    const summaryMeeting = document.getElementById('summaryMeeting');
+    const summaryProgressPct = document.getElementById('summaryProgressPct');
+    const summaryProgressBar = document.getElementById('summaryProgressBar');
+    const leaderSelect = document.querySelector('select[name="leader_id"]');
+    const meetingDaySelect = document.querySelector('select[name="meeting_day"]');
+    const meetingTimeInput = document.querySelector('input[name="meeting_time"]');
+
+    function updateGroupSummary() {
+        const nameVal = groupForm.querySelector('[name="name"]').value.trim();
+        summaryName.textContent = nameVal || '—';
+        summaryName.classList.toggle('text-muted-value', !nameVal);
+
+        const congOption = congregationSelect.options[congregationSelect.selectedIndex];
+        summaryCongregation.textContent = (congOption && congOption.value) ? congOption.text : '—';
+        summaryCongregation.classList.toggle('text-muted-value', !(congOption && congOption.value));
+
+        const leaderOption = leaderSelect.options[leaderSelect.selectedIndex];
+        summaryLeader.textContent = (leaderOption && leaderOption.value) ? leaderOption.text.trim() : '—';
+        summaryLeader.classList.toggle('text-muted-value', !(leaderOption && leaderOption.value));
+
+        const dayVal = meetingDaySelect.value;
+        const timeVal = meetingTimeInput.value;
+        const meetingText = [dayVal, timeVal].filter(Boolean).join(' às ');
+        summaryMeeting.textContent = meetingText || '—';
+        summaryMeeting.classList.toggle('text-muted-value', !meetingText);
+
+        const requiredFields = Array.from(groupForm.querySelectorAll('[required]'));
+        const filled = requiredFields.filter(f => f.value && f.value.trim() !== '').length;
+        const pct = requiredFields.length ? Math.round((filled / requiredFields.length) * 100) : 0;
+        summaryProgressPct.textContent = pct + '%';
+        summaryProgressBar.style.width = pct + '%';
+    }
+
+    groupForm.addEventListener('input', updateGroupSummary);
+    groupForm.addEventListener('change', updateGroupSummary);
+    updateGroupSummary();
 });
 </script>
 
