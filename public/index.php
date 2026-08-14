@@ -994,6 +994,9 @@ elseif (preg_match('#^/admin/service_reports/visitors/(\d+)$#', $uri, $matches))
 elseif ($uri == '/admin/reports/general') {
     (new GeneralReportController())->index();
 }
+elseif ($uri == '/admin/reports/general/print') {
+    (new GeneralReportController())->printGeneral();
+}
 elseif (preg_match('#^/admin/service_reports/delete/(\d+)$#', $uri, $matches)) {
     (new ServiceReportController())->delete($matches[1]);
 }

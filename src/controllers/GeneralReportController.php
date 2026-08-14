@@ -2,16 +2,15 @@
 // src/controllers/GeneralReportController.php
 
 class GeneralReportController {
-    
-    public function index() {
-        requirePermission('general_reports.view');
+
+    private function gatherStats() {
         $db = (new Database())->connect();
-        
+
         // --- Filters ---
         $start_date = $_GET['start_date'] ?? date('Y-m-01');
         $end_date = $_GET['end_date'] ?? date('Y-m-t');
         $congregation_id = $_GET['congregation_id'] ?? null;
-        
+
         // Security: Restrict congregation if user is limited
         if (!empty($_SESSION['user_congregation_id'])) {
             $congregation_id = $_SESSION['user_congregation_id'];
@@ -19,17 +18,17 @@ class GeneralReportController {
 
         // --- 1. Service Reports Stats (People Actions) ---
         // Aggregate by Action Type (Visitante, Aceitou Jesus, etc)
-        $sqlPeople = "SELECT spa.action_type, COUNT(*) as total, GROUP_CONCAT(spa.name SEPARATOR ', ') as names 
+        $sqlPeople = "SELECT spa.action_type, COUNT(*) as total, GROUP_CONCAT(spa.name SEPARATOR ', ') as names
                       FROM service_people_actions spa
                       JOIN service_reports sr ON spa.service_report_id = sr.id
                       WHERE sr.date BETWEEN ? AND ? AND spa.action_type IS NOT NULL AND spa.action_type != ''";
         $paramsPeople = [$start_date, $end_date];
-        
+
         if ($congregation_id) {
             $sqlPeople .= " AND sr.congregation_id = ?";
             $paramsPeople[] = $congregation_id;
         }
-        
+
         $sqlPeople .= " GROUP BY spa.action_type ORDER BY total DESC";
         $peopleStats = $db->prepare($sqlPeople);
         $peopleStats->execute($paramsPeople);
@@ -46,27 +45,27 @@ class GeneralReportController {
                           FROM service_reports sr
                           WHERE sr.date BETWEEN ? AND ?";
         $paramsAttendance = [$start_date, $end_date];
-        
+
         if ($congregation_id) {
             $sqlAttendance .= " AND sr.congregation_id = ?";
             $paramsAttendance[] = $congregation_id;
         }
-        
+
         $attendanceStats = $db->prepare($sqlAttendance);
         $attendanceStats->execute($paramsAttendance);
         $attendanceStats = $attendanceStats->fetch();
 
         // --- 3. EBD Stats (Classes & Enrollment) ---
         // Just a snapshot of current active classes/students as historical EBD attendance might not be fully tracked yet
-        $sqlEbd = "SELECT 
+        $sqlEbd = "SELECT
                     (SELECT COUNT(*) FROM ebd_classes) as total_classes,
                     (SELECT COUNT(*) FROM ebd_students WHERE status = 'active') as total_students,
                     (SELECT COUNT(*) FROM ebd_teachers WHERE status = 'active') as total_teachers";
-        
+
         // EBD data is usually global or linked via members, but classes might belong to congregation if structure allows
         // For now, global snapshot or simple count
         $ebdStats = $db->query($sqlEbd)->fetch();
-        
+
         // --- 4. Groups/Cells Stats ---
         // 'groups' é palavra reservada em alguns SQLs, usar backticks ou alias com cuidado
         $sqlGroups = "SELECT COUNT(*) as total_groups, SUM(members_count) as total_members FROM (
@@ -84,7 +83,7 @@ class GeneralReportController {
             $congregations = $db->query("SELECT * FROM congregations WHERE id = " . $_SESSION['user_congregation_id'])->fetchAll();
         }
 
-        view('admin/reports/general', [
+        return [
             'peopleStats' => $peopleStats,
             'attendanceStats' => $attendanceStats,
             'ebdStats' => $ebdStats,
@@ -95,6 +94,16 @@ class GeneralReportController {
                 'end_date' => $end_date,
                 'congregation_id' => $congregation_id
             ]
-        ]);
+        ];
+    }
+
+    public function index() {
+        requirePermission('general_reports.view');
+        view('admin/reports/general', $this->gatherStats());
+    }
+
+    public function printGeneral() {
+        requirePermission('general_reports.view');
+        view('admin/reports/print_general', $this->gatherStats());
     }
 }

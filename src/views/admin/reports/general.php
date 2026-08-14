@@ -3,38 +3,184 @@
 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
     <h1 class="h2">Relatório Geral de Estatísticas</h1>
     <div class="btn-toolbar mb-2 mb-md-0">
-        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="window.print()">
-            <i class="fas fa-print me-1"></i> Imprimir
-        </button>
+        <a href="/admin/reports/general/print?start_date=<?= urlencode($filters['start_date']) ?>&end_date=<?= urlencode($filters['end_date']) ?>&congregation_id=<?= urlencode((string)$filters['congregation_id']) ?>" target="_blank" class="btn btn-sm btn-outline-secondary rounded-pill fw-semibold px-3">
+            <i class="fas fa-print me-1"></i> Visualizar / Imprimir
+        </a>
     </div>
 </div>
 
-<form method="GET" class="row g-3 mb-4 border p-3 rounded shadow-sm bg-light no-print">
-    <div class="col-6 col-md-3">
-        <label for="start_date" class="form-label">Data Início</label>
-        <input type="date" class="form-control" id="start_date" name="start_date" value="<?= $filters['start_date'] ?>">
+<style>
+    .member-form-card {
+        background: #fff;
+        border: 1px solid rgba(0,0,0,0.08);
+        border-radius: 16px;
+        overflow: hidden;
+    }
+    .member-form-card-header {
+        display: flex;
+        align-items: flex-start;
+        gap: .85rem;
+        padding: 1.1rem 1.25rem;
+        border-bottom: 1px solid rgba(0,0,0,0.07);
+        background: #fafafa;
+    }
+    .member-form-badge {
+        flex: 0 0 auto;
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        background: #eef0f2;
+        color: #212529;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 800;
+        font-size: .95rem;
+    }
+    .member-form-card-title {
+        font-weight: 800;
+        font-size: 1.05rem;
+        color: #1a1a1a;
+        line-height: 1.2;
+    }
+    .member-form-card-subtitle {
+        font-size: .82rem;
+        color: #868e96;
+        margin-top: .1rem;
+    }
+    .member-form-card-body { padding: 1.25rem; }
+    .member-form-card-body .form-label {
+        font-weight: 600;
+        font-size: .88rem;
+        color: #343a40;
+    }
+    .member-form-card-body .form-control,
+    .member-form-card-body .form-select {
+        border-radius: 10px;
+        border-color: rgba(0,0,0,0.14);
+        padding: .55rem .8rem;
+    }
+    .member-form-card-body .form-control:focus,
+    .member-form-card-body .form-select:focus {
+        border-color: #b30000;
+        box-shadow: 0 0 0 .2rem rgba(179,0,0,0.12);
+    }
+
+    .kpi-tile {
+        background: #fff;
+        border: 1px solid rgba(0,0,0,0.08);
+        border-radius: 16px;
+        padding: 1.1rem 1.25rem;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        gap: .9rem;
+    }
+    .kpi-tile .kpi-icon {
+        flex: 0 0 auto;
+        width: 46px;
+        height: 46px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.15rem;
+    }
+    .kpi-tile .kpi-value {
+        font-weight: 800;
+        font-size: 1.6rem;
+        color: #1a1a1a;
+        line-height: 1.1;
+    }
+    .kpi-tile .kpi-label {
+        font-size: .78rem;
+        color: #868e96;
+        font-weight: 600;
+    }
+    .kpi-tile.kpi-primary .kpi-icon { background: rgba(179,0,0,0.10); color: #b30000; }
+    .kpi-tile.kpi-success .kpi-icon { background: rgba(25,135,84,0.12); color: #198754; }
+    .kpi-tile.kpi-warning .kpi-icon { background: rgba(212,175,55,0.18); color: #a6790a; }
+    .kpi-tile.kpi-info .kpi-icon { background: rgba(13,110,253,0.10); color: #0d6efd; }
+
+    .reports-table thead th {
+        font-size: .76rem;
+        text-transform: uppercase;
+        letter-spacing: .03em;
+        color: #868e96;
+        font-weight: 700;
+        border-bottom-width: 1px;
+    }
+    .reports-table td {
+        vertical-align: middle;
+        padding-top: .6rem;
+        padding-bottom: .6rem;
+    }
+    .action-pill {
+        display: inline-block;
+        padding: .25rem .6rem;
+        border-radius: 999px;
+        font-size: .72rem;
+        font-weight: 700;
+    }
+    .action-pill.pill-success { background: rgba(25,135,84,0.12); color: #198754; }
+    .action-pill.pill-warning { background: rgba(212,175,55,0.18); color: #a6790a; }
+    .action-pill.pill-info { background: rgba(13,110,253,0.10); color: #0d6efd; }
+    .action-pill.pill-primary { background: rgba(179,0,0,0.10); color: #b30000; }
+    .action-pill.pill-danger { background: rgba(220,53,69,0.10); color: #dc3545; }
+    .action-pill.pill-dark { background: rgba(0,0,0,0.08); color: #343a40; }
+
+    .stat-list-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: .85rem 1.25rem;
+        border-bottom: 1px solid rgba(0,0,0,0.06);
+        font-size: .92rem;
+    }
+    .stat-list-item:last-child { border-bottom: none; }
+    .stat-list-item .stat-count-pill {
+        display: inline-flex;
+        align-items: center;
+        padding: .3rem .7rem;
+        border-radius: 999px;
+        font-size: .8rem;
+        font-weight: 700;
+        background: #eef0f2;
+        color: #495057;
+    }
+</style>
+
+<!-- Filtros -->
+<div class="member-form-card mb-4">
+    <div class="member-form-card-body">
+        <form method="GET" class="row g-3">
+            <div class="col-6 col-md-3">
+                <label for="start_date" class="form-label">Data Início</label>
+                <input type="date" class="form-control" id="start_date" name="start_date" value="<?= $filters['start_date'] ?>">
+            </div>
+            <div class="col-6 col-md-3">
+                <label for="end_date" class="form-label">Data Fim</label>
+                <input type="date" class="form-control" id="end_date" name="end_date" value="<?= $filters['end_date'] ?>">
+            </div>
+            <div class="col-md-3">
+                <label for="congregation_id" class="form-label">Congregação</label>
+                <select class="form-select" id="congregation_id" name="congregation_id">
+                    <option value="">Todas</option>
+                    <?php foreach ($congregations as $cong): ?>
+                        <option value="<?= $cong['id'] ?>" <?= $filters['congregation_id'] == $cong['id'] ? 'selected' : '' ?>>
+                            <?= htmlspecialchars($cong['name']) ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <div class="col-md-3 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary rounded-pill fw-semibold w-100">
+                    <i class="fas fa-filter me-2"></i> Filtrar
+                </button>
+            </div>
+        </form>
     </div>
-    <div class="col-6 col-md-3">
-        <label for="end_date" class="form-label">Data Fim</label>
-        <input type="date" class="form-control" id="end_date" name="end_date" value="<?= $filters['end_date'] ?>">
-    </div>
-    <div class="col-md-3">
-        <label for="congregation_id" class="form-label">Congregação</label>
-        <select class="form-select" id="congregation_id" name="congregation_id">
-            <option value="">Todas</option>
-            <?php foreach ($congregations as $cong): ?>
-                <option value="<?= $cong['id'] ?>" <?= $filters['congregation_id'] == $cong['id'] ? 'selected' : '' ?>>
-                    <?= htmlspecialchars($cong['name']) ?>
-                </option>
-            <?php endforeach; ?>
-        </select>
-    </div>
-    <div class="col-md-3 d-flex align-items-end">
-        <button type="submit" class="btn btn-primary w-100">
-            <i class="fas fa-filter me-2"></i> Filtrar
-        </button>
-    </div>
-</form>
+</div>
 
 <?php
 $visitorsCount = 0;
@@ -59,217 +205,80 @@ $totalAttendance = (int)($attendanceStats['total_men'] ?? 0)
     + (int)($attendanceStats['total_children'] ?? 0)
     + (int)($attendanceStats['total_visitors'] ?? 0);
 $avgAttendance = $totalServices > 0 ? (int)round($totalAttendance / $totalServices) : 0;
+
+function reportActionPillClass($actionType) {
+    switch ($actionType) {
+        case 'Visitante': return 'pill-success';
+        case 'Aceitou Jesus':
+        case 'Conversão': return 'pill-warning';
+        case 'Reconciliado':
+        case 'Reconciliação': return 'pill-info';
+        case 'Batismo': return 'pill-primary';
+        case 'Desligamento': return 'pill-danger';
+        case 'Disciplinado': return 'pill-dark';
+        default: return 'pill-dark';
+    }
+}
 ?>
 
-<div class="stats-cards-carousel d-lg-none mb-3 no-print">
-    <div class="px-2 pt-2">
-        <div class="d-flex justify-content-between align-items-center">
-            <span class="text-muted small">Estatísticas</span>
-            <div class="d-flex align-items-center gap-2">
-                <span class="badge bg-dark" id="stats-cards-counter">1/4</span>
-                <span class="text-muted small"><i class="fas fa-arrows-left-right me-1"></i>Deslize para o lado</span>
+<!-- KPIs -->
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-3">
+        <div class="kpi-tile kpi-primary">
+            <div class="kpi-icon"><i class="fas fa-church"></i></div>
+            <div>
+                <div class="kpi-value"><?= $attendanceStats['total_services'] ?? 0 ?></div>
+                <div class="kpi-label">Cultos Realizados</div>
             </div>
         </div>
     </div>
-    <div class="stats-cards-track" id="statsCardsTrack">
-        <div class="stats-cards-slide">
-            <div class="card text-white bg-primary shadow-sm h-100">
-                <div class="card-header">Cultos Realizados</div>
-                <div class="card-body">
-                    <h2 class="card-title text-center"><?= $attendanceStats['total_services'] ?? 0 ?></h2>
-                    <p class="card-text small text-center mb-0">No período selecionado</p>
-                </div>
+    <div class="col-6 col-md-3">
+        <div class="kpi-tile kpi-success">
+            <div class="kpi-icon"><i class="fas fa-user-friends"></i></div>
+            <div>
+                <div class="kpi-value"><?= $visitorsCount ?></div>
+                <div class="kpi-label">Visitantes (Únicos)</div>
             </div>
         </div>
-        <div class="stats-cards-slide">
-            <div class="card text-white bg-success shadow-sm h-100">
-                <div class="card-header">Visitantes (Únicos)</div>
-                <div class="card-body">
-                    <h2 class="card-title text-center"><?= $visitorsCount ?></h2>
-                    <p class="card-text small text-center mb-0">Cadastrados nos relatórios</p>
-                </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="kpi-tile kpi-warning">
+            <div class="kpi-icon"><i class="fas fa-hands-praying"></i></div>
+            <div>
+                <div class="kpi-value"><?= $conversionsCount ?></div>
+                <div class="kpi-label">Decisões / Conversões</div>
             </div>
         </div>
-        <div class="stats-cards-slide">
-            <div class="card text-white bg-warning text-dark shadow-sm h-100">
-                <div class="card-header">Decisões / Conversões</div>
-                <div class="card-body">
-                    <h2 class="card-title text-center"><?= $conversionsCount ?></h2>
-                    <p class="card-text small text-center mb-0">Aceitou Jesus + Reconciliados</p>
-                </div>
-            </div>
-        </div>
-        <div class="stats-cards-slide">
-            <div class="card text-white bg-info text-dark shadow-sm h-100">
-                <div class="card-header">Média de Público</div>
-                <div class="card-body">
-                    <h2 class="card-title text-center"><?= $avgAttendance ?></h2>
-                    <p class="card-text small text-center mb-0">Pessoas por culto (aprox.)</p>
-                </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="kpi-tile kpi-info">
+            <div class="kpi-icon"><i class="fas fa-chart-line"></i></div>
+            <div>
+                <div class="kpi-value"><?= $avgAttendance ?></div>
+                <div class="kpi-label">Média de Público</div>
             </div>
         </div>
     </div>
 </div>
 
-<div class="stats-cards-grid row mb-4">
-    <!-- Card: Total Cultos -->
-    <div class="col-md-3">
-        <div class="card text-white bg-primary mb-3 shadow-sm">
-            <div class="card-header">Cultos Realizados</div>
-            <div class="card-body">
-                <h2 class="card-title text-center"><?= $attendanceStats['total_services'] ?? 0 ?></h2>
-                <p class="card-text small text-center">No período selecionado</p>
-            </div>
-        </div>
-    </div>
-    <!-- Card: Total Visitantes (Pessoas) -->
-    <div class="col-md-3">
-        <div class="card text-white bg-success mb-3 shadow-sm">
-            <div class="card-header">Visitantes (Únicos)</div>
-            <div class="card-body">
-                <h2 class="card-title text-center"><?= $visitorsCount ?></h2>
-                <p class="card-text small text-center">Cadastrados nos relatórios</p>
-            </div>
-        </div>
-    </div>
-    <!-- Card: Total Decisões -->
-    <div class="col-md-3">
-        <div class="card text-white bg-warning text-dark mb-3 shadow-sm">
-            <div class="card-header">Decisões / Conversões</div>
-            <div class="card-body">
-                <h2 class="card-title text-center"><?= $conversionsCount ?></h2>
-                <p class="card-text small text-center">Aceitou Jesus + Reconciliados</p>
-            </div>
-        </div>
-    </div>
-    <!-- Card: Média Frequência -->
-    <div class="col-md-3">
-        <div class="card text-white bg-info text-dark mb-3 shadow-sm">
-            <div class="card-header">Média de Público</div>
-            <div class="card-body">
-                <h2 class="card-title text-center"><?= $avgAttendance ?></h2>
-                <p class="card-text small text-center">Pessoas por culto (aprox.)</p>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="stats-panels-carousel d-lg-none mb-3 no-print">
-    <div class="px-2 pt-2">
-        <div class="d-flex justify-content-between align-items-center">
-            <span class="text-muted small">Detalhes</span>
-            <div class="d-flex align-items-center gap-2">
-                <span class="badge bg-dark" id="stats-panels-counter">1/3</span>
-                <span class="text-muted small"><i class="fas fa-arrows-left-right me-1"></i>Deslize para o lado</span>
-            </div>
-        </div>
-    </div>
-    <div class="stats-panels-track" id="statsPanelsTrack">
-        <div class="stats-panels-slide">
-            <div class="card shadow-sm h-100">
-                <div class="card-header bg-white">
-                    <h5 class="mb-0 text-secondary"><i class="fas fa-users me-2"></i> Movimentação de Pessoas (Detalhado)</h5>
-                </div>
-                <div class="card-body">
-                    <?php if (empty($peopleStats)): ?>
-                        <p class="text-center text-muted py-4">Nenhum registro encontrado no período.</p>
-                    <?php else: ?>
-                        <div class="table-responsive">
-                            <table class="table table-hover align-middle">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th>Tipo de Ação</th>
-                                        <th class="text-center">Quantidade</th>
-                                        <th>Nomes (Resumo)</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php foreach ($peopleStats as $stat): ?>
-                                    <tr>
-                                        <td>
-                                            <?php
-                                            $badgeClass = 'bg-secondary';
-                                            switch($stat['action_type']) {
-                                                case 'Visitante': $badgeClass = 'bg-success'; break;
-                                                case 'Aceitou Jesus':
-                                                case 'Conversão': $badgeClass = 'bg-warning text-dark'; break;
-                                                case 'Reconciliado':
-                                                case 'Reconciliação': $badgeClass = 'bg-info text-dark'; break;
-                                                case 'Batismo': $badgeClass = 'bg-primary'; break;
-                                                case 'Desligamento': $badgeClass = 'bg-danger'; break;
-                                                case 'Disciplinado': $badgeClass = 'bg-dark'; break;
-                                            }
-                                            ?>
-                                            <span class="badge <?= $badgeClass ?>"><?= htmlspecialchars($stat['action_type']) ?></span>
-                                        </td>
-                                        <td class="text-center fw-bold fs-5"><?= $stat['total'] ?></td>
-                                        <td class="small text-muted text-truncate" style="max-width: 300px;" title="<?= htmlspecialchars($stat['names']) ?>">
-                                            <?= htmlspecialchars(mb_strimwidth($stat['names'], 0, 100, "...")) ?>
-                                        </td>
-                                    </tr>
-                                    <?php endforeach; ?>
-                                </tbody>
-                            </table>
-                        </div>
-                    <?php endif; ?>
+<div class="row g-3">
+    <!-- Movimentação de Pessoas -->
+    <div class="col-lg-8">
+        <div class="member-form-card h-100">
+            <div class="member-form-card-header">
+                <div class="member-form-badge"><i class="fas fa-users"></i></div>
+                <div>
+                    <div class="member-form-card-title">Movimentação de Pessoas</div>
+                    <div class="member-form-card-subtitle">Detalhado por tipo de ação, no período selecionado.</div>
                 </div>
             </div>
-        </div>
-        <div class="stats-panels-slide">
-            <div class="card shadow-sm mb-3">
-                <div class="card-header bg-white">
-                    <h5 class="mb-0 text-secondary"><i class="fas fa-book-open me-2"></i> Escola Bíblica (Atual)</h5>
-                </div>
-                <ul class="list-group list-group-flush">
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        Classes Ativas
-                        <span class="badge bg-primary rounded-pill"><?= $ebdStats['total_classes'] ?></span>
-                    </li>
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        Alunos Matriculados
-                        <span class="badge bg-primary rounded-pill"><?= $ebdStats['total_students'] ?></span>
-                    </li>
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        Professores
-                        <span class="badge bg-primary rounded-pill"><?= $ebdStats['total_teachers'] ?></span>
-                    </li>
-                </ul>
-            </div>
-        </div>
-        <div class="stats-panels-slide">
-            <div class="card shadow-sm">
-                <div class="card-header bg-white">
-                    <h5 class="mb-0 text-secondary"><i class="fas fa-users-cog me-2"></i> Grupos e Células</h5>
-                </div>
-                <ul class="list-group list-group-flush">
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        Grupos Ativos
-                        <span class="badge bg-info text-dark rounded-pill"><?= $groupStats['total_groups'] ?></span>
-                    </li>
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        Total de Participantes
-                        <span class="badge bg-info text-dark rounded-pill"><?= $groupStats['total_members'] ?? 0 ?></span>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="stats-panels-grid row">
-    <!-- Tabela: Detalhamento de Pessoas -->
-    <div class="col-md-8 mb-4">
-        <div class="card shadow-sm h-100">
-            <div class="card-header bg-white">
-                <h5 class="mb-0 text-secondary"><i class="fas fa-users me-2"></i> Movimentação de Pessoas (Detalhado)</h5>
-            </div>
-            <div class="card-body">
+            <div class="member-form-card-body">
                 <?php if (empty($peopleStats)): ?>
-                    <p class="text-center text-muted py-4">Nenhum registro encontrado no período.</p>
+                    <p class="text-center text-muted py-4 mb-0">Nenhum registro encontrado no período.</p>
                 <?php else: ?>
                     <div class="table-responsive">
-                        <table class="table table-hover align-middle">
-                            <thead class="table-light">
+                        <table class="table table-hover reports-table mb-0">
+                            <thead>
                                 <tr>
                                     <th>Tipo de Ação</th>
                                     <th class="text-center">Quantidade</th>
@@ -280,20 +289,7 @@ $avgAttendance = $totalServices > 0 ? (int)round($totalAttendance / $totalServic
                                 <?php foreach ($peopleStats as $stat): ?>
                                 <tr>
                                     <td>
-                                        <?php
-                                        $badgeClass = 'bg-secondary';
-                                        switch($stat['action_type']) {
-                                            case 'Visitante': $badgeClass = 'bg-success'; break;
-                                            case 'Aceitou Jesus': 
-                                            case 'Conversão': $badgeClass = 'bg-warning text-dark'; break;
-                                            case 'Reconciliado': 
-                                            case 'Reconciliação': $badgeClass = 'bg-info text-dark'; break;
-                                            case 'Batismo': $badgeClass = 'bg-primary'; break;
-                                            case 'Desligamento': $badgeClass = 'bg-danger'; break;
-                                            case 'Disciplinado': $badgeClass = 'bg-dark'; break;
-                                        }
-                                        ?>
-                                        <span class="badge <?= $badgeClass ?>"><?= htmlspecialchars($stat['action_type']) ?></span>
+                                        <span class="action-pill <?= reportActionPillClass($stat['action_type']) ?>"><?= htmlspecialchars($stat['action_type']) ?></span>
                                     </td>
                                     <td class="text-center fw-bold fs-5"><?= $stat['total'] ?></td>
                                     <td class="small text-muted text-truncate" style="max-width: 300px;" title="<?= htmlspecialchars($stat['names']) ?>">
@@ -310,191 +306,51 @@ $avgAttendance = $totalServices > 0 ? (int)round($totalAttendance / $totalServic
     </div>
 
     <!-- Cards Laterais: EBD e Grupos -->
-    <div class="col-md-4">
-        <!-- EBD Stats -->
-        <div class="card shadow-sm mb-4">
-            <div class="card-header bg-white">
-                <h5 class="mb-0 text-secondary"><i class="fas fa-book-open me-2"></i> Escola Bíblica (Atual)</h5>
+    <div class="col-lg-4">
+        <div class="member-form-card mb-3">
+            <div class="member-form-card-header">
+                <div class="member-form-badge"><i class="fas fa-book-open"></i></div>
+                <div>
+                    <div class="member-form-card-title">Escola Bíblica</div>
+                    <div class="member-form-card-subtitle">Situação atual.</div>
+                </div>
             </div>
-            <ul class="list-group list-group-flush">
-                <li class="list-group-item d-flex justify-content-between align-items-center">
-                    Classes Ativas
-                    <span class="badge bg-primary rounded-pill"><?= $ebdStats['total_classes'] ?></span>
-                </li>
-                <li class="list-group-item d-flex justify-content-between align-items-center">
-                    Alunos Matriculados
-                    <span class="badge bg-primary rounded-pill"><?= $ebdStats['total_students'] ?></span>
-                </li>
-                <li class="list-group-item d-flex justify-content-between align-items-center">
-                    Professores
-                    <span class="badge bg-primary rounded-pill"><?= $ebdStats['total_teachers'] ?></span>
-                </li>
-            </ul>
+            <div>
+                <div class="stat-list-item">
+                    <span>Classes Ativas</span>
+                    <span class="stat-count-pill"><?= $ebdStats['total_classes'] ?></span>
+                </div>
+                <div class="stat-list-item">
+                    <span>Alunos Matriculados</span>
+                    <span class="stat-count-pill"><?= $ebdStats['total_students'] ?></span>
+                </div>
+                <div class="stat-list-item">
+                    <span>Professores</span>
+                    <span class="stat-count-pill"><?= $ebdStats['total_teachers'] ?></span>
+                </div>
+            </div>
         </div>
 
-        <!-- Groups Stats -->
-        <div class="card shadow-sm">
-            <div class="card-header bg-white">
-                <h5 class="mb-0 text-secondary"><i class="fas fa-users-cog me-2"></i> Grupos e Células</h5>
+        <div class="member-form-card">
+            <div class="member-form-card-header">
+                <div class="member-form-badge"><i class="fas fa-users-cog"></i></div>
+                <div>
+                    <div class="member-form-card-title">Grupos e Células</div>
+                    <div class="member-form-card-subtitle">Situação atual.</div>
+                </div>
             </div>
-            <ul class="list-group list-group-flush">
-                <li class="list-group-item d-flex justify-content-between align-items-center">
-                    Grupos Ativos
-                    <span class="badge bg-info text-dark rounded-pill"><?= $groupStats['total_groups'] ?></span>
-                </li>
-                <li class="list-group-item d-flex justify-content-between align-items-center">
-                    Total de Participantes
-                    <span class="badge bg-info text-dark rounded-pill"><?= $groupStats['total_members'] ?? 0 ?></span>
-                </li>
-            </ul>
+            <div>
+                <div class="stat-list-item">
+                    <span>Grupos Ativos</span>
+                    <span class="stat-count-pill"><?= $groupStats['total_groups'] ?></span>
+                </div>
+                <div class="stat-list-item">
+                    <span>Total de Participantes</span>
+                    <span class="stat-count-pill"><?= $groupStats['total_members'] ?? 0 ?></span>
+                </div>
+            </div>
         </div>
     </div>
 </div>
-
-<style>
-@media (max-width: 991.98px) {
-    .stats-cards-carousel {
-        position: relative;
-    }
-    .stats-cards-carousel::before {
-        content: '';
-        position: absolute;
-        inset: 0 0 auto 0;
-        height: 4px;
-        background: linear-gradient(90deg, #0d6efd 0%, #198754 45%, #ffc107 70%, #0dcaf0 100%);
-        z-index: 2;
-    }
-    .stats-cards-track {
-        display: flex;
-        gap: 0;
-        overflow-x: auto;
-        scroll-snap-type: x mandatory;
-        scroll-behavior: smooth;
-        scrollbar-width: none;
-        padding: .25rem .25rem .35rem;
-    }
-    .stats-cards-track::-webkit-scrollbar { display: none; }
-    .stats-cards-slide {
-        flex: 0 0 100%;
-        min-width: 100%;
-        scroll-snap-align: center;
-        padding: .35rem;
-    }
-    .stats-cards-slide .card {
-        border-radius: 16px;
-    }
-    .stats-cards-grid {
-        display: none;
-    }
-
-    .stats-panels-carousel {
-        position: relative;
-    }
-    .stats-panels-carousel::before {
-        content: '';
-        position: absolute;
-        inset: 0 0 auto 0;
-        height: 4px;
-        background: linear-gradient(90deg, #0d6efd 0%, #6c757d 55%, #0dcaf0 100%);
-        z-index: 2;
-    }
-    .stats-panels-track {
-        display: flex;
-        gap: 0;
-        overflow-x: auto;
-        scroll-snap-type: x mandatory;
-        scroll-behavior: smooth;
-        scrollbar-width: none;
-        padding: .25rem .25rem .35rem;
-    }
-    .stats-panels-track::-webkit-scrollbar { display: none; }
-    .stats-panels-slide {
-        flex: 0 0 100%;
-        min-width: 100%;
-        scroll-snap-align: center;
-        padding: .35rem;
-    }
-    .stats-panels-slide .card {
-        border-radius: 16px;
-    }
-    .stats-panels-grid {
-        display: none;
-    }
-}
-
-@media print {
-    .no-print { display: none !important; }
-    .stats-cards-carousel { display: none !important; }
-    .stats-cards-grid { display: flex !important; }
-    .stats-panels-carousel { display: none !important; }
-    .stats-panels-grid { display: flex !important; }
-    .card { border: 1px solid #ddd !important; box-shadow: none !important; }
-    .badge { border: 1px solid #000; color: #000 !important; background: none !important; }
-}
-</style>
-
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-    var track = document.getElementById('statsCardsTrack');
-    var counter = document.getElementById('stats-cards-counter');
-    if (!track || !counter) return;
-
-    var slides = track.querySelectorAll('.stats-cards-slide');
-    var total = slides.length || 1;
-    counter.textContent = '1/' + total;
-
-    var scheduled = false;
-    function update() {
-        scheduled = false;
-        var width = track.clientWidth || 1;
-        var idx = Math.round(track.scrollLeft / width) + 1;
-        if (idx < 1) idx = 1;
-        if (idx > total) idx = total;
-        counter.textContent = idx + '/' + total;
-    }
-
-    function scheduleUpdate() {
-        if (scheduled) return;
-        scheduled = true;
-        window.requestAnimationFrame(update);
-    }
-
-    track.addEventListener('scroll', scheduleUpdate, { passive: true });
-    window.addEventListener('resize', scheduleUpdate);
-    scheduleUpdate();
-});
-</script>
-
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-    var track = document.getElementById('statsPanelsTrack');
-    var counter = document.getElementById('stats-panels-counter');
-    if (!track || !counter) return;
-
-    var slides = track.querySelectorAll('.stats-panels-slide');
-    var total = slides.length || 1;
-    counter.textContent = '1/' + total;
-
-    var scheduled = false;
-    function update() {
-        scheduled = false;
-        var width = track.clientWidth || 1;
-        var idx = Math.round(track.scrollLeft / width) + 1;
-        if (idx < 1) idx = 1;
-        if (idx > total) idx = total;
-        counter.textContent = idx + '/' + total;
-    }
-
-    function scheduleUpdate() {
-        if (scheduled) return;
-        scheduled = true;
-        window.requestAnimationFrame(update);
-    }
-
-    track.addEventListener('scroll', scheduleUpdate, { passive: true });
-    window.addEventListener('resize', scheduleUpdate);
-    scheduleUpdate();
-});
-</script>
 
 <?php include __DIR__ . '/../../layout/footer.php'; ?>
