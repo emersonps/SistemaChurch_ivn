@@ -336,8 +336,45 @@ class StudyController {
         redirect('/admin/studies?success=deleted');
     }
     
+    // Resolve e serve o arquivo do estudo, com mensagem amigável se o PDF não existir no disco
+    private function resolveStudyFile($id, $backUrl) {
+        $db = (new Database())->connect();
+        $stmt = $db->prepare("SELECT * FROM studies WHERE id = ?");
+        $stmt->execute([$id]);
+        $study = $stmt->fetch();
+
+        if (!$study) {
+            view('errors/file_not_found', [
+                'title' => null,
+                'backUrl' => $backUrl
+            ]);
+            return;
+        }
+
+        $filePath = __DIR__ . '/../../public/uploads/studies/' . $study['file_path'];
+        if (!is_file($filePath)) {
+            view('errors/file_not_found', [
+                'title' => $study['title'],
+                'backUrl' => $backUrl
+            ]);
+            return;
+        }
+
+        redirect('/uploads/studies/' . $study['file_path']);
+    }
+
+    public function viewFile($id) {
+        requirePermission('studies.view');
+        $this->resolveStudyFile($id, '/admin/studies');
+    }
+
+    public function portalViewFile($id) {
+        $this->requireMember();
+        $this->resolveStudyFile($id, '/portal/studies');
+    }
+
     // PORTAL METHODS
-    
+
     public function portalIndex() {
         $this->requireMember();
         $member_id = $_SESSION['member_id'];

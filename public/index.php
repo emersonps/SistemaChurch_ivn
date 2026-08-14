@@ -755,6 +755,12 @@ elseif (preg_match('#^/admin/studies/edit/(\d+)$#', $uri, $matches)) {
         (new StudyController())->edit($matches[1]);
     }
 }
+elseif (preg_match('#^/admin/studies/view/(\d+)$#', $uri, $matches)) {
+    (new StudyController())->viewFile($matches[1]);
+}
+elseif (preg_match('#^/portal/studies/view/(\d+)$#', $uri, $matches)) {
+    (new StudyController())->portalViewFile($matches[1]);
+}
 elseif ($uri == '/portal/studies') {
     (new StudyController())->portalIndex();
 }

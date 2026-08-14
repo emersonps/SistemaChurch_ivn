@@ -29,7 +29,7 @@
                         <?php endif; ?>
                     </div>
                     <div class="card-footer bg-white border-top-0">
-                        <a href="/uploads/studies/<?= $s['file_path'] ?>" target="_blank" class="btn btn-danger w-100">
+                        <a href="/portal/studies/view/<?= $s['id'] ?>" target="_blank" class="btn btn-danger w-100">
                             <i class="fas fa-file-pdf me-2"></i> Baixar PDF
                         </a>
                     </div>
