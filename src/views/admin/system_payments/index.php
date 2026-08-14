@@ -254,11 +254,7 @@ $hero = ($status === 'paid' && !empty($latestPaidPayment)) ? $heroMap['paid'] : 
         </div>
 
         <?php if (!($status == 'paid' && !empty($latestPaidPayment))): ?>
-            <?php if (!empty($billingManagedByCentral)): ?>
-                <div class="alert alert-info mt-3 mb-0">
-                    <i class="fas fa-info-circle me-1"></i> A baixa e a alteração da cobrança devem ser feitas diretamente na central.
-                </div>
-            <?php elseif (($_SESSION['user_role'] ?? '') === 'developer'): ?>
+            <?php if (!$billingManagedByCentral && ($_SESSION['user_role'] ?? '') === 'developer'): ?>
                 <form method="POST" action="/admin/system-payments/pay" id="confirmPaymentForm" class="mt-3">
                     <?= csrf_field() ?>
                     <input type="hidden" name="month" value="<?= $currentMonth ?>">
