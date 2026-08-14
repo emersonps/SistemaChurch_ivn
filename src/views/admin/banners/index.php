@@ -30,11 +30,15 @@
         padding-bottom: .65rem;
     }
     .banner-thumb {
-        height: 48px;
-        width: 96px;
-        object-fit: cover;
+        max-height: 54px;
+        max-width: 160px;
+        width: auto;
+        height: auto;
+        object-fit: contain;
         border-radius: 8px;
         border: 1px solid rgba(0,0,0,0.08);
+        background: #f8f9fa;
+        padding: 2px;
     }
     .status-pill {
         display: inline-flex;

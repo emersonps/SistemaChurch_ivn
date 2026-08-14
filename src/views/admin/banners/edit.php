@@ -137,7 +137,7 @@
                     <label class="form-label">Imagem Atual</label><br>
                     <?php if ($banner['image_path']): ?>
                         <div class="current-image-preview">
-                            <img src="/<?= $banner['image_path'] ?>" alt="Atual" style="height: 70px; border-radius: 6px;">
+                            <img src="/<?= $banner['image_path'] ?>" alt="Atual" style="max-height: 70px; max-width: 100%; width: auto; height: auto; border-radius: 6px;">
                         </div>
                     <?php else: ?>
                         <span class="text-muted small">Sem imagem</span>
