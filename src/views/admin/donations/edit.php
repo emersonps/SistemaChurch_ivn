@@ -80,8 +80,27 @@
         box-shadow: 0 0 0 .2rem rgba(179,0,0,0.12);
     }
     .required-mark { color: #dc3545; }
+
+    .member-summary-box .summary-label {
+        font-size: .76rem;
+        color: #868e96;
+        text-transform: uppercase;
+        letter-spacing: .03em;
+    }
+    .member-summary-box .summary-value {
+        font-weight: 700;
+        color: #212529;
+        margin-bottom: .9rem;
+    }
+    .member-summary-box .summary-value.text-muted-value { color: #adb5bd; font-weight: 500; }
+    .member-summary-note {
+        font-size: .8rem;
+        color: #868e96;
+    }
 </style>
 
+<div class="row">
+<div class="col-lg-8">
 <form method="POST" action="/admin/donations/edit/<?= $account['id'] ?>" class="app-form-with-bottom-actions" id="donationEditForm">
     <?= csrf_field() ?>
 
@@ -148,5 +167,71 @@
         <button type="submit" class="btn btn-primary px-4">Salvar</button>
     </div>
 </form>
+</div>
+
+<div class="col-lg-4">
+    <div class="member-summary-box sticky-top" style="top: 1rem; z-index: 10;">
+        <div class="member-form-card">
+            <div class="member-form-card-body">
+                <div class="fw-bold mb-3">Resumo</div>
+
+                <div class="summary-label">Banco</div>
+                <div class="summary-value" id="summaryBank"><?= htmlspecialchars($account['bank_name'] ?: '—') ?></div>
+
+                <div class="summary-label">Titular</div>
+                <div class="summary-value" id="summaryBeneficiary"><?= htmlspecialchars($account['beneficiary_name'] ?: '—') ?></div>
+
+                <div class="summary-label">Chave PIX</div>
+                <div class="summary-value" id="summaryPixKey"><?= htmlspecialchars($account['pix_key'] ?: '—') ?></div>
+
+                <div class="summary-label">Status</div>
+                <div class="summary-value mb-2" id="summaryStatus"><?= $account['status'] === 'inactive' ? 'Inativa' : 'Ativa' ?></div>
+
+                <hr>
+                <div class="d-flex justify-content-between small text-muted mb-1">
+                    <span>Preenchimento</span>
+                    <span id="summaryProgressPct">0%</span>
+                </div>
+                <div class="progress" style="height: 6px;">
+                    <div class="progress-bar bg-dark" id="summaryProgressBar" style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
+        <div class="member-form-card">
+            <div class="member-form-card-body member-summary-note">
+                Campos marcados com <span class="required-mark">*</span> são obrigatórios.
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+<script>
+    const donationForm = document.getElementById('donationEditForm');
+    const summaryBank = document.getElementById('summaryBank');
+    const summaryBeneficiary = document.getElementById('summaryBeneficiary');
+    const summaryPixKey = document.getElementById('summaryPixKey');
+    const summaryStatus = document.getElementById('summaryStatus');
+    const summaryProgressPct = document.getElementById('summaryProgressPct');
+    const summaryProgressBar = document.getElementById('summaryProgressBar');
+    const statusSelect = document.querySelector('select[name="status"]');
+
+    function updateDonationSummary() {
+        summaryBank.textContent = donationForm.querySelector('[name="bank_name"]').value.trim() || '—';
+        summaryBeneficiary.textContent = donationForm.querySelector('[name="beneficiary_name"]').value.trim() || '—';
+        summaryPixKey.textContent = donationForm.querySelector('[name="pix_key"]').value.trim() || '—';
+        summaryStatus.textContent = statusSelect.value === 'inactive' ? 'Inativa' : 'Ativa';
+
+        const requiredFields = Array.from(donationForm.querySelectorAll('[required]'));
+        const filled = requiredFields.filter(f => f.value && f.value.trim() !== '').length;
+        const pct = requiredFields.length ? Math.round((filled / requiredFields.length) * 100) : 0;
+        summaryProgressPct.textContent = pct + '%';
+        summaryProgressBar.style.width = pct + '%';
+    }
+
+    donationForm.addEventListener('input', updateDonationSummary);
+    donationForm.addEventListener('change', updateDonationSummary);
+    updateDonationSummary();
+</script>
 
 <?php include __DIR__ . '/../../layout/footer.php'; ?>
