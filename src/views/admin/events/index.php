@@ -2,12 +2,12 @@
 
 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
     <h1 class="h2">Eventos</h1>
-    <div class="btn-toolbar mb-2 mb-md-0">
-        <a href="/admin/attendance" class="btn btn-sm btn-outline-dark me-2">
+    <div class="btn-toolbar mb-2 mb-md-0 gap-2">
+        <a href="/admin/attendance" class="btn btn-sm btn-outline-dark rounded-pill fw-semibold px-3">
             <i class="fas fa-list-check me-1"></i> Controle de Presença
         </a>
-        <a href="/admin/events/create" class="btn btn-sm btn-primary">
-            <i class="fas fa-plus"></i> Novo Evento
+        <a href="/admin/events/create" class="btn btn-sm btn-primary rounded-pill fw-semibold px-3">
+            <i class="fas fa-plus me-1"></i> Novo Evento
         </a>
     </div>
 </div>
@@ -23,7 +23,7 @@ $groupedEvents = [
 
 foreach ($events as $e) {
     $type = strtolower($e['type'] ?? '');
-    
+
     // Agrupar categorias
     if ($type === 'culto') {
         $groupedEvents['culto'][] = $e;
@@ -48,6 +48,123 @@ $now = new DateTimeImmutable('now');
 ?>
 
 <style>
+    #eventTabs.nav-tabs {
+        border-bottom: none;
+        gap: .4rem;
+    }
+    #eventTabs.nav-tabs .nav-link {
+        border: 1px solid rgba(0,0,0,0.1);
+        border-radius: 999px;
+        padding: .45rem 1rem;
+        font-weight: 700;
+        font-size: .85rem;
+        color: #495057;
+        background: #fff;
+    }
+    #eventTabs.nav-tabs .nav-link:hover {
+        border-color: rgba(179,0,0,0.3);
+        color: #b30000;
+        isolation: isolate;
+    }
+    #eventTabs.nav-tabs .nav-link.active {
+        background: #b30000;
+        border-color: #b30000;
+        color: #fff;
+    }
+    #eventTabs.nav-tabs .nav-link .badge {
+        font-weight: 700;
+        background: #eef0f2;
+        color: #495057;
+    }
+    #eventTabs.nav-tabs .nav-link.active .badge {
+        background: rgba(255,255,255,0.25);
+        color: #fff;
+    }
+
+    .event-pane-card {
+        border-radius: 16px;
+        border: 1px solid rgba(0,0,0,0.08);
+        overflow: hidden;
+        background: #fff;
+    }
+    .event-pane-head { background: #fafafa; }
+    .event-pane-title {
+        font-weight: 800;
+        font-size: 1.05rem;
+        letter-spacing: .01em;
+        color: #1a1a1a;
+    }
+    .event-pane-hint {
+        font-size: .72rem;
+        letter-spacing: .06em;
+        font-weight: 700;
+        color: rgba(0,0,0,0.4);
+        text-transform: uppercase;
+    }
+    .event-pane-hint i { color: #b30000; }
+
+    .events-table thead th {
+        font-size: .76rem;
+        text-transform: uppercase;
+        letter-spacing: .03em;
+        color: #868e96;
+        font-weight: 700;
+        border-bottom-width: 1px;
+    }
+    .events-table td {
+        vertical-align: middle;
+        padding-top: .65rem;
+        padding-bottom: .65rem;
+    }
+    .status-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: .4rem;
+        padding: .3rem .65rem;
+        border-radius: 999px;
+        font-size: .72rem;
+        font-weight: 700;
+    }
+    .status-pill::before {
+        content: '';
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: currentColor;
+        flex: 0 0 auto;
+    }
+    .status-pill.is-active { background: rgba(25,135,84,0.12); color: #198754; }
+    .status-pill.is-inactive { background: rgba(0,0,0,0.06); color: #6c757d; }
+    .icon-btn {
+        width: 32px;
+        height: 32px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        padding: 0;
+    }
+    .table-responsive {
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+    .table-responsive::-webkit-scrollbar {
+        display: none;
+    }
+    .dataTables_wrapper .dataTables_filter input {
+        border-radius: 10px;
+        border-color: rgba(0,0,0,0.14);
+        padding: .5rem .8rem;
+        box-shadow: none;
+    }
+    .dataTables_wrapper .dataTables_filter input:focus {
+        border-color: #b30000;
+        box-shadow: 0 0 0 .2rem rgba(179,0,0,0.12);
+    }
+    .dataTables_wrapper .dataTables_length select {
+        border-radius: 8px;
+    }
+
     @media (max-width: 991.98px) {
         .event-tabs-carousel {
             position: relative;
@@ -57,7 +174,7 @@ $now = new DateTimeImmutable('now');
             position: absolute;
             inset: 0 0 auto 0;
             height: 4px;
-            background: linear-gradient(90deg, #0d6efd 0%, #6f42c1 55%, #d4af37 100%);
+            background: linear-gradient(90deg, #ff2a7a 0%, #b30000 52%, #d4af37 100%);
             z-index: 2;
         }
         .event-tabs-carousel.multi #eventTabsContent {
@@ -79,50 +196,38 @@ $now = new DateTimeImmutable('now');
             padding: .35rem;
         }
         .event-tabs-carousel.multi #eventTabsContent > .tab-pane.fade { transition: none; }
-        .event-pane-card {
-            border-radius: 16px;
-            border: 1px solid rgba(0,0,0,0.08);
-            overflow: hidden;
-            background: #fff;
+        .dataTables_wrapper .dataTables_filter {
+            width: 100%;
+            text-align: left;
+            margin: .25rem 0 .5rem;
         }
-        .event-pane-head {
-            background: linear-gradient(135deg, rgba(13,110,253,0.10), rgba(111,66,193,0.14));
+        .dataTables_wrapper .dataTables_filter label {
+            width: 100%;
+            margin: 0;
         }
-        .event-pane-title {
-            font-weight: 900;
-            font-size: 1.05rem;
-            letter-spacing: .01em;
-            color: #1b1b2a;
-        }
-        .event-pane-hint {
-            font-size: .72rem;
-            letter-spacing: .08em;
-            font-weight: 800;
-            color: rgba(0,0,0,0.52);
-            text-transform: uppercase;
-        }
-        .event-pane-hint i {
-            color: #6f42c1;
+        .dataTables_wrapper .dataTables_filter input {
+            width: 100% !important;
+            margin-left: 0 !important;
         }
     }
 </style>
 
 <ul class="nav nav-tabs mb-3 d-none d-lg-flex" id="eventTabs" role="tablist">
-    <?php 
-    $first = true; 
-    foreach ($categories as $key => $label): 
+    <?php
+    $first = true;
+    foreach ($categories as $key => $label):
         // Create safe ID for tab
         $tabId = 'tab-' . $key;
     ?>
         <li class="nav-item" role="presentation">
             <button class="nav-link <?= $first ? 'active' : '' ?>" id="<?= $tabId ?>-btn" data-bs-toggle="tab" data-bs-target="#<?= $tabId ?>" type="button" role="tab" aria-controls="<?= $tabId ?>" aria-selected="<?= $first ? 'true' : 'false' ?>">
-                <?= $label ?> 
-                <span class="badge bg-secondary ms-1"><?= count($groupedEvents[$key]) ?></span>
+                <?= $label ?>
+                <span class="badge ms-1"><?= count($groupedEvents[$key]) ?></span>
             </button>
         </li>
-    <?php 
-        $first = false; 
-    endforeach; 
+    <?php
+        $first = false;
+    endforeach;
     ?>
 </ul>
 
@@ -131,10 +236,10 @@ $now = new DateTimeImmutable('now');
 
 <div class="event-tabs-carousel <?= $hasMultipleCategories ? 'multi' : '' ?>">
 <div class="tab-content" id="eventTabsContent">
-    <?php 
-    $first = true; 
+    <?php
+    $first = true;
     $tabStep = 1;
-    foreach ($categories as $key => $label): 
+    foreach ($categories as $key => $label):
         $tabId = 'tab-' . $key;
     ?>
         <div class="tab-pane fade <?= $first ? 'show active' : '' ?>" id="<?= $tabId ?>" role="tabpanel" aria-labelledby="<?= $tabId ?>-btn">
@@ -157,7 +262,7 @@ $now = new DateTimeImmutable('now');
                     </div>
                 </div>
                 <div class="table-responsive p-2">
-                    <table class="table table-striped table-hover table-sm datatable" style="width:100%">
+                    <table class="table table-hover events-table datatable" style="width:100%">
                     <thead>
                         <tr>
                             <th>Data/Recorrência</th>
@@ -188,7 +293,7 @@ $now = new DateTimeImmutable('now');
                                     }
                                     ?>
                                 </td>
-                                <td>
+                                <td class="fw-bold">
                                     <?php if (!empty($e['banner_path'])): ?>
                                         <i class="fas fa-image text-primary me-1" title="Possui Banner"></i>
                                     <?php endif; ?>
@@ -196,28 +301,28 @@ $now = new DateTimeImmutable('now');
                                 </td>
                                 <td><?= htmlspecialchars($e['location']) ?></td>
                                 <td>
-                                    <span class="badge bg-<?= ($e['status'] ?? 'active') == 'active' ? 'success' : 'secondary' ?>">
+                                    <span class="status-pill <?= (($e['status'] ?? 'active') == 'active') ? 'is-active' : 'is-inactive' ?>">
                                         <?= (($e['status'] ?? 'active') == 'active') ? 'Ativo' : 'Inativo' ?>
                                     </span>
                                 </td>
                                 <td class="text-end">
-                                    <a href="/admin/events/edit/<?= $e['id'] ?>" class="btn btn-sm btn-outline-secondary" title="Editar">
+                                    <a href="/admin/events/edit/<?= $e['id'] ?>" class="btn btn-sm btn-outline-secondary icon-btn" title="Editar">
                                         <i class="fas fa-edit"></i>
                                     </a>
                                     <?php if (
-                                        strtolower($e['type'] ?? '') === 'culto' 
+                                        strtolower($e['type'] ?? '') === 'culto'
                                         || (!empty($e['recurring_days']))
                                         || eventHasFutureOccurrence($e, $now)
                                     ): ?>
-                                    <a href="/admin/events/toggle/<?= $e['id'] ?>" class="btn btn-sm btn-outline-<?= ($e['status'] ?? 'active') == 'active' ? 'warning' : 'success' ?>" title="<?= ($e['status'] ?? 'active') == 'active' ? 'Desativar' : 'Ativar' ?>">
+                                    <a href="/admin/events/toggle/<?= $e['id'] ?>" class="btn btn-sm btn-outline-<?= ($e['status'] ?? 'active') == 'active' ? 'warning' : 'success' ?> icon-btn" title="<?= ($e['status'] ?? 'active') == 'active' ? 'Desativar' : 'Ativar' ?>">
                                         <i class="fas fa-power-off"></i>
                                     </a>
                                     <?php else: ?>
-                                    <button class="btn btn-sm btn-outline-secondary disabled" title="Evento Finalizado" disabled>
+                                    <button class="btn btn-sm btn-outline-secondary icon-btn disabled" title="Evento Finalizado" disabled>
                                         <i class="fas fa-power-off"></i>
                                     </button>
                                     <?php endif; ?>
-                                    <a href="/admin/events/delete/<?= $e['id'] ?>" class="btn btn-sm btn-outline-danger" onclick="return confirm('Tem certeza que deseja excluir?')" title="Excluir">
+                                    <a href="/admin/events/delete/<?= $e['id'] ?>" class="btn btn-sm btn-outline-danger icon-btn btn-delete-event" data-title="<?= htmlspecialchars($e['title']) ?>" title="Excluir">
                                         <i class="fas fa-trash"></i>
                                     </a>
                                 </td>
@@ -259,16 +364,16 @@ $now = new DateTimeImmutable('now');
                 { orderable: false, targets: [4] } // Não ordenar ações
             ]
         });
-        
+
         // Ajustar colunas ao mudar de aba e salvar estado
         $('button[data-bs-toggle="tab"]').on('shown.bs.tab', function (e) {
             $.fn.dataTable.tables({ visible: true, api: true }).columns.adjust();
-            
+
             // Salvar aba ativa no localStorage
             var target = $(e.target).attr("data-bs-target"); // ex: #nav-evento
             localStorage.setItem('activeEventTab', target);
         });
-        
+
         // Restaurar aba ativa ao carregar a página
         var activeTab = localStorage.getItem('activeEventTab');
         if (activeTab) {
@@ -295,5 +400,26 @@ $now = new DateTimeImmutable('now');
             }, { passive: true });
             window.addEventListener('resize', adjust);
         }
+
+        // Confirmação de exclusão via SweetAlert (substitui confirm() nativo)
+        $(document).on('click', '.btn-delete-event', function (e) {
+            e.preventDefault();
+            const href = $(this).attr('href');
+            const title = $(this).data('title');
+            Swal.fire({
+                title: 'Excluir evento?',
+                text: `Tem certeza que deseja excluir "${title}"? Esta ação não pode ser desfeita.`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Sim, excluir',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = href;
+                }
+            });
+        });
     });
 </script>

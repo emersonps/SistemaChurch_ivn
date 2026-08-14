@@ -1,13 +1,106 @@
 <?php include __DIR__ . '/../../layout/header.php'; ?>
 
-<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-    <h1 class="h2">Editar Evento</h1>
+<div class="member-form-topbar d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+    <div>
+        <nav aria-label="breadcrumb" class="mb-1">
+            <ol class="breadcrumb small mb-0">
+                <li class="breadcrumb-item"><a href="/admin/events" class="text-decoration-none">Eventos</a></li>
+                <li class="breadcrumb-item active">Editar</li>
+            </ol>
+        </nav>
+        <h1 class="h3 mb-0">Editar Evento</h1>
+    </div>
+    <div class="d-none d-md-flex gap-2">
+        <a href="/admin/events" class="btn btn-outline-secondary rounded-pill fw-semibold px-3">Cancelar</a>
+        <button type="submit" form="eventEditForm" class="btn btn-dark rounded-pill fw-semibold px-3">Salvar</button>
+    </div>
 </div>
 
 <style>
+    .member-form-topbar {
+        position: sticky;
+        top: 0;
+        z-index: 1030;
+        background: #f8f9fa;
+        padding-bottom: .85rem;
+    }
+    .member-form-card {
+        background: #fff;
+        border: 1px solid rgba(0,0,0,0.08);
+        border-radius: 16px;
+        margin-bottom: 1.25rem;
+        overflow: hidden;
+    }
+    .member-form-card-header {
+        display: flex;
+        align-items: flex-start;
+        gap: .85rem;
+        padding: 1.1rem 1.25rem;
+        border-bottom: 1px solid rgba(0,0,0,0.07);
+        background: #fafafa;
+    }
+    .member-form-badge {
+        flex: 0 0 auto;
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        background: #eef0f2;
+        color: #212529;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 800;
+        font-size: .95rem;
+    }
+    .member-form-card-title {
+        font-weight: 800;
+        font-size: 1.05rem;
+        color: #1a1a1a;
+        line-height: 1.2;
+    }
+    .member-form-card-subtitle {
+        font-size: .82rem;
+        color: #868e96;
+        margin-top: .1rem;
+    }
+    .member-form-card-body { padding: 1.25rem; }
+    .member-form-card-body .form-label {
+        font-weight: 600;
+        font-size: .88rem;
+        color: #343a40;
+    }
+    .member-form-card-body .form-control,
+    .member-form-card-body .form-select {
+        border-radius: 10px;
+        border-color: rgba(0,0,0,0.14);
+        padding: .55rem .8rem;
+    }
+    .member-form-card-body .form-control:focus,
+    .member-form-card-body .form-select:focus {
+        border-color: #b30000;
+        box-shadow: 0 0 0 .2rem rgba(179,0,0,0.12);
+    }
     .event-date-row .weekday-label {
         min-height: 1.2em;
         white-space: nowrap;
+    }
+    .required-mark { color: #dc3545; }
+
+    .member-summary-box .summary-label {
+        font-size: .76rem;
+        color: #868e96;
+        text-transform: uppercase;
+        letter-spacing: .03em;
+    }
+    .member-summary-box .summary-value {
+        font-weight: 700;
+        color: #212529;
+        margin-bottom: .9rem;
+    }
+    .member-summary-box .summary-value.text-muted-value { color: #adb5bd; font-weight: 500; }
+    .member-summary-note {
+        font-size: .8rem;
+        color: #868e96;
     }
 </style>
 
@@ -42,176 +135,264 @@ if (!empty($event['recurring_days'])) {
 }
 ?>
 
-<form action="/admin/events/edit/<?= $event['id'] ?>" method="POST" class="row g-3 app-form-with-bottom-actions" enctype="multipart/form-data">
+<div class="row">
+<div class="col-lg-8">
+<form action="/admin/events/edit/<?= $event['id'] ?>" method="POST" class="app-form-with-bottom-actions" id="eventEditForm" enctype="multipart/form-data">
     <?= csrf_field() ?>
-    <div class="col-md-6">
-        <label class="form-label">Título</label>
-        <input type="text" class="form-control" name="title" value="<?= htmlspecialchars($event['title']) ?>" required>
-    </div>
-    <div class="col-md-6">
-        <label class="form-label">Banner (Atualizar)</label>
-        <?php if (!empty($event['banner_path'])): ?>
-            <div class="mb-2">
-                <a href="<?= $event['banner_path'] ?>" target="_blank">
-                    <img src="<?= $event['banner_path'] ?>" alt="Banner Atual" style="height: 50px; object-fit: cover; border-radius: 4px;">
-                </a>
-                <small class="text-success"><i class="fas fa-check"></i> Banner existente</small>
-            </div>
-        <?php endif; ?>
-        <input type="file" class="form-control" name="banner" accept="image/*">
-        <div class="form-check mt-2">
-            <input class="form-check-input" type="checkbox" name="remove_banner" id="removeBanner">
-            <label class="form-check-label" for="removeBanner">Remover banner</label>
-        </div>
-    </div>
-    <div class="col-12" id="eventDatesBox">
-        <label class="form-label">Datas</label>
-        <div id="eventDatesContainer" class="d-grid gap-2"></div>
-        <div class="form-text">Adicione uma ou mais datas para o mesmo evento.</div>
-    </div>
-    <div class="col-md-3">
-        <label class="form-label">Tipo</label>
-        <select class="form-select" name="type">
-            <option value="culto" <?= $event['type'] == 'culto' ? 'selected' : '' ?>>Culto — recorrente (cultos semanais, diários etc.)</option>
-            <option value="evento" <?= (in_array($event['type'], ['evento', 'congresso', 'aniversario', 'outro'])) ? 'selected' : '' ?>>Evento — pontual (aniversários, congressos, datas marcadas)</option>
-            <option value="convite" <?= $event['type'] == 'convite' ? 'selected' : '' ?>>Convite — fora da igreja (culto no lar, rua, convite de outras igrejas)</option>
-            <option value="interno" <?= strtolower($event['type']) == 'interno' ? 'selected' : '' ?>>Interno — reuniões e encontros para grupos fechados</option>
-        </select>
-        <div id="typeHelp" class="form-text"></div>
-    </div>
-    <div class="col-md-9" id="recurringDaysBox" style="display:none">
-        <label class="form-label">Dias da Semana (Recorrente)</label>
-        <div class="d-flex gap-3 flex-wrap">
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" name="recurring_days[]" value="Domingo" id="dom" <?= in_array('Domingo', $recurringDaysSelected) ? 'checked' : '' ?>>
-                <label class="form-check-label" for="dom">Domingo</label>
-            </div>
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" name="recurring_days[]" value="Segunda" id="seg" <?= in_array('Segunda', $recurringDaysSelected) ? 'checked' : '' ?>>
-                <label class="form-check-label" for="seg">Segunda</label>
-            </div>
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" name="recurring_days[]" value="Terça" id="ter" <?= in_array('Terça', $recurringDaysSelected) ? 'checked' : '' ?>>
-                <label class="form-check-label" for="ter">Terça</label>
-            </div>
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" name="recurring_days[]" value="Quarta" id="qua" <?= in_array('Quarta', $recurringDaysSelected) ? 'checked' : '' ?>>
-                <label class="form-check-label" for="qua">Quarta</label>
-            </div>
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" name="recurring_days[]" value="Quinta" id="qui" <?= in_array('Quinta', $recurringDaysSelected) ? 'checked' : '' ?>>
-                <label class="form-check-label" for="qui">Quinta</label>
-            </div>
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" name="recurring_days[]" value="Sexta" id="sex" <?= in_array('Sexta', $recurringDaysSelected) ? 'checked' : '' ?>>
-                <label class="form-check-label" for="sex">Sexta</label>
-            </div>
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" name="recurring_days[]" value="Sábado" id="sab" <?= in_array('Sábado', $recurringDaysSelected) ? 'checked' : '' ?>>
-                <label class="form-check-label" for="sab">Sábado</label>
-            </div>
-        </div>
-        <small class="text-muted d-block mb-2">Selecione para cultos semanais fixos.</small>
-        <div class="row g-3">
-            <div class="col-md-4">
-                <label class="form-label">Horário do Culto</label>
-                <input type="time" class="form-control" name="event_time_only" value="<?= !empty($event['event_date']) && strtotime($event['event_date']) !== false ? date('H:i', strtotime($event['event_date'])) : '' ?>">
-            </div>
-            <div class="col-md-4">
-                <label class="form-label">Horário Término</label>
-                <input type="time" class="form-control" name="end_time" value="<?= htmlspecialchars($event['end_time'] ?? '') ?>">
-                <small class="text-muted">Opcional</small>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <label class="form-label">Status</label>
-        <select class="form-select" name="status">
-            <option value="active" <?= ($event['status'] ?? 'active') == 'active' ? 'selected' : '' ?>>Ativo</option>
-            <option value="inactive" <?= ($event['status'] ?? 'active') == 'inactive' ? 'selected' : '' ?>>Inativo</option>
-        </select>
-    </div>
-    <div class="col-md-9">
-        <label class="form-label">Local (Congregação ou Outro)</label>
-        <input type="text" class="form-control" name="location" id="locationInput" list="congregationList" value="<?= htmlspecialchars($event['location'] ?? '') ?>" placeholder="Selecione ou digite um local...">
-        <datalist id="congregationList">
-            <?php foreach ($congregations as $cong): ?>
-                <option value="<?= htmlspecialchars($cong['name']) ?>" data-address="<?= htmlspecialchars($cong['address'] ?? '') ?>">
-            <?php endforeach; ?>
-        </datalist>
-        <small class="text-muted">Escolha uma congregação ou digite um local livre. Se digitar livre, todos verão o evento.</small>
-    </div>
-    
-    <div class="col-md-12">
-        <label class="form-label">Endereço do Evento</label>
-        <div class="input-group">
-            <input type="text" class="form-control" name="address" id="addressInput" value="<?= htmlspecialchars($event['address'] ?? '') ?>" placeholder="Digite o endereço ou selecione a congregação">
-            <button class="btn btn-outline-secondary" type="button" id="useCongregationAddress">
-                Usar da Congregação
-            </button>
-        </div>
-    </div>
-    <div class="col-md-6">
-        <label class="form-label">E-mail de Contato</label>
-        <input type="email" class="form-control" name="contact_email" value="<?= htmlspecialchars($event['contact_email'] ?? '') ?>" placeholder="ex: contato@igreja.com">
-    </div>
-    <div class="col-md-6">
-        <label class="form-label">WhatsApp/Celular</label>
-        <input type="text" class="form-control" name="contact_phone" value="<?= htmlspecialchars($event['contact_phone'] ?? '') ?>" placeholder="(00) 00000-0000">
-    </div>
 
-    <div class="col-md-12">
-        <label class="form-label">Descrição</label>
-        <textarea class="form-control" name="description" rows="3"><?= htmlspecialchars($event['description'] ?? '') ?></textarea>
-    </div>
-    
-    <div class="col-md-12" id="internalOptions" style="display:none">
-        <div class="alert alert-warning mb-2">Evento Interno: selecione quem poderá visualizar na área de membro.</div>
-        <div class="row g-3">
-            <div class="col-md-6">
-                <label class="form-label">Membros Autorizados</label>
-                <select class="form-select" name="allowed_members[]" multiple size="8">
-                    <?php foreach (($members ?? []) as $m): ?>
-                        <option value="<?= $m['id'] ?>" <?= in_array($m['id'], ($allowedMemberIds ?? [])) ? 'selected' : '' ?>><?= htmlspecialchars($m['name']) ?><?= !empty($m['congregation_name']) ? ' (' . htmlspecialchars($m['congregation_name']) . ')' : '' ?></option>
-                    <?php endforeach; ?>
-                </select>
-                <small class="text-muted">Selecione um ou mais membros específicos.</small>
+    <!-- 1. Informações Básicas -->
+    <div class="member-form-card">
+        <div class="member-form-card-header">
+            <div class="member-form-badge">1</div>
+            <div>
+                <div class="member-form-card-title">Informações Básicas</div>
+                <div class="member-form-card-subtitle">Título, tipo, status e banner do evento.</div>
             </div>
-            <div class="col-md-6">
-                <label class="form-label">Congregações Autorizadas</label>
-                <select class="form-select" name="allowed_congregations[]" multiple size="8">
-                    <?php foreach ($congregations as $cong): ?>
-                        <option value="<?= $cong['id'] ?>" <?= in_array($cong['id'], ($allowedCongIds ?? [])) ? 'selected' : '' ?>><?= htmlspecialchars($cong['name']) ?></option>
-                    <?php endforeach; ?>
-                </select>
-                <small class="text-muted">Todos os membros das congregações selecionadas poderão ver.</small>
+        </div>
+        <div class="member-form-card-body">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label">Título <span class="required-mark">*</span></label>
+                    <input type="text" class="form-control" name="title" value="<?= htmlspecialchars($event['title']) ?>" required>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Banner (Atualizar)</label>
+                    <?php if (!empty($event['banner_path'])): ?>
+                        <div class="mb-2">
+                            <a href="<?= $event['banner_path'] ?>" target="_blank">
+                                <img src="<?= $event['banner_path'] ?>" alt="Banner Atual" style="height: 50px; object-fit: cover; border-radius: 4px;">
+                            </a>
+                            <small class="text-success"><i class="fas fa-check"></i> Banner existente</small>
+                        </div>
+                    <?php endif; ?>
+                    <input type="file" class="form-control" name="banner" accept="image/*">
+                    <div class="form-check mt-2">
+                        <input class="form-check-input" type="checkbox" name="remove_banner" id="removeBanner">
+                        <label class="form-check-label" for="removeBanner">Remover banner</label>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Tipo</label>
+                    <select class="form-select" name="type">
+                        <option value="culto" <?= $event['type'] == 'culto' ? 'selected' : '' ?>>Culto — recorrente (cultos semanais, diários etc.)</option>
+                        <option value="evento" <?= (in_array($event['type'], ['evento', 'congresso', 'aniversario', 'outro'])) ? 'selected' : '' ?>>Evento — pontual (aniversários, congressos, datas marcadas)</option>
+                        <option value="convite" <?= $event['type'] == 'convite' ? 'selected' : '' ?>>Convite — fora da igreja (culto no lar, rua, convite de outras igrejas)</option>
+                        <option value="interno" <?= strtolower($event['type']) == 'interno' ? 'selected' : '' ?>>Interno — reuniões e encontros para grupos fechados</option>
+                    </select>
+                    <div id="typeHelp" class="form-text"></div>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Status</label>
+                    <select class="form-select" name="status">
+                        <option value="active" <?= ($event['status'] ?? 'active') == 'active' ? 'selected' : '' ?>>Ativo</option>
+                        <option value="inactive" <?= ($event['status'] ?? 'active') == 'inactive' ? 'selected' : '' ?>>Inativo</option>
+                    </select>
+                </div>
             </div>
         </div>
     </div>
 
-    <div class="col-12 mt-4 text-end d-none d-lg-block">
-        <button type="submit" class="btn btn-primary px-4">Salvar</button>
+    <!-- 2. Data e Recorrência -->
+    <div class="member-form-card">
+        <div class="member-form-card-header">
+            <div class="member-form-badge">2</div>
+            <div>
+                <div class="member-form-card-title">Data e Recorrência</div>
+                <div class="member-form-card-subtitle">Quando o evento acontece.</div>
+            </div>
+        </div>
+        <div class="member-form-card-body">
+            <div class="row g-3">
+                <div class="col-12" id="eventDatesBox">
+                    <label class="form-label">Datas</label>
+                    <div id="eventDatesContainer" class="d-grid gap-2"></div>
+                    <div class="form-text">Adicione uma ou mais datas para o mesmo evento.</div>
+                </div>
+                <div class="col-12" id="recurringDaysBox" style="display:none">
+                    <label class="form-label">Dias da Semana (Recorrente)</label>
+                    <div class="d-flex gap-3 flex-wrap">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="recurring_days[]" value="Domingo" id="dom" <?= in_array('Domingo', $recurringDaysSelected) ? 'checked' : '' ?>>
+                            <label class="form-check-label" for="dom">Domingo</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="recurring_days[]" value="Segunda" id="seg" <?= in_array('Segunda', $recurringDaysSelected) ? 'checked' : '' ?>>
+                            <label class="form-check-label" for="seg">Segunda</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="recurring_days[]" value="Terça" id="ter" <?= in_array('Terça', $recurringDaysSelected) ? 'checked' : '' ?>>
+                            <label class="form-check-label" for="ter">Terça</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="recurring_days[]" value="Quarta" id="qua" <?= in_array('Quarta', $recurringDaysSelected) ? 'checked' : '' ?>>
+                            <label class="form-check-label" for="qua">Quarta</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="recurring_days[]" value="Quinta" id="qui" <?= in_array('Quinta', $recurringDaysSelected) ? 'checked' : '' ?>>
+                            <label class="form-check-label" for="qui">Quinta</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="recurring_days[]" value="Sexta" id="sex" <?= in_array('Sexta', $recurringDaysSelected) ? 'checked' : '' ?>>
+                            <label class="form-check-label" for="sex">Sexta</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="recurring_days[]" value="Sábado" id="sab" <?= in_array('Sábado', $recurringDaysSelected) ? 'checked' : '' ?>>
+                            <label class="form-check-label" for="sab">Sábado</label>
+                        </div>
+                    </div>
+                    <div class="form-text mb-2">Selecione para cultos semanais fixos.</div>
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Horário do Culto</label>
+                            <input type="time" class="form-control" name="event_time_only" value="<?= !empty($event['event_date']) && strtotime($event['event_date']) !== false ? date('H:i', strtotime($event['event_date'])) : '' ?>">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Horário Término</label>
+                            <input type="time" class="form-control" name="end_time" value="<?= htmlspecialchars($event['end_time'] ?? '') ?>">
+                            <div class="form-text">Opcional</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. Local e Contato -->
+    <div class="member-form-card">
+        <div class="member-form-card-header">
+            <div class="member-form-badge">3</div>
+            <div>
+                <div class="member-form-card-title">Local e Contato</div>
+                <div class="member-form-card-subtitle">Onde o evento acontece e como falar com os responsáveis.</div>
+            </div>
+        </div>
+        <div class="member-form-card-body">
+            <div class="row g-3">
+                <div class="col-md-9">
+                    <label class="form-label">Local (Congregação ou Outro) <span class="required-mark">*</span></label>
+                    <input type="text" class="form-control" name="location" id="locationInput" list="congregationList" value="<?= htmlspecialchars($event['location'] ?? '') ?>" placeholder="Selecione ou digite um local..." required>
+                    <datalist id="congregationList">
+                        <?php foreach ($congregations as $cong): ?>
+                            <option value="<?= htmlspecialchars($cong['name']) ?>" data-address="<?= htmlspecialchars($cong['address'] ?? '') ?>">
+                        <?php endforeach; ?>
+                    </datalist>
+                    <div class="form-text">Escolha uma congregação ou digite um local livre. Se digitar livre, todos verão o evento.</div>
+                </div>
+
+                <div class="col-md-12">
+                    <label class="form-label">Endereço do Evento</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control" name="address" id="addressInput" value="<?= htmlspecialchars($event['address'] ?? '') ?>" placeholder="Digite o endereço ou selecione a congregação">
+                        <button class="btn btn-outline-secondary" type="button" id="useCongregationAddress">
+                            Usar da Congregação
+                        </button>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">E-mail de Contato</label>
+                    <input type="email" class="form-control" name="contact_email" value="<?= htmlspecialchars($event['contact_email'] ?? '') ?>" placeholder="ex: contato@igreja.com">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">WhatsApp/Celular</label>
+                    <input type="text" class="form-control" name="contact_phone" value="<?= htmlspecialchars($event['contact_phone'] ?? '') ?>" placeholder="(00) 00000-0000">
+                </div>
+
+                <div class="col-md-12">
+                    <label class="form-label">Descrição</label>
+                    <textarea class="form-control" name="description" rows="3"><?= htmlspecialchars($event['description'] ?? '') ?></textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. Acesso (Interno) -->
+    <div class="member-form-card" id="internalOptions" style="display:none">
+        <div class="member-form-card-header">
+            <div class="member-form-badge">4</div>
+            <div>
+                <div class="member-form-card-title">Acesso</div>
+                <div class="member-form-card-subtitle">Evento interno: selecione quem poderá visualizar na área de membro.</div>
+            </div>
+        </div>
+        <div class="member-form-card-body">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label">Membros Autorizados</label>
+                    <select class="form-select" name="allowed_members[]" multiple size="8">
+                        <?php foreach (($members ?? []) as $m): ?>
+                            <option value="<?= $m['id'] ?>" <?= in_array($m['id'], ($allowedMemberIds ?? [])) ? 'selected' : '' ?>><?= htmlspecialchars($m['name']) ?><?= !empty($m['congregation_name']) ? ' (' . htmlspecialchars($m['congregation_name']) . ')' : '' ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                    <div class="form-text">Selecione um ou mais membros específicos.</div>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Congregações Autorizadas</label>
+                    <select class="form-select" name="allowed_congregations[]" multiple size="8">
+                        <?php foreach ($congregations as $cong): ?>
+                            <option value="<?= $cong['id'] ?>" <?= in_array($cong['id'], ($allowedCongIds ?? [])) ? 'selected' : '' ?>><?= htmlspecialchars($cong['name']) ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                    <div class="form-text">Todos os membros das congregações selecionadas poderão ver.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-end gap-2 mb-5 d-md-none">
         <a href="/admin/events" class="btn btn-outline-secondary px-4">Cancelar</a>
-    </div>
-
-    <div class="col-12 app-form-bottom-actions d-lg-none">
-        <div class="row g-2">
-            <div class="col-6">
-                <button type="submit" class="btn btn-primary w-100">Salvar</button>
-            </div>
-            <div class="col-6">
-                <a href="/admin/events" class="btn btn-outline-secondary w-100">Cancelar</a>
-            </div>
-        </div>
+        <button type="submit" class="btn btn-primary px-4">Salvar</button>
     </div>
 </form>
+</div>
+
+<?php
+$typeLabelsPhp = ['culto' => 'Culto', 'evento' => 'Evento', 'convite' => 'Convite', 'interno' => 'Interno'];
+$currentTypeKey = strtolower($event['type'] ?? '');
+if (!isset($typeLabelsPhp[$currentTypeKey])) { $currentTypeKey = 'evento'; }
+?>
+<div class="col-lg-4">
+    <div class="member-summary-box sticky-top" style="top: 1rem; z-index: 10;">
+        <div class="member-form-card">
+            <div class="member-form-card-body">
+                <div class="fw-bold mb-3">Resumo</div>
+
+                <div class="summary-label">Título</div>
+                <div class="summary-value" id="summaryTitle"><?= htmlspecialchars($event['title'] ?: '—') ?></div>
+
+                <div class="summary-label">Local</div>
+                <div class="summary-value" id="summaryLocation"><?= htmlspecialchars($event['location'] ?: '—') ?></div>
+
+                <div class="summary-label">Tipo</div>
+                <div class="summary-value" id="summaryType"><?= htmlspecialchars($typeLabelsPhp[$currentTypeKey]) ?></div>
+
+                <div class="summary-label">Situação</div>
+                <div class="summary-value mb-2" id="summaryStatus"><?= ($event['status'] ?? 'active') == 'active' ? 'Ativo' : 'Inativo' ?></div>
+
+                <hr>
+                <div class="d-flex justify-content-between small text-muted mb-1">
+                    <span>Preenchimento</span>
+                    <span id="summaryProgressPct">0%</span>
+                </div>
+                <div class="progress" style="height: 6px;">
+                    <div class="progress-bar bg-dark" id="summaryProgressBar" style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
+        <div class="member-form-card">
+            <div class="member-form-card-body member-summary-note">
+                Campos marcados com <span class="required-mark">*</span> são obrigatórios.
+            </div>
+        </div>
+    </div>
+</div>
+</div>
 
 <script>
     document.getElementById('useCongregationAddress').addEventListener('click', function() {
         var inputVal = document.getElementById('locationInput').value;
         var options = document.getElementById('congregationList').options;
         var found = false;
-        
+
         for (var i = 0; i < options.length; i++) {
             if (options[i].value === inputVal) {
                 var address = options[i].getAttribute('data-address');
@@ -222,7 +403,7 @@ if (!empty($event['recurring_days'])) {
                 break;
             }
         }
-        
+
         if (!found) {
             Swal.fire({
                 icon: 'warning',
@@ -354,7 +535,7 @@ if (!empty($event['recurring_days'])) {
     }
     typeSelect.addEventListener('change', toggleInternal);
     toggleInternal();
-    
+
     // Exclusividade: selecionar membros limpa congregações e vice-versa
     (function(){
         const selMembers = document.querySelector('select[name="allowed_members[]"]');
@@ -372,6 +553,43 @@ if (!empty($event['recurring_days'])) {
         if (selMembers) selMembers.addEventListener('change', () => clearIfOtherSelected('members'));
         if (selCongs) selCongs.addEventListener('change', () => clearIfOtherSelected('congs'));
     })();
+
+    // Painel de resumo lateral (título, local, tipo, situação, % preenchido)
+    const eventForm = document.getElementById('eventEditForm');
+    const summaryTitle = document.getElementById('summaryTitle');
+    const summaryLocation = document.getElementById('summaryLocation');
+    const summaryType = document.getElementById('summaryType');
+    const summaryStatus = document.getElementById('summaryStatus');
+    const summaryProgressPct = document.getElementById('summaryProgressPct');
+    const summaryProgressBar = document.getElementById('summaryProgressBar');
+    const statusSelect = document.querySelector('select[name="status"]');
+    const typeLabels = {
+        'culto': 'Culto',
+        'evento': 'Evento',
+        'convite': 'Convite',
+        'interno': 'Interno'
+    };
+
+    function updateEventSummary() {
+        const titleVal = eventForm.querySelector('[name="title"]').value.trim();
+        summaryTitle.textContent = titleVal || '—';
+
+        const locationVal = document.getElementById('locationInput').value.trim();
+        summaryLocation.textContent = locationVal || '—';
+
+        summaryType.textContent = typeLabels[String(typeSelect.value).toLowerCase()] || 'Evento';
+        summaryStatus.textContent = statusSelect.value === 'inactive' ? 'Inativo' : 'Ativo';
+
+        const requiredFields = Array.from(eventForm.querySelectorAll('[required]'));
+        const filled = requiredFields.filter(f => f.value && f.value.trim() !== '').length;
+        const pct = requiredFields.length ? Math.round((filled / requiredFields.length) * 100) : 0;
+        summaryProgressPct.textContent = pct + '%';
+        summaryProgressBar.style.width = pct + '%';
+    }
+
+    eventForm.addEventListener('input', updateEventSummary);
+    eventForm.addEventListener('change', updateEventSummary);
+    updateEventSummary();
 </script>
 
 <?php include __DIR__ . '/../../layout/footer.php'; ?>
