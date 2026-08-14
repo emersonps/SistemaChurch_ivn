@@ -1,412 +1,632 @@
 <?php include __DIR__ . '/../../layout/header.php'; ?>
 
-<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-    <h1 class="h2">Editar</h1>
+<div class="member-form-topbar d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+    <div>
+        <nav aria-label="breadcrumb" class="mb-1">
+            <ol class="breadcrumb small mb-0">
+                <li class="breadcrumb-item"><a href="/admin/members" class="text-decoration-none">Membros</a></li>
+                <li class="breadcrumb-item active">Editar</li>
+            </ol>
+        </nav>
+        <h1 class="h3 mb-0">Editar Membro</h1>
+    </div>
+    <div class="d-none d-md-flex gap-2">
+        <a href="/admin/members/show/<?= $member['id'] ?>" class="btn btn-outline-secondary">Cancelar</a>
+        <button type="submit" form="memberEditForm" class="btn btn-dark">Salvar alterações</button>
+    </div>
 </div>
 
-<form action="/admin/members/edit/<?= $member['id'] ?>" method="POST" enctype="multipart/form-data" class="row g-3 app-form-with-bottom-actions">
+<style>
+    .member-form-topbar {
+        position: sticky;
+        top: 0;
+        z-index: 1030;
+        background: #f8f9fa;
+        padding-bottom: .85rem;
+    }
+    .member-form-card {
+        background: #fff;
+        border: 1px solid rgba(0,0,0,0.08);
+        border-radius: 16px;
+        margin-bottom: 1.25rem;
+        overflow: hidden;
+    }
+    .member-form-card-header {
+        display: flex;
+        align-items: flex-start;
+        gap: .85rem;
+        padding: 1.1rem 1.25rem;
+        border-bottom: 1px solid rgba(0,0,0,0.07);
+        background: #fafafa;
+    }
+    .member-form-badge {
+        flex: 0 0 auto;
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        background: #eef0f2;
+        color: #212529;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 800;
+        font-size: .95rem;
+    }
+    .member-form-card-title {
+        font-weight: 800;
+        font-size: 1.05rem;
+        color: #1a1a1a;
+        line-height: 1.2;
+    }
+    .member-form-card-subtitle {
+        font-size: .82rem;
+        color: #868e96;
+        margin-top: .1rem;
+    }
+    .member-form-card-body {
+        padding: 1.25rem;
+    }
+    .member-form-card-body .form-label {
+        font-weight: 600;
+        font-size: .88rem;
+        color: #343a40;
+    }
+    .member-form-card-body .form-control,
+    .member-form-card-body .form-select {
+        border-radius: 10px;
+        border-color: rgba(0,0,0,0.14);
+        padding: .55rem .8rem;
+    }
+    .member-form-card-body .form-control:focus,
+    .member-form-card-body .form-select:focus {
+        border-color: #b30000;
+        box-shadow: 0 0 0 .2rem rgba(179,0,0,0.12);
+    }
+    .required-mark { color: #dc3545; }
+
+    .status-options { display: flex; gap: .75rem; flex-wrap: wrap; }
+    .status-option {
+        flex: 1 1 220px;
+        border: 1.5px solid rgba(0,0,0,0.12);
+        border-radius: 12px;
+        padding: .85rem 1rem;
+        cursor: pointer;
+        display: flex;
+        align-items: flex-start;
+        gap: .65rem;
+        transition: border-color .15s ease, background-color .15s ease;
+    }
+    .status-option input { margin-top: .25rem; }
+    .status-option .status-title { font-weight: 700; font-size: .92rem; color: #212529; }
+    .status-option .status-desc { font-size: .78rem; color: #868e96; }
+    .status-option.active {
+        border-color: #b30000;
+        background: rgba(179,0,0,0.045);
+    }
+
+    .photo-uploader { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
+    .photo-uploader-preview {
+        width: 84px;
+        height: 84px;
+        border-radius: 50%;
+        object-fit: cover;
+        background: #f1f3f5;
+        border: 1px solid rgba(0,0,0,0.08);
+    }
+
+    .member-summary-box .summary-label {
+        font-size: .76rem;
+        color: #868e96;
+        text-transform: uppercase;
+        letter-spacing: .03em;
+    }
+    .member-summary-box .summary-value {
+        font-weight: 700;
+        color: #212529;
+        margin-bottom: .9rem;
+    }
+    .member-summary-box .summary-value.text-muted-value { color: #adb5bd; font-weight: 500; }
+    .member-summary-note {
+        font-size: .8rem;
+        color: #868e96;
+    }
+</style>
+
+<div class="row">
+<div class="col-lg-8">
+<form action="/admin/members/edit/<?= $member['id'] ?>" method="POST" enctype="multipart/form-data" class="app-form-with-bottom-actions" id="memberEditForm">
     <?= csrf_field() ?>
-    <!-- Dados Pessoais -->
-    <h4 class="mb-3 text-primary border-bottom pb-2">Dados Pessoais</h4>
 
-    <div class="col-md-12 mb-3">
-        <label class="form-label">Foto do Membro</label>
-        <div class="d-flex gap-3 align-items-start">
-            <div class="text-center">
-                <?php $photoPath = !empty($member['photo']) ? '/uploads/members/' . $member['photo'] : 'https://via.placeholder.com/150'; ?>
-                <img id="photoPreview" src="<?= $photoPath ?>" class="img-thumbnail mb-2" style="width: 150px; height: 150px; object-fit: cover;">
-                <input type="file" class="form-control form-control-sm" name="photo" id="photoInput" accept="image/*">
-                <div class="form-check mt-2">
-                    <input class="form-check-input" type="checkbox" name="remove_photo" id="removePhoto">
-                    <label class="form-check-label" for="removePhoto">Remover foto</label>
-                </div>
-            </div>
-            <div class="d-flex flex-column gap-2">
-                <button type="button" class="btn btn-outline-primary btn-sm" id="btnWebcam">
-                    <i class="fas fa-camera"></i> Alterar Foto com Webcam
-                </button>
-                <div id="webcamContainer" style="display:none;" class="border p-2 rounded">
-                    <video id="webcamVideo" width="320" height="240" autoplay></video>
-                    <canvas id="webcamCanvas" width="320" height="240" style="display:none;"></canvas>
-                    <div class="mt-2">
-                        <button type="button" class="btn btn-success btn-sm" id="btnCapture">Capturar</button>
-                        <button type="button" class="btn btn-secondary btn-sm" id="btnCancelWebcam">Cancelar</button>
-                    </div>
-                </div>
-                <input type="hidden" name="webcam_photo" id="webcamPhotoData">
+    <!-- 1. Dados pessoais -->
+    <div class="member-form-card">
+        <div class="member-form-card-header">
+            <div class="member-form-badge">1</div>
+            <div>
+                <div class="member-form-card-title">Dados pessoais</div>
+                <div class="member-form-card-subtitle">Identificação básica do membro.</div>
             </div>
         </div>
-    </div>
-    
-    <div class="col-md-6">
-        <label class="form-label">Nome Completo *</label>
-        <input type="text" class="form-control" name="name" value="<?= htmlspecialchars($member['name']) ?>" required>
-    </div>
-    <div class="col-md-3">
-        <label class="form-label">Data de Nascimento *</label>
-        <input type="date" class="form-control" name="birth_date" value="<?= !empty($member['birth_date']) ? date('Y-m-d', strtotime($member['birth_date'])) : '' ?>" required>
-    </div>
-    <div class="col-md-3">
-        <label class="form-label">Sexo</label>
-        <select class="form-select" name="gender">
-            <option value="">Selecione...</option>
-            <option value="M" <?= ($member['gender'] ?? '') == 'M' ? 'selected' : '' ?>>Masculino</option>
-            <option value="F" <?= ($member['gender'] ?? '') == 'F' ? 'selected' : '' ?>>Feminino</option>
-        </select>
-    </div>
-    
-    <div class="col-md-3">
-        <label class="form-label">CPF *</label>
-        <input type="text" class="form-control" name="cpf" value="<?= htmlspecialchars($member['cpf'] ?? '') ?>" placeholder="000.000.000-00" required>
-    </div>
-    <div class="col-md-3">
-        <label class="form-label">Identidade (RG)</label>
-        <input type="text" class="form-control" name="rg" value="<?= htmlspecialchars($member['rg'] ?? '') ?>">
-    </div>
-    <div class="col-md-3">
-        <label class="form-label">Estado Civil</label>
-        <select class="form-select" name="marital_status">
-            <option value="">Selecione...</option>
-            <?php 
-                $status_civil = ['Solteiro(a)', 'Casado(a)', 'Divorciado(a)', 'Viúvo(a)', 'Separado(a)'];
-                foreach ($status_civil as $IVN) {
-                    $selected = ($member['marital_status'] ?? '') == $IVN ? 'selected' : '';
-                    echo "<option value='$IVN' $selected>$IVN</option>";
-                }
-            ?>
-        </select>
-    </div>
-    <div class="col-md-3">
-        <label class="form-label">Nacionalidade</label>
-        <input type="text" class="form-control" name="nationality" value="<?= htmlspecialchars($member['nationality'] ?? 'Brasileira') ?>">
-    </div>
-    
-    <div class="col-md-4">
-        <label class="form-label">Natural de (Cidade/Estado) *</label>
-        <input type="text" class="form-control" name="birthplace" value="<?= htmlspecialchars($member['birthplace'] ?? '') ?>" required>
-    </div>
-    <div class="col-md-4">
-        <label class="form-label">Profissão</label>
-        <input type="text" class="form-control" name="profession" value="<?= htmlspecialchars($member['profession'] ?? '') ?>">
-    </div>
-    <div class="col-md-4">
-        <label class="form-label">Quantidade de Filhos</label>
-        <input type="number" class="form-control" name="children_count" min="0" value="<?= $member['children_count'] ?? 0 ?>">
-    </div>
-
-    <div class="col-md-6">
-        <label class="form-label">Nome do Pai</label>
-        <input type="text" class="form-control" name="father_name" value="<?= htmlspecialchars($member['father_name'] ?? '') ?>">
-    </div>
-    <div class="col-md-6">
-        <label class="form-label">Nome da Mãe *</label>
-        <input type="text" class="form-control" name="mother_name" value="<?= htmlspecialchars($member['mother_name'] ?? '') ?>" required>
-    </div>
-
-    <!-- Contato e Endereço -->
-    <h4 class="mb-3 mt-4 text-primary border-bottom pb-2">Contato e Endereço</h4>
-
-    <div class="col-md-4">
-        <label class="form-label">Telefone (WhatsApp) *</label>
-        <input type="text" class="form-control" name="phone" value="<?= htmlspecialchars($member['phone'] ?? '') ?>" placeholder="(00) 00000-0000" required>
-    </div>
-    <div class="col-md-4">
-        <label class="form-label">Email</label>
-        <input type="email" class="form-control" name="email" value="<?= htmlspecialchars($member['email'] ?? '') ?>">
-    </div>
-    <div class="col-md-4">
-        <label class="form-label">CEP</label>
-        <input type="text" class="form-control" name="zip_code" id="zip_code" value="<?= htmlspecialchars($member['zip_code'] ?? '') ?>" placeholder="00000-000">
-    </div>
-
-    <div class="col-md-6">
-        <label class="form-label">Endereço (Rua) *</label>
-        <input type="text" class="form-control" name="address" value="<?= htmlspecialchars($member['address'] ?? '') ?>" required>
-    </div>
-    <div class="col-md-2">
-        <label class="form-label">Número *</label>
-        <input type="text" class="form-control" name="address_number" value="<?= htmlspecialchars($member['address_number'] ?? '') ?>" required>
-    </div>
-    <div class="col-md-4">
-        <label class="form-label">Bairro *</label>
-        <input type="text" class="form-control" name="neighborhood" value="<?= htmlspecialchars($member['neighborhood'] ?? '') ?>" required>
-    </div>
-    
-    <div class="col-md-4">
-        <label class="form-label">Complemento</label>
-        <input type="text" class="form-control" name="complement" value="<?= htmlspecialchars($member['complement'] ?? '') ?>">
-    </div>
-    <div class="col-md-4">
-        <label class="form-label">Ponto de Referência</label>
-        <input type="text" class="form-control" name="reference_point" value="<?= htmlspecialchars($member['reference_point'] ?? '') ?>">
-    </div>
-    <div class="col-md-2">
-        <label class="form-label">Estado *</label>
-        <select class="form-select" name="state" id="state" required>
-            <option value="">UF</option>
-            <?php 
-                $states = ['AC','AL','AP','AM','BA','CE','DF','ES','GO','MA','MT','MS','MG','PA','PB','PR','PE','PI','RJ','RN','RS','RO','RR','IVN','SP','SE','TO'];
-                foreach ($states as $st) {
-                    $selected = ($member['state'] ?? '') == $st ? 'selected' : '';
-                    echo "<option value='$st' $selected>$st</option>";
-                }
-            ?>
-        </select>
-    </div>
-    <div class="col-md-2">
-        <label class="form-label">Cidade *</label>
-        <input type="text" class="form-control" name="city" id="city" value="<?= htmlspecialchars($member['city'] ?? '') ?>" required>
-    </div>
-
-    <!-- Dados Eclesiásticos -->
-    <h4 class="mb-3 mt-4 text-primary border-bottom pb-2">Dados Eclesiásticos</h4>
-
-    <div class="col-md-4">
-        <label class="form-label">Congregação *</label>
-        <select class="form-select" name="congregation_id" required>
-            <?php foreach ($congregations as $c): ?>
-                <option value="<?= $c['id'] ?>" <?= $c['id'] == $member['congregation_id'] ? 'selected' : '' ?>>
-                    <?= htmlspecialchars($c['name']) ?>
-                </option>
-            <?php endforeach; ?>
-        </select>
-    </div>
-    <div class="col-md-4">
-        <label class="form-label">Cargo *</label>
-        <div class="input-group">
-            <select class="form-select" name="role" id="roleSelect" data-selected="<?= htmlspecialchars($member['role'] ?? '') ?>" required>
-                <option value="">Carregando...</option>
-            </select>
-            <button type="button" class="btn btn-outline-secondary" id="btnAddRole" title="Adicionar novo cargo">
-                <i class="fas fa-plus"></i>
-            </button>
-            <button type="button" class="btn btn-outline-secondary" id="btnEditRole" title="Editar cargo selecionado">
-                <i class="fas fa-edit"></i>
-            </button>
-            <button type="button" class="btn btn-outline-danger" id="btnDeleteRole" title="Excluir cargo selecionado">
-                <i class="fas fa-trash"></i>
-            </button>
-        </div>
-    </div>
-    <div class="col-md-4">
-        <label class="form-label">Situação do Membro *</label>
-        <select class="form-select" name="status" id="memberStatus" required>
-            <?php 
-                // Convert old statuses to active/inactive internally or just keep the visual labels
-                $currentStatus = $member['status'] ?? 'active';
-                $isActive = ($currentStatus === 'active' || strtolower(trim($currentStatus)) === 'congregando');
-            ?>
-            <option value="active" <?= $isActive ? 'selected' : '' ?>>Ativo (Congregando)</option>
-            <option value="inactive" <?= !$isActive ? 'selected' : '' ?>>Inativo (Desligado/Saiu)</option>
-        </select>
-    </div>
-
-    <div class="col-md-4">
-        <label class="form-label">Forma de Ingresso *</label>
-        <select class="form-select" name="admission_method" id="admissionMethod" required>
-            <?php 
-                $options = [
-                    'Aclamação' => 'Aclamação — recebido pela igreja sem carta de transferência',
-                    'Transferido' => 'Transferido — recebido com carta de transferência de outra igreja',
-                    'Batismo' => 'Batismo — novo convertido recebido após batismo',
-                    'Congregado' => 'Congregado — passou a congregar sem transferência formal'
-                ];
-                foreach ($options as $val => $label) {
-                    $selected = ($member['admission_method'] ?? '') == $val ? 'selected' : '';
-                    echo "<option value='$val' $selected>$label</option>";
-                }
-            ?>
-        </select>
-        <div id="admissionHelp" class="form-text"></div>
-    </div>
-    <div class="col-md-4">
-        <label class="form-label">Data de Aceite/Entrada</label>
-        <input type="date" class="form-control" name="admission_date" value="<?= !empty($member['admission_date']) ? date('Y-m-d', strtotime($member['admission_date'])) : '' ?>">
-    </div>
-    <div class="col-md-4">
-        <label class="form-label">Origem (Igreja Anterior)</label>
-        <input type="text" class="form-control" name="church_origin" value="<?= htmlspecialchars($member['church_origin'] ?? '') ?>">
-    </div>
-    
-    <div class="col-12" id="transferLetterBox" style="display:none">
-        <div class="card mt-2">
-            <div class="card-body">
-                <h6 class="mb-2">Carta de Transferência</h6>
-                <?php 
-                    $hasTransferLetter = false; 
-                    if (!empty($documents)) { 
-                        foreach ($documents as $doc) { 
-                            if (($doc['type'] ?? '') === 'transfer_letter') { $hasTransferLetter = true; break; } 
-                        } 
-                    }
-                    if ($hasTransferLetter): ?>
-                    <div class="alert alert-warning py-2">
-                        Já existe uma carta anexada. Ao salvar, a nova substituirá a atual.
-                    </div>
-                <?php endif; ?>
-                <div class="row g-3">
-                    <div class="col-md-6">
-                        <label class="form-label">Importar Arquivo</label>
-                        <input type="file" class="form-control" name="transfer_letter" accept="image/*,application/pdf">
-                        <small class="text-muted">Aceita imagem ou PDF.</small>
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label">Capturar com Webcam</label>
+        <div class="member-form-card-body">
+            <div class="row g-3">
+                <div class="col-12">
+                    <?php $photoPath = !empty($member['photo']) ? '/uploads/members/' . $member['photo'] : ''; ?>
+                    <div class="photo-uploader">
+                        <img id="photoPreview" src="<?= htmlspecialchars($photoPath) ?>" class="photo-uploader-preview" style="<?= $photoPath ? '' : 'display:none;' ?>">
+                        <div id="photoPlaceholder" class="photo-uploader-placeholder" style="width:84px;height:84px;border-radius:50%;background:#f1f3f5;border:1px solid rgba(0,0,0,0.08);display:<?= $photoPath ? 'none' : 'flex' ?>;align-items:center;justify-content:center;color:#adb5bd;font-size:1.7rem;"><i class="fas fa-user"></i></div>
                         <div>
-                            <button type="button" class="btn btn-outline-secondary btn-sm" id="btnTransferWebcam"><i class="fas fa-camera"></i> Capturar Imagem</button>
-                        </div>
-                        <div id="transferWebcamContainer" style="display:none;" class="border p-2 rounded mt-2">
-                            <div id="transferVideoWrap" style="position:relative; display:inline-block; overflow:hidden;">
-                                <video id="transferWebcamVideo" width="640" height="480" autoplay style="position:absolute; left:0; top:0;"></video>
-                                <div id="transferGuide" style="position:absolute; border:2px dashed #ffc107;"></div>
+                            <label class="btn btn-outline-secondary btn-sm mb-0" for="photoInput">Alterar foto</label>
+                            <input type="file" class="d-none" name="photo" id="photoInput" accept="image/*">
+                            <button type="button" class="btn btn-outline-secondary btn-sm ms-1" id="btnWebcam" title="Tirar foto com webcam"><i class="fas fa-camera"></i></button>
+                            <?php if ($photoPath): ?>
+                            <div class="form-check d-inline-block ms-2">
+                                <input class="form-check-input" type="checkbox" name="remove_photo" id="removePhoto">
+                                <label class="form-check-label small" for="removePhoto">Remover foto</label>
                             </div>
-                            <canvas id="transferWebcamCanvas" width="600" height="848" style="display:none;"></canvas>
-                            <div class="mt-2">
-                                <button type="button" class="btn btn-success btn-sm" id="btnTransferCapture">Capturar</button>
-                                <button type="button" class="btn btn-secondary btn-sm" id="btnTransferCancel">Cancelar</button>
-                            </div>
+                            <?php endif; ?>
+                            <div class="form-text mb-0">JPG ou PNG quadrado, até 2 MB.</div>
                         </div>
-                        <input type="hidden" name="transfer_letter_webcam" id="transferLetterWebcamData">
-                        <img id="transferPreviewImage" class="img-thumbnail mt-2" style="width: 150px; height: 212px; object-fit: cover; display:none;">
                     </div>
+                    <div class="col-12 mt-2">
+                        <div id="webcamContainer" style="display:none;" class="border p-2 rounded">
+                            <video id="webcamVideo" autoplay style="max-width: 100%; height: auto;"></video>
+                            <canvas id="webcamCanvas" width="320" height="240" style="display:none;"></canvas>
+                            <div class="mt-2 d-flex gap-2">
+                                <button type="button" class="btn btn-success btn-sm flex-fill" id="btnCapture">Capturar</button>
+                                <button type="button" class="btn btn-secondary btn-sm flex-fill" id="btnCancelWebcam">Cancelar</button>
+                            </div>
+                        </div>
+                        <input type="hidden" name="webcam_photo" id="webcamPhotoData">
+                    </div>
+                </div>
+
+                <div class="col-md-8">
+                    <label class="form-label">Nome completo <span class="required-mark">*</span></label>
+                    <input type="text" class="form-control" name="name" value="<?= htmlspecialchars($member['name']) ?>" required>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Nacionalidade</label>
+                    <input type="text" class="form-control" name="nationality" value="<?= htmlspecialchars($member['nationality'] ?? 'Brasileira') ?>">
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Data de nascimento <span class="required-mark">*</span></label>
+                    <input type="date" class="form-control" name="birth_date" value="<?= !empty($member['birth_date']) ? date('Y-m-d', strtotime($member['birth_date'])) : '' ?>" required>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Sexo</label>
+                    <select class="form-select" name="gender">
+                        <option value="">Selecione...</option>
+                        <option value="M" <?= ($member['gender'] ?? '') == 'M' ? 'selected' : '' ?>>Masculino</option>
+                        <option value="F" <?= ($member['gender'] ?? '') == 'F' ? 'selected' : '' ?>>Feminino</option>
+                    </select>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Estado civil</label>
+                    <select class="form-select" name="marital_status">
+                        <option value="">Selecione...</option>
+                        <?php
+                            $status_civil = ['Solteiro(a)', 'Casado(a)', 'Divorciado(a)', 'Viúvo(a)', 'Separado(a)'];
+                            foreach ($status_civil as $ms) {
+                                $selected = ($member['marital_status'] ?? '') == $ms ? 'selected' : '';
+                                echo "<option value='" . htmlspecialchars($ms) . "' $selected>" . htmlspecialchars($ms) . "</option>";
+                            }
+                        ?>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">CPF</label>
+                    <input type="text" class="form-control" name="cpf" value="<?= htmlspecialchars($member['cpf'] ?? '') ?>" placeholder="000.000.000-00">
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">RG</label>
+                    <input type="text" class="form-control" name="rg" value="<?= htmlspecialchars($member['rg'] ?? '') ?>" placeholder="Documento de identidade">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Natural de (Cidade/Estado) <span class="required-mark">*</span></label>
+                    <input type="text" class="form-control" name="birthplace" value="<?= htmlspecialchars($member['birthplace'] ?? '') ?>" required>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label">Profissão</label>
+                    <input type="text" class="form-control" name="profession" value="<?= htmlspecialchars($member['profession'] ?? '') ?>">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Quantidade de filhos</label>
+                    <input type="number" class="form-control" name="children_count" min="0" value="<?= (int)($member['children_count'] ?? 0) ?>">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Nome do pai</label>
+                    <input type="text" class="form-control" name="father_name" value="<?= htmlspecialchars($member['father_name'] ?? '') ?>">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Nome da mãe <span class="required-mark">*</span></label>
+                    <input type="text" class="form-control" name="mother_name" value="<?= htmlspecialchars($member['mother_name'] ?? '') ?>" required>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="col-md-3">
-        <div class="form-check mt-4">
-            <input class="form-check-input" type="checkbox" id="isBaptized" name="is_baptized" value="1" <?= $member['is_baptized'] ? 'checked' : '' ?>>
-            <label class="form-check-label fw-bold" for="isBaptized">Batizado nas Águas?</label>
+    <!-- 2. Contato -->
+    <div class="member-form-card">
+        <div class="member-form-card-header">
+            <div class="member-form-badge">2</div>
+            <div>
+                <div class="member-form-card-title">Contato</div>
+                <div class="member-form-card-subtitle">Formas de falar com o membro.</div>
+            </div>
         </div>
-    </div>
-    <div class="col-md-3" id="baptismDateDiv" style="display:<?= $member['is_baptized'] ? 'block' : 'none' ?>;">
-        <label class="form-label">Data de Batismo</label>
-        <input type="date" class="form-control" name="baptism_date" value="<?= !empty($member['baptism_date']) ? date('Y-m-d', strtotime($member['baptism_date'])) : '' ?>">
-    </div>
-    
-    <div class="col-md-3">
-        <div class="form-check mt-4">
-            <input class="form-check-input" type="checkbox" name="is_tither" value="1" <?= ($member['is_tither'] ?? 0) ? 'checked' : '' ?>>
-            <label class="form-check-label fw-bold">Dizimista?</label>
+        <div class="member-form-card-body">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label">E-mail</label>
+                    <input type="email" class="form-control" name="email" value="<?= htmlspecialchars($member['email'] ?? '') ?>" placeholder="ex.: maria@email.com">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">WhatsApp / Celular <span class="required-mark">*</span></label>
+                    <input type="text" class="form-control" name="phone" value="<?= htmlspecialchars($member['phone'] ?? '') ?>" placeholder="(00) 00000-0000" required>
+                </div>
+            </div>
         </div>
-        <div class="form-check mt-2">
-            <input class="form-check-input" type="checkbox" name="is_ebd_teacher" value="1" <?= ($member['is_ebd_teacher'] ?? 0) ? 'checked' : '' ?>>
-            <label class="form-check-label text-primary fw-bold">Professor de EBD?</label>
-        </div>
-    </div>
-    
-    <div class="col-md-12 mt-3">
-        <h5 class="text-secondary border-bottom pb-2">Status Espiritual</h5>
-    </div>
-    
-    <div class="col-md-3">
-        <div class="form-check mt-4">
-            <input class="form-check-input" type="checkbox" name="is_new_convert" value="1" id="isNewConvert" <?= ($member['is_new_convert'] ?? 0) ? 'checked' : '' ?>>
-            <label class="form-check-label fw-bold" for="isNewConvert">Novo Convertido?</label>
-        </div>
-    </div>
-    
-    <div class="col-md-3">
-        <label class="form-label">Data de Aceitação (Jesus)</label>
-        <input type="date" class="form-control" name="accepted_jesus_at" value="<?= !empty($member['accepted_jesus_at']) ? date('Y-m-d', strtotime($member['accepted_jesus_at'])) : '' ?>">
-    </div>
-    
-    <div class="col-md-3">
-        <label class="form-label">Data de Reconciliação</label>
-        <input type="date" class="form-control" name="reconciled_at" value="<?= !empty($member['reconciled_at']) ? date('Y-m-d', strtotime($member['reconciled_at'])) : '' ?>">
-    </div>
-    
-    <div class="col-md-3" id="exitDateDiv">
-        <label class="form-label">Data de Saída (Opcional)</label>
-        <input type="date" class="form-control" name="exit_date" value="<?= !empty($member['exit_date']) ? date('Y-m-d', strtotime($member['exit_date'])) : '' ?>">
     </div>
 
-    <div class="col-12 text-end d-none d-lg-block">
-        <button type="submit" class="btn btn-primary px-4">Salvar</button>
+    <!-- 3. Endereço -->
+    <div class="member-form-card">
+        <div class="member-form-card-header">
+            <div class="member-form-badge">3</div>
+            <div>
+                <div class="member-form-card-title">Endereço</div>
+                <div class="member-form-card-subtitle">Endereço residencial do membro.</div>
+            </div>
+        </div>
+        <div class="member-form-card-body">
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label">CEP</label>
+                    <input type="text" class="form-control" name="zip_code" id="zip_code" value="<?= htmlspecialchars($member['zip_code'] ?? '') ?>" placeholder="00000-000">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Rua / Logradouro <span class="required-mark">*</span></label>
+                    <input type="text" class="form-control" name="address" value="<?= htmlspecialchars($member['address'] ?? '') ?>" placeholder="Av. Principal" required>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Número <span class="required-mark">*</span></label>
+                    <input type="text" class="form-control" name="address_number" value="<?= htmlspecialchars($member['address_number'] ?? '') ?>" placeholder="123" required>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label">Bairro <span class="required-mark">*</span></label>
+                    <input type="text" class="form-control" name="neighborhood" value="<?= htmlspecialchars($member['neighborhood'] ?? '') ?>" placeholder="Centro" required>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Complemento</label>
+                    <input type="text" class="form-control" name="complement" value="<?= htmlspecialchars($member['complement'] ?? '') ?>">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Ponto de referência</label>
+                    <input type="text" class="form-control" name="reference_point" value="<?= htmlspecialchars($member['reference_point'] ?? '') ?>">
+                </div>
+
+                <div class="col-md-8">
+                    <label class="form-label">Cidade <span class="required-mark">*</span></label>
+                    <input type="text" class="form-control" name="city" id="city" value="<?= htmlspecialchars($member['city'] ?? '') ?>" placeholder="Manaus" required>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">UF <span class="required-mark">*</span></label>
+                    <select class="form-select" name="state" id="state" required>
+                        <option value="">--</option>
+                        <?php
+                            $states = ['AC','AL','AP','AM','BA','CE','DF','ES','GO','MA','MT','MS','MG','PA','PB','PR','PE','PI','RJ','RN','RS','RO','RR','SP','SE','TO'];
+                            foreach ($states as $st) {
+                                $selected = ($member['state'] ?? '') == $st ? 'selected' : '';
+                                echo "<option value='$st' $selected>$st</option>";
+                            }
+                        ?>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. Vida eclesiástica -->
+    <div class="member-form-card">
+        <div class="member-form-card-header">
+            <div class="member-form-badge">4</div>
+            <div>
+                <div class="member-form-card-title">Vida eclesiástica</div>
+                <div class="member-form-card-subtitle">Vínculo do membro com a igreja.</div>
+            </div>
+        </div>
+        <div class="member-form-card-body">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label">Congregação <span class="required-mark">*</span></label>
+                    <select class="form-select" name="congregation_id" required>
+                        <?php foreach ($congregations as $c): ?>
+                            <option value="<?= $c['id'] ?>" <?= $c['id'] == $member['congregation_id'] ? 'selected' : '' ?>><?= htmlspecialchars($c['name']) ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                    <div class="form-text">Selecione a congregação de vínculo do membro.</div>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Cargo / Função <span class="required-mark">*</span></label>
+                    <div class="input-group">
+                        <select class="form-select" name="role" id="roleSelect" data-selected="<?= htmlspecialchars($member['role'] ?? '') ?>" required>
+                            <option value="">Carregando...</option>
+                        </select>
+                        <button type="button" class="btn btn-outline-secondary" id="btnAddRole" title="Adicionar novo cargo">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary" id="btnEditRole" title="Editar cargo selecionado">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button type="button" class="btn btn-outline-danger" id="btnDeleteRole" title="Excluir cargo selecionado">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label">Data de batismo</label>
+                    <input type="date" class="form-control" name="baptism_date" id="baptismDateInput" value="<?= !empty($member['baptism_date']) ? date('Y-m-d', strtotime($member['baptism_date'])) : '' ?>" <?= empty($member['is_baptized']) ? 'disabled' : '' ?>>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Membro desde</label>
+                    <input type="date" class="form-control" name="admission_date" value="<?= !empty($member['admission_date']) ? date('Y-m-d', strtotime($member['admission_date'])) : '' ?>">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Origem (igreja anterior)</label>
+                    <input type="text" class="form-control" name="church_origin" value="<?= htmlspecialchars($member['church_origin'] ?? '') ?>">
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Forma de ingresso <span class="required-mark">*</span></label>
+                    <select class="form-select" name="admission_method" id="admissionMethod" required>
+                        <option value="">Selecione...</option>
+                        <?php
+                            $options = [
+                                'Aclamação' => 'Aclamação — recebido pela igreja sem carta de transferência',
+                                'Transferido' => 'Transferido — recebido com carta de transferência de outra igreja',
+                                'Batismo' => 'Batismo — novo convertido recebido após batismo',
+                                'Congregado' => 'Congregado — passou a congregar sem transferência formal'
+                            ];
+                            foreach ($options as $val => $label) {
+                                $selected = ($member['admission_method'] ?? '') == $val ? 'selected' : '';
+                                echo "<option value='" . htmlspecialchars($val) . "' $selected>" . htmlspecialchars($label) . "</option>";
+                            }
+                        ?>
+                    </select>
+                    <div id="admissionHelp" class="form-text"></div>
+                </div>
+                <div class="col-md-6 d-flex align-items-end">
+                    <div class="form-check me-4">
+                        <input class="form-check-input" type="checkbox" id="isBaptized" name="is_baptized" value="1" <?= !empty($member['is_baptized']) ? 'checked' : '' ?>>
+                        <label class="form-check-label fw-semibold" for="isBaptized">Batizado nas águas?</label>
+                    </div>
+                </div>
+
+                <?php
+                    $hasTransferLetter = false;
+                    if (!empty($documents)) {
+                        foreach ($documents as $doc) {
+                            if (($doc['type'] ?? '') === 'transfer_letter') { $hasTransferLetter = true; break; }
+                        }
+                    }
+                ?>
+                <div class="col-12" id="transferLetterBox" style="display:none">
+                    <div class="border rounded-3 p-3">
+                        <h6 class="mb-2">Carta de Transferência</h6>
+                        <?php if ($hasTransferLetter): ?>
+                            <div class="alert alert-warning py-2">
+                                Já existe uma carta anexada. Ao salvar, a nova substituirá a atual.
+                            </div>
+                        <?php endif; ?>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Importar arquivo</label>
+                                <input type="file" class="form-control" name="transfer_letter" accept="image/*,application/pdf">
+                                <small class="text-muted">Aceita imagem ou PDF.</small>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Capturar com webcam</label>
+                                <div>
+                                    <button type="button" class="btn btn-outline-secondary btn-sm" id="btnTransferWebcam"><i class="fas fa-camera"></i> Capturar Imagem</button>
+                                </div>
+                                <div id="transferWebcamContainer" style="display:none;" class="border p-2 rounded mt-2">
+                                    <div id="transferVideoWrap" style="position:relative; display:inline-block; overflow:hidden;">
+                                        <video id="transferWebcamVideo" width="640" height="480" autoplay style="position:absolute; left:0; top:0;"></video>
+                                        <div id="transferGuide" style="position:absolute; border:2px dashed #ffc107;"></div>
+                                    </div>
+                                    <canvas id="transferWebcamCanvas" width="600" height="848" style="display:none;"></canvas>
+                                    <div class="mt-2">
+                                        <button type="button" class="btn btn-success btn-sm" id="btnTransferCapture">Capturar</button>
+                                        <button type="button" class="btn btn-secondary btn-sm" id="btnTransferCancel">Cancelar</button>
+                                    </div>
+                                </div>
+                                <input type="hidden" name="transfer_letter_webcam" id="transferLetterWebcamData">
+                                <img id="transferPreviewImage" class="img-thumbnail mt-2" style="width: 150px; height: 212px; object-fit: cover; display:none;">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12">
+                    <label class="form-label d-block">Situação <span class="required-mark">*</span></label>
+                    <?php
+                        $currentStatus = $member['status'] ?? 'active';
+                        $isActive = ($currentStatus === 'active' || strtolower(trim($currentStatus)) === 'congregando');
+                    ?>
+                    <div class="status-options">
+                        <label class="status-option <?= $isActive ? 'active' : '' ?>" data-status-option>
+                            <input type="radio" name="status" value="active" <?= $isActive ? 'checked' : '' ?>>
+                            <div>
+                                <div class="status-title">Ativo</div>
+                                <div class="status-desc">Participa das atividades regularmente.</div>
+                            </div>
+                        </label>
+                        <label class="status-option <?= !$isActive ? 'active' : '' ?>" data-status-option>
+                            <input type="radio" name="status" value="inactive" <?= !$isActive ? 'checked' : '' ?>>
+                            <div>
+                                <div class="status-title">Inativo</div>
+                                <div class="status-desc">Afastado ou transferido.</div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-md-4" id="exitDateDiv" style="display:<?= !$isActive ? '' : 'none' ?>;">
+                    <label class="form-label">Data de saída (opcional)</label>
+                    <input type="date" class="form-control" name="exit_date" value="<?= !empty($member['exit_date']) ? date('Y-m-d', strtotime($member['exit_date'])) : '' ?>">
+                </div>
+
+                <div class="col-12 mt-2">
+                    <div class="row g-2">
+                        <div class="col-md-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="is_tither" value="1" id="isTither" <?= !empty($member['is_tither']) ? 'checked' : '' ?>>
+                                <label class="form-check-label fw-semibold" for="isTither">Dizimista?</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="is_ebd_teacher" value="1" id="isEbdTeacher" <?= !empty($member['is_ebd_teacher']) ? 'checked' : '' ?>>
+                                <label class="form-check-label fw-semibold text-primary" for="isEbdTeacher">Professor de EBD?</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="is_new_convert" value="1" id="isNewConvert" <?= !empty($member['is_new_convert']) ? 'checked' : '' ?>>
+                                <label class="form-check-label fw-semibold" for="isNewConvert">Novo convertido?</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Data de aceitação (Jesus)</label>
+                    <input type="date" class="form-control" name="accepted_jesus_at" value="<?= !empty($member['accepted_jesus_at']) ? date('Y-m-d', strtotime($member['accepted_jesus_at'])) : '' ?>">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Data de reconciliação</label>
+                    <input type="date" class="form-control" name="reconciled_at" value="<?= !empty($member['reconciled_at']) ? date('Y-m-d', strtotime($member['reconciled_at'])) : '' ?>">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-end gap-2 mb-5 d-md-none">
         <a href="/admin/members/show/<?= $member['id'] ?>" class="btn btn-outline-secondary px-4">Cancelar</a>
-    </div>
-
-    <div class="col-12 app-form-bottom-actions d-lg-none">
-        <div class="row g-2">
-            <div class="col-6">
-                <button type="submit" class="btn btn-primary w-100">Salvar</button>
-            </div>
-            <div class="col-6">
-                <a href="/admin/members/show/<?= $member['id'] ?>" class="btn btn-outline-secondary w-100">Cancelar</a>
-            </div>
-        </div>
+        <button type="submit" class="btn btn-primary px-4">Salvar</button>
     </div>
 </form>
 
-<div class="mt-4">
-    <h4 class="mb-3 text-primary border-bottom pb-2">Documentos do Membro</h4>
-    <div class="card shadow-sm">
-        <div class="card-body">
-            <?php if (empty($documents)): ?>
-                <p class="text-muted">Nenhum documento anexado para este membro.</p>
-            <?php else: ?>
-                <div class="table-responsive">
-                    <table class="table table-striped table-hover">
-                        <thead>
+<!-- Documentos do Membro -->
+<div class="member-form-card">
+    <div class="member-form-card-header">
+        <div class="member-form-badge"><i class="fas fa-folder-open"></i></div>
+        <div>
+            <div class="member-form-card-title">Documentos do Membro</div>
+            <div class="member-form-card-subtitle">Arquivos anexados ao cadastro.</div>
+        </div>
+    </div>
+    <div class="member-form-card-body">
+        <?php if (empty($documents)): ?>
+            <p class="text-muted mb-0">Nenhum documento anexado para este membro.</p>
+        <?php else: ?>
+            <div class="table-responsive">
+                <table class="table table-striped table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>Título</th>
+                            <th>Tipo</th>
+                            <th>Data</th>
+                            <th class="text-end">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($documents as $d): ?>
                             <tr>
-                                <th>Título</th>
-                                <th>Tipo</th>
-                                <th>Data</th>
-                                <th class="text-end">Ações</th>
+                                <td><?= htmlspecialchars($d['title']) ?></td>
+                                <td>
+                                    <?php
+                                        $type = strtolower($d['type'] ?? '');
+                                        $label = $type;
+                                        if ($type === 'transfer_letter') $label = 'Carta de Transferência';
+                                        elseif ($type === 'rg') $label = 'RG';
+                                        elseif ($type === 'cpf') $label = 'CPF';
+                                        elseif ($type === 'other') $label = 'Outro';
+                                    ?>
+                                    <span class="badge bg-secondary"><?= htmlspecialchars($label) ?></span>
+                                </td>
+                                <td><?= date('d/m/Y H:i', strtotime($d['created_at'])) ?></td>
+                                <td class="text-end">
+                                    <a class="btn btn-sm btn-outline-primary" target="_blank" href="/uploads/members_docs/<?= htmlspecialchars($d['file_path']) ?>">
+                                        <i class="fas fa-download me-1"></i> Abrir
+                                    </a>
+                                    <a class="btn btn-sm btn-outline-danger btn-delete-doc" data-href="/admin/members/documents/delete/<?= $d['id'] ?>">
+                                        <i class="fas fa-trash me-1"></i> Excluir
+                                    </a>
+                                </td>
                             </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($documents as $d): ?>
-                                <tr>
-                                    <td><?= htmlspecialchars($d['title']) ?></td>
-                                    <td>
-                                        <?php 
-                                            $type = strtolower($d['type'] ?? '');
-                                            $label = $type;
-                                            if ($type === 'transfer_letter') $label = 'Carta de Transferência';
-                                            elseif ($type === 'rg') $label = 'RG';
-                                            elseif ($type === 'cpf') $label = 'CPF';
-                                            elseif ($type === 'other') $label = 'Outro';
-                                        ?>
-                                        <span class="badge bg-secondary"><?= htmlspecialchars($label) ?></span>
-                                    </td>
-                                    <td><?= date('d/m/Y H:i', strtotime($d['created_at'])) ?></td>
-                                    <td class="text-end">
-                                        <a class="btn btn-sm btn-outline-primary" target="_blank" href="/uploads/members_docs/<?= htmlspecialchars($d['file_path']) ?>">
-                                            <i class="fas fa-download me-1"></i> Abrir
-                                        </a>
-                                        <a class="btn btn-sm btn-outline-danger btn-delete-doc" data-href="/admin/members/documents/delete/<?= $d['id'] ?>">
-                                            <i class="fas fa-trash me-1"></i> Excluir
-                                        </a>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        <?php endif; ?>
+    </div>
+</div>
+</div>
+
+<div class="col-lg-4">
+    <div class="member-summary-box sticky-top" style="top: 1rem; z-index: 10;">
+        <div class="member-form-card">
+            <div class="member-form-card-body">
+                <div class="fw-bold mb-3">Resumo</div>
+
+                <div class="summary-label">Nome</div>
+                <div class="summary-value" id="summaryName"><?= htmlspecialchars($member['name'] ?: '—') ?></div>
+
+                <div class="summary-label">Congregação</div>
+                <div class="summary-value" id="summaryCongregation">—</div>
+
+                <div class="summary-label">Cargo</div>
+                <div class="summary-value" id="summaryRole"><?= htmlspecialchars($member['role'] ?: 'Membro') ?></div>
+
+                <div class="summary-label">Situação</div>
+                <div class="summary-value mb-2" id="summaryStatus"><?= $isActive ? 'Ativo' : 'Inativo' ?></div>
+
+                <hr>
+                <div class="d-flex justify-content-between small text-muted mb-1">
+                    <span>Preenchimento</span>
+                    <span id="summaryProgressPct">0%</span>
                 </div>
-            <?php endif; ?>
+                <div class="progress" style="height: 6px;">
+                    <div class="progress-bar bg-dark" id="summaryProgressBar" style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
+        <div class="member-form-card">
+            <div class="member-form-card-body member-summary-note">
+                Campos marcados com <span class="required-mark">*</span> são obrigatórios. Os dados pessoais são de uso interno da secretaria.
+            </div>
         </div>
     </div>
 </div>
+</div>
 
 <script>
-document.querySelector('form').addEventListener('submit', function(e) {
+document.getElementById('memberEditForm').addEventListener('submit', function(e) {
     let isValid = true;
     const requiredFields = this.querySelectorAll('[required]');
-    
-    // Remove estilos anteriores
     requiredFields.forEach(field => field.classList.remove('is-invalid'));
-    
-    // Valida campos
+
     for (let field of requiredFields) {
         if (!field.value.trim()) {
             field.classList.add('is-invalid');
             if (isValid) {
-                // Foca apenas no primeiro campo inválido
+                field.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 field.focus();
                 isValid = false;
-                
                 Swal.fire({
                     icon: 'warning',
                     title: 'Campos Obrigatórios',
@@ -416,7 +636,7 @@ document.querySelector('form').addEventListener('submit', function(e) {
             }
         }
     }
-    
+
     if (!isValid) {
         e.preventDefault();
     }
@@ -426,12 +646,11 @@ document.querySelector('form').addEventListener('submit', function(e) {
 function loadRoles(selectedRole = null) {
     const select = document.getElementById('roleSelect');
     const initialSelected = select.getAttribute('data-selected');
-    
-    // Se não foi passado um cargo específico para selecionar, usa o do atributo data-selected (cargo atual do membro)
+
     if (!selectedRole && initialSelected) {
         selectedRole = initialSelected;
     }
-    
+
     fetch('/api/roles/list')
         .then(response => response.json())
         .then(roles => {
@@ -443,13 +662,13 @@ function loadRoles(selectedRole = null) {
                 }
                 select.add(option);
             });
-            
-            // Se o cargo atual não estiver na lista (foi removido ou é legado), adiciona ele
+
             if (selectedRole && !Array.from(select.options).some(opt => opt.value === selectedRole)) {
                 const option = new Option(selectedRole, selectedRole);
                 option.selected = true;
                 select.add(option);
             }
+            updateSummary();
         })
         .catch(error => {
             console.error('Erro ao carregar cargos:', error);
@@ -457,7 +676,6 @@ function loadRoles(selectedRole = null) {
         });
 }
 
-// Carregar cargos ao iniciar
 document.addEventListener('DOMContentLoaded', function() {
     loadRoles();
 });
@@ -480,20 +698,16 @@ document.getElementById('btnAddRole').addEventListener('click', function() {
     }).then((result) => {
         if (result.isConfirmed) {
             const newRole = result.value;
-            
-            // Enviar para API
             fetch('/api/roles/create', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ name: newRole })
             })
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
                     Swal.fire('Sucesso', data.message, 'success');
-                    loadRoles(newRole); // Recarrega e seleciona o novo
+                    loadRoles(newRole);
                 } else {
                     Swal.fire('Erro', data.error || 'Erro desconhecido', 'error');
                 }
@@ -509,7 +723,7 @@ document.getElementById('btnAddRole').addEventListener('click', function() {
 document.getElementById('btnEditRole').addEventListener('click', function() {
     const select = document.getElementById('roleSelect');
     const selectedOption = select.options[select.selectedIndex];
-    
+
     if (!selectedOption.value) {
         Swal.fire('Atenção', 'Selecione um cargo para editar.', 'warning');
         return;
@@ -533,20 +747,16 @@ document.getElementById('btnEditRole').addEventListener('click', function() {
     }).then((result) => {
         if (result.isConfirmed) {
             const newName = result.value;
-            
-            // Enviar para API
             fetch('/api/roles/update', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ old_name: oldName, new_name: newName })
             })
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
                     Swal.fire('Sucesso', data.message, 'success');
-                    loadRoles(newName); // Recarrega e seleciona o editado
+                    loadRoles(newName);
                 } else {
                     Swal.fire('Erro', data.error || 'Erro desconhecido', 'error');
                 }
@@ -562,7 +772,7 @@ document.getElementById('btnEditRole').addEventListener('click', function() {
 document.getElementById('btnDeleteRole').addEventListener('click', function() {
     const select = document.getElementById('roleSelect');
     const selectedOption = select.options[select.selectedIndex];
-    
+
     if (!selectedOption.value) {
         Swal.fire('Atenção', 'Selecione um cargo para excluir.', 'warning');
         return;
@@ -581,19 +791,16 @@ document.getElementById('btnDeleteRole').addEventListener('click', function() {
         cancelButtonText: 'Cancelar'
     }).then((result) => {
         if (result.isConfirmed) {
-            // Enviar para API
             fetch('/api/roles/delete', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ name: roleName })
             })
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
                     Swal.fire('Removido!', data.message, 'success');
-                    loadRoles(); // Recarrega a lista
+                    loadRoles();
                 } else {
                     Swal.fire('Erro', data.error || 'Erro desconhecido', 'error');
                 }
@@ -609,24 +816,65 @@ document.getElementById('btnDeleteRole').addEventListener('click', function() {
 <script>
     // Controle de exibição da data de batismo
     document.getElementById('isBaptized').addEventListener('change', function() {
-        document.getElementById('baptismDateDiv').style.display = this.checked ? 'block' : 'none';
+        document.getElementById('baptismDateInput').disabled = !this.checked;
+        if (!this.checked) document.getElementById('baptismDateInput').value = '';
     });
 
-    // Controle de exibição da data de saída
-    const memberStatus = document.getElementById('memberStatus');
+    // Seleção visual do status (Ativo/Inativo) + campo de data de saída
+    const statusOptions = document.querySelectorAll('[data-status-option]');
     const exitDateDiv = document.getElementById('exitDateDiv');
+    function refreshStatusUI() {
+        statusOptions.forEach(opt => {
+            const input = opt.querySelector('input[type="radio"]');
+            opt.classList.toggle('active', input.checked);
+        });
+        const checked = document.querySelector('input[name="status"]:checked');
+        exitDateDiv.style.display = (checked && checked.value === 'inactive') ? '' : 'none';
+    }
+    statusOptions.forEach(opt => {
+        opt.addEventListener('click', function () {
+            const input = this.querySelector('input[type="radio"]');
+            input.checked = true;
+            refreshStatusUI();
+            updateSummary();
+        });
+    });
+    refreshStatusUI();
 
-    function toggleExitDate() {
-        if (memberStatus.value === 'active' || memberStatus.value === '') {
-            exitDateDiv.style.display = 'none';
-        } else {
-            exitDateDiv.style.display = 'block';
-        }
+    // Painel de resumo lateral
+    const form = document.getElementById('memberEditForm');
+    const nameInput = document.querySelector('[name="name"]');
+    const congregationSelect = document.querySelector('[name="congregation_id"]');
+    const roleSelect = document.getElementById('roleSelect');
+
+    const summaryName = document.getElementById('summaryName');
+    const summaryCongregation = document.getElementById('summaryCongregation');
+    const summaryRole = document.getElementById('summaryRole');
+    const summaryStatus = document.getElementById('summaryStatus');
+    const summaryProgressPct = document.getElementById('summaryProgressPct');
+    const summaryProgressBar = document.getElementById('summaryProgressBar');
+
+    function updateSummary() {
+        summaryName.textContent = nameInput.value.trim() || '—';
+
+        const congOption = congregationSelect.options[congregationSelect.selectedIndex];
+        summaryCongregation.textContent = (congOption && congOption.value) ? congOption.text : '—';
+
+        summaryRole.textContent = roleSelect.value || 'Membro';
+
+        const checkedStatus = document.querySelector('input[name="status"]:checked');
+        summaryStatus.textContent = (checkedStatus && checkedStatus.value === 'inactive') ? 'Inativo' : 'Ativo';
+
+        const requiredFields = Array.from(form.querySelectorAll('[required]'));
+        const filled = requiredFields.filter(f => f.value && f.value.trim() !== '').length;
+        const pct = requiredFields.length ? Math.round((filled / requiredFields.length) * 100) : 0;
+        summaryProgressPct.textContent = pct + '%';
+        summaryProgressBar.style.width = pct + '%';
     }
 
-    memberStatus.addEventListener('change', toggleExitDate);
-    // Executa ao carregar para garantir estado inicial correto
-    toggleExitDate();
+    form.addEventListener('input', updateSummary);
+    form.addEventListener('change', updateSummary);
+    updateSummary();
 
     // Busca de CEP automática (ViaCEP)
     document.getElementById('zip_code').addEventListener('blur', function() {
@@ -646,6 +894,7 @@ document.getElementById('btnDeleteRole').addEventListener('click', function() {
                 .catch(error => console.error('Erro ao buscar CEP:', error));
         }
     });
+
     // Webcam functionality
     const btnWebcam = document.getElementById('btnWebcam');
     const webcamContainer = document.getElementById('webcamContainer');
@@ -654,16 +903,22 @@ document.getElementById('btnDeleteRole').addEventListener('click', function() {
     const btnCapture = document.getElementById('btnCapture');
     const btnCancelWebcam = document.getElementById('btnCancelWebcam');
     const photoPreview = document.getElementById('photoPreview');
+    const photoPlaceholder = document.getElementById('photoPlaceholder');
     const webcamPhotoData = document.getElementById('webcamPhotoData');
     const photoInput = document.getElementById('photoInput');
     let stream = null;
+
+    function showPhotoPreview(src) {
+        photoPreview.src = src;
+        photoPreview.style.display = '';
+        photoPlaceholder.style.display = 'none';
+    }
 
     btnWebcam.addEventListener('click', async () => {
         try {
             stream = await navigator.mediaDevices.getUserMedia({ video: true });
             video.srcObject = stream;
             webcamContainer.style.display = 'block';
-            btnWebcam.style.display = 'none';
         } catch (err) {
             console.error("Error accessing webcam: ", err);
             Swal.fire({
@@ -678,20 +933,15 @@ document.getElementById('btnDeleteRole').addEventListener('click', function() {
     btnCapture.addEventListener('click', () => {
         const context = canvas.getContext('2d');
         context.drawImage(video, 0, 0, 320, 240);
-        // Set preview image src to dataURL
         const dataURL = canvas.toDataURL('image/jpeg');
-        photoPreview.src = dataURL;
-        webcamPhotoData.value = dataURL; // Store base64 data in hidden input
-        
-        // Clear file input if webcam is used
+        showPhotoPreview(dataURL);
+        webcamPhotoData.value = dataURL;
         photoInput.value = '';
-        
-        // Stop webcam stream
+
         if (stream) {
             stream.getTracks().forEach(track => track.stop());
         }
         webcamContainer.style.display = 'none';
-        btnWebcam.style.display = 'block';
     });
 
     btnCancelWebcam.addEventListener('click', () => {
@@ -699,23 +949,19 @@ document.getElementById('btnDeleteRole').addEventListener('click', function() {
             stream.getTracks().forEach(track => track.stop());
         }
         webcamContainer.style.display = 'none';
-        btnWebcam.style.display = 'block';
     });
 
-    // Preview uploaded file
     photoInput.addEventListener('change', function(e) {
         if (e.target.files && e.target.files[0]) {
             const reader = new FileReader();
             reader.onload = function(e) {
-                photoPreview.src = e.target.result;
+                showPhotoPreview(e.target.result);
             }
             reader.readAsDataURL(e.target.files[0]);
-            
-            // Clear webcam data if file is selected
             webcamPhotoData.value = '';
         }
     });
-    
+
     const methodSelect = document.getElementById('admissionMethod');
     const helpBox = document.getElementById('admissionHelp');
     const transferBox = document.getElementById('transferLetterBox');
@@ -726,13 +972,12 @@ document.getElementById('btnDeleteRole').addEventListener('click', function() {
             'Batismo': 'Novo convertido, recebido após o batismo nas águas.',
             'Congregado': 'Passou a congregar, sem transferência formal.'
         };
-        const val = methodSelect.value.split(' — ')[0];
-        helpBox.textContent = map[val] || '';
-        transferBox.style.display = (val === 'Transferido') ? '' : 'none';
+        helpBox.textContent = map[methodSelect.value] || 'Selecione a forma de ingresso do membro.';
+        transferBox.style.display = (methodSelect.value === 'Transferido') ? '' : 'none';
     }
     methodSelect.addEventListener('change', updateAdmission);
     updateAdmission();
-    
+
     let transferStream = null;
     const btnTransferWebcam = document.getElementById('btnTransferWebcam');
     const transferWebcamContainer = document.getElementById('transferWebcamContainer');
@@ -742,30 +987,23 @@ document.getElementById('btnDeleteRole').addEventListener('click', function() {
     const btnTransferCancel = document.getElementById('btnTransferCancel');
     const transferData = document.getElementById('transferLetterWebcamData');
     const transferPreview = document.getElementById('transferPreviewImage');
-    const transferFile = document.querySelector('input[name=\"transfer_letter\"]');
-    const hasExistingTransfer = <?= isset($hasTransferLetter) && $hasTransferLetter ? 'true' : 'false' ?>;
+    const transferFile = document.querySelector('input[name="transfer_letter"]');
+    const hasExistingTransfer = <?= $hasTransferLetter ? 'true' : 'false' ?>;
     if (transferFile) {
         transferFile.addEventListener('change', async function () {
             if (transferFile.files && transferFile.files.length > 0) {
                 if (hasExistingTransfer) {
-                    if (typeof Swal !== 'undefined') {
-                        const res = await Swal.fire({
-                            icon: 'warning',
-                            title: 'Substituir carta?',
-                            text: 'Já existe uma carta anexada. A nova irá substituir a atual.',
-                            showCancelButton: true,
-                            confirmButtonText: 'Substituir',
-                            cancelButtonText: 'Cancelar'
-                        });
-                        if (!res.isConfirmed) {
-                            transferFile.value = '';
-                            return;
-                        }
-                    } else {
-                        if (!confirm('Já existe uma carta anexada. A nova irá substituir a atual. Deseja continuar?')) {
-                            transferFile.value = '';
-                            return;
-                        }
+                    const res = await Swal.fire({
+                        icon: 'warning',
+                        title: 'Substituir carta?',
+                        text: 'Já existe uma carta anexada. A nova irá substituir a atual.',
+                        showCancelButton: true,
+                        confirmButtonText: 'Substituir',
+                        cancelButtonText: 'Cancelar'
+                    });
+                    if (!res.isConfirmed) {
+                        transferFile.value = '';
+                        return;
                     }
                 }
                 transferData.value = '';
@@ -809,26 +1047,20 @@ document.getElementById('btnDeleteRole').addEventListener('click', function() {
     });
     btnTransferCapture.addEventListener('click', async () => {
         if (hasExistingTransfer) {
-            if (typeof Swal !== 'undefined') {
-                const res = await Swal.fire({
-                    icon: 'warning',
-                    title: 'Substituir carta?',
-                    text: 'Já existe uma carta anexada. A nova irá substituir a atual.',
-                    showCancelButton: true,
-                    confirmButtonText: 'Substituir',
-                    cancelButtonText: 'Cancelar'
-                });
-                if (!res.isConfirmed) return;
-            } else {
-                if (!confirm('Já existe uma carta anexada. A nova irá substituir a atual. Deseja continuar?')) {
-                    return;
-                }
-            }
+            const res = await Swal.fire({
+                icon: 'warning',
+                title: 'Substituir carta?',
+                text: 'Já existe uma carta anexada. A nova irá substituir a atual.',
+                showCancelButton: true,
+                confirmButtonText: 'Substituir',
+                cancelButtonText: 'Cancelar'
+            });
+            if (!res.isConfirmed) return;
         }
         const ctx = transferCanvas.getContext('2d');
         const targetW = transferCanvas.width;
         const targetH = transferCanvas.height;
-        const targetRatio = targetW / targetH; // ~0.707 (A4 portrait)
+        const targetRatio = targetW / targetH;
         const vw = transferVideo.videoWidth || 640;
         const vh = transferVideo.videoHeight || 480;
         const videoRatio = vw / vh;
@@ -849,7 +1081,7 @@ document.getElementById('btnDeleteRole').addEventListener('click', function() {
         transferData.value = dataURL;
         transferPreview.src = dataURL;
         transferPreview.style.display = '';
-    if (transferFile) transferFile.value = '';
+        if (transferFile) transferFile.value = '';
         if (transferStream) transferStream.getTracks().forEach(t => t.stop());
         transferWebcamContainer.style.display = 'none';
         btnTransferWebcam.style.display = 'block';
@@ -883,5 +1115,5 @@ document.querySelectorAll('.btn-delete-doc').forEach(btn => {
     });
 });
 </script>
-<?php include __DIR__ . '/../../layout/footer.php'; ?>
+
 <?php include __DIR__ . '/../../layout/footer.php'; ?>

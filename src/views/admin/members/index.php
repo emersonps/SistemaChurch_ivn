@@ -4,8 +4,8 @@
     <h1 class="h2">Membros</h1>
     <div class="btn-toolbar mb-2 mb-md-0 gap-2">
         <?php if (hasPermission('members.manage')): ?>
-        <a href="/admin/members/import" class="btn btn-sm btn-outline-primary">
-            <i class="fas fa-file-import"></i> Importar Planilha
+        <a href="/admin/members/import" class="btn btn-sm btn-outline-secondary rounded-pill fw-semibold px-3">
+            <i class="fas fa-file-import me-1"></i> Importar Planilha
         </a>
         <?php endif; ?>
         <?php
@@ -14,11 +14,11 @@
             $waMessage = "Olá! Para se cadastrar como membro, preencha a ficha de cadastro no link abaixo:\n" . $selfRegisterUrl;
             $waLink = "https://wa.me/?text=" . urlencode($waMessage);
         ?>
-        <a href="<?= $waLink ?>" target="_blank" class="btn btn-sm btn-success">
-            <i class="fab fa-whatsapp"></i> Enviar Ficha de Cadastro
+        <a href="<?= $waLink ?>" target="_blank" class="btn btn-sm btn-outline-success rounded-pill fw-semibold px-3">
+            <i class="fab fa-whatsapp me-1"></i> Enviar Ficha de Cadastro
         </a>
-        <a href="/admin/members/create" class="btn btn-sm btn-primary">
-            <i class="fas fa-plus"></i> Novo Membro
+        <a href="/admin/members/create" class="btn btn-sm btn-primary rounded-pill fw-semibold px-3">
+            <i class="fas fa-plus me-1"></i> Novo Membro
         </a>
     </div>
 </div>
@@ -64,6 +64,130 @@ $hasMultipleCongregations = count($groupedMembers) > 1;
 ?>
 
 <style>
+    #memberTabs.nav-tabs {
+        border-bottom: none;
+        gap: .4rem;
+    }
+    #memberTabs.nav-tabs .nav-link {
+        border: 1px solid rgba(0,0,0,0.1);
+        border-radius: 999px;
+        padding: .45rem 1rem;
+        font-weight: 700;
+        font-size: .85rem;
+        color: #495057;
+        background: #fff;
+    }
+    #memberTabs.nav-tabs .nav-link:hover {
+        border-color: rgba(179,0,0,0.3);
+        color: #b30000;
+        isolation: isolate;
+    }
+    #memberTabs.nav-tabs .nav-link.active {
+        background: #b30000;
+        border-color: #b30000;
+        color: #fff;
+    }
+    #memberTabs.nav-tabs .nav-link .badge {
+        font-weight: 700;
+        background: #eef0f2;
+        color: #495057;
+    }
+    #memberTabs.nav-tabs .nav-link.active .badge {
+        background: rgba(255,255,255,0.25);
+        color: #fff;
+    }
+
+    .member-pane-card {
+        border-radius: 16px;
+        border: 1px solid rgba(0,0,0,0.08);
+        overflow: hidden;
+        background: #fff;
+    }
+    .member-pane-head {
+        background: #fafafa;
+    }
+    .member-pane-title {
+        font-weight: 800;
+        font-size: 1.05rem;
+        letter-spacing: .01em;
+        color: #1a1a1a;
+    }
+    .member-pane-hint {
+        font-size: .72rem;
+        letter-spacing: .06em;
+        font-weight: 700;
+        color: rgba(0,0,0,0.4);
+        text-transform: uppercase;
+    }
+    .member-pane-hint i {
+        color: #b30000;
+    }
+
+    .members-table thead th {
+        font-size: .76rem;
+        text-transform: uppercase;
+        letter-spacing: .03em;
+        color: #868e96;
+        font-weight: 700;
+        border-bottom-width: 1px;
+    }
+    .members-table td {
+        vertical-align: middle;
+        padding-top: .65rem;
+        padding-bottom: .65rem;
+    }
+
+    .role-pill {
+        display: inline-block;
+        padding: .25rem .6rem;
+        border-radius: 999px;
+        font-size: .72rem;
+        font-weight: 700;
+        background: #eef0f2;
+        color: #495057;
+    }
+    .status-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: .4rem;
+        padding: .3rem .65rem;
+        border-radius: 999px;
+        font-size: .72rem;
+        font-weight: 700;
+    }
+    .status-pill::before {
+        content: '';
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: currentColor;
+        flex: 0 0 auto;
+    }
+    .status-pill.is-active { background: rgba(25,135,84,0.12); color: #198754; }
+    .status-pill.is-inactive { background: rgba(0,0,0,0.06); color: #6c757d; }
+
+    .table-responsive {
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+    .table-responsive::-webkit-scrollbar {
+        display: none;
+    }
+
+    .dataTables_wrapper .dataTables_filter input {
+        border-radius: 10px;
+        border-color: rgba(0,0,0,0.14);
+        padding: .5rem .8rem;
+        box-shadow: none;
+    }
+    .dataTables_wrapper .dataTables_filter input:focus {
+        border-color: #b30000;
+        box-shadow: 0 0 0 .2rem rgba(179,0,0,0.12);
+    }
+    .dataTables_wrapper .dataTables_length select {
+        border-radius: 8px;
+    }
+
     @media (max-width: 991.98px) {
         .member-tabs-carousel {
             position: relative;
@@ -95,31 +219,6 @@ $hasMultipleCongregations = count($groupedMembers) > 1;
             padding: .35rem;
         }
         .member-tabs-carousel.multi #memberTabsContent > .tab-pane.fade { transition: none; }
-        .member-pane-card {
-            border-radius: 16px;
-            border: 1px solid rgba(0,0,0,0.08);
-            overflow: hidden;
-            background: #fff;
-        }
-        .member-pane-head {
-            background: linear-gradient(135deg, rgba(179,0,0,0.10), rgba(212,175,55,0.16));
-        }
-        .member-pane-title {
-            font-weight: 900;
-            font-size: 1.05rem;
-            letter-spacing: .01em;
-            color: #2d1a21;
-        }
-        .member-pane-hint {
-            font-size: .72rem;
-            letter-spacing: .08em;
-            font-weight: 800;
-            color: rgba(0,0,0,0.52);
-            text-transform: uppercase;
-        }
-        .member-pane-hint i {
-            color: #b30000;
-        }
         .dataTables_wrapper .dataTables_filter {
             width: 100%;
             text-align: left;
@@ -178,7 +277,7 @@ $hasMultipleCongregations = count($groupedMembers) > 1;
                 </div>
             </div>
         <div class="table-responsive p-2">
-            <table class="table table-striped table-hover table-sm datatable" style="width:100%">
+            <table class="table table-hover members-table datatable" style="width:100%">
                 <thead class="table-light">
                     <tr>
                         <th style="width: 60px;">Foto</th>
@@ -207,7 +306,7 @@ $hasMultipleCongregations = count($groupedMembers) > 1;
                                 <span class="badge bg-warning text-dark ms-1">Dirigente</span>
                             <?php endif; ?>
                         </td>
-                        <td class="align-middle"><span class="badge bg-light text-dark border"><?= htmlspecialchars($member['role'] ?? 'Membro') ?></span></td>
+                        <td class="align-middle"><span class="role-pill"><?= htmlspecialchars($member['role'] ?? 'Membro') ?></span></td>
                         <td class="align-middle d-none d-md-table-cell"><?= htmlspecialchars($member['phone'] ?? '-') ?></td>
                         <td class="align-middle d-none d-md-table-cell">
                             <?php 
@@ -222,12 +321,12 @@ $hasMultipleCongregations = count($groupedMembers) > 1;
                                     $statusLabel = 'Inativo(Desligado/Saiu)';
                                 }
                             ?>
-                            <span class="badge bg-<?= $isActive ? 'success' : 'secondary' ?>">
+                            <span class="status-pill <?= $isActive ? 'is-active' : 'is-inactive' ?>">
                                 <?= $statusLabel ?>
                             </span>
                         </td>
                         <td class="align-middle text-end">
-                            <a href="/admin/members/show/<?= $member['id'] ?>" class="btn btn-sm btn-outline-primary" title="Ficha">
+                            <a href="/admin/members/show/<?= $member['id'] ?>" class="btn btn-sm btn-outline-primary rounded-pill" title="Ficha">
                                 <i class="fas fa-user me-1"></i> Ficha
                             </a>
                         </td>
@@ -274,7 +373,6 @@ $hasMultipleCongregations = count($groupedMembers) > 1;
         });
 
         $('.dataTables_wrapper .dataTables_filter input')
-            .addClass('form-control-lg border-primary shadow-sm')
             .attr('aria-label', 'Buscar por registros');
         
         // Ajustar colunas ao mudar de aba
