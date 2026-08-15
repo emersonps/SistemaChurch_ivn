@@ -139,7 +139,7 @@ if (!empty($fhRestCategories)) {
 <div class="portal-card fh-hero mb-3 p-3">
     <div class="d-flex justify-content-between align-items-start gap-2">
         <div>
-            <div class="fh-hero-title">🙏 <?= htmlspecialchars($fhTier['title']) ?></div>
+            <div class="fh-hero-title"><?= htmlspecialchars($fhTier['title']) ?></div>
             <div class="text-muted small">Consulta direta ao módulo da secretaria</div>
         </div>
         <span class="fh-shield fh-shield-<?= $healthTier ?>"><i class="fas fa-shield-heart"></i></span>
@@ -234,8 +234,7 @@ if (!empty($fhRestCategories)) {
             </div>
             <div class="modal-body">
                 <div class="fh-info-box mb-3">
-                    <div class="fw-bold small mb-1"><?= htmlspecialchars(mb_strtoupper($monthLabel, 'UTF-8')) ?></div>
-                    <div class="text-muted small">Todos os compromissos foram mapeados diretamente do módulo secretaria. Sem exibir valores, só proporção e status real — evita fofoca, mantém confiança.</div>
+                    <div class="fw-bold small"><?= htmlspecialchars(mb_strtoupper($monthLabel, 'UTF-8')) ?></div>
                 </div>
                 <?php if (empty($categories)): ?>
                     <p class="text-muted text-center py-3 mb-0">Nenhuma despesa lançada em <?= htmlspecialchars($monthLabel) ?> até agora.</p>
@@ -257,7 +256,7 @@ if (!empty($fhRestCategories)) {
                 <?php endif; ?>
             </div>
             <div class="modal-footer fh-modal-footer justify-content-center">
-                <span class="text-muted small text-center">🙏 Sem R$ na visão pública evita fofoca e mantém o foco no cuidado da casa</span>
+                <span class="text-muted small text-center">Sem R$ na visão pública evita fofoca e mantém o foco no cuidado da casa</span>
             </div>
         </div>
     </div>
