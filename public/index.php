@@ -669,6 +669,9 @@ elseif (preg_match('#^/admin/expenses/delete/(\d+)$#', $uri, $matches)) {
 elseif ($uri == '/admin/financial/report') {
     (new FinancialReportController())->index();
 }
+elseif ($uri == '/admin/financial/report/print') {
+    (new FinancialReportController())->print();
+}
 elseif (preg_match('#^/admin/financial/export/(csv|excel)$#', $uri, $matches)) {
     (new FinancialReportController())->export($matches[1]);
 }

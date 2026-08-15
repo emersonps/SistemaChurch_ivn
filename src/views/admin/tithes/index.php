@@ -131,6 +131,38 @@ $hasMultipleCongregations = $tabTotal > 1;
 ?>
 
 <style>
+    #titheTabs.nav-tabs {
+        border-bottom: none;
+        gap: .4rem;
+    }
+    #titheTabs.nav-tabs .nav-link {
+        border: 1px solid rgba(0,0,0,0.1);
+        border-radius: 999px;
+        padding: .45rem 1rem;
+        font-weight: 700;
+        font-size: .85rem;
+        color: #495057;
+        background: #fff;
+    }
+    #titheTabs.nav-tabs .nav-link:hover {
+        border-color: rgba(179,0,0,0.3);
+        color: #b30000;
+        isolation: isolate;
+    }
+    #titheTabs.nav-tabs .nav-link.active {
+        background: #b30000;
+        border-color: #b30000;
+        color: #fff;
+    }
+    #titheTabs.nav-tabs .nav-link .badge {
+        font-weight: 700;
+        background: #eef0f2;
+        color: #495057;
+    }
+    #titheTabs.nav-tabs .nav-link.active .badge {
+        background: rgba(255,255,255,0.25);
+        color: #fff;
+    }
     .tithe-pane-card {
         border-radius: 16px;
         border: 1px solid rgba(0,0,0,0.08);

@@ -1,11 +1,21 @@
 <?php include __DIR__ . '/../../layout/header.php'; ?>
 <?php $siteProfile = getChurchSiteProfileSettings(); ?>
 
-<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-4 border-bottom">
-    <h1 class="h2">Layout da Carteirinha</h1>
+<div class="member-form-topbar d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-4 border-bottom">
+    <h1 class="h2 mb-0">Layout da Carteirinha</h1>
+    <div class="d-none d-md-flex gap-2">
+        <a href="/" target="_blank" class="btn btn-outline-secondary rounded-pill fw-semibold px-4">Ver Site</a>
+        <button type="submit" form="cardLayoutForm" class="btn btn-dark rounded-pill fw-semibold px-4"><i class="fas fa-save me-2"></i> Salvar Layout</button>
+    </div>
 </div>
 
 <style>
+    .member-form-topbar {
+        position: sticky;
+        top: 0;
+        z-index: 1030;
+        background: #f8f9fa;
+    }
     .member-form-card {
         background: #fff;
         border: 1px solid rgba(0,0,0,0.08);
@@ -216,7 +226,8 @@
         </div>
     </div>
 
-    <div class="d-flex justify-content-end mb-4">
+    <div class="d-flex justify-content-end gap-2 mb-4 d-md-none">
+        <a href="/" target="_blank" class="btn btn-outline-secondary rounded-pill fw-semibold px-4">Ver Site</a>
         <button type="submit" class="btn btn-dark rounded-pill fw-semibold px-4"><i class="fas fa-save me-2"></i> Salvar Layout</button>
     </div>
 </form>

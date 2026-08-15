@@ -72,32 +72,30 @@ class FinancialReportController {
         return [$start->format('Y-m-d'), $end->format('Y-m-d')];
     }
     
-    public function index() {
-        requirePermission('financial.view');
-        $db = (new Database())->connect();
+    private function buildReportData(PDO $db) {
         $hasAccountableField = $this->tableHasColumn($db, 'tithes', 'is_accountable');
         $hasExpenseAccountableField = $this->tableHasColumn($db, 'expenses', 'is_accountable');
-        
+
         // Default Filters
         [$start_date, $end_date] = $this->resolveDateRangeYmd();
         $congregation_id = $_GET['congregation_id'] ?? null;
-        
+
         // Scope Check
         if (!empty($_SESSION['user_congregation_id'])) {
             $congregation_id = $_SESSION['user_congregation_id'];
         }
 
         // --- Fetch Entries (Tithes/Offerings) ---
-        $sqlEntries = "SELECT t.*, m.name as member_name, c.name as congregation_name 
-                       FROM tithes t 
-                       LEFT JOIN members m ON t.member_id = m.id 
+        $sqlEntries = "SELECT t.*, m.name as member_name, c.name as congregation_name
+                       FROM tithes t
+                       LEFT JOIN members m ON t.member_id = m.id
                        LEFT JOIN congregations c ON t.congregation_id = c.id
                        WHERE t.payment_date BETWEEN ? AND ?";
         $paramsEntries = [$start_date, $end_date];
         if ($hasAccountableField) {
             $sqlEntries .= " AND t.is_accountable = 1";
         }
-        
+
         if ($congregation_id) {
             $sqlEntries .= " AND t.congregation_id = ?";
             $paramsEntries[] = $congregation_id;
@@ -108,15 +106,15 @@ class FinancialReportController {
         $entries = $entries->fetchAll();
 
         // --- Fetch Expenses ---
-        $sqlExpenses = "SELECT e.*, c.name as congregation_name 
-                        FROM expenses e 
-                        LEFT JOIN congregations c ON e.congregation_id = c.id 
+        $sqlExpenses = "SELECT e.*, c.name as congregation_name
+                        FROM expenses e
+                        LEFT JOIN congregations c ON e.congregation_id = c.id
                         WHERE e.expense_date BETWEEN ? AND ?";
         $paramsExpenses = [$start_date, $end_date];
         if ($hasExpenseAccountableField) {
             $sqlExpenses .= " AND e.is_accountable = 1";
         }
-        
+
         if ($congregation_id) {
             $sqlExpenses .= " AND e.congregation_id = ?";
             $paramsExpenses[] = $congregation_id;
@@ -156,7 +154,17 @@ class FinancialReportController {
             $congregations = $db->query("SELECT * FROM congregations WHERE id = " . $_SESSION['user_congregation_id'])->fetchAll();
         }
 
-        view('admin/financial/report', [
+        $congregationName = null;
+        if ($congregation_id) {
+            foreach ($congregations as $c) {
+                if ((string)$c['id'] === (string)$congregation_id) {
+                    $congregationName = $c['name'];
+                    break;
+                }
+            }
+        }
+
+        return [
             'entries' => $entries,
             'expenses' => $expenses,
             'total_entries' => $total_entries,
@@ -169,9 +177,22 @@ class FinancialReportController {
             'filters' => [
                 'start_date' => $start_date,
                 'end_date' => $end_date,
-                'congregation_id' => $congregation_id
+                'congregation_id' => $congregation_id,
+                'congregation_name' => $congregationName
             ]
-        ]);
+        ];
+    }
+
+    public function index() {
+        requirePermission('financial.view');
+        $db = (new Database())->connect();
+        view('admin/financial/report', $this->buildReportData($db));
+    }
+
+    public function print() {
+        requirePermission('financial.view');
+        $db = (new Database())->connect();
+        view('admin/financial/print_report', $this->buildReportData($db));
     }
 
     public function export($type) {

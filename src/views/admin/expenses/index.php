@@ -121,6 +121,38 @@ $hasMultipleCongregations = $tabTotal > 1;
 ?>
 
 <style>
+    #expenseTabs.nav-tabs {
+        border-bottom: none;
+        gap: .4rem;
+    }
+    #expenseTabs.nav-tabs .nav-link {
+        border: 1px solid rgba(0,0,0,0.1);
+        border-radius: 999px;
+        padding: .45rem 1rem;
+        font-weight: 700;
+        font-size: .85rem;
+        color: #495057;
+        background: #fff;
+    }
+    #expenseTabs.nav-tabs .nav-link:hover {
+        border-color: rgba(179,0,0,0.3);
+        color: #b30000;
+        isolation: isolate;
+    }
+    #expenseTabs.nav-tabs .nav-link.active {
+        background: #b30000;
+        border-color: #b30000;
+        color: #fff;
+    }
+    #expenseTabs.nav-tabs .nav-link .badge {
+        font-weight: 700;
+        background: #eef0f2;
+        color: #495057;
+    }
+    #expenseTabs.nav-tabs .nav-link.active .badge {
+        background: rgba(255,255,255,0.25);
+        color: #fff;
+    }
     .expense-pane-card {
         border-radius: 16px;
         border: 1px solid rgba(0,0,0,0.08);
@@ -192,7 +224,7 @@ $hasMultipleCongregations = $tabTotal > 1;
         $slug = md5($congName); // ID seguro para a aba
     ?>
     <li class="nav-item" role="presentation">
-        <button class="nav-link <?= $active ? 'active text-danger' : 'text-dark' ?>" id="tab-<?= $slug ?>" data-bs-toggle="tab" data-bs-target="#content-<?= $slug ?>" type="button" role="tab">
+        <button class="nav-link <?= $active ? 'active' : '' ?>" id="tab-<?= $slug ?>" data-bs-toggle="tab" data-bs-target="#content-<?= $slug ?>" type="button" role="tab">
             <i class="fas fa-church me-2"></i> <?= htmlspecialchars($congName) ?>
             <span class="badge bg-danger ms-1"><?= count($congExpenses) ?></span>
         </button>
@@ -309,10 +341,6 @@ $hasMultipleCongregations = $tabTotal > 1;
         // Ajustar colunas ao mudar de aba (bug comum do DataTables em abas ocultas)
         $('button[data-bs-toggle="tab"]').on('shown.bs.tab', function (e) {
             $.fn.dataTable.tables({ visible: true, api: true }).columns.adjust();
-            
-            // Alterar cor da aba ativa para vermelho (saídas)
-            $('#expenseTabs .nav-link').removeClass('text-danger text-dark').addClass('text-dark');
-            $(e.target).removeClass('text-dark').addClass('text-danger');
         });
 
         document.querySelectorAll('.btn-delete-expense').forEach(function (btn) {

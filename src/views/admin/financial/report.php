@@ -4,9 +4,9 @@
 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
     <h1 class="h2">Relatório Financeiro</h1>
     <div class="btn-toolbar mb-2 mb-md-0 d-print-none">
-        <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill fw-semibold px-3" onclick="window.print()">
+        <a href="/admin/financial/report/print?start_date=<?= $filters['start_date'] ?>&end_date=<?= $filters['end_date'] ?>&congregation_id=<?= $filters['congregation_id'] ?>" target="_blank" class="btn btn-sm btn-outline-secondary rounded-pill fw-semibold px-3">
             <i class="fas fa-print me-1"></i> Imprimir
-        </button>
+        </a>
     </div>
 </div>
 
@@ -16,6 +16,9 @@
         border: 1px solid rgba(0,0,0,0.08);
         border-radius: 16px;
         overflow: hidden;
+    }
+    .filter-card {
+        overflow: visible;
     }
     .filter-card .form-control,
     .filter-card .form-select {
