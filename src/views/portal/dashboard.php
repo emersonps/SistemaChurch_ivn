@@ -1,5 +1,22 @@
 <?php include __DIR__ . '/layout/header.php'; ?>
 
+<?php
+function portalWorkerHonorific($role) {
+    $map = [
+        'pastor' => 'Pr.', 'pastora' => 'Pra.',
+        'diacono' => 'Dc.', 'diácono' => 'Dc.', 'diaconisa' => 'Dca.',
+        'presbitero' => 'Presb.', 'presbítero' => 'Presb.', 'presbitera' => 'Presb.', 'presbítera' => 'Presb.',
+        'evangelista' => 'Evang.',
+        'cooperador' => 'Coop.', 'cooperadora' => 'Coop.',
+        'missionario' => 'Miss.', 'missionário' => 'Miss.', 'missionaria' => 'Miss.', 'missionária' => 'Miss.',
+        'obreiro' => 'Ob.', 'obreira' => 'Ob.',
+        'secretario' => 'Sec.', 'secretário' => 'Sec.', 'secretaria' => 'Sec.', 'secretária' => 'Sec.',
+        'tesoureiro' => 'Tes.', 'tesoureira' => 'Tes.',
+    ];
+    return $map[mb_strtolower(trim((string)$role), 'UTF-8')] ?? '';
+}
+?>
+
 <style>
     .portal-hero-banner {
         background: linear-gradient(135deg, var(--portal-primary) 0%, var(--portal-primary-dark) 100%);
@@ -100,6 +117,63 @@
         font-weight: 800;
         font-size: .8rem;
         flex: 0 0 auto;
+    }
+
+    /* ---------- Workers modal ---------- */
+    .pwm-modal-content { border-radius: 20px; border: none; overflow: hidden; }
+    .pwm-modal-header { border-bottom: 1px solid rgba(0,0,0,.06); align-items: flex-start; }
+    .pwm-eyebrow {
+        font-size: .68rem;
+        font-weight: 800;
+        letter-spacing: .08em;
+        text-transform: uppercase;
+        color: var(--portal-primary);
+        margin-bottom: .15rem;
+    }
+    .pwm-title { font-weight: 800; font-size: 1.15rem; color: #1a1a1a; }
+    .pwm-card {
+        background: #fff;
+        border: 1px solid rgba(0,0,0,.06);
+        border-radius: 16px;
+        padding: 1.1rem .9rem;
+        text-align: center;
+        height: 100%;
+    }
+    .pwm-avatar, .pwm-avatar-photo {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        margin: 0 auto .65rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 800;
+        font-size: 1.15rem;
+        object-fit: cover;
+    }
+    .pwm-yellow { background: #fdf0c4; color: #a17c00; }
+    .pwm-orange { background: #fbe0c8; color: #b05f11; }
+    .pwm-green { background: #cdeede; color: #1f8f68; }
+    .pwm-lavender { background: #dcdcf7; color: #5b52c9; }
+    .pwm-pink { background: #f9d9e6; color: #c23d78; }
+    .pwm-blue { background: #d6e6fb; color: #2464b0; }
+    .pwm-name { font-weight: 700; font-size: .88rem; color: #1a1a1a; }
+    .pwm-role { font-size: .76rem; color: #868e96; margin-top: .1rem; }
+    .pwm-caption {
+        font-size: .68rem;
+        color: #adb5bd;
+        margin-top: .6rem;
+        padding-top: .5rem;
+        border-top: 1px dashed rgba(0,0,0,.08);
+    }
+    .pwm-footnote {
+        background: rgba(179,0,0,.05);
+        border: 1px solid rgba(179,0,0,.12);
+        border-radius: 14px;
+        padding: .75rem 1rem;
+        text-align: center;
+        font-size: .78rem;
+        color: #6c757d;
     }
 </style>
 
@@ -246,31 +320,46 @@ if (isset($portalNavGroupsDashboard['Igreja'])) {
 <!-- Obreiros da Congregação Modal -->
 <div class="modal fade" id="portalWorkersModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-        <div class="modal-content" style="border-radius: 20px; border: none;">
-            <div class="modal-header" style="border-bottom: 1px solid rgba(0,0,0,.06);">
-                <h5 class="modal-title fw-bold"><i class="fas fa-users text-primary me-2"></i> Obreiros da Congregação</h5>
+        <div class="modal-content pwm-modal-content">
+            <div class="modal-header pwm-modal-header">
+                <div>
+                    <div class="pwm-eyebrow">Nossa Família</div>
+                    <h5 class="modal-title pwm-title mb-0">
+                        <?= !empty($member['congregation_name']) ? 'Obreiros ' . htmlspecialchars($member['congregation_name']) : 'Obreiros da Congregação' ?>
+                    </h5>
+                </div>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
             </div>
             <div class="modal-body">
                 <?php if (empty($workers)): ?>
                     <p class="text-muted text-center mb-0 py-3">Nenhum obreiro cadastrado.</p>
                 <?php else: ?>
-                    <div class="row g-2">
-                        <?php foreach ($workers as $w): ?>
-                            <div class="col-sm-6 col-lg-4">
-                                <div class="portal-worker">
+                    <?php $pwmPalette = ['pwm-yellow', 'pwm-orange', 'pwm-green', 'pwm-lavender', 'pwm-pink', 'pwm-blue']; ?>
+                    <div class="row g-3">
+                        <?php foreach ($workers as $wi => $w): ?>
+                            <?php
+                            $honorific = portalWorkerHonorific($w['role'] ?? '');
+                            $paletteClass = $pwmPalette[$wi % count($pwmPalette)];
+                            $nameParts = preg_split('/\s+/', trim((string)($w['name'] ?? '')));
+                            $initials = mb_strtoupper(mb_substr($nameParts[0] ?? '', 0, 1), 'UTF-8');
+                            if (count($nameParts) > 1) $initials .= mb_strtoupper(mb_substr(end($nameParts), 0, 1), 'UTF-8');
+                            ?>
+                            <div class="col-6 col-lg-4">
+                                <div class="pwm-card">
                                     <?php if (!empty($w['photo'])): ?>
-                                        <img src="/uploads/members/<?= htmlspecialchars($w['photo']) ?>" class="portal-worker-avatar" alt="">
+                                        <img src="/uploads/members/<?= htmlspecialchars($w['photo']) ?>" class="pwm-avatar-photo" alt="">
                                     <?php else: ?>
-                                        <div class="portal-worker-avatar-fallback"><?= htmlspecialchars(mb_strtoupper(mb_substr($w['name'], 0, 1))) ?></div>
+                                        <div class="pwm-avatar <?= $paletteClass ?>"><?= htmlspecialchars($initials) ?></div>
                                     <?php endif; ?>
-                                    <div class="flex-grow-1 text-truncate">
-                                        <div class="fw-bold text-truncate small"><?= htmlspecialchars($w['name']) ?></div>
-                                        <div class="text-muted text-truncate" style="font-size:.72rem;"><?= htmlspecialchars($w['role']) ?></div>
-                                    </div>
+                                    <div class="pwm-name"><?= htmlspecialchars(trim($honorific . ' ' . ($w['name'] ?? ''))) ?></div>
+                                    <div class="pwm-role"><?= htmlspecialchars($w['role']) ?></div>
+                                    <div class="pwm-caption">Servindo com amor</div>
                                 </div>
                             </div>
                         <?php endforeach; ?>
+                    </div>
+                    <div class="pwm-footnote mt-3">
+                        Nossa equipe está sempre disponível para te receber com um abraço.
                     </div>
                 <?php endif; ?>
             </div>
