@@ -46,32 +46,46 @@ class SettingsController {
         view('admin/settings/card_layout', ['current_layout' => $layout, 'models' => getCardLayouts()]);
     }
 
+    private function saveSetting(PDO $db, $key, $value) {
+        $exists = $db->prepare("SELECT COUNT(*) FROM settings WHERE setting_key = ?");
+        $exists->execute([$key]);
+        if ($exists->fetchColumn()) {
+            $stmt = $db->prepare("UPDATE settings SET setting_value = ? WHERE setting_key = ?");
+            $stmt->execute([$value, $key]);
+        } else {
+            $stmt = $db->prepare("INSERT INTO settings (setting_key, setting_value) VALUES (?, ?)");
+            $stmt->execute([$key, $value]);
+        }
+    }
+
     public function storeCardLayout() {
         requirePermission('settings.view');
         $db = (new Database())->connect();
         $layout = $_POST['card_layout'] ?? 'model_1';
         $siglaColor = $_POST['card_sigla_color'] ?? '#0d6efd';
-        
-        // Save layout
-        $exists = $db->query("SELECT COUNT(*) FROM settings WHERE setting_key = 'card_layout'")->fetchColumn();
-        if ($exists) {
-            $stmt = $db->prepare("UPDATE settings SET setting_value = ? WHERE setting_key = 'card_layout'");
-            $stmt->execute([$layout]);
-        } else {
-            $stmt = $db->prepare("INSERT INTO settings (setting_key, setting_value) VALUES ('card_layout', ?)");
-            $stmt->execute([$layout]);
+
+        // Handle a user-uploaded custom card background image
+        if (isset($_FILES['custom_card_image']) && $_FILES['custom_card_image']['error'] === UPLOAD_ERR_OK) {
+            $uploadDir = __DIR__ . '/../../public/uploads/card_layouts/';
+            if (!is_dir($uploadDir)) {
+                mkdir($uploadDir, 0777, true);
+            }
+
+            $fileExt = strtolower(pathinfo($_FILES['custom_card_image']['name'], PATHINFO_EXTENSION));
+            $allowedExts = ['jpg', 'jpeg', 'png', 'webp'];
+
+            if (in_array($fileExt, $allowedExts, true)) {
+                $newFileName = 'custom_card_' . time() . '.' . $fileExt;
+                if (move_uploaded_file($_FILES['custom_card_image']['tmp_name'], $uploadDir . $newFileName)) {
+                    $this->saveSetting($db, 'card_custom_image', $newFileName);
+                    $layout = 'custom_upload';
+                }
+            }
         }
 
-        // Save sigla color
-        $existsColor = $db->query("SELECT COUNT(*) FROM settings WHERE setting_key = 'card_sigla_color'")->fetchColumn();
-        if ($existsColor) {
-            $stmt = $db->prepare("UPDATE settings SET setting_value = ? WHERE setting_key = 'card_sigla_color'");
-            $stmt->execute([$siglaColor]);
-        } else {
-            $stmt = $db->prepare("INSERT INTO settings (setting_key, setting_value) VALUES ('card_sigla_color', ?)");
-            $stmt->execute([$siglaColor]);
-        }
-        
+        $this->saveSetting($db, 'card_layout', $layout);
+        $this->saveSetting($db, 'card_sigla_color', $siglaColor);
+
         redirect('/admin/settings/card-layout?success=1');
     }
 

@@ -565,6 +565,28 @@ function getCardLayouts() {
         }
     }
 
+    // Inject the admin's own uploaded custom card background, if one was saved
+    try {
+        $db = (new Database())->connect();
+        $customImage = $db->query("SELECT setting_value FROM settings WHERE setting_key = 'card_custom_image'")->fetchColumn();
+    } catch (Exception $e) {
+        $customImage = false;
+    }
+    if ($customImage && is_file(__DIR__ . '/../public/uploads/card_layouts/' . $customImage)) {
+        $layouts['custom_upload'] = [
+            'name' => 'Minha Imagem',
+            'bg' => "url('/uploads/card_layouts/{$customImage}') center/cover no-repeat",
+            'left' => '#0d6efd',
+            'top' => 'transparent',
+            'bottom' => 'transparent',
+            'text_top' => '#fff',
+            'back_top' => '#212529',
+            'type' => 'image',
+            'file' => $customImage,
+            'custom' => true
+        ];
+    }
+
     return $layouts;
 }
 
