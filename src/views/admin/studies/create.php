@@ -80,6 +80,23 @@
         box-shadow: 0 0 0 .2rem rgba(179,0,0,0.12);
     }
     .required-mark { color: #dc3545; }
+
+    .member-summary-box .summary-label {
+        font-size: .76rem;
+        color: #868e96;
+        text-transform: uppercase;
+        letter-spacing: .03em;
+    }
+    .member-summary-box .summary-value {
+        font-weight: 700;
+        color: #212529;
+        margin-bottom: .9rem;
+    }
+    .member-summary-box .summary-value.text-muted-value { color: #adb5bd; font-weight: 500; }
+    .member-summary-note {
+        font-size: .8rem;
+        color: #868e96;
+    }
 </style>
 
 <?php if (isset($_GET['error'])): ?>
@@ -95,6 +112,8 @@
     </div>
 <?php endif; ?>
 
+<div class="row">
+<div class="col-lg-8">
 <form action="/admin/studies/create" method="POST" enctype="multipart/form-data" class="app-form-with-bottom-actions" id="studyCreateForm">
     <?= csrf_field() ?>
 
@@ -148,5 +167,74 @@
         <button type="submit" class="btn btn-primary px-4">Salvar</button>
     </div>
 </form>
+</div>
+
+<div class="col-lg-4">
+    <div class="member-summary-box sticky-top" style="top: 1rem; z-index: 10;">
+        <div class="member-form-card">
+            <div class="member-form-card-body">
+                <div class="fw-bold mb-3">Resumo</div>
+
+                <div class="summary-label">Título</div>
+                <div class="summary-value text-muted-value" id="summaryTitle">—</div>
+
+                <div class="summary-label">Arquivo</div>
+                <div class="summary-value text-muted-value" id="summaryFile">Nenhum arquivo selecionado</div>
+
+                <div class="summary-label">Visibilidade</div>
+                <div class="summary-value mb-2" id="summaryVisibility">Geral (Todas)</div>
+
+                <hr>
+                <div class="d-flex justify-content-between small text-muted mb-1">
+                    <span>Preenchimento</span>
+                    <span id="summaryProgressPct">0%</span>
+                </div>
+                <div class="progress" style="height: 6px;">
+                    <div class="progress-bar bg-dark" id="summaryProgressBar" style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
+        <div class="member-form-card">
+            <div class="member-form-card-body member-summary-note">
+                Campos marcados com <span class="required-mark">*</span> são obrigatórios.
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+<script>
+    const studyForm = document.getElementById('studyCreateForm');
+    const summaryTitle = document.getElementById('summaryTitle');
+    const summaryFile = document.getElementById('summaryFile');
+    const summaryVisibility = document.getElementById('summaryVisibility');
+    const summaryProgressPct = document.getElementById('summaryProgressPct');
+    const summaryProgressBar = document.getElementById('summaryProgressBar');
+    const congregationSelect = document.querySelector('select[name="congregation_id"]');
+    const fileInput = document.querySelector('input[name="file"]');
+
+    function updateStudySummary() {
+        const titleVal = studyForm.querySelector('[name="title"]').value.trim();
+        summaryTitle.textContent = titleVal || '—';
+        summaryTitle.classList.toggle('text-muted-value', !titleVal);
+
+        const fileName = fileInput.files.length ? fileInput.files[0].name : '';
+        summaryFile.textContent = fileName || 'Nenhum arquivo selecionado';
+        summaryFile.classList.toggle('text-muted-value', !fileName);
+
+        const congOption = congregationSelect.options[congregationSelect.selectedIndex];
+        summaryVisibility.textContent = (congOption && congOption.value) ? congOption.text : 'Geral (Todas)';
+
+        const requiredFields = Array.from(studyForm.querySelectorAll('[required]'));
+        const filled = requiredFields.filter(f => f.value && f.value.trim() !== '').length;
+        const pct = requiredFields.length ? Math.round((filled / requiredFields.length) * 100) : 0;
+        summaryProgressPct.textContent = pct + '%';
+        summaryProgressBar.style.width = pct + '%';
+    }
+
+    studyForm.addEventListener('input', updateStudySummary);
+    studyForm.addEventListener('change', updateStudySummary);
+    updateStudySummary();
+</script>
 
 <?php include __DIR__ . '/../../layout/footer.php'; ?>

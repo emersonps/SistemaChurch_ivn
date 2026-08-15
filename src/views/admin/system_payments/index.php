@@ -203,12 +203,6 @@
 <?php unset($_SESSION['error']); ?>
 <?php endif; ?>
 
-<?php if (!empty($billingManagedByCentral)): ?>
-<div class="alert alert-info">
-    <i class="fas fa-info-circle me-2"></i> A central é a fonte oficial das cobranças. Esta tela mostra apenas a situação atual sincronizada para consulta.
-</div>
-<?php endif; ?>
-
 <?php
 $heroMap = [
     'paid' => ['class' => 'hero-success', 'icon' => 'fa-check-circle', 'title' => 'PAGO'],
@@ -262,10 +256,6 @@ $hero = ($status === 'paid' && !empty($latestPaidPayment)) ? $heroMap['paid'] : 
                         <i class="fas fa-check me-1"></i> Confirmar Pagamento
                     </button>
                 </form>
-            <?php else: ?>
-                <div class="alert alert-info mt-3 mb-0">
-                    <i class="fas fa-info-circle me-1"></i> O pagamento deve ser realizado via PIX. A baixa será dada pelo administrador do sistema.
-                </div>
             <?php endif; ?>
         <?php endif; ?>
     </div>

@@ -98,6 +98,18 @@
         border-color: #b30000;
         box-shadow: 0 0 0 .2rem rgba(179,0,0,0.12);
     }
+    .study-desc-toggle {
+        display: inline-block;
+        font-size: .72rem;
+        font-weight: 700;
+        color: #b30000;
+        text-decoration: none;
+        white-space: nowrap;
+    }
+    .study-desc-toggle:hover {
+        color: #8a0000;
+        text-decoration: underline;
+    }
 </style>
 
 <div class="member-form-card filter-card mb-3">
