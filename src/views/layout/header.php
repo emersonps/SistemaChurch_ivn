@@ -780,38 +780,77 @@ $mobileLauncherHref = '/admin?launcher=1';
                     if ($systemPaymentShowAlert):
             ?>
                 <!-- Modal -->
+                <?php
+                    $paymentAlertIsDanger = $systemPaymentAlertType == 'overdue';
+                    $paymentAlertTitle = $paymentAlertIsDanger ? 'Pagamento Atrasado' : ($systemPaymentAlertType == 'today' ? 'Pagamento Vence Hoje' : 'Lembrete de Pagamento');
+                    $paymentAlertIcon = $paymentAlertIsDanger ? 'fa-exclamation-circle' : ($systemPaymentAlertType == 'today' ? 'fa-exclamation-triangle' : 'fa-clock');
+                    $paymentAlertMainText = $paymentAlertIsDanger
+                        ? 'O pagamento da hospedagem/domínio venceu em ' . $systemPaymentDueDateText . ' e ainda não consta no sistema.'
+                        : ($systemPaymentAlertType == 'today'
+                            ? 'O pagamento da hospedagem/domínio vence hoje (' . $systemPaymentDueDateText . ').'
+                            : 'O pagamento da hospedagem/domínio vence em ' . $systemPaymentDueDateText . '.');
+                    $paymentAlertSubText = $paymentAlertIsDanger
+                        ? 'Por favor, regularize a situação o quanto antes.'
+                        : ($systemPaymentAlertType == 'today'
+                            ? 'Hoje é a data de vencimento. Se possível, realize o pagamento para evitar atraso.'
+                            : 'Se desejar, já pode se programar para realizar o pagamento dentro do prazo.');
+                ?>
+                <style>
+                    #paymentAlertModal .modal-content { border-radius: 16px; border: none; overflow: hidden; }
+                    #paymentAlertModal .modal-header { background: #fafafa; border-bottom: 1px solid rgba(0,0,0,0.07); }
+                    #paymentAlertModal .modal-title { font-weight: 800; color: #1a1a1a; font-size: 1.05rem; }
+                    #paymentAlertModal .payment-alert-hero {
+                        display: flex;
+                        align-items: flex-start;
+                        gap: 1rem;
+                        border-radius: 14px;
+                        padding: 1.1rem 1.25rem;
+                    }
+                    #paymentAlertModal .payment-alert-icon {
+                        flex: 0 0 auto;
+                        width: 48px;
+                        height: 48px;
+                        border-radius: 50%;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        font-size: 1.2rem;
+                    }
+                    #paymentAlertModal .payment-alert-hero.is-danger { background: rgba(220,53,69,0.06); }
+                    #paymentAlertModal .payment-alert-hero.is-danger .payment-alert-icon { background: rgba(220,53,69,0.14); color: #dc3545; }
+                    #paymentAlertModal .payment-alert-hero.is-danger .payment-alert-title { color: #dc3545; }
+                    #paymentAlertModal .payment-alert-hero.is-warning { background: rgba(212,175,55,0.10); }
+                    #paymentAlertModal .payment-alert-hero.is-warning .payment-alert-icon { background: rgba(212,175,55,0.22); color: #a6790a; }
+                    #paymentAlertModal .payment-alert-hero.is-warning .payment-alert-title { color: #a6790a; }
+                    #paymentAlertModal .payment-alert-title { font-weight: 800; font-size: 1rem; margin-bottom: .25rem; }
+                    #paymentAlertModal .payment-alert-text { font-size: .92rem; color: #343a40; margin-bottom: 0; }
+                    #paymentAlertModal .payment-alert-sub { font-size: .85rem; color: #6c757d; margin: .9rem 0 0; }
+                </style>
                 <div class="modal fade" id="paymentAlertModal" tabindex="-1" aria-labelledby="paymentAlertLabel" aria-hidden="true">
-                  <div class="modal-dialog">
+                  <div class="modal-dialog modal-dialog-centered">
                     <div class="modal-content">
-                      <div class="modal-header bg-<?= $systemPaymentAlertType == 'overdue' ? 'danger' : 'warning' ?> text-white">
-                        <h5 class="modal-title" id="paymentAlertLabel">
-                            <i class="fas fa-exclamation-triangle"></i> 
-                            <?= $systemPaymentAlertType == 'overdue' ? 'Pagamento Atrasado!' : ($systemPaymentAlertType == 'today' ? 'Pagamento Vence Hoje' : 'Lembrete de Pagamento') ?>
-                        </h5>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                      <div class="modal-header">
+                        <h5 class="modal-title" id="paymentAlertLabel"><?= htmlspecialchars($paymentAlertTitle) ?></h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                       </div>
-                      <div class="modal-body">
-                        <p class="fs-5">
-                            <?= $systemPaymentAlertType == 'overdue' 
-                                ? 'O pagamento da hospedagem/domínio venceu em ' . $systemPaymentDueDateText . ' e ainda não consta no sistema.' 
-                                : ($systemPaymentAlertType == 'today'
-                                    ? 'O pagamento da hospedagem/domínio vence hoje (' . $systemPaymentDueDateText . ').'
-                                    : 'O pagamento da hospedagem/domínio vence em ' . $systemPaymentDueDateText . '.') ?>
-                        </p>
-                        <p><?= $systemPaymentAlertType == 'overdue'
-                            ? 'Por favor, regularize a situação.'
-                            : ($systemPaymentAlertType == 'today'
-                                ? 'Hoje é a data de vencimento. Se possível, realize o pagamento para evitar atraso.'
-                                : 'Se desejar, já pode se programar para realizar o pagamento dentro do prazo.') ?></p>
+                      <div class="modal-body p-4">
+                        <div class="payment-alert-hero <?= $paymentAlertIsDanger ? 'is-danger' : 'is-warning' ?>">
+                            <div class="payment-alert-icon"><i class="fas <?= $paymentAlertIcon ?>"></i></div>
+                            <div>
+                                <div class="payment-alert-title"><?= htmlspecialchars($paymentAlertTitle) ?></div>
+                                <p class="payment-alert-text"><?= htmlspecialchars($paymentAlertMainText) ?></p>
+                            </div>
+                        </div>
+                        <p class="payment-alert-sub"><?= htmlspecialchars($paymentAlertSubText) ?></p>
                       </div>
-                      <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
-                        <a href="/admin/system-payments" class="btn btn-primary">Ir para Pagamento</a>
+                      <div class="modal-footer border-top-0 pt-0">
+                        <button type="button" class="btn btn-outline-secondary rounded-pill fw-semibold px-3" data-bs-dismiss="modal">Fechar</button>
+                        <a href="/admin/system-payments" class="btn <?= $paymentAlertIsDanger ? 'btn-danger' : 'btn-dark' ?> rounded-pill fw-semibold px-3">Ir para Pagamento</a>
                       </div>
                     </div>
                   </div>
                 </div>
-                
+
                 <script>
                     document.addEventListener('DOMContentLoaded', function() {
                         var modalElement = document.getElementById('paymentAlertModal');
