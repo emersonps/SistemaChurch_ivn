@@ -3,11 +3,48 @@
 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
     <h1 class="h2">Fechamentos Financeiros</h1>
     <div class="btn-toolbar mb-2 mb-md-0">
-        <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#newClosureModal">
-            <i class="fas fa-lock"></i> Novo Fechamento
+        <button type="button" class="btn btn-sm btn-success rounded-pill fw-semibold px-3" data-bs-toggle="modal" data-bs-target="#newClosureModal">
+            <i class="fas fa-lock me-1"></i> Novo Fechamento
         </button>
     </div>
 </div>
+
+<style>
+    .closure-pane-card {
+        border-radius: 16px;
+        border: 1px solid rgba(0,0,0,0.08);
+        overflow: hidden;
+        background: #fff;
+    }
+    .type-pill {
+        display: inline-block;
+        padding: .2rem .6rem;
+        border-radius: 999px;
+        font-size: .7rem;
+        font-weight: 700;
+    }
+    .type-pill.type-mensal { background: rgba(13,202,240,0.14); color: #087990; }
+    .type-pill.type-anual { background: rgba(13,110,253,0.10); color: #0d6efd; }
+    .icon-btn {
+        width: 32px;
+        height: 32px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        padding: 0;
+    }
+    .modal-content { border-radius: 16px; border: none; overflow: hidden; }
+    .modal-header { background: #fafafa; }
+    #newClosureModal .form-control, #newClosureModal .form-select {
+        border-radius: 10px;
+        border-color: rgba(0,0,0,0.14);
+    }
+    #newClosureModal .form-control:focus, #newClosureModal .form-select:focus {
+        border-color: #b30000;
+        box-shadow: 0 0 0 .2rem rgba(179,0,0,0.12);
+    }
+</style>
 
 <?php
 // Agrupar fechamentos por congregação
@@ -56,12 +93,6 @@ $hasMultipleCongregations = $tabTotal > 1;
             padding: .35rem;
         }
         .closure-tabs-carousel.multi #closureTabsContent > .tab-pane.fade { transition: none; }
-        .closure-pane-card {
-            border-radius: 16px;
-            border: 1px solid rgba(0,0,0,0.08);
-            overflow: hidden;
-            background: #fff;
-        }
         .closure-pane-head {
             background: linear-gradient(135deg, rgba(25,135,84,0.14), rgba(13,110,253,0.10));
         }
@@ -139,23 +170,21 @@ $hasMultipleCongregations = $tabTotal > 1;
                         <?php foreach ($items as $fc): ?>
                             <tr>
                                 <td class="align-middle fw-bold"><?= htmlspecialchars($fc['period']) ?></td>
-                                <td class="align-middle"><span class="badge bg-<?= $fc['type'] == 'Mensal' ? 'info' : 'primary' ?>"><?= $fc['type'] ?></span></td>
-                                <td class="align-middle text-success">R$ <?= number_format($fc['total_entries'], 2, ',', '.') ?></td>
-                                <td class="align-middle text-danger">R$ <?= number_format($fc['total_expenses'], 2, ',', '.') ?></td>
+                                <td class="align-middle"><span class="type-pill type-<?= $fc['type'] == 'Mensal' ? 'mensal' : 'anual' ?>"><?= $fc['type'] ?></span></td>
+                                <td class="align-middle text-success fw-bold">R$ <?= number_format($fc['total_entries'], 2, ',', '.') ?></td>
+                                <td class="align-middle text-danger fw-bold">R$ <?= number_format($fc['total_expenses'], 2, ',', '.') ?></td>
                                 <td class="align-middle fw-bold <?= $fc['balance'] >= 0 ? 'text-success' : 'text-danger' ?>">
                                     R$ <?= number_format($fc['balance'], 2, ',', '.') ?>
                                 </td>
                                 <td class="align-middle fw-bold bg-light text-dark">R$ <?= number_format($fc['final_balance'], 2, ',', '.') ?></td>
                                 <td class="align-middle text-muted small"><?= date('d/m/Y H:i', strtotime($fc['created_at'])) ?></td>
                                 <td class="align-middle text-end">
-                                    <div class="btn-group">
-                                        <a href="/admin/financial/closures/show/<?= $fc['id'] ?>" class="btn btn-sm btn-outline-secondary" title="Ver Detalhes">
-                                            <i class="fas fa-eye"></i>
-                                        </a>
-                                        <a href="/admin/financial/closures/delete/<?= $fc['id'] ?>" class="btn btn-sm btn-outline-danger" title="Excluir" onclick="return confirm('Tem certeza? Isso reabrirá o período.')">
-                                            <i class="fas fa-trash"></i>
-                                        </a>
-                                    </div>
+                                    <a href="/admin/financial/closures/show/<?= $fc['id'] ?>" class="btn btn-sm btn-outline-primary icon-btn" title="Ver Detalhes">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a href="/admin/financial/closures/delete/<?= $fc['id'] ?>" class="btn btn-sm btn-outline-danger icon-btn btn-delete-closure" data-period="<?= htmlspecialchars($fc['period']) ?>" title="Excluir">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
                                 </td>
                             </tr>
                         <?php endforeach; ?>
@@ -181,12 +210,12 @@ $hasMultipleCongregations = $tabTotal > 1;
             <?= csrf_field() ?>
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Novo Fechamento</h5>
+                    <h5 class="modal-title"><i class="fas fa-lock me-2"></i>Novo Fechamento</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label class="form-label">Congregação</label>
+                        <label class="form-label fw-semibold">Congregação <span class="text-danger">*</span></label>
                         <select name="congregation_id" class="form-select" required>
                             <?php foreach ($congregations as $c): ?>
                                 <option value="<?= $c['id'] ?>"><?= htmlspecialchars($c['name']) ?></option>
@@ -194,14 +223,14 @@ $hasMultipleCongregations = $tabTotal > 1;
                         </select>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Tipo</label>
+                        <label class="form-label fw-semibold">Tipo <span class="text-danger">*</span></label>
                         <select name="type" class="form-select" id="closureType" onchange="togglePeriodInput()" required>
                             <option value="Mensal">Mensal</option>
                             <option value="Anual">Anual</option>
                         </select>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Período</label>
+                        <label class="form-label fw-semibold">Período <span class="text-danger">*</span></label>
                         <input type="month" name="period" id="periodMonthly" class="form-control" required>
                         <select name="period" id="periodAnnual" class="form-select d-none" disabled>
                             <?php for($i = date('Y'); $i >= 2020; $i--): ?>
@@ -209,13 +238,13 @@ $hasMultipleCongregations = $tabTotal > 1;
                             <?php endfor; ?>
                         </select>
                     </div>
-                    <div class="alert alert-warning">
-                        <small><i class="fas fa-exclamation-triangle"></i> O fechamento consolidará todas as entradas e saídas do período selecionado e calculará o saldo final acumulado.</small>
+                    <div class="alert alert-warning mb-0">
+                        <small><i class="fas fa-exclamation-triangle me-1"></i> O fechamento consolidará todas as entradas e saídas do período selecionado e calculará o saldo final acumulado.</small>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-success">Gerar Fechamento</button>
+                    <button type="button" class="btn btn-outline-secondary rounded-pill fw-semibold px-3" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-success rounded-pill fw-semibold px-3">Gerar Fechamento</button>
                 </div>
             </div>
         </form>
@@ -240,6 +269,28 @@ function togglePeriodInput() {
         annual.disabled = false;
     }
 }
+
+document.querySelectorAll('.btn-delete-closure').forEach(function (btn) {
+    btn.addEventListener('click', function (e) {
+        e.preventDefault();
+        const href = btn.getAttribute('href');
+        const period = btn.getAttribute('data-period');
+        Swal.fire({
+            title: 'Excluir fechamento?',
+            text: `Tem certeza que deseja excluir o fechamento de "${period}"? Isso reabrirá o período.`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Sim, excluir',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = href;
+            }
+        });
+    });
+});
 </script>
 
 <?php include __DIR__ . '/../../layout/footer.php'; ?>

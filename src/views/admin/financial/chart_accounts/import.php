@@ -3,23 +3,88 @@
 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
     <h1 class="h2">Importar Plano de Contas</h1>
     <div class="btn-toolbar mb-2 mb-md-0">
-        <a href="/admin/financial/chart-accounts" class="btn btn-sm btn-outline-secondary">
-            <i class="fas fa-arrow-left"></i> Voltar
+        <a href="/admin/financial/chart-accounts" class="btn btn-sm btn-outline-secondary rounded-pill fw-semibold px-3">
+            <i class="fas fa-arrow-left me-1"></i> Voltar
         </a>
     </div>
 </div>
 
+<style>
+    .member-form-card {
+        background: #fff;
+        border: 1px solid rgba(0,0,0,0.08);
+        border-radius: 16px;
+        overflow: hidden;
+    }
+    .member-form-card-header {
+        display: flex;
+        align-items: flex-start;
+        gap: .85rem;
+        padding: 1.1rem 1.25rem;
+        border-bottom: 1px solid rgba(0,0,0,0.07);
+        background: #fafafa;
+    }
+    .member-form-badge {
+        flex: 0 0 auto;
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        background: #eef0f2;
+        color: #212529;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 800;
+        font-size: .95rem;
+    }
+    .member-form-card-title {
+        font-weight: 800;
+        font-size: 1.05rem;
+        color: #1a1a1a;
+        line-height: 1.2;
+    }
+    .member-form-card-subtitle {
+        font-size: .82rem;
+        color: #868e96;
+        margin-top: .1rem;
+    }
+    .member-form-card-body { padding: 1.25rem; }
+    .member-form-card-body .form-label {
+        font-weight: 600;
+        font-size: .88rem;
+        color: #343a40;
+    }
+    .member-form-card-body .form-control,
+    .member-form-card-body .form-select {
+        border-radius: 10px;
+        border-color: rgba(0,0,0,0.14);
+        padding: .55rem .8rem;
+    }
+    .member-form-card-body .form-control:focus,
+    .member-form-card-body .form-select:focus {
+        border-color: #b30000;
+        box-shadow: 0 0 0 .2rem rgba(179,0,0,0.12);
+    }
+</style>
+
 <?php if (isset($_SESSION['flash_error'])): ?>
     <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        <?= $_SESSION['flash_error'] ?>
+        <i class="fas fa-exclamation-triangle me-2"></i><?= $_SESSION['flash_error'] ?>
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
     <?php unset($_SESSION['flash_error']); ?>
 <?php endif; ?>
 
 <?php if (($step ?? 'upload') === 'upload'): ?>
-    <div class="card shadow-sm">
-        <div class="card-body">
+    <div class="member-form-card">
+        <div class="member-form-card-header">
+            <div class="member-form-badge"><i class="fas fa-file-import"></i></div>
+            <div>
+                <div class="member-form-card-title">Enviar Planilha CSV</div>
+                <div class="member-form-card-subtitle">Selecione o plano de contas de destino e o arquivo a importar.</div>
+            </div>
+        </div>
+        <div class="member-form-card-body">
             <form action="/admin/financial/chart-accounts/import/preview" method="POST" enctype="multipart/form-data" class="row g-3">
                 <?= csrf_field() ?>
                 <div class="col-md-4">
@@ -43,30 +108,36 @@
                         <option value=";">Ponto e vírgula (;)</option>
                     </select>
                 </div>
-                <div class="col-12">
-                    <button type="submit" class="btn btn-primary"><i class="fas fa-upload"></i> Enviar</button>
-                    <a href="/admin/financial/chart-accounts/template" class="btn btn-outline-primary ms-2">
-                        <i class="fas fa-download"></i> Baixar Modelo CSV
+                <div class="col-12 d-flex flex-wrap gap-2">
+                    <button type="submit" class="btn btn-dark rounded-pill fw-semibold px-4"><i class="fas fa-upload me-2"></i> Enviar</button>
+                    <a href="/admin/financial/chart-accounts/template" class="btn btn-outline-primary rounded-pill fw-semibold px-4">
+                        <i class="fas fa-download me-2"></i> Baixar Modelo CSV
                     </a>
-                    <a href="#" class="btn btn-outline-secondary ms-2" onclick="alert('Para XLSX: abra o modelo CSV no Excel e salve como .xlsx. Podemos habilitar exportação XLSX nativa adicionando uma biblioteca específica.'); return false;">
-                        <i class="fas fa-file-excel"></i> Dica para XLSX
-                    </a>
+                    <button type="button" id="btnXlsxTip" class="btn btn-outline-secondary rounded-pill fw-semibold px-4">
+                        <i class="fas fa-file-excel me-2"></i> Dica para XLSX
+                    </button>
                 </div>
             </form>
         </div>
     </div>
 <?php else: ?>
-    <div class="card shadow-sm">
-        <div class="card-body">
+    <div class="member-form-card">
+        <div class="member-form-card-header">
+            <div class="member-form-badge"><i class="fas fa-table-columns"></i></div>
+            <div>
+                <div class="member-form-card-title">Mapeamento de Colunas</div>
+                <div class="member-form-card-subtitle">Relacione as colunas do arquivo com os campos do sistema.</div>
+            </div>
+        </div>
+        <div class="member-form-card-body">
             <form action="/admin/financial/chart-accounts/import/commit" method="POST" class="row g-3">
                 <?= csrf_field() ?>
                 <input type="hidden" name="account_set_id" value="<?= (int)$account_set_id ?>">
                 <input type="hidden" name="file" value="<?= htmlspecialchars($file) ?>">
                 <input type="hidden" name="delimiter" value="<?= htmlspecialchars($delimiter) ?>">
                 <div class="col-12">
-                    <h5 class="mb-3">Mapeamento de Colunas</h5>
                     <div class="row g-3">
-                        <?php 
+                        <?php
                             $targets = [
                                 'map_code' => 'Código (obrigatório)',
                                 'map_name' => 'Nome (obrigatório)',
@@ -94,9 +165,9 @@
                     </div>
                 </div>
                 <div class="col-12">
-                    <h5 class="mt-3">Amostra</h5>
+                    <h6 class="fw-bold text-uppercase text-muted small mt-2 mb-2">Amostra</h6>
                     <div class="table-responsive">
-                        <table class="table table-sm table-striped">
+                        <table class="table table-sm table-striped mb-0">
                             <thead>
                                 <tr>
                                     <?php foreach ($headers as $h): ?>
@@ -117,7 +188,7 @@
                     </div>
                 </div>
                 <div class="col-12 mt-2">
-                    <button type="submit" class="btn btn-success"><i class="fas fa-play"></i> Importar</button>
+                    <button type="submit" class="btn btn-success rounded-pill fw-semibold px-4"><i class="fas fa-play me-2"></i> Importar</button>
                 </div>
             </form>
         </div>
@@ -125,3 +196,18 @@
 <?php endif; ?>
 
 <?php include __DIR__ . '/../../../layout/footer.php'; ?>
+
+<script>
+    const xlsxBtn = document.getElementById('btnXlsxTip');
+    if (xlsxBtn) {
+        xlsxBtn.addEventListener('click', function () {
+            Swal.fire({
+                title: 'Importar de XLSX',
+                text: 'Para XLSX: abra o modelo CSV no Excel e salve como .xlsx. Podemos habilitar exportação XLSX nativa adicionando uma biblioteca específica.',
+                icon: 'info',
+                confirmButtonColor: '#b30000',
+                confirmButtonText: 'Entendi'
+            });
+        });
+    }
+</script>

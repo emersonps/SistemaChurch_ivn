@@ -3,26 +3,72 @@
 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
     <h1 class="h2">Saídas / Despesas</h1>
     <div class="btn-toolbar mb-2 mb-md-0">
-        <a href="/admin/expenses/create" class="btn btn-sm btn-danger">
-            <i class="fas fa-minus-circle"></i> Nova Saída
+        <a href="/admin/expenses/create" class="btn btn-sm btn-danger rounded-pill fw-semibold px-3">
+            <i class="fas fa-minus-circle me-1"></i> Nova Saída
         </a>
     </div>
 </div>
 
+<style>
+    .member-form-card {
+        background: #fff;
+        border: 1px solid rgba(0,0,0,0.08);
+        border-radius: 16px;
+        overflow: hidden;
+    }
+    .filter-card .form-control,
+    .filter-card .form-select {
+        border-radius: 10px;
+        border-color: rgba(0,0,0,0.14);
+    }
+    .filter-card .form-control:focus,
+    .filter-card .form-select:focus {
+        border-color: #b30000;
+        box-shadow: 0 0 0 .2rem rgba(179,0,0,0.12);
+    }
+    .category-pill {
+        display: inline-block;
+        padding: .2rem .6rem;
+        border-radius: 999px;
+        font-size: .7rem;
+        font-weight: 700;
+        background: #eef0f2;
+        color: #495057;
+    }
+    .unaccountable-pill {
+        display: inline-block;
+        padding: .15rem .5rem;
+        border-radius: 999px;
+        font-size: .66rem;
+        font-weight: 700;
+        background: #eef0f2;
+        color: #6c757d;
+    }
+    .icon-btn {
+        width: 32px;
+        height: 32px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        padding: 0;
+    }
+</style>
+
 <?php if (isset($_SESSION['flash_error'])): ?>
     <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        <?= $_SESSION['flash_error'] ?>
+        <i class="fas fa-exclamation-triangle me-2"></i><?= $_SESSION['flash_error'] ?>
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
     <?php unset($_SESSION['flash_error']); ?>
 <?php endif; ?>
 
-<div class="card mb-3 bg-light">
-    <div class="card-body py-2">
+<div class="member-form-card filter-card mb-3">
+    <div class="p-3">
         <form class="row g-2 align-items-end" method="GET" action="/admin/expenses">
             <?php if (empty($_SESSION['user_congregation_id'])): ?>
             <div class="col-md-3">
-                <label class="form-label small mb-0">Congregação</label>
+                <label class="form-label small mb-0 fw-semibold">Congregação</label>
                 <select name="congregation_id" class="form-select form-select-sm">
                     <option value="">Todas</option>
                     <?php foreach ($congregations as $c): ?>
@@ -34,18 +80,18 @@
             </div>
             <?php endif; ?>
             <div class="col-6 col-md-3">
-                <label class="form-label small mb-0">Data Início</label>
+                <label class="form-label small mb-0 fw-semibold">Data Início</label>
                 <input type="date" name="start_date" class="form-control form-control-sm" value="<?= $_GET['start_date'] ?? '' ?>">
             </div>
             <div class="col-6 col-md-3">
-                <label class="form-label small mb-0">Data Fim</label>
+                <label class="form-label small mb-0 fw-semibold">Data Fim</label>
                 <input type="date" name="end_date" class="form-control form-control-sm" value="<?= $_GET['end_date'] ?? '' ?>">
             </div>
             <div class="col-md-3 d-flex align-items-end gap-1">
-                <button type="submit" class="btn btn-sm btn-secondary w-50" title="Filtrar">
+                <button type="submit" class="btn btn-sm btn-dark rounded-pill fw-semibold w-50" title="Filtrar">
                     <i class="fas fa-filter"></i> Filtrar
                 </button>
-                <a href="/admin/expenses" class="btn btn-sm btn-outline-secondary w-50" title="Limpar Filtro">
+                <a href="/admin/expenses" class="btn btn-sm btn-outline-secondary rounded-pill fw-semibold w-50" title="Limpar Filtro">
                     <i class="fas fa-times"></i> Limpar
                 </a>
             </div>
@@ -75,6 +121,12 @@ $hasMultipleCongregations = $tabTotal > 1;
 ?>
 
 <style>
+    .expense-pane-card {
+        border-radius: 16px;
+        border: 1px solid rgba(0,0,0,0.08);
+        overflow: hidden;
+        background: #fff;
+    }
     @media (max-width: 991.98px) {
         .expense-tabs-carousel {
             position: relative;
@@ -106,12 +158,6 @@ $hasMultipleCongregations = $tabTotal > 1;
             padding: .35rem;
         }
         .expense-tabs-carousel.multi #expenseTabsContent > .tab-pane.fade { transition: none; }
-        .expense-pane-card {
-            border-radius: 16px;
-            border: 1px solid rgba(0,0,0,0.08);
-            overflow: hidden;
-            background: #fff;
-        }
         .expense-pane-head {
             background: linear-gradient(135deg, rgba(179,0,0,0.10), rgba(212,175,55,0.16));
         }
@@ -207,18 +253,18 @@ $hasMultipleCongregations = $tabTotal > 1;
                         <tr>
                             <td data-sort="<?= $e['expense_date'] ?>"><?= date('d/m/Y', strtotime($e['expense_date'])) ?></td>
                             <td>
-                                <span class="badge bg-secondary"><?= htmlspecialchars($e['category']) ?></span>
+                                <span class="category-pill"><?= htmlspecialchars($e['category']) ?></span>
                                 <?php if (isset($e['is_accountable']) && (int)$e['is_accountable'] === 0): ?>
-                                    <div><span class="badge bg-secondary mt-1">Não contabilizada</span></div>
+                                    <div><span class="unaccountable-pill mt-1">Não contabilizada</span></div>
                                 <?php endif; ?>
                             </td>
                             <td><?= htmlspecialchars($e['description']) ?></td>
                             <td class="text-danger fw-bold" data-sort="<?= $e['amount'] ?>">- R$ <?= number_format($e['amount'], 2, ',', '.') ?></td>
                             <td class="text-end">
-                                <a href="/admin/expenses/edit/<?= $e['id'] ?>" class="btn btn-sm btn-outline-secondary" title="Editar">
+                                <a href="/admin/expenses/edit/<?= $e['id'] ?>" class="btn btn-sm btn-outline-primary icon-btn" title="Editar">
                                     <i class="fas fa-edit"></i>
                                 </a>
-                                <a href="/admin/expenses/delete/<?= $e['id'] ?>" class="btn btn-sm btn-outline-danger" title="Excluir" onclick="return confirm('Tem certeza?')">
+                                <a href="/admin/expenses/delete/<?= $e['id'] ?>" class="btn btn-sm btn-outline-danger icon-btn btn-delete-expense" title="Excluir">
                                     <i class="fas fa-trash"></i>
                                 </a>
                             </td>
@@ -267,6 +313,27 @@ $hasMultipleCongregations = $tabTotal > 1;
             // Alterar cor da aba ativa para vermelho (saídas)
             $('#expenseTabs .nav-link').removeClass('text-danger text-dark').addClass('text-dark');
             $(e.target).removeClass('text-dark').addClass('text-danger');
+        });
+
+        document.querySelectorAll('.btn-delete-expense').forEach(function (btn) {
+            btn.addEventListener('click', function (e) {
+                e.preventDefault();
+                const href = btn.getAttribute('href');
+                Swal.fire({
+                    title: 'Excluir despesa?',
+                    text: 'Tem certeza que deseja excluir esta despesa? Esta ação não pode ser desfeita.',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Sim, excluir',
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = href;
+                    }
+                });
+            });
         });
 
         const carousel = document.querySelector('.expense-tabs-carousel.multi #expenseTabsContent');

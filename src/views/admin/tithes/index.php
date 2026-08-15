@@ -3,26 +3,71 @@
 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
     <h1 class="h2">Dízimos e Ofertas</h1>
     <div class="btn-toolbar mb-2 mb-md-0">
-        <a href="/admin/tithes/create" class="btn btn-sm btn-primary">
-            <i class="fas fa-plus"></i> Novo Lançamento
+        <a href="/admin/tithes/create" class="btn btn-sm btn-primary rounded-pill fw-semibold px-3">
+            <i class="fas fa-plus me-1"></i> Novo Lançamento
         </a>
     </div>
 </div>
 
+<style>
+    .member-form-card {
+        background: #fff;
+        border: 1px solid rgba(0,0,0,0.08);
+        border-radius: 16px;
+        overflow: hidden;
+    }
+    .filter-card .form-control,
+    .filter-card .form-select {
+        border-radius: 10px;
+        border-color: rgba(0,0,0,0.14);
+    }
+    .filter-card .form-control:focus,
+    .filter-card .form-select:focus {
+        border-color: #b30000;
+        box-shadow: 0 0 0 .2rem rgba(179,0,0,0.12);
+    }
+    .type-pill {
+        display: inline-block;
+        padding: .2rem .6rem;
+        border-radius: 999px;
+        font-size: .7rem;
+        font-weight: 700;
+    }
+    .type-pill.type-dizimo { background: rgba(13,110,253,0.10); color: #0d6efd; }
+    .type-pill.type-oferta { background: rgba(25,135,84,0.10); color: #198754; }
+    .unaccountable-pill {
+        display: inline-block;
+        padding: .15rem .5rem;
+        border-radius: 999px;
+        font-size: .66rem;
+        font-weight: 700;
+        background: #eef0f2;
+        color: #6c757d;
+    }
+    .icon-btn {
+        width: 32px;
+        height: 32px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        padding: 0;
+    }
+</style>
+
 <?php if (isset($_SESSION['flash_error'])): ?>
     <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        <?= $_SESSION['flash_error'] ?>
+        <i class="fas fa-exclamation-triangle me-2"></i><?= $_SESSION['flash_error'] ?>
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
     <?php unset($_SESSION['flash_error']); ?>
 <?php endif; ?>
 
-<div class="card mb-3 bg-light">
-    <div class="card-body py-2">
+<div class="member-form-card filter-card mb-3">
+    <div class="p-3">
         <form class="row g-2 align-items-end" method="GET" action="/admin/tithes">
-            <!-- Filtros (mantidos) -->
             <div class="col-md-3">
-                <label class="form-label small mb-0">Congregação</label>
+                <label class="form-label small mb-0 fw-semibold">Congregação</label>
                 <select name="congregation_id" class="form-select form-select-sm">
                     <option value="">Todas</option>
                     <?php foreach ($congregations as $c): ?>
@@ -33,19 +78,19 @@
                 </select>
             </div>
             <div class="col-md-2">
-                <label class="form-label small mb-0">Membro</label>
+                <label class="form-label small mb-0 fw-semibold">Membro</label>
                 <input type="text" name="member_name" class="form-control form-control-sm" value="<?= htmlspecialchars($_GET['member_name'] ?? '') ?>" placeholder="Nome...">
             </div>
             <div class="col-6 col-md-2">
-                <label class="form-label small mb-0">Data Início</label>
+                <label class="form-label small mb-0 fw-semibold">Data Início</label>
                 <input type="date" name="start_date" class="form-control form-control-sm" value="<?= $_GET['start_date'] ?? '' ?>">
             </div>
             <div class="col-6 col-md-2">
-                <label class="form-label small mb-0">Data Fim</label>
+                <label class="form-label small mb-0 fw-semibold">Data Fim</label>
                 <input type="date" name="end_date" class="form-control form-control-sm" value="<?= $_GET['end_date'] ?? '' ?>">
             </div>
              <div class="col-md-1">
-                <label class="form-label small mb-0">Tipo</label>
+                <label class="form-label small mb-0 fw-semibold">Tipo</label>
                 <select name="type" class="form-select form-select-sm">
                     <option value="">Todos</option>
                     <option value="Dízimo" <?= (isset($_GET['type']) && $_GET['type'] == 'Dízimo') ? 'selected' : '' ?>>Dízimo</option>
@@ -53,10 +98,10 @@
                 </select>
             </div>
             <div class="col-md-2 d-flex align-items-end gap-1">
-                <button type="submit" class="btn btn-sm btn-secondary w-50" title="Filtrar">
+                <button type="submit" class="btn btn-sm btn-dark rounded-pill fw-semibold w-50" title="Filtrar">
                     <i class="fas fa-filter"></i> Filtrar
                 </button>
-                <a href="/admin/tithes" class="btn btn-sm btn-outline-secondary w-50" title="Limpar Filtro">
+                <a href="/admin/tithes" class="btn btn-sm btn-outline-secondary rounded-pill fw-semibold w-50" title="Limpar Filtro">
                     <i class="fas fa-times"></i> Limpar
                 </a>
             </div>
@@ -86,6 +131,12 @@ $hasMultipleCongregations = $tabTotal > 1;
 ?>
 
 <style>
+    .tithe-pane-card {
+        border-radius: 16px;
+        border: 1px solid rgba(0,0,0,0.08);
+        overflow: hidden;
+        background: #fff;
+    }
     @media (max-width: 991.98px) {
         .tithe-tabs-carousel {
             position: relative;
@@ -117,12 +168,6 @@ $hasMultipleCongregations = $tabTotal > 1;
             padding: .35rem;
         }
         .tithe-tabs-carousel.multi #titheTabsContent > .tab-pane.fade { transition: none; }
-        .tithe-pane-card {
-            border-radius: 16px;
-            border: 1px solid rgba(0,0,0,0.08);
-            overflow: hidden;
-            background: #fff;
-        }
         .tithe-pane-head {
             background: linear-gradient(135deg, rgba(13,110,253,0.12), rgba(25,135,84,0.14));
         }
@@ -241,17 +286,17 @@ $hasMultipleCongregations = $tabTotal > 1;
                             </div>
                         </td>
                         <td class="d-none d-md-table-cell">
-                            <span class="badge bg-<?= ($t['type'] ?? 'Dízimo') == 'Dízimo' ? 'primary' : 'success' ?>"><?= htmlspecialchars($t['type'] ?? 'Dízimo') ?></span>
+                            <span class="type-pill type-<?= ($t['type'] ?? 'Dízimo') == 'Dízimo' ? 'dizimo' : 'oferta' ?>"><?= htmlspecialchars($t['type'] ?? 'Dízimo') ?></span>
                             <?php if (isset($t['is_accountable']) && (int)$t['is_accountable'] === 0): ?>
-                                <div><span class="badge bg-secondary mt-1">Não contabilizada</span></div>
+                                <div><span class="unaccountable-pill mt-1">Não contabilizada</span></div>
                             <?php endif; ?>
                         </td>
                         <td class="fw-bold text-success" data-sort="<?= $t['amount'] ?>">R$ <?= number_format($t['amount'], 2, ',', '.') ?></td>
                         <td class="d-none d-md-table-cell"><?= ucfirst($t['payment_method']) ?></td>
                         <td class="text-end">
-                            <button type="button" class="btn btn-sm btn-outline-info" data-bs-toggle="modal" data-bs-target="#receiptModal" data-url="/admin/tithes/receipt/<?= $t['id'] ?>" title="Recibo"><i class="fas fa-print"></i></button>
-                            <a href="/admin/tithes/edit/<?= $t['id'] ?>" class="btn btn-sm btn-outline-secondary" title="Editar"><i class="fas fa-edit"></i></a>
-                            <a href="/admin/tithes/delete/<?= $t['id'] ?>" class="btn btn-sm btn-outline-danger" title="Excluir" onclick="return confirm('Tem certeza que deseja excluir este lançamento? Esta ação não pode ser desfeita.')"><i class="fas fa-trash"></i></a>
+                            <button type="button" class="btn btn-sm btn-outline-info icon-btn" data-bs-toggle="modal" data-bs-target="#receiptModal" data-url="/admin/tithes/receipt/<?= $t['id'] ?>" title="Recibo"><i class="fas fa-print"></i></button>
+                            <a href="/admin/tithes/edit/<?= $t['id'] ?>" class="btn btn-sm btn-outline-primary icon-btn" title="Editar"><i class="fas fa-edit"></i></a>
+                            <a href="/admin/tithes/delete/<?= $t['id'] ?>" class="btn btn-sm btn-outline-danger icon-btn btn-delete-tithe" title="Excluir"><i class="fas fa-trash"></i></a>
                         </td>
                     </tr>
                     <?php endforeach; ?>
@@ -332,6 +377,27 @@ $hasMultipleCongregations = $tabTotal > 1;
         // Ajustar colunas ao mudar de aba (bug comum do DataTables em abas ocultas)
         $('button[data-bs-toggle="tab"]').on('shown.bs.tab', function (e) {
             $.fn.dataTable.tables({ visible: true, api: true }).columns.adjust();
+        });
+
+        document.querySelectorAll('.btn-delete-tithe').forEach(function (btn) {
+            btn.addEventListener('click', function (e) {
+                e.preventDefault();
+                const href = btn.getAttribute('href');
+                Swal.fire({
+                    title: 'Excluir lançamento?',
+                    text: 'Tem certeza que deseja excluir este lançamento? Esta ação não pode ser desfeita.',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Sim, excluir',
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = href;
+                    }
+                });
+            });
         });
 
         const carousel = document.querySelector('.tithe-tabs-carousel.multi #titheTabsContent');
