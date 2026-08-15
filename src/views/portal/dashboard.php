@@ -205,7 +205,20 @@ if (!empty($internalEvents)):
     </div>
 </div>
 
-<?php foreach ($portalNavGroups as $groupName => $items): ?>
+<?php
+$portalNavGroupsDashboard = $portalNavGroups;
+if (isset($portalNavGroupsDashboard['Igreja'])) {
+    $portalNavGroupsDashboard['Igreja'][] = [
+        'label' => 'Obreiros da Congregação',
+        'subtitle' => 'Liderança e equipe',
+        'icon' => 'fa-users',
+        'href' => '#portalWorkersModal',
+        'color' => 'blue',
+        'modal' => true,
+    ];
+}
+?>
+<?php foreach ($portalNavGroupsDashboard as $groupName => $items): ?>
     <div class="portal-section-label">
         <span><?= htmlspecialchars($groupName) ?></span>
         <span class="portal-pill portal-pill-gray"><?= count($items) ?> <?= count($items) === 1 ? 'item' : 'itens' ?></span>
@@ -213,7 +226,11 @@ if (!empty($internalEvents)):
     <div class="row g-3 mb-2">
         <?php foreach ($items as $item): ?>
             <div class="col-6 col-md-4 col-lg-3">
-                <a href="<?= htmlspecialchars($item['href']) ?>" class="portal-launcher-card plc-<?= $item['color'] ?>">
+                <?php if (!empty($item['modal'])): ?>
+                    <a href="#" data-bs-toggle="modal" data-bs-target="<?= htmlspecialchars($item['href']) ?>" class="portal-launcher-card plc-<?= $item['color'] ?>">
+                <?php else: ?>
+                    <a href="<?= htmlspecialchars($item['href']) ?>" class="portal-launcher-card plc-<?= $item['color'] ?>">
+                <?php endif; ?>
                     <span class="portal-launcher-icon"><i class="fas <?= $item['icon'] ?>"></i></span>
                     <span>
                         <span class="portal-launcher-title d-block"><?= htmlspecialchars($item['label']) ?></span>
@@ -226,72 +243,15 @@ if (!empty($internalEvents)):
     </div>
 <?php endforeach; ?>
 
-<div class="portal-section-label"><span>Atividade Recente</span></div>
-<div class="row g-3">
-    <div class="col-md-6">
-        <div class="portal-card h-100">
-            <div class="portal-card-header">
-                <div class="portal-card-title"><i class="fas fa-hand-holding-dollar text-success me-2"></i> Últimas Contribuições</div>
+<!-- Obreiros da Congregação Modal -->
+<div class="modal fade" id="portalWorkersModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content" style="border-radius: 20px; border: none;">
+            <div class="modal-header" style="border-bottom: 1px solid rgba(0,0,0,.06);">
+                <h5 class="modal-title fw-bold"><i class="fas fa-users text-primary me-2"></i> Obreiros da Congregação</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
             </div>
-            <div class="p-3">
-                <?php if (empty($last_tithes)): ?>
-                    <p class="text-muted text-center mb-0 py-3">Nenhum registro recente.</p>
-                <?php else: ?>
-                    <?php foreach ($last_tithes as $t): ?>
-                        <div class="d-flex justify-content-between align-items-center py-2 border-bottom" style="border-color: rgba(0,0,0,0.05) !important;">
-                            <div>
-                                <span class="portal-pill <?= ($t['type'] ?? 'Dízimo') == 'Dízimo' ? 'portal-pill-red' : 'portal-pill-green' ?> me-2"><?= htmlspecialchars($t['type'] ?? 'Dízimo') ?></span>
-                                <span class="text-muted small"><?= date('d/m/Y', strtotime($t['payment_date'])) ?></span>
-                            </div>
-                            <strong>R$ <?= number_format($t['amount'], 2, ',', '.') ?></strong>
-                        </div>
-                    <?php endforeach; ?>
-                    <div class="mt-3 text-end">
-                        <a href="/portal/financial" class="btn btn-sm btn-outline-danger rounded-pill">Ver Histórico Completo</a>
-                    </div>
-                <?php endif; ?>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-md-6">
-        <div class="portal-card h-100">
-            <div class="portal-card-header">
-                <div class="portal-card-title"><i class="fas fa-calendar-days text-primary me-2"></i> Próximos Eventos</div>
-            </div>
-            <div class="p-3">
-                <?php if (empty($next_events)): ?>
-                    <p class="text-muted text-center mb-0 py-3">Nenhum evento agendado.</p>
-                <?php else: ?>
-                    <?php foreach ($next_events as $e): ?>
-                        <div class="py-2 border-bottom" style="border-color: rgba(0,0,0,0.05) !important;">
-                            <div class="fw-bold">
-                                <?= htmlspecialchars($e['title']) ?>
-                                <?php if (strtolower($e['type'] ?? '') === 'interno'): ?>
-                                    <span class="portal-pill portal-pill-warning ms-1">Interno</span>
-                                <?php endif; ?>
-                            </div>
-                            <div class="small text-muted">
-                                <?php $dateBadges = eventGetDateBadges($e); ?>
-                                <i class="far fa-clock"></i> <?= htmlspecialchars($e['_next_occurrence'] ?? ($dateBadges[0]['date'] ?? '') . ' ' . ($dateBadges[0]['time'] ?? '')) ?>
-                                <?php if (!empty($e['location'])): ?> · <i class="fas fa-map-marker-alt"></i> <?= htmlspecialchars($e['location']) ?><?php endif; ?>
-                            </div>
-                        </div>
-                    <?php endforeach; ?>
-                    <div class="mt-3 text-end">
-                        <a href="/portal/agenda" class="btn btn-sm btn-outline-primary rounded-pill">Ver Agenda Completa</a>
-                    </div>
-                <?php endif; ?>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-md-8">
-        <div class="portal-card h-100">
-            <div class="portal-card-header">
-                <div class="portal-card-title"><i class="fas fa-users text-primary me-2"></i> Obreiros da Congregação</div>
-            </div>
-            <div class="p-3">
+            <div class="modal-body">
                 <?php if (empty($workers)): ?>
                     <p class="text-muted text-center mb-0 py-3">Nenhum obreiro cadastrado.</p>
                 <?php else: ?>
@@ -311,34 +271,6 @@ if (!empty($internalEvents)):
                                 </div>
                             </div>
                         <?php endforeach; ?>
-                    </div>
-                <?php endif; ?>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-md-4">
-        <div class="portal-card h-100">
-            <div class="portal-card-header">
-                <div class="portal-card-title"><i class="fas fa-book-open text-danger me-2"></i> Estudos</div>
-            </div>
-            <div class="p-3">
-                <?php if (empty($recent_studies)): ?>
-                    <p class="text-muted text-center mb-0 py-3">Nenhum estudo publicado recentemente.</p>
-                <?php else: ?>
-                    <?php foreach ($recent_studies as $s): ?>
-                        <div class="d-flex justify-content-between align-items-center py-2 border-bottom" style="border-color: rgba(0,0,0,0.05) !important;">
-                            <div class="text-truncate me-2">
-                                <div class="fw-bold text-truncate small" title="<?= htmlspecialchars($s['title']) ?>"><?= htmlspecialchars($s['title']) ?></div>
-                                <small class="text-muted"><?= date('d/m/Y', strtotime($s['created_at'])) ?></small>
-                            </div>
-                            <a href="/portal/studies" class="btn btn-sm btn-outline-danger icon-btn" style="width:32px;height:32px;padding:0;border-radius:50%;">
-                                <i class="fas fa-file-pdf"></i>
-                            </a>
-                        </div>
-                    <?php endforeach; ?>
-                    <div class="mt-3 text-end">
-                        <a href="/portal/studies" class="btn btn-sm btn-outline-danger rounded-pill w-100">Ver Todos</a>
                     </div>
                 <?php endif; ?>
             </div>
