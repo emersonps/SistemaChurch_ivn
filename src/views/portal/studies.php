@@ -80,6 +80,7 @@ function portalFormatFileSize($bytes) {
         letter-spacing: .05em;
         padding: .22rem .6rem;
         border-radius: 999px;
+        z-index: 1;
     }
     .pst-thumb-sub {
         position: absolute;
@@ -95,6 +96,16 @@ function portalFormatFileSize($bytes) {
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
+        z-index: 1;
+    }
+    .pst-thumb.pst-has-cover { background: #eef0f2; }
+    .pst-thumb-cover-img {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        z-index: 0;
     }
     .pst-thumb-icon { position: absolute; right: 1rem; bottom: 1rem; font-size: 2.4rem; opacity: .18; }
     .pst-thumb-title {
@@ -267,6 +278,19 @@ function portalFormatFileSize($bytes) {
             $fileSize = (!empty($s['file_path']) && is_file($studyFilePath)) ? portalFormatFileSize(filesize($studyFilePath)) : null;
             $description = trim((string)($s['description'] ?? ''));
 
+            $coverUrl = null;
+            $coverBaseName = pathinfo((string)($s['file_path'] ?? ''), PATHINFO_FILENAME);
+            if ($coverBaseName !== '') {
+                $coverDir = __DIR__ . '/../../../public/uploads/studies/covers/';
+                foreach (['jpg', 'jpeg', 'png', 'webp'] as $coverExt) {
+                    $coverCandidate = $coverDir . $coverBaseName . '.' . $coverExt;
+                    if (is_file($coverCandidate)) {
+                        $coverUrl = '/uploads/studies/covers/' . $coverBaseName . '.' . $coverExt;
+                        break;
+                    }
+                }
+            }
+
             $titleWords = preg_split('/\s+/', trim(preg_replace('/[^\p{L}\p{N}\s]/u', '', (string)$s['title'])));
             $tagWords = [];
             foreach ($titleWords as $w) {
@@ -277,11 +301,16 @@ function portalFormatFileSize($bytes) {
             ?>
             <div class="col-md-6 col-lg-4 pst-item" data-type="<?= htmlspecialchars($s['material_type'] ?? 'Estudo') ?>" data-search="<?= htmlspecialchars($searchBlob) ?>">
                 <div class="pst-card">
-                    <div class="pst-thumb pst-thumb-clickable <?= $typeMeta['class'] ?>" data-bs-toggle="modal" data-bs-target="#pstModal<?= (int)$s['id'] ?>" title="Pré-visualizar">
+                    <div class="pst-thumb pst-thumb-clickable <?= $coverUrl ? 'pst-has-cover' : $typeMeta['class'] ?>" data-bs-toggle="modal" data-bs-target="#pstModal<?= (int)$s['id'] ?>" title="Pré-visualizar">
+                        <?php if ($coverUrl): ?>
+                            <img src="<?= htmlspecialchars($coverUrl) ?>" alt="Capa" class="pst-thumb-cover-img">
+                        <?php endif; ?>
                         <span class="pst-thumb-badge"><?= htmlspecialchars(mb_strtoupper($typeMeta['label'], 'UTF-8')) ?></span>
                         <span class="pst-thumb-sub"><?= htmlspecialchars($s['congregation_name'] ?: 'Geral') ?></span>
-                        <i class="fas <?= $typeMeta['icon'] ?> pst-thumb-icon"></i>
-                        <div class="pst-thumb-title"><?= htmlspecialchars($s['title']) ?></div>
+                        <?php if (!$coverUrl): ?>
+                            <i class="fas <?= $typeMeta['icon'] ?> pst-thumb-icon"></i>
+                            <div class="pst-thumb-title"><?= htmlspecialchars($s['title']) ?></div>
+                        <?php endif; ?>
                         <div class="pst-thumb-hint"><span><i class="fas fa-eye"></i> Pré-visualizar</span></div>
                     </div>
                     <div class="pst-body">
@@ -334,11 +363,16 @@ function portalFormatFileSize($bytes) {
                         <div class="modal-body pst-modal-body">
                             <div class="row g-3">
                                 <div class="col-lg-7">
-                                    <div class="pst-thumb pst-modal-thumb <?= $typeMeta['class'] ?>">
+                                    <div class="pst-thumb pst-modal-thumb <?= $coverUrl ? 'pst-has-cover' : $typeMeta['class'] ?>">
+                                        <?php if ($coverUrl): ?>
+                                            <img src="<?= htmlspecialchars($coverUrl) ?>" alt="Capa" class="pst-thumb-cover-img">
+                                        <?php endif; ?>
                                         <span class="pst-thumb-badge"><?= htmlspecialchars(mb_strtoupper($typeMeta['label'], 'UTF-8')) ?></span>
                                         <span class="pst-thumb-sub"><?= htmlspecialchars($s['congregation_name'] ?: 'Geral') ?></span>
-                                        <i class="fas <?= $typeMeta['icon'] ?> pst-thumb-icon"></i>
-                                        <div class="pst-thumb-title pst-thumb-title-lg"><?= htmlspecialchars($s['title']) ?></div>
+                                        <?php if (!$coverUrl): ?>
+                                            <i class="fas <?= $typeMeta['icon'] ?> pst-thumb-icon"></i>
+                                            <div class="pst-thumb-title pst-thumb-title-lg"><?= htmlspecialchars($s['title']) ?></div>
+                                        <?php endif; ?>
                                     </div>
                                     <div class="pst-modal-preview">
                                         <div class="portal-pill portal-pill-gray mb-2">Prévia do Conteúdo</div>
