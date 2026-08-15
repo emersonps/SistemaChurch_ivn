@@ -41,6 +41,7 @@ $portalNavGroups = [
     ],
     'Financeiro' => [
         ['label' => 'Meus Dízimos', 'subtitle' => 'Contribuições e ofertas', 'icon' => 'fa-hand-holding-dollar', 'href' => '/portal/financial', 'color' => 'green'],
+        ['label' => 'Saúde Financeira', 'subtitle' => 'Como cuidamos da nossa casa', 'icon' => 'fa-heart-pulse', 'href' => '/portal/financial-health', 'color' => 'red'],
     ],
     'Ajuda' => [
         ['label' => 'Manual / Ajuda', 'subtitle' => 'Vídeos e suporte', 'icon' => 'fa-circle-question', 'href' => '/portal/manual', 'color' => 'cyan'],
@@ -295,6 +296,7 @@ $portalCurrentUri = $_SERVER['REQUEST_URI'] ?? '';
         .plc-gray .portal-launcher-icon { background: rgba(108,117,125,.12); color: #6c757d; }
         .plc-green .portal-launcher-icon { background: rgba(25,135,84,.12); color: #198754; }
         .plc-cyan .portal-launcher-icon { background: rgba(13,202,240,.16); color: #087990; }
+        .plc-red .portal-launcher-icon { background: rgba(179,0,0,.10); color: var(--portal-primary); }
 
         /* ---------- Bottom app nav ---------- */
         .portal-bottom-nav {

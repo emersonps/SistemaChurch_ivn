@@ -1109,6 +1109,9 @@ elseif ($uri == '/portal/manual') {
 elseif ($uri == '/portal/financial') {
     (new PortalController())->financial();
 }
+elseif ($uri == '/portal/financial-health') {
+    (new PortalController())->financialHealth();
+}
 elseif ($uri == '/portal/card') {
     (new PortalController())->card();
 }

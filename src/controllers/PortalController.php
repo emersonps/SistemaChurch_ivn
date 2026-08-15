@@ -311,6 +311,64 @@ class PortalController {
         view('portal/financial', ['tithes' => $tithes]);
     }
 
+    public function financialHealth() {
+        $this->requireMemberLogin();
+        $db = (new Database())->connect();
+
+        $monthStart = date('Y-m-01');
+        $today = date('Y-m-d');
+        $meses = [1=>'Janeiro',2=>'Fevereiro',3=>'Março',4=>'Abril',5=>'Maio',6=>'Junho',7=>'Julho',8=>'Agosto',9=>'Setembro',10=>'Outubro',11=>'Novembro',12=>'Dezembro'];
+        $monthLabel = $meses[(int)date('n')] . ' de ' . date('Y');
+
+        $stmtIncome = $db->prepare("SELECT COALESCE(SUM(amount), 0) FROM tithes WHERE payment_date BETWEEN ? AND ?");
+        $stmtIncome->execute([$monthStart, $today]);
+        $income = (float)$stmtIncome->fetchColumn();
+
+        $stmtExpTotal = $db->prepare("SELECT COALESCE(SUM(amount), 0) as total, COUNT(*) as cnt FROM expenses WHERE expense_date BETWEEN ? AND ?");
+        $stmtExpTotal->execute([$monthStart, $today]);
+        $expRow = $stmtExpTotal->fetch();
+        $totalExpense = (float)$expRow['total'];
+        $expenseCount = (int)$expRow['cnt'];
+
+        $stmtCat = $db->prepare("SELECT category, COALESCE(SUM(amount), 0) as total FROM expenses WHERE expense_date BETWEEN ? AND ? GROUP BY category ORDER BY total DESC");
+        $stmtCat->execute([$monthStart, $today]);
+        $categoryRows = $stmtCat->fetchAll();
+
+        $categories = [];
+        foreach ($categoryRows as $row) {
+            $amount = (float)$row['total'];
+            $categories[] = [
+                'label' => $row['category'] ?: 'Outros',
+                'amount' => $amount,
+                'pct' => $totalExpense > 0 ? round(($amount / $totalExpense) * 100) : 0,
+            ];
+        }
+
+        // Health score: income vs. expenses recorded so far this month.
+        if ($totalExpense <= 0 && $income <= 0) {
+            $healthPct = null;
+            $healthTier = 'none';
+        } elseif ($totalExpense <= 0) {
+            $healthPct = 100;
+            $healthTier = 'positive';
+        } else {
+            $healthPct = min(100, (int)round(($income / $totalExpense) * 100));
+            $healthTier = $healthPct >= 100 ? 'positive' : ($healthPct >= 80 ? 'stable' : 'attention');
+        }
+
+        view('portal/financial_health', [
+            'monthLabel' => $monthLabel,
+            'income' => $income,
+            'totalExpense' => $totalExpense,
+            'expenseCount' => $expenseCount,
+            'categoryCount' => count($categories),
+            'categories' => $categories,
+            'healthPct' => $healthPct,
+            'healthTier' => $healthTier,
+            'lastUpdated' => date('d/m/Y H:i'),
+        ]);
+    }
+
     public function card() {
         $this->requireMemberLogin();
         $member_id = $_SESSION['member_id'];
