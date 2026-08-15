@@ -33,11 +33,11 @@ $portalNavGroups = [
         ['label' => 'Meus Dados', 'subtitle' => 'Editar cadastro', 'icon' => 'fa-user-pen', 'href' => '/portal/profile', 'color' => 'blue'],
         ['label' => 'Minha Carteirinha', 'subtitle' => 'Credencial digital', 'icon' => 'fa-id-card', 'href' => '/portal/card', 'color' => 'purple'],
         ['label' => 'Alterar Senha', 'subtitle' => 'Segurança da conta', 'icon' => 'fa-key', 'href' => '/portal/change-password', 'color' => 'slate'],
+        ['label' => 'Meus Documentos', 'subtitle' => 'Arquivos pessoais', 'icon' => 'fa-folder-open', 'href' => '/portal/documents', 'color' => 'gray'],
     ],
     'Igreja' => [
         ['label' => 'Agenda da Igreja', 'subtitle' => 'Cultos e eventos', 'icon' => 'fa-calendar-days', 'href' => '/portal/agenda', 'color' => 'orange'],
         ['label' => 'Estudos e Esboços', 'subtitle' => 'Materiais em PDF', 'icon' => 'fa-book-bible', 'href' => '/portal/studies', 'color' => 'teal'],
-        ['label' => 'Meus Documentos', 'subtitle' => 'Arquivos pessoais', 'icon' => 'fa-folder-open', 'href' => '/portal/documents', 'color' => 'gray'],
     ],
     'Financeiro' => [
         ['label' => 'Meus Dízimos', 'subtitle' => 'Contribuições e ofertas', 'icon' => 'fa-hand-holding-dollar', 'href' => '/portal/financial', 'color' => 'green'],

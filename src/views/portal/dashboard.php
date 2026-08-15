@@ -71,24 +71,6 @@ function portalWorkerHonorific($role) {
         margin-bottom: .25rem;
     }
     .portal-stat-value { font-size: 1.3rem; font-weight: 800; color: #1a1a1a; }
-    .portal-quick-action {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: .4rem;
-        text-decoration: none;
-        color: #1a1a1a;
-    }
-    .portal-quick-action-icon {
-        width: 52px;
-        height: 52px;
-        border-radius: 16px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.15rem;
-    }
-    .portal-quick-action span.label { font-size: .74rem; font-weight: 700; }
     .portal-worker {
         display: flex;
         align-items: center;
@@ -248,34 +230,6 @@ if (!empty($internalEvents)):
             <div class="portal-stat-label">Estudos Novos</div>
             <div class="portal-stat-value"><?= count($recent_studies) ?></div>
         </div>
-    </div>
-</div>
-
-<div class="portal-section-label"><span>Atalhos Rápidos</span></div>
-<div class="row g-3 text-center mb-2">
-    <div class="col-3">
-        <a href="/portal/card" class="portal-quick-action">
-            <span class="portal-quick-action-icon plc-purple"><i class="fas fa-id-card"></i></span>
-            <span class="label">Carteira</span>
-        </a>
-    </div>
-    <div class="col-3">
-        <a href="/portal/financial" class="portal-quick-action">
-            <span class="portal-quick-action-icon plc-green"><i class="fas fa-hand-holding-dollar"></i></span>
-            <span class="label">Dízimos</span>
-        </a>
-    </div>
-    <div class="col-3">
-        <a href="/portal/agenda" class="portal-quick-action">
-            <span class="portal-quick-action-icon plc-orange"><i class="fas fa-calendar-days"></i></span>
-            <span class="label">Agenda</span>
-        </a>
-    </div>
-    <div class="col-3">
-        <a href="/portal/documents" class="portal-quick-action">
-            <span class="portal-quick-action-icon plc-gray"><i class="fas fa-folder-open"></i></span>
-            <span class="label">Documentos</span>
-        </a>
     </div>
 </div>
 
