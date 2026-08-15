@@ -38,19 +38,6 @@
         padding: .3rem .8rem;
         border-radius: 999px;
     }
-    .portal-hero-bubble {
-        background: #fff;
-        color: var(--portal-primary);
-        font-weight: 800;
-        font-size: .82rem;
-        width: 34px;
-        height: 34px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-    }
     .portal-stat {
         background: #fff;
         border: 1px solid rgba(0,0,0,0.06);
@@ -136,10 +123,6 @@
         </div>
         <div class="d-none d-sm-flex flex-column align-items-end gap-2">
             <span class="portal-hero-badge">Bem-vindo</span>
-            <div class="d-flex gap-1">
-                <span class="portal-hero-bubble" title="Próximos eventos"><?= count($next_events) ?></span>
-                <span class="portal-hero-bubble" title="Estudos recentes"><?= count($recent_studies) ?></span>
-            </div>
         </div>
     </div>
 </div>
