@@ -38,6 +38,13 @@ class PortalController {
         
         // Last Tithes
         $last_tithes = $db->query("SELECT * FROM tithes WHERE member_id = $member_id ORDER BY payment_date DESC LIMIT 5")->fetchAll();
+
+        // Year-to-date contribution total (for the dashboard stat row)
+        $currentYear = date('Y');
+        $ytdYearExpr = $db->getAttribute(PDO::ATTR_DRIVER_NAME) === 'mysql' ? "YEAR(payment_date)" : "strftime('%Y', payment_date)";
+        $stmtYtd = $db->prepare("SELECT COALESCE(SUM(amount), 0) FROM tithes WHERE member_id = ? AND $ytdYearExpr = ?");
+        $stmtYtd->execute([$member_id, $currentYear]);
+        $ytd_total = (float)$stmtYtd->fetchColumn();
         
         // Next Events (General or Congregation specific, include internos permitidos)
         $congregation_id = $member['congregation_id'];
@@ -110,6 +117,7 @@ class PortalController {
         view('portal/dashboard', [
             'member' => $member,
             'last_tithes' => $last_tithes,
+            'ytd_total' => $ytd_total,
             'next_events' => $next_events,
             'recent_studies' => $recent_studies,
             'leaderName' => $leaderName,

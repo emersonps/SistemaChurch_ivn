@@ -1,14 +1,17 @@
 <?php include __DIR__ . '/layout/header.php'; ?>
 <?php $siteProfile = getChurchSiteProfileSettings(); ?>
 
-<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom no-print">
-    <h1 class="h2">Minha Carteirinha</h1>
-    <div class="btn-toolbar mb-2 mb-md-0">
-        <button id="btnDownload" class="btn btn-sm btn-success me-2">
-            <i class="fas fa-download"></i> Baixar Imagem
+<div class="d-flex justify-content-between flex-wrap align-items-center mb-3 no-print gap-2">
+    <div>
+        <div class="portal-page-title mb-0">Minha Carteirinha</div>
+        <p class="text-muted mb-0">Sua credencial digital de membro.</p>
+    </div>
+    <div class="d-flex gap-2">
+        <button id="btnDownload" class="btn btn-sm btn-dark rounded-pill fw-semibold px-3">
+            <i class="fas fa-download me-1"></i> Baixar Imagem
         </button>
-        <button onclick="window.print()" class="btn btn-sm btn-secondary">
-            <i class="fas fa-print"></i> Imprimir
+        <button onclick="window.print()" class="btn btn-sm btn-outline-secondary rounded-pill fw-semibold px-3">
+            <i class="fas fa-print me-1"></i> Imprimir
         </button>
     </div>
 </div>
@@ -23,9 +26,12 @@
     .no-print {
         display: none !important;
     }
-    .d-flex.flex-column.align-items-center.mt-4.gap-0 {
+    #memberCardFrame {
         margin-top: 0 !important;
         padding: 0 !important;
+        border: none !important;
+        box-shadow: none !important;
+        background: transparent !important;
     }
     #member-card-front, #member-card-back {
         border: 1px dashed #ccc !important;
@@ -34,8 +40,8 @@
 }
 </style>
 
-<div class="d-flex flex-column align-items-center mt-4 gap-0">
-    <?php 
+<div id="memberCardFrame" class="portal-card p-4 p-md-5 d-flex flex-column align-items-center">
+    <?php
     $layoutKey = getSystemSetting('card_layout', 'model_1');
     $siglaColor = getSystemSetting('card_sigla_color', '#0d6efd');
     $layouts = getCardLayouts();
@@ -205,8 +211,8 @@
     </div>
 </div>
 
-<div class="text-center mt-3 text-muted no-print">
-    <small>A carteirinha é gerada no tamanho padrão CR-80 (85.6mm x 53.98mm).</small>
+<div class="text-center mt-3 no-print">
+    <span class="portal-pill portal-pill-gray"><i class="fas fa-ruler-combined me-1"></i> Tamanho padrão CR-80 (85.6mm x 53.98mm)</span>
 </div>
 
 <!-- Include QRCode.js library -->
@@ -238,7 +244,7 @@ document.getElementById('btnDownload').addEventListener('click', function() {
 });
 
 function generateCardImage(callback) {
-    var element = document.querySelector(".d-flex.flex-column.align-items-center.mt-4.gap-0");
+    var element = document.getElementById("memberCardFrame");
     
     html2canvas(element, {
         scale: 3, 

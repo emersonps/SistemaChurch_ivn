@@ -1,16 +1,12 @@
 <?php include __DIR__ . '/layout/header.php'; ?>
 
-<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-    <h1 class="h2"><?= htmlspecialchars($title ?? 'Documento indisponível') ?></h1>
-</div>
-
-<div class="alert alert-warning d-flex align-items-center" role="alert">
-    <i class="fas fa-exclamation-triangle me-2"></i>
-    <div><?= htmlspecialchars($message ?? 'O arquivo solicitado não foi encontrado ou está inacessível.') ?></div>
-</div>
-
-<div class="mt-3">
-    <a href="/portal/documents" class="btn btn-outline-secondary">
+<div class="portal-card text-center py-5 px-4">
+    <div class="mx-auto mb-3" style="width: 64px; height: 64px; border-radius: 50%; background: rgba(255,193,7,0.14); color: #997404; display: flex; align-items: center; justify-content: center; font-size: 1.6rem;">
+        <i class="fas fa-triangle-exclamation"></i>
+    </div>
+    <h5 class="fw-bold mb-2"><?= htmlspecialchars($title ?? 'Documento indisponível') ?></h5>
+    <p class="text-muted mb-4"><?= htmlspecialchars($message ?? 'O arquivo solicitado não foi encontrado ou está inacessível.') ?></p>
+    <a href="/portal/documents" class="btn btn-outline-secondary rounded-pill fw-semibold px-4">
         <i class="fas fa-arrow-left me-1"></i> Voltar para Meus Documentos
     </a>
 </div>

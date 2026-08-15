@@ -1,38 +1,56 @@
 <?php include __DIR__ . '/layout/header.php'; ?>
 
-<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-    <h1 class="h2">Estudos Bíblicos e Esboços</h1>
-    <div class="btn-toolbar mb-2 mb-md-0">
-        <a href="/portal" class="btn btn-sm btn-outline-secondary">
-            <i class="fas fa-arrow-left"></i> Voltar
-        </a>
-    </div>
-</div>
+<style>
+    .portal-study-card {
+        background: #fff;
+        border: 1px solid rgba(0,0,0,0.06);
+        border-radius: 16px;
+        box-shadow: 0 2px 8px rgba(17,17,17,0.03);
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+    .portal-study-icon {
+        width: 42px;
+        height: 42px;
+        border-radius: 12px;
+        background: rgba(179,0,0,.08);
+        color: var(--portal-primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.05rem;
+    }
+</style>
 
-<div class="row">
+<div class="portal-page-title">Estudos e Esboços</div>
+<p class="text-muted mb-3">Materiais em PDF disponíveis para você.</p>
+
+<div class="row g-3">
     <?php if (empty($studies)): ?>
-        <div class="col-12 text-center py-5">
-            <i class="fas fa-book-open fa-4x text-muted mb-3"></i>
-            <p class="text-muted">Nenhum estudo disponível no momento.</p>
+        <div class="col-12">
+            <div class="portal-card text-center py-5 text-muted">
+                <i class="fas fa-book-open fa-2x mb-3 opacity-50"></i>
+                <p class="mb-0">Nenhum estudo disponível no momento.</p>
+            </div>
         </div>
     <?php else: ?>
         <?php foreach ($studies as $s): ?>
-            <div class="col-md-6 col-lg-4 mb-4">
-                <div class="card h-100 shadow-sm">
-                    <div class="card-body">
-                        <h5 class="card-title text-danger"><?= htmlspecialchars($s['title']) ?></h5>
-                        <h6 class="card-subtitle mb-2 text-muted">
-                            <i class="far fa-calendar-alt"></i> <?= date('d/m/Y', strtotime($s['created_at'])) ?>
-                        </h6>
-                        <?php if (!empty($s['description'])): ?>
-                            <p class="card-text"><?= nl2br(htmlspecialchars($s['description'])) ?></p>
-                        <?php endif; ?>
+            <div class="col-md-6 col-lg-4">
+                <div class="portal-study-card p-3">
+                    <div class="d-flex align-items-start gap-3 mb-2">
+                        <span class="portal-study-icon"><i class="fas fa-book-bible"></i></span>
+                        <div>
+                            <div class="fw-bold"><?= htmlspecialchars($s['title']) ?></div>
+                            <div class="text-muted small"><i class="far fa-calendar-alt me-1"></i> <?= date('d/m/Y', strtotime($s['created_at'])) ?></div>
+                        </div>
                     </div>
-                    <div class="card-footer bg-white border-top-0">
-                        <a href="/portal/studies/view/<?= $s['id'] ?>" target="_blank" class="btn btn-danger w-100">
-                            <i class="fas fa-file-pdf me-2"></i> Baixar PDF
-                        </a>
-                    </div>
+                    <?php if (!empty($s['description'])): ?>
+                        <p class="text-muted small flex-grow-1"><?= nl2br(htmlspecialchars($s['description'])) ?></p>
+                    <?php endif; ?>
+                    <a href="/portal/studies/view/<?= $s['id'] ?>" target="_blank" class="btn btn-outline-danger rounded-pill fw-semibold mt-2">
+                        <i class="fas fa-file-pdf me-2"></i> Abrir PDF
+                    </a>
                 </div>
             </div>
         <?php endforeach; ?>
