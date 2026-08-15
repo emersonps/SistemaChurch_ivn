@@ -6,9 +6,9 @@
         <a href="/admin/financial/closures" class="btn btn-sm btn-outline-secondary rounded-pill fw-semibold px-3">
             <i class="fas fa-arrow-left me-1"></i> Voltar
         </a>
-        <button type="button" class="btn btn-sm btn-outline-primary rounded-pill fw-semibold px-3" onclick="window.print()">
+        <a href="/admin/financial/closures/print/<?= $closure['id'] ?>" target="_blank" class="btn btn-sm btn-outline-primary rounded-pill fw-semibold px-3">
             <i class="fas fa-print me-1"></i> Imprimir
-        </button>
+        </a>
         <button type="button" class="btn btn-sm btn-outline-danger rounded-pill fw-semibold px-3 btn-delete-closure" data-id="<?= $closure['id'] ?>" data-period="<?= htmlspecialchars($closure['period']) ?>">
             <i class="fas fa-trash me-1"></i> Excluir
         </button>

@@ -688,6 +688,9 @@ elseif ($uri == '/admin/financial/closures/store') {
 elseif (preg_match('#^/admin/financial/closures/show/(\d+)$#', $uri, $matches)) {
     (new FinancialClosureController())->show($matches[1]);
 }
+elseif (preg_match('#^/admin/financial/closures/print/(\d+)$#', $uri, $matches)) {
+    (new FinancialClosureController())->print($matches[1]);
+}
 elseif (preg_match('#^/admin/financial/closures/delete/(\d+)$#', $uri, $matches)) {
     (new FinancialClosureController())->delete($matches[1]);
 }

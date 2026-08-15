@@ -160,25 +160,42 @@ class FinancialClosureController {
         redirect('/admin/financial/closures');
     }
     
-    public function show($id) {
-        requirePermission('financial.view');
-        $db = (new Database())->connect();
-        
-        $stmt = $db->prepare("SELECT fc.*, c.name as congregation_name, u.username as creator_name 
-                              FROM financial_closures fc 
-                              LEFT JOIN congregations c ON fc.congregation_id = c.id 
+    private function fetchClosure(PDO $db, $id) {
+        $stmt = $db->prepare("SELECT fc.*, c.name as congregation_name, u.username as creator_name
+                              FROM financial_closures fc
+                              LEFT JOIN congregations c ON fc.congregation_id = c.id
                               LEFT JOIN users u ON fc.created_by = u.id
                               WHERE fc.id = ?");
         $stmt->execute([$id]);
         $closure = $stmt->fetch();
-        
-        if (!$closure) redirect('/admin/financial/closures');
-        
+
+        if (!$closure) {
+            redirect('/admin/financial/closures');
+            return null;
+        }
+
         // Scope check
         if (!empty($_SESSION['user_congregation_id']) && $closure['congregation_id'] != $_SESSION['user_congregation_id']) {
             redirect('/admin/financial/closures');
+            return null;
         }
-        
+
+        return $closure;
+    }
+
+    public function show($id) {
+        requirePermission('financial.view');
+        $db = (new Database())->connect();
+        $closure = $this->fetchClosure($db, $id);
+        if (!$closure) return;
         view('admin/financial/closure_details', ['closure' => $closure]);
+    }
+
+    public function print($id) {
+        requirePermission('financial.view');
+        $db = (new Database())->connect();
+        $closure = $this->fetchClosure($db, $id);
+        if (!$closure) return;
+        view('admin/financial/print_closure', ['closure' => $closure]);
     }
 }
