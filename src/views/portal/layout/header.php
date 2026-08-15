@@ -234,6 +234,24 @@ $portalCurrentUri = $_SERVER['REQUEST_URI'] ?? '';
             color: #1a1a1a;
             margin-bottom: .25rem;
         }
+        .portal-breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+            font-size: .8rem;
+            margin-bottom: .9rem;
+        }
+        .portal-breadcrumb-link {
+            display: inline-flex;
+            align-items: center;
+            gap: .35rem;
+            color: #868e96;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .portal-breadcrumb-link:hover { color: var(--portal-primary); }
+        .portal-breadcrumb-sep { font-size: .55rem; color: #ced4da; }
+        .portal-breadcrumb-current { color: #1a1a1a; font-weight: 700; }
         .portal-pill {
             display: inline-block;
             padding: .22rem .7rem;
@@ -474,3 +492,22 @@ $portalCurrentUri = $_SERVER['REQUEST_URI'] ?? '';
 </div>
 
 <div class="portal-content">
+
+<?php
+$portalBreadcrumbMap = [];
+foreach ($portalNavGroups as $groupName => $items) {
+    foreach ($items as $item) {
+        $portalBreadcrumbMap[$item['href']] = $item['label'];
+    }
+}
+$portalCurrentPath = parse_url($portalCurrentUri, PHP_URL_PATH) ?: $portalCurrentUri;
+$portalIsHome = in_array($portalCurrentPath, ['/portal', '/portal/', '/portal/dashboard'], true);
+$portalBreadcrumbLabel = $portalBreadcrumbMap[$portalCurrentPath] ?? null;
+?>
+<?php if (!$portalIsHome && $portalBreadcrumbLabel): ?>
+    <nav class="portal-breadcrumb" aria-label="breadcrumb">
+        <a href="/portal/dashboard" class="portal-breadcrumb-link"><i class="fas fa-house"></i> Painel</a>
+        <i class="fas fa-chevron-right portal-breadcrumb-sep"></i>
+        <span class="portal-breadcrumb-current"><?= htmlspecialchars($portalBreadcrumbLabel) ?></span>
+    </nav>
+<?php endif; ?>
