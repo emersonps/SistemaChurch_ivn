@@ -31,7 +31,78 @@ if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'developer') {
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         body { background-color: #f8f9fa; }
-        .sidebar { min-height: 100vh; box-shadow: 2px 0 5px rgba(0,0,0,0.1); }
+        .sidebar { min-height: 100vh; box-shadow: 2px 0 5px rgba(0,0,0,0.1); background: #fff; }
+        .sidebar-brand {
+            padding: 1.5rem 1.25rem 1.25rem;
+        }
+        .sidebar-brand h4 {
+            font-weight: 800;
+            letter-spacing: .02em;
+        }
+        .sidebar .nav {
+            padding: 0 .7rem;
+        }
+        .sidebar .nav-item {
+            margin-bottom: .15rem;
+        }
+        .sidebar .nav-link {
+            display: flex;
+            align-items: center;
+            border-radius: 10px;
+            padding: .55rem .8rem;
+            font-size: .9rem;
+            font-weight: 600;
+            transition: background-color .15s ease, color .15s ease;
+        }
+        .sidebar .nav-link i.fas,
+        .sidebar .nav-link i.fab {
+            width: 20px;
+            flex: 0 0 auto;
+            text-align: center;
+            font-size: .92rem;
+            margin-right: .7rem !important;
+        }
+        .sidebar .nav-link:hover:not(.active) {
+            background-color: rgba(179,0,0,0.06);
+            color: #b30000 !important;
+        }
+        .sidebar .nav-link.active {
+            box-shadow: 0 2px 6px rgba(179,0,0,0.25);
+        }
+        .sidebar .nav-link[aria-expanded="true"] .fa-chevron-down {
+            transform: rotate(180deg);
+        }
+        .sidebar .nav-link .fa-chevron-down {
+            transition: transform .2s ease;
+        }
+        .sidebar-heading {
+            font-size: .72rem !important;
+            font-weight: 800 !important;
+            letter-spacing: .08em !important;
+            color: #adb5bd !important;
+            padding-left: .8rem !important;
+            padding-right: .8rem !important;
+            margin-top: 1.4rem !important;
+        }
+        .sidebar .nav ul.collapse {
+            padding-left: 0;
+            margin-top: .15rem;
+            margin-bottom: .25rem;
+            margin-left: 1.35rem;
+            border-left: 2px solid rgba(0,0,0,0.07);
+        }
+        .sidebar .nav ul.collapse .nav-link {
+            padding: .45rem .8rem;
+            margin-left: .5rem;
+            font-size: .84rem;
+            font-weight: 500;
+        }
+        .sidebar .nav ul.collapse .nav-link.active {
+            background-color: rgba(179,0,0,0.10);
+            color: #b30000 !important;
+            box-shadow: none;
+            font-weight: 700;
+        }
         .nav-link.active { background-color: #b30000; color: white !important; } /* Red for admin active */
         /* Fix for Tabs collision */
         .nav-tabs .nav-link.active {
@@ -169,7 +240,7 @@ $mobileLauncherHref = '/admin?launcher=1';
         <div class="row">
             <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-white sidebar collapse">
                 <div class="position-sticky pt-3">
-                    <div class="px-3 pb-3 border-bottom text-center">
+                    <div class="sidebar-brand px-3 pb-3 border-bottom text-center">
                         <img src="<?= htmlspecialchars($siteProfile['logo_url'] ?? '/assets/img/logo.png') ?>" alt="<?= htmlspecialchars($siteProfile['alias'] ?? 'IVN') ?>" class="sidebar-brand-logo mb-2">
                         <h4 class="text-danger mb-0"><?= htmlspecialchars($siteProfile['alias'] ?? 'IVN') ?></h4>
                     </div>
@@ -275,12 +346,17 @@ $mobileLauncherHref = '/admin?launcher=1';
                         <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-3 mb-1 text-muted text-uppercase small">
                             <span>Financeiro</span>
                         </h6>
+                        <?php
+                        $inFinanceiroSubmenu = strpos($_SERVER['REQUEST_URI'], '/admin/financial') !== false
+                            || strpos($_SERVER['REQUEST_URI'], '/admin/tithes') !== false
+                            || strpos($_SERVER['REQUEST_URI'], '/admin/expenses') !== false;
+                        ?>
                         <li class="nav-item">
-                            <a class="nav-link d-flex justify-content-between align-items-center" href="#financeiroSubmenu" data-bs-toggle="collapse" aria-expanded="false" aria-controls="financeiroSubmenu">
+                            <a class="nav-link d-flex justify-content-between align-items-center <?= $inFinanceiroSubmenu ? 'active' : 'text-dark' ?>" href="#financeiroSubmenu" data-bs-toggle="collapse" aria-expanded="<?= $inFinanceiroSubmenu ? 'true' : 'false' ?>" aria-controls="financeiroSubmenu">
                                 <span><i class="fas fa-chart-line me-2"></i> Gestão Financeira e Contábil</span>
                                 <i class="fas fa-chevron-down" style="font-size: 0.8em;"></i>
                             </a>
-                            <ul class="collapse flex-column ms-3 nav" id="financeiroSubmenu">
+                            <ul class="collapse flex-column ms-3 nav <?= $inFinanceiroSubmenu ? 'show' : '' ?>" id="financeiroSubmenu">
                                 <?php if (hasPermission('financial_accounts.manage')): ?>
                                 <li class="nav-item">
                                     <a class="nav-link <?= strpos($_SERVER['REQUEST_URI'], '/admin/financial/bank-accounts') !== false ? 'active' : '' ?>" href="/admin/financial/bank-accounts">
