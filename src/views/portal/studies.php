@@ -109,10 +109,86 @@ function portalFormatFileSize($bytes) {
         -webkit-box-orient: vertical;
         overflow: hidden;
     }
+    .pst-thumb-title-lg { font-size: 1.55rem; -webkit-line-clamp: 4; }
     .pst-gold { background: linear-gradient(135deg, #f7d79b, #f0a85c); }
     .pst-sage { background: linear-gradient(135deg, #c9e4c5, #8fbf8a); }
     .pst-coral { background: linear-gradient(135deg, #fbd0c4, #f0987e); }
     .pst-blue { background: linear-gradient(135deg, #cfe0f7, #93b8e6); }
+
+    .pst-thumb-clickable { cursor: pointer; }
+    .pst-thumb-hint {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        background: rgba(0,0,0,0);
+        transition: opacity .15s ease, background .15s ease;
+        z-index: 2;
+    }
+    .pst-thumb-clickable:hover .pst-thumb-hint { opacity: 1; background: rgba(0,0,0,.18); }
+    .pst-thumb-hint span {
+        background: rgba(255,255,255,.94);
+        color: #1a1a1a;
+        font-size: .72rem;
+        font-weight: 800;
+        padding: .35rem .85rem;
+        border-radius: 999px;
+        display: inline-flex;
+        align-items: center;
+        gap: .35rem;
+    }
+
+    /* ---------- Preview modal ---------- */
+    .pst-modal-content { border-radius: 20px; border: none; overflow: hidden; }
+    .pst-modal-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: .75rem;
+        padding: 1rem 1.25rem;
+        border-bottom: 1px solid rgba(0,0,0,.06);
+    }
+    .pst-modal-icon {
+        width: 38px;
+        height: 38px;
+        border-radius: 12px;
+        background: #f4f5f7;
+        color: #495057;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex: 0 0 auto;
+        font-size: .95rem;
+    }
+    .pst-modal-title { font-weight: 800; font-size: 1rem; color: #1a1a1a; line-height: 1.2; }
+    .pst-modal-subtitle { font-size: .74rem; color: #868e96; font-weight: 600; }
+    .pst-modal-thumb { border-radius: 16px; min-height: 220px; }
+    .pst-modal-preview { margin-top: 1.1rem; }
+    .pst-modal-preview-title {
+        font-family: Georgia, 'Times New Roman', serif;
+        font-weight: 700;
+        font-size: 1.15rem;
+        color: #1a1a1a;
+        margin: .35rem 0 .5rem;
+    }
+    .pst-modal-details-card {
+        background: #fafafa;
+        border: 1px solid rgba(0,0,0,.06);
+        border-radius: 16px;
+        padding: 1.1rem;
+        height: 100%;
+    }
+    .pst-detail-label {
+        font-size: .68rem;
+        font-weight: 800;
+        letter-spacing: .04em;
+        text-transform: uppercase;
+        color: #adb5bd;
+        margin-bottom: .15rem;
+    }
+    .pst-detail-value { font-size: .85rem; font-weight: 700; color: #1a1a1a; }
 
     .pst-body { padding: 1rem 1.1rem 1.1rem; display: flex; flex-direction: column; flex-grow: 1; }
     .date-pill-portal {
@@ -201,11 +277,12 @@ function portalFormatFileSize($bytes) {
             ?>
             <div class="col-md-6 col-lg-4 pst-item" data-type="<?= htmlspecialchars($s['material_type'] ?? 'Estudo') ?>" data-search="<?= htmlspecialchars($searchBlob) ?>">
                 <div class="pst-card">
-                    <div class="pst-thumb <?= $typeMeta['class'] ?>">
+                    <div class="pst-thumb pst-thumb-clickable <?= $typeMeta['class'] ?>" data-bs-toggle="modal" data-bs-target="#pstModal<?= (int)$s['id'] ?>" title="Pré-visualizar">
                         <span class="pst-thumb-badge"><?= htmlspecialchars(mb_strtoupper($typeMeta['label'], 'UTF-8')) ?></span>
                         <span class="pst-thumb-sub"><?= htmlspecialchars($s['congregation_name'] ?: 'Geral') ?></span>
                         <i class="fas <?= $typeMeta['icon'] ?> pst-thumb-icon"></i>
                         <div class="pst-thumb-title"><?= htmlspecialchars($s['title']) ?></div>
+                        <div class="pst-thumb-hint"><span><i class="fas fa-eye"></i> Pré-visualizar</span></div>
                     </div>
                     <div class="pst-body">
                         <div class="d-flex flex-wrap align-items-center gap-2">
@@ -227,6 +304,87 @@ function portalFormatFileSize($bytes) {
                         <a href="/portal/studies/view/<?= $s['id'] ?>" target="_blank" class="btn pst-open-btn">
                             <i class="fas fa-file-pdf me-2"></i> Abrir PDF <i class="fas fa-arrow-up-right-from-square ms-2 small"></i>
                         </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Preview Modal -->
+            <div class="modal fade" id="pstModal<?= (int)$s['id'] ?>" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+                    <div class="modal-content pst-modal-content">
+                        <div class="pst-modal-header">
+                            <div class="d-flex align-items-center gap-2 min-width-0">
+                                <span class="pst-modal-icon"><i class="fas <?= $typeMeta['icon'] ?>"></i></span>
+                                <div class="min-width-0">
+                                    <div class="pst-modal-title text-truncate"><?= htmlspecialchars($s['title']) ?></div>
+                                    <div class="pst-modal-subtitle">
+                                        <?= htmlspecialchars($typeMeta['label']) ?>
+                                        <?php if ($fileSize): ?> &bull; <?= htmlspecialchars($fileSize) ?><?php endif; ?>
+                                        &bull; <i class="far fa-calendar-alt me-1"></i><?= date('d/m/Y', strtotime($s['created_at'])) ?>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center gap-2 flex-shrink-0">
+                                <a href="/portal/studies/view/<?= $s['id'] ?>" target="_blank" class="btn btn-dark rounded-pill btn-sm fw-semibold px-3">
+                                    <i class="fas fa-arrow-up-right-from-square me-1"></i> Abrir PDF
+                                </a>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                            </div>
+                        </div>
+                        <div class="modal-body pst-modal-body">
+                            <div class="row g-3">
+                                <div class="col-lg-7">
+                                    <div class="pst-thumb pst-modal-thumb <?= $typeMeta['class'] ?>">
+                                        <span class="pst-thumb-badge"><?= htmlspecialchars(mb_strtoupper($typeMeta['label'], 'UTF-8')) ?></span>
+                                        <span class="pst-thumb-sub"><?= htmlspecialchars($s['congregation_name'] ?: 'Geral') ?></span>
+                                        <i class="fas <?= $typeMeta['icon'] ?> pst-thumb-icon"></i>
+                                        <div class="pst-thumb-title pst-thumb-title-lg"><?= htmlspecialchars($s['title']) ?></div>
+                                    </div>
+                                    <div class="pst-modal-preview">
+                                        <div class="portal-pill portal-pill-gray mb-2">Prévia do Conteúdo</div>
+                                        <h3 class="pst-modal-preview-title"><?= htmlspecialchars($s['title']) ?></h3>
+                                        <?php if ($description !== ''): ?>
+                                            <p class="text-muted mb-0"><?= nl2br(htmlspecialchars($description)) ?></p>
+                                        <?php else: ?>
+                                            <p class="text-muted fst-italic mb-0">Nenhuma descrição cadastrada para este material.</p>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+                                <div class="col-lg-5">
+                                    <div class="pst-modal-details-card">
+                                        <div class="fw-bold mb-3">Detalhes do material</div>
+                                        <div class="row g-2 mb-3">
+                                            <div class="col-6">
+                                                <div class="pst-detail-label">Categoria</div>
+                                                <div class="pst-detail-value"><?= htmlspecialchars($typeMeta['label']) ?></div>
+                                            </div>
+                                            <div class="col-6">
+                                                <div class="pst-detail-label">Data</div>
+                                                <div class="pst-detail-value"><?= date('d/m/Y', strtotime($s['created_at'])) ?></div>
+                                            </div>
+                                            <?php if ($s['congregation_name']): ?>
+                                            <div class="col-12">
+                                                <div class="pst-detail-label">Congregação</div>
+                                                <div class="pst-detail-value"><?= htmlspecialchars($s['congregation_name']) ?></div>
+                                            </div>
+                                            <?php endif; ?>
+                                        </div>
+                                        <?php if (!empty($tagWords)): ?>
+                                            <div class="pst-detail-label mb-1">Tags</div>
+                                            <div class="d-flex flex-wrap gap-1 mb-3">
+                                                <?php foreach ($tagWords as $tw): ?>
+                                                    <span class="pst-tag">#<?= htmlspecialchars($tw) ?></span>
+                                                <?php endforeach; ?>
+                                            </div>
+                                        <?php endif; ?>
+                                        <a href="/portal/studies/view/<?= $s['id'] ?>" target="_blank" class="btn pst-open-btn w-100">
+                                            <i class="fas fa-file-pdf me-2"></i> Abrir PDF completo <i class="fas fa-arrow-up-right-from-square ms-2 small"></i>
+                                        </a>
+                                        <div class="text-muted text-center mt-2" style="font-size:.72rem;">O PDF completo abre em uma nova aba.</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
