@@ -366,7 +366,9 @@
 
         document.getElementById('previewBg').style.background = model.bg;
         document.getElementById('previewSigla').style.color = siglaColor;
-        document.getElementById('previewPhotoBox').style.borderColor = isImageLayout ? 'rgba(0,0,0,0.15)' : model.left;
+        // Bootstrap's .border utility sets border-color with !important, so a plain
+        // style.borderColor assignment is silently ignored — must use setProperty.
+        document.getElementById('previewPhotoBox').style.setProperty('border-color', model.left, 'important');
 
         const leftBar = document.getElementById('previewLeftBar');
         const topGradient = document.getElementById('previewTopGradient');
