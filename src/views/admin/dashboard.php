@@ -7,16 +7,16 @@ $totalFinancialFormatted = 'R$ ' . number_format($total_financial, 2, ',', '.');
 ?>
 
 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-    <h1 class="h2">Painel</h1>
-    <div class="btn-toolbar mb-2 mb-md-0">
+    <h1 class="h2 mb-0">Painel</h1>
+    <div class="d-flex align-items-center gap-2">
         <?php if ($canToggleFinancialValues): ?>
-            <button type="button" class="btn btn-sm btn-outline-secondary me-2 px-2" id="toggle-dashboard-values" title="Exibir valores" aria-label="Exibir valores">
+            <button type="button" class="btn btn-sm btn-outline-secondary icon-btn" id="toggle-dashboard-values" title="Exibir valores" aria-label="Exibir valores">
                 <i class="fas fa-eye"></i>
             </button>
         <?php endif; ?>
-        <form class="d-flex align-items-center" method="GET">
-            <select name="month" class="form-select form-select-sm me-2" onchange="this.form.submit()">
-                <?php 
+        <form class="d-flex align-items-center gap-2" method="GET">
+            <select name="month" class="form-select form-select-sm" onchange="this.form.submit()">
+                <?php
                 $months = [
                     '01' => 'Janeiro', '02' => 'Fevereiro', '03' => 'Março', '04' => 'Abril',
                     '05' => 'Maio', '06' => 'Junho', '07' => 'Julho', '08' => 'Agosto',
@@ -36,6 +36,87 @@ $totalFinancialFormatted = 'R$ ' . number_format($total_financial, 2, ',', '.');
 </div>
 
 <style>
+    .member-form-card {
+        background: #fff;
+        border: 1px solid rgba(0,0,0,0.08);
+        border-radius: 16px;
+        overflow: hidden;
+    }
+    .member-form-card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: .75rem;
+        padding: 1.1rem 1.25rem;
+        border-bottom: 1px solid rgba(0,0,0,0.07);
+        background: #fafafa;
+    }
+    .member-form-card-title {
+        font-weight: 800;
+        font-size: 1.02rem;
+        color: #1a1a1a;
+        display: flex;
+        align-items: center;
+    }
+    .icon-btn {
+        width: 34px;
+        height: 34px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        padding: 0;
+    }
+    .form-select-sm {
+        border-radius: 10px;
+        border-color: rgba(0,0,0,0.14);
+    }
+    .form-select-sm:focus {
+        border-color: #b30000;
+        box-shadow: 0 0 0 .2rem rgba(179,0,0,0.12);
+    }
+
+    .stat-box {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        border-radius: 16px;
+        padding: 1.1rem 1.25rem;
+        border: 1px solid rgba(0,0,0,0.08);
+        background: #fff;
+        height: 100%;
+    }
+    .stat-box .stat-icon {
+        flex: 0 0 auto;
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.15rem;
+    }
+    .stat-box .stat-label {
+        font-size: .76rem;
+        text-transform: uppercase;
+        letter-spacing: .04em;
+        font-weight: 700;
+        color: #868e96;
+        margin-bottom: .15rem;
+    }
+    .stat-box .stat-value {
+        font-size: 1.45rem;
+        font-weight: 800;
+        color: #1a1a1a;
+        line-height: 1.1;
+    }
+    .stat-box.stat-members .stat-icon { background: rgba(13,110,253,0.10); color: #0d6efd; }
+    .stat-box.stat-tithes .stat-icon { background: rgba(25,135,84,0.10); color: #198754; }
+    .stat-box.stat-offerings .stat-icon { background: rgba(13,202,240,0.14); color: #087990; }
+    .stat-box.stat-total { background: rgba(179,0,0,0.05); border-color: rgba(179,0,0,0.15); }
+    .stat-box.stat-total .stat-icon { background: rgba(179,0,0,0.12); color: #b30000; }
+    .stat-box.stat-total .stat-value { color: #b30000; }
+
     @media (max-width: 767.98px) {
         .dashboard-cards-carousel {
             position: relative;
@@ -66,10 +147,68 @@ $totalFinancialFormatted = 'R$ ' . number_format($total_financial, 2, ',', '.');
             scroll-snap-align: center;
             padding: .35rem;
         }
-        .dashboard-cards-slide .card {
-            border-radius: 16px;
-        }
     }
+
+    .congregation-table thead th {
+        font-size: .74rem;
+        text-transform: uppercase;
+        letter-spacing: .03em;
+        color: #868e96;
+        font-weight: 700;
+        border-bottom-width: 1px;
+    }
+    .congregation-table td { vertical-align: middle; }
+
+    .dash-list-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: .75rem;
+        padding: .7rem .25rem;
+        border-bottom: 1px solid rgba(0,0,0,0.06);
+    }
+    .dash-list-item:last-child { border-bottom: none; }
+    .dash-list-item.is-today {
+        background: rgba(255,193,7,0.08);
+        border-radius: 10px;
+        padding: .7rem .6rem;
+    }
+    .date-pill {
+        display: inline-block;
+        padding: .2rem .65rem;
+        border-radius: 999px;
+        font-size: .72rem;
+        font-weight: 700;
+        background: rgba(13,202,240,0.14);
+        color: #087990;
+    }
+    .today-pill {
+        display: inline-block;
+        padding: .15rem .55rem;
+        border-radius: 999px;
+        font-size: .66rem;
+        font-weight: 700;
+        background: #ffc107;
+        color: #212529;
+        margin-left: .4rem;
+    }
+    .event-item {
+        padding: .7rem .25rem;
+        border-bottom: 1px solid rgba(0,0,0,0.06);
+    }
+    .event-item:last-child { border-bottom: none; }
+    .event-date-pill {
+        display: inline-block;
+        padding: .2rem .65rem;
+        border-radius: 999px;
+        font-size: .72rem;
+        font-weight: 700;
+        background: rgba(13,110,253,0.10);
+        color: #0d6efd;
+        margin-right: .5rem;
+    }
+
+    #birthdayModal .modal-content { border-radius: 16px; border: none; overflow: hidden; }
 </style>
 
 <div class="dashboard-cards-carousel d-md-none mb-2">
@@ -81,110 +220,78 @@ $totalFinancialFormatted = 'R$ ' . number_format($total_financial, 2, ',', '.');
     </div>
     <div class="dashboard-cards-track">
         <div class="dashboard-cards-slide">
-            <div class="card bg-primary text-white h-100">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="text-uppercase mb-1">Total Membros</h6>
-                            <h2 class="mb-0"><?= $members_count ?></h2>
-                        </div>
-                        <i class="fas fa-users fa-2x opacity-50"></i>
-                    </div>
+            <div class="stat-box stat-members">
+                <div class="stat-icon"><i class="fas fa-users"></i></div>
+                <div>
+                    <div class="stat-label">Total Membros</div>
+                    <div class="stat-value"><?= $members_count ?></div>
                 </div>
             </div>
         </div>
         <div class="dashboard-cards-slide">
-            <div class="card bg-success text-white h-100">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="text-uppercase mb-1">Dízimos (<?= $selected_month ?>/<?= $selected_year ?>)</h6>
-                            <h2 class="mb-0 sensitive-dashboard-value" data-value="<?= htmlspecialchars($tithesSumFormatted) ?>"><?= $canToggleFinancialValues ? 'R$ ••••••' : $tithesSumFormatted ?></h2>
-                        </div>
-                        <i class="fas fa-hand-holding-usd fa-2x opacity-50"></i>
-                    </div>
+            <div class="stat-box stat-tithes">
+                <div class="stat-icon"><i class="fas fa-hand-holding-dollar"></i></div>
+                <div>
+                    <div class="stat-label">Dízimos (<?= $selected_month ?>/<?= $selected_year ?>)</div>
+                    <div class="stat-value sensitive-dashboard-value" data-value="<?= htmlspecialchars($tithesSumFormatted) ?>"><?= $canToggleFinancialValues ? 'R$ ••••••' : $tithesSumFormatted ?></div>
                 </div>
             </div>
         </div>
         <div class="dashboard-cards-slide">
-            <div class="card bg-info text-white h-100">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="text-uppercase mb-1">Ofertas (<?= $selected_month ?>/<?= $selected_year ?>)</h6>
-                            <h2 class="mb-0 sensitive-dashboard-value" data-value="<?= htmlspecialchars($offeringsSumFormatted) ?>"><?= $canToggleFinancialValues ? 'R$ ••••••' : $offeringsSumFormatted ?></h2>
-                        </div>
-                        <i class="fas fa-donate fa-2x opacity-50"></i>
-                    </div>
+            <div class="stat-box stat-offerings">
+                <div class="stat-icon"><i class="fas fa-donate"></i></div>
+                <div>
+                    <div class="stat-label">Ofertas (<?= $selected_month ?>/<?= $selected_year ?>)</div>
+                    <div class="stat-value sensitive-dashboard-value" data-value="<?= htmlspecialchars($offeringsSumFormatted) ?>"><?= $canToggleFinancialValues ? 'R$ ••••••' : $offeringsSumFormatted ?></div>
                 </div>
             </div>
         </div>
         <div class="dashboard-cards-slide">
-            <div class="card bg-secondary text-white h-100">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="text-uppercase mb-1">Total Geral</h6>
-                            <h2 class="mb-0 sensitive-dashboard-value" data-value="<?= htmlspecialchars($totalFinancialFormatted) ?>"><?= $canToggleFinancialValues ? 'R$ ••••••' : $totalFinancialFormatted ?></h2>
-                        </div>
-                        <i class="fas fa-chart-line fa-2x opacity-50"></i>
-                    </div>
+            <div class="stat-box stat-total">
+                <div class="stat-icon"><i class="fas fa-chart-line"></i></div>
+                <div>
+                    <div class="stat-label">Total Geral</div>
+                    <div class="stat-value sensitive-dashboard-value" data-value="<?= htmlspecialchars($totalFinancialFormatted) ?>"><?= $canToggleFinancialValues ? 'R$ ••••••' : $totalFinancialFormatted ?></div>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-<div class="row d-none d-md-flex">
-    <div class="col-md-3 mb-4">
-        <div class="card bg-primary text-white h-100">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h6 class="text-uppercase mb-1">Total Membros</h6>
-                        <h2 class="mb-0"><?= $members_count ?></h2>
-                    </div>
-                    <i class="fas fa-users fa-2x opacity-50"></i>
-                </div>
+<div class="row d-none d-md-flex g-3 mb-1">
+    <div class="col-md-3">
+        <div class="stat-box stat-members">
+            <div class="stat-icon"><i class="fas fa-users"></i></div>
+            <div>
+                <div class="stat-label">Total Membros</div>
+                <div class="stat-value"><?= $members_count ?></div>
             </div>
         </div>
     </div>
-    <div class="col-md-3 mb-4">
-        <div class="card bg-success text-white h-100">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h6 class="text-uppercase mb-1">Dízimos (<?= $selected_month ?>/<?= $selected_year ?>)</h6>
-                        <h2 class="mb-0 sensitive-dashboard-value" data-value="<?= htmlspecialchars($tithesSumFormatted) ?>"><?= $canToggleFinancialValues ? 'R$ ••••••' : $tithesSumFormatted ?></h2>
-                    </div>
-                    <i class="fas fa-hand-holding-usd fa-2x opacity-50"></i>
-                </div>
+    <div class="col-md-3">
+        <div class="stat-box stat-tithes">
+            <div class="stat-icon"><i class="fas fa-hand-holding-dollar"></i></div>
+            <div>
+                <div class="stat-label">Dízimos (<?= $selected_month ?>/<?= $selected_year ?>)</div>
+                <div class="stat-value sensitive-dashboard-value" data-value="<?= htmlspecialchars($tithesSumFormatted) ?>"><?= $canToggleFinancialValues ? 'R$ ••••••' : $tithesSumFormatted ?></div>
             </div>
         </div>
     </div>
-    <div class="col-md-3 mb-4">
-        <div class="card bg-info text-white h-100">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h6 class="text-uppercase mb-1">Ofertas (<?= $selected_month ?>/<?= $selected_year ?>)</h6>
-                        <h2 class="mb-0 sensitive-dashboard-value" data-value="<?= htmlspecialchars($offeringsSumFormatted) ?>"><?= $canToggleFinancialValues ? 'R$ ••••••' : $offeringsSumFormatted ?></h2>
-                    </div>
-                    <i class="fas fa-donate fa-2x opacity-50"></i>
-                </div>
+    <div class="col-md-3">
+        <div class="stat-box stat-offerings">
+            <div class="stat-icon"><i class="fas fa-donate"></i></div>
+            <div>
+                <div class="stat-label">Ofertas (<?= $selected_month ?>/<?= $selected_year ?>)</div>
+                <div class="stat-value sensitive-dashboard-value" data-value="<?= htmlspecialchars($offeringsSumFormatted) ?>"><?= $canToggleFinancialValues ? 'R$ ••••••' : $offeringsSumFormatted ?></div>
             </div>
         </div>
     </div>
-    <div class="col-md-3 mb-4">
-        <div class="card bg-secondary text-white h-100">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h6 class="text-uppercase mb-1">Total Geral</h6>
-                        <h2 class="mb-0 sensitive-dashboard-value" data-value="<?= htmlspecialchars($totalFinancialFormatted) ?>"><?= $canToggleFinancialValues ? 'R$ ••••••' : $totalFinancialFormatted ?></h2>
-                    </div>
-                    <i class="fas fa-chart-line fa-2x opacity-50"></i>
-                </div>
+    <div class="col-md-3">
+        <div class="stat-box stat-total">
+            <div class="stat-icon"><i class="fas fa-chart-line"></i></div>
+            <div>
+                <div class="stat-label">Total Geral</div>
+                <div class="stat-value sensitive-dashboard-value" data-value="<?= htmlspecialchars($totalFinancialFormatted) ?>"><?= $canToggleFinancialValues ? 'R$ ••••••' : $totalFinancialFormatted ?></div>
             </div>
         </div>
     </div>
@@ -224,42 +331,44 @@ $totalFinancialFormatted = 'R$ ' . number_format($total_financial, 2, ',', '.');
 </script>
 <?php endif; ?>
 
-<div class="row">
+<div class="row mt-4">
     <div class="col-12 mb-4">
-        <div class="card shadow-sm">
-            <div class="card-header bg-white">
-                <h5 class="mb-0"><i class="fas fa-chart-pie text-secondary me-2"></i> Estatísticas por Congregação (<?= $selected_month ?>/<?= $selected_year ?>)</h5>
+        <div class="member-form-card">
+            <div class="member-form-card-header">
+                <div class="member-form-card-title"><i class="fas fa-chart-pie text-secondary me-2"></i> Estatísticas por Congregação (<?= $selected_month ?>/<?= $selected_year ?>)</div>
             </div>
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-hover mb-0">
-                        <thead class="table-light">
-                            <tr>
-                                <th>Congregação</th>
-                                <th class="text-center">Membros</th>
-                                <th class="text-end">Dízimos</th>
-                                <th class="text-end">Ofertas</th>
-                                <th class="text-end">Total</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($congregation_stats as $stat): 
+            <div class="table-responsive p-2">
+                <table class="table table-hover congregation-table mb-0" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th>Congregação</th>
+                            <th class="text-center">Membros</th>
+                            <th class="text-end">Dízimos</th>
+                            <th class="text-end">Ofertas</th>
+                            <th class="text-end">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php if (empty($congregation_stats)): ?>
+                            <tr><td colspan="5" class="text-center py-4 text-muted">Nenhuma congregação cadastrada.</td></tr>
+                        <?php else: ?>
+                            <?php foreach ($congregation_stats as $stat):
                                 $total = $stat['tithe_sum'] + $stat['offering_sum'];
                                 $titheValue = 'R$ ' . number_format($stat['tithe_sum'], 2, ',', '.');
                                 $offeringValue = 'R$ ' . number_format($stat['offering_sum'], 2, ',', '.');
                                 $totalValue = 'R$ ' . number_format($total, 2, ',', '.');
                             ?>
                                 <tr>
-                                    <td><?= htmlspecialchars($stat['congregation_name']) ?></td>
+                                    <td class="fw-bold"><?= htmlspecialchars($stat['congregation_name']) ?></td>
                                     <td class="text-center"><?= $stat['member_count'] ?></td>
                                     <td class="text-end sensitive-dashboard-value" data-value="<?= htmlspecialchars($titheValue) ?>"><?= $canToggleFinancialValues ? 'R$ ••••••' : $titheValue ?></td>
                                     <td class="text-end sensitive-dashboard-value" data-value="<?= htmlspecialchars($offeringValue) ?>"><?= $canToggleFinancialValues ? 'R$ ••••••' : $offeringValue ?></td>
                                     <td class="text-end fw-bold sensitive-dashboard-value" data-value="<?= htmlspecialchars($totalValue) ?>"><?= $canToggleFinancialValues ? 'R$ ••••••' : $totalValue ?></td>
                                 </tr>
                             <?php endforeach; ?>
-                        </tbody>
-                    </table>
-                </div>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
@@ -268,65 +377,59 @@ $totalFinancialFormatted = 'R$ ' . number_format($total_financial, 2, ',', '.');
 <div class="row">
     <?php if (hasPermission('members.view')): ?>
     <div class="col-md-6 mb-4">
-        <div class="card shadow-sm h-100">
-            <div class="card-header bg-white">
-                <h5 class="mb-0"><i class="fas fa-birthday-cake text-warning me-2"></i> Aniversariantes do Mês</h5>
+        <div class="member-form-card h-100">
+            <div class="member-form-card-header">
+                <div class="member-form-card-title"><i class="fas fa-birthday-cake text-warning me-2"></i> Aniversariantes do Mês</div>
             </div>
-            <div class="card-body">
+            <div class="p-3">
                 <?php if (empty($birthdays)): ?>
-                    <p class="text-muted">Nenhum aniversariante este mês.</p>
+                    <p class="text-muted text-center mb-0 py-2">Nenhum aniversariante este mês.</p>
                 <?php else: ?>
-                    <ul class="list-group list-group-flush">
-                        <?php 
-                        $today_day = date('d');
-                        foreach ($birthdays as $b): 
-                            $b_day = date('d', strtotime($b['birth_date']));
-                            $is_today = ($b_day == $today_day);
-                        ?>
-                            <li class="list-group-item d-flex justify-content-between align-items-center <?= $is_today ? 'bg-light border-start border-warning border-4' : '' ?>">
-                                <div>
-                                    <?= htmlspecialchars($b['name']) ?>
-                                    <?php if ($is_today): ?>
-                                        <span class="badge bg-warning text-dark ms-2">Hoje!</span>
-                                    <?php endif; ?>
-                                </div>
-                                <div>
-                                    <span class="badge bg-info rounded-pill me-2">
-                                        <?= date('d/m', strtotime($b['birth_date'])) ?>
-                                    </span>
-                                    <?php if ($is_today): ?>
-                                        <button class="btn btn-sm btn-outline-success btn-xs" onclick="openBirthdayCard('<?= addslashes(htmlspecialchars($b['name'])) ?>')" title="Gerar Cartão">
-                                            <i class="fas fa-gift"></i>
-                                        </button>
-                                    <?php endif; ?>
-                                </div>
-                            </li>
-                        <?php endforeach; ?>
-                    </ul>
+                    <?php
+                    $today_day = date('d');
+                    foreach ($birthdays as $b):
+                        $b_day = date('d', strtotime($b['birth_date']));
+                        $is_today = ($b_day == $today_day);
+                    ?>
+                        <div class="dash-list-item <?= $is_today ? 'is-today' : '' ?>">
+                            <div>
+                                <?= htmlspecialchars($b['name']) ?>
+                                <?php if ($is_today): ?>
+                                    <span class="today-pill">Hoje!</span>
+                                <?php endif; ?>
+                            </div>
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="date-pill"><?= date('d/m', strtotime($b['birth_date'])) ?></span>
+                                <?php if ($is_today): ?>
+                                    <button class="btn btn-sm btn-outline-success icon-btn" style="width:30px;height:30px;" onclick="openBirthdayCard('<?= addslashes(htmlspecialchars($b['name'])) ?>')" title="Gerar Cartão">
+                                        <i class="fas fa-gift"></i>
+                                    </button>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
                 <?php endif; ?>
             </div>
         </div>
     </div>
     <?php endif; ?>
-    
+
     <?php if (hasPermission('events.view')): ?>
     <div class="col-md-6 mb-4">
-        <div class="card shadow-sm h-100">
-            <div class="card-header bg-white">
-                <h5 class="mb-0"><i class="fas fa-calendar-alt text-primary me-2"></i> Próximos Eventos</h5>
+        <div class="member-form-card h-100">
+            <div class="member-form-card-header">
+                <div class="member-form-card-title"><i class="fas fa-calendar-alt text-primary me-2"></i> Próximos Eventos</div>
             </div>
-            <div class="card-body">
+            <div class="p-3">
                 <?php if (empty($next_events)): ?>
-                    <p class="text-muted">Nenhum evento próximo.</p>
+                    <p class="text-muted text-center mb-0 py-2">Nenhum evento próximo.</p>
                 <?php else: ?>
-                    <ul class="list-group list-group-flush">
-                        <?php foreach ($next_events as $e): ?>
-                            <li class="list-group-item">
-                                <strong><?= date('d/m/Y', strtotime($e['event_date'])) ?></strong> - 
-                                <?= htmlspecialchars($e['title']) ?>
-                            </li>
-                        <?php endforeach; ?>
-                    </ul>
+                    <?php foreach ($next_events as $e): ?>
+                        <div class="event-item">
+                            <span class="event-date-pill"><?= date('d/m/Y', strtotime($e['event_date'])) ?></span>
+                            <?= htmlspecialchars($e['title']) ?>
+                        </div>
+                    <?php endforeach; ?>
                 <?php endif; ?>
             </div>
         </div>
@@ -353,7 +456,7 @@ $totalFinancialFormatted = 'R$ ' . number_format($total_financial, 2, ',', '.');
                 <div id="birthdayCardArt" class="position-relative mx-auto rounded overflow-hidden mb-3" style="width: 350px; height: 500px; background: url('/assets/img/birthday-bg.jpg') center/cover no-repeat; border: 8px solid #fff; box-shadow: 0 10px 25px rgba(0,0,0,0.15);">
                     <!-- Overlay Branco Suave (quase transparente para destacar balões) -->
                     <div style="position: absolute; inset: 0; background: rgba(255, 255, 255, 0.1);"></div>
-                    
+
                     <!-- Conteúdo -->
                     <div class="d-flex flex-column justify-content-center align-items-center h-100 p-4" style="position: relative; z-index: 2; font-family: 'Lato', sans-serif;">
                         <div class="mb-4 text-center">
@@ -361,33 +464,33 @@ $totalFinancialFormatted = 'R$ ' . number_format($total_financial, 2, ',', '.');
                             <img src="<?= htmlspecialchars($siteProfile['logo_url'] ?? '/assets/img/logo.png') ?>" alt="<?= htmlspecialchars($siteProfile['alias'] ?? 'IVN') ?>" style="max-height: 80px; max-width: 150px; object-fit: contain; filter: drop-shadow(0 2px 2px rgba(0,0,0,0.1));" onerror="this.onerror=null; this.style.display='none'; document.getElementById('fallbackIcon').style.display='block';">
                             <i id="fallbackIcon" class="fas fa-church fa-3x text-warning" style="display:none;"></i>
                         </div>
-                        
+
                         <h5 class="text-uppercase text-secondary small mb-2" style="letter-spacing: 3px; font-weight: 600; color: #8b7d4b;">Feliz Aniversário</h5>
-                        
+
                         <h1 class="text-dark mb-3 px-2" id="cardMemberName" style="font-family: 'Great Vibes', cursive; font-size: 2.8rem; line-height: 1.1; color: #b8860b; text-shadow: 2px 2px 0 rgba(255,255,255,0.8);">Nome do Membro</h1>
-                        
+
                         <p class="text-dark mb-3 text-center px-3" style="font-style: italic; font-weight: 500; font-size: 0.95rem; line-height: 1.5; text-shadow: 0 0 10px rgba(255,255,255,0.8);">
                             "O Senhor te abençoe e te guarde;<br>
                             o Senhor faça resplandecer o seu rosto sobre ti<br>
                             e tenha misericórdia de ti."
                         </p>
-                        
+
                         <div class="border-top border-secondary w-25 mb-3" style="opacity: 0.4;"></div>
                         <span class="fw-bold text-secondary small text-uppercase" style="letter-spacing: 1px; color: #8b7d4b;">Números 6:24-25</span>
-                        
+
                         <div class="mt-auto pt-4">
                             <small class="text-uppercase fw-bold text-muted" style="letter-spacing: 2px; font-size: 0.7rem;">Família <?= htmlspecialchars($siteProfile['alias'] ?? 'IVN') ?></small>
                         </div>
                     </div>
                 </div>
-                
+
                 <p class="text-muted small mb-3">Compartilhe este cartão com o aniversariante:</p>
-                
+
                 <div class="d-grid gap-2">
-                    <button class="btn btn-outline-primary" onclick="downloadCard()">
+                    <button class="btn btn-outline-primary rounded-pill fw-semibold" onclick="downloadCard()">
                         <i class="fas fa-download me-2"></i> Baixar Imagem (JPG)
                     </button>
-                    <button class="btn btn-success" onclick="shareWhatsApp()">
+                    <button class="btn btn-success rounded-pill fw-semibold" onclick="shareWhatsApp()">
                         <i class="fab fa-whatsapp me-2"></i> Enviar Mensagem (Texto)
                     </button>
                 </div>
@@ -429,13 +532,12 @@ $totalFinancialFormatted = 'R$ ' . number_format($total_financial, 2, ',', '.');
         const url = `https://wa.me/?text=${encodeURIComponent(message)}`;
         window.open(url, '_blank');
     }
-    
+
     function downloadCard() {
         const card = document.getElementById('birthdayCardArt');
-        
-        // Tentar carregar logo antes de printar se for imagem externa (CORS pode bloquear, mas local funciona)
+
         html2canvas(card, {
-            scale: 2, // Melhor qualidade
+            scale: 2,
             useCORS: true,
             backgroundColor: null
         }).then(canvas => {
@@ -445,7 +547,13 @@ $totalFinancialFormatted = 'R$ ' . number_format($total_financial, 2, ',', '.');
             link.click();
         }).catch(err => {
             console.error(err);
-            alert('Erro ao gerar imagem. Tente tirar um print da tela.');
+            Swal.fire({
+                title: 'Erro ao gerar imagem',
+                text: 'Não foi possível gerar a imagem do cartão. Tente tirar um print da tela.',
+                icon: 'error',
+                confirmButtonColor: '#b30000',
+                confirmButtonText: 'Entendi'
+            });
         });
     }
 </script>
