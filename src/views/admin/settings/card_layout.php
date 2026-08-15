@@ -4,7 +4,7 @@
 <div class="member-form-topbar d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-4 border-bottom">
     <h1 class="h2 mb-0">Layout da Carteirinha</h1>
     <div class="d-none d-md-flex gap-2">
-        <a href="/" target="_blank" class="btn btn-outline-secondary rounded-pill fw-semibold px-4">Ver Site</a>
+        <button type="button" class="btn btn-outline-secondary rounded-pill fw-semibold px-4" data-bs-toggle="modal" data-bs-target="#cardPreviewModal"><i class="fas fa-id-card me-2"></i> Ver Carteirinha</button>
         <button type="submit" form="cardLayoutForm" class="btn btn-dark rounded-pill fw-semibold px-4"><i class="fas fa-save me-2"></i> Salvar Layout</button>
     </div>
 </div>
@@ -111,6 +111,19 @@
         overflow: hidden;
         background: #fff;
         box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    }
+
+    #cardPreviewModal .modal-content { border-radius: 16px; border: none; overflow: hidden; }
+    #cardPreviewModal .modal-header { background: #fafafa; }
+    #previewCardFront {
+        width: 85.6mm;
+        height: 53.98mm;
+        max-width: 100%;
+        border: 1px dashed #ccc;
+        font-family: 'Arial', sans-serif;
+        position: relative;
+        overflow: hidden;
+        margin: 0 auto;
     }
 </style>
 
@@ -227,15 +240,101 @@
     </div>
 
     <div class="d-flex justify-content-end gap-2 mb-4 d-md-none">
-        <a href="/" target="_blank" class="btn btn-outline-secondary rounded-pill fw-semibold px-4">Ver Site</a>
+        <button type="button" class="btn btn-outline-secondary rounded-pill fw-semibold px-4" data-bs-toggle="modal" data-bs-target="#cardPreviewModal"><i class="fas fa-id-card me-2"></i> Ver Carteirinha</button>
         <button type="submit" class="btn btn-dark rounded-pill fw-semibold px-4"><i class="fas fa-save me-2"></i> Salvar Layout</button>
     </div>
 </form>
 
+<!-- Modal Pré-visualização da Carteirinha -->
+<div class="modal fade" id="cardPreviewModal" tabindex="-1" aria-labelledby="cardPreviewModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="cardPreviewModalLabel"><i class="fas fa-id-card me-2"></i>Pré-visualização da Carteirinha</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <div id="previewCardFront" class="bg-white shadow-sm">
+                    <div id="previewBg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0;"></div>
+                    <div id="previewLeftBar" style="position: absolute; top: 0; left: 0; width: 6px; height: 100%; z-index: 1;"></div>
+                    <div id="previewTopGradient" style="position: absolute; top: 0; right: 0; width: 100%; height: 60px; z-index: 0;"></div>
+
+                    <div class="d-flex h-100 position-relative" style="z-index: 2; padding: 12px 10px 12px 15px; align-items: flex-start;">
+                        <div class="d-flex flex-column align-items-center justify-content-start pt-1" style="width: 32%;">
+                            <div class="mb-2">
+                                <img src="<?= htmlspecialchars(getChurchLogoUrl($siteProfile)) ?>" alt="<?= htmlspecialchars($siteProfile['alias'] ?? 'IVN') ?>" style="height: 54px; width: auto; filter: drop-shadow(0px 2px 2px rgba(0,0,0,0.1));">
+                            </div>
+                            <div id="previewPhotoBox" class="border border-2 rounded-3 overflow-hidden shadow-sm" style="width: 72px; height: 95px; background-color: #fff;">
+                                <div class="bg-light d-flex align-items-center justify-content-center h-100">
+                                    <i class="fas fa-user text-secondary fa-2x"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="ps-2 d-flex flex-column" style="width: 68%; margin-top: -2px;">
+                            <div class="mb-2 pe-1">
+                                <h6 id="previewSigla" class="m-0 fw-bold text-uppercase" style="font-size: 16px; letter-spacing: 0.5px;"><?= htmlspecialchars($siteProfile['alias'] ?? 'IVN') ?></h6>
+                                <div class="fw-bold text-uppercase" style="font-size: 7px; line-height: 1.1; color: #333; max-width: 170px;"><?= htmlspecialchars($siteProfile['name'] ?? 'Igreja Vida Nova') ?></div>
+                            </div>
+
+                            <div class="mb-2 pe-1">
+                                <div class="d-inline-block bg-white px-2 py-1 shadow-sm" style="opacity: 0.95; border-radius: 12px;">
+                                    <label class="d-block text-primary" style="font-size: 6px; margin-bottom: 0; text-transform: uppercase; letter-spacing: 0.5px; font-weight: bold;">Nome do Membro</label>
+                                    <div class="fw-bold" style="font-size: 11px; color: #333; padding-bottom: 1px; max-width: 170px; line-height: 1.1;">João da Silva Exemplo</div>
+                                </div>
+                            </div>
+
+                            <div class="d-flex mb-2 pe-1">
+                                <div class="me-2">
+                                    <div class="d-inline-block bg-white px-2 py-1 shadow-sm" style="opacity: 0.95; border-radius: 12px;">
+                                        <label class="d-block text-primary" style="font-size: 6px; margin-bottom: 0; text-transform: uppercase; letter-spacing: 0.5px; font-weight: bold;">Cargo/Função</label>
+                                        <div class="fw-bold" style="font-size: 10px; color: #444; max-width: 80px; line-height: 1.1;">Membro</div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="d-inline-block bg-white px-2 py-1 shadow-sm" style="opacity: 0.95; border-radius: 12px;">
+                                        <label class="d-block text-primary" style="font-size: 6px; margin-bottom: 0; text-transform: uppercase; letter-spacing: 0.5px; font-weight: bold;">Congregação</label>
+                                        <div class="fw-bold" style="font-size: 10px; color: #444; max-width: 100px; line-height: 1.1;">Sede</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="d-flex pe-1">
+                                <div class="me-2">
+                                    <div class="d-inline-block bg-white px-2 py-1 shadow-sm" style="opacity: 0.95; border-radius: 12px;">
+                                        <label class="d-block text-primary" style="font-size: 6px; margin-bottom: 0; text-transform: uppercase; letter-spacing: 0.5px; font-weight: bold;">Data de Batismo</label>
+                                        <div class="fw-bold" style="font-size: 9px; color: #555;">01/01/2020</div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="d-inline-block bg-white px-2 py-1 shadow-sm" style="opacity: 0.95; border-radius: 12px;">
+                                        <label class="d-block text-primary" style="font-size: 6px; margin-bottom: 0; text-transform: uppercase; letter-spacing: 0.5px; font-weight: bold;">ID Único</label>
+                                        <div class="fw-bold" style="font-size: 9px; color: #555; font-family: monospace;">0000001</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="previewBottomBar" style="position: absolute; bottom: 0; left: 0; width: 100%; height: 4px; z-index: 1;"></div>
+                </div>
+                <p class="text-muted small mt-3 mb-0">Exemplo com dados fictícios, no modelo e cor atualmente selecionados.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
+    const cardModels = <?= json_encode($models) ?>;
+
     document.getElementById('siglaColorInput').addEventListener('input', function () {
         document.getElementById('siglaColorText').value = this.value;
     });
+
+    function getCheckedLayoutKey() {
+        const checked = document.querySelector('.layout-radio:checked');
+        return checked ? checked.value : Object.keys(cardModels)[0];
+    }
 
     document.querySelectorAll('.layout-radio').forEach(function (radio) {
         radio.addEventListener('change', function () {
@@ -255,6 +354,42 @@
                 radio.dispatchEvent(new Event('change'));
             }
         });
+    });
+
+    function renderCardPreview() {
+        const key = getCheckedLayoutKey();
+        const model = cardModels[key];
+        if (!model) return;
+
+        const isImageLayout = (model.type || 'color') === 'image';
+        const siglaColor = isImageLayout ? document.getElementById('siglaColorInput').value : model.left;
+
+        document.getElementById('previewBg').style.background = model.bg;
+        document.getElementById('previewSigla').style.color = siglaColor;
+        document.getElementById('previewPhotoBox').style.borderColor = isImageLayout ? 'rgba(0,0,0,0.15)' : model.left;
+
+        const leftBar = document.getElementById('previewLeftBar');
+        const topGradient = document.getElementById('previewTopGradient');
+        const bottomBar = document.getElementById('previewBottomBar');
+
+        if (isImageLayout) {
+            leftBar.style.display = 'none';
+            topGradient.style.display = 'none';
+            bottomBar.style.display = 'none';
+        } else {
+            leftBar.style.display = '';
+            leftBar.style.backgroundColor = model.left;
+            topGradient.style.display = '';
+            topGradient.style.background = model.top;
+            bottomBar.style.display = '';
+            bottomBar.style.backgroundColor = model.bottom;
+        }
+    }
+
+    document.getElementById('cardPreviewModal').addEventListener('show.bs.modal', renderCardPreview);
+    document.getElementById('siglaColorInput').addEventListener('input', renderCardPreview);
+    document.querySelectorAll('.layout-radio').forEach(function (radio) {
+        radio.addEventListener('change', renderCardPreview);
     });
 </script>
 
