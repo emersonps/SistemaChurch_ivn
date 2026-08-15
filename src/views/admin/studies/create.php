@@ -127,9 +127,18 @@
         </div>
         <div class="member-form-card-body">
             <div class="row g-3">
-                <div class="col-12">
+                <div class="col-md-8">
                     <label class="form-label">Título <span class="required-mark">*</span></label>
                     <input type="text" name="title" class="form-control" required placeholder="Ex: Estudo sobre Oração">
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label">Tipo de Material <span class="required-mark">*</span></label>
+                    <select name="material_type" class="form-select" required>
+                        <?php foreach ($materialTypes as $value => $label): ?>
+                            <option value="<?= htmlspecialchars($value) ?>"><?= htmlspecialchars($label) ?></option>
+                        <?php endforeach; ?>
+                    </select>
                 </div>
 
                 <div class="col-12">

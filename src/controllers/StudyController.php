@@ -22,6 +22,23 @@ class StudyController {
         }
     }
 
+    private function ensureStudiesMaterialTypeColumn($db): void {
+        try {
+            $db->query("SELECT material_type FROM studies LIMIT 1")->fetch();
+            return;
+        } catch (Exception $e) {
+        }
+
+        try {
+            $db->exec("ALTER TABLE studies ADD COLUMN material_type VARCHAR(20) NULL");
+        } catch (Exception $e) {
+        }
+    }
+
+    public static function materialTypeOptions(): array {
+        return ['Estudo' => 'Estudos', 'Esboço' => 'Esboços', 'EBD' => 'EBD', 'Livro' => 'Livros'];
+    }
+
     private function claimStudyIfUnowned($db, $studyId): void {
         if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin') {
             return;
@@ -83,8 +100,10 @@ class StudyController {
             $title = $_POST['title'];
             $description = $_POST['description'];
             $congregation_id = !empty($_POST['congregation_id']) ? $_POST['congregation_id'] : null;
+            $materialType = !empty($_POST['material_type']) ? $_POST['material_type'] : 'Estudo';
             $createdBy = $_SESSION['user_id'] ?? null;
             $this->ensureStudiesCreatedByColumn($db);
+            $this->ensureStudiesMaterialTypeColumn($db);
 
             $hasCover = isset($_FILES['cover']) && ($_FILES['cover']['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_OK;
             $coverExt = null;
@@ -136,6 +155,15 @@ class StudyController {
                         }
                     }
 
+                    if ($studyId !== null) {
+                        $this->ensureStudiesMaterialTypeColumn($db);
+                        try {
+                            $stmtType = $db->prepare("UPDATE studies SET material_type = ? WHERE id = ?");
+                            $stmtType->execute([$materialType, $studyId]);
+                        } catch (Exception $e) {
+                        }
+                    }
+
                     if ($hasCover) {
                         $coverDir = __DIR__ . '/../../public/uploads/studies/covers/';
                         if (!file_exists($coverDir)) mkdir($coverDir, 0777, true);
@@ -155,7 +183,7 @@ class StudyController {
         }
         
         $congregations = $db->query("SELECT * FROM congregations ORDER BY name ASC")->fetchAll();
-        view('admin/studies/create', ['congregations' => $congregations]);
+        view('admin/studies/create', ['congregations' => $congregations, 'materialTypes' => self::materialTypeOptions()]);
     }
     
     public function edit($id) {
@@ -181,8 +209,9 @@ class StudyController {
             redirect('/admin/studies');
         }
 
+        $this->ensureStudiesMaterialTypeColumn($db);
         $congregations = $db->query("SELECT * FROM congregations ORDER BY name ASC")->fetchAll();
-        view('admin/studies/edit', ['study' => $study, 'congregations' => $congregations]);
+        view('admin/studies/edit', ['study' => $study, 'congregations' => $congregations, 'materialTypes' => self::materialTypeOptions()]);
     }
 
     public function update($id) {
@@ -211,6 +240,8 @@ class StudyController {
         $title = $_POST['title'];
         $description = $_POST['description'];
         $congregation_id = !empty($_POST['congregation_id']) ? $_POST['congregation_id'] : null;
+        $materialType = !empty($_POST['material_type']) ? $_POST['material_type'] : 'Estudo';
+        $this->ensureStudiesMaterialTypeColumn($db);
 
         $hasCover = isset($_FILES['cover']) && ($_FILES['cover']['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_OK;
         $coverExt = null;
@@ -288,8 +319,8 @@ class StudyController {
             move_uploaded_file($_FILES['cover']['tmp_name'], $coverDir . $coverFilename);
         }
 
-        $stmtUp = $db->prepare("UPDATE studies SET title = ?, description = ?, congregation_id = ?, file_path = ? WHERE id = ?");
-        $stmtUp->execute([$title, $description, $congregation_id, $newFilePath, $id]);
+        $stmtUp = $db->prepare("UPDATE studies SET title = ?, description = ?, congregation_id = ?, file_path = ?, material_type = ? WHERE id = ?");
+        $stmtUp->execute([$title, $description, $congregation_id, $newFilePath, $materialType, $id]);
 
         redirect('/admin/studies?success=updated');
     }
@@ -385,9 +416,10 @@ class StudyController {
         $congregation_id = $member['congregation_id'];
         
         // Fetch studies: Global (null) OR Member's Congregation
-        $sql = "SELECT * FROM studies 
-                WHERE congregation_id IS NULL OR congregation_id = ? 
-                ORDER BY created_at DESC";
+        $sql = "SELECT s.*, c.name as congregation_name FROM studies s
+                LEFT JOIN congregations c ON s.congregation_id = c.id
+                WHERE s.congregation_id IS NULL OR s.congregation_id = ?
+                ORDER BY s.created_at DESC";
         $stmt = $db->prepare($sql);
         $stmt->execute([$congregation_id]);
         $studies = $stmt->fetchAll();

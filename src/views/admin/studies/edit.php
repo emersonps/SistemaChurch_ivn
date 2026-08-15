@@ -150,9 +150,18 @@ $studyFileExists = !empty($study['file_path']) && is_file($studyFilePath);
         </div>
         <div class="member-form-card-body">
             <div class="row g-3">
-                <div class="col-12">
+                <div class="col-md-8">
                     <label class="form-label">Título <span class="required-mark">*</span></label>
                     <input type="text" name="title" class="form-control" required value="<?= htmlspecialchars($study['title'] ?? '') ?>">
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label">Tipo de Material <span class="required-mark">*</span></label>
+                    <select name="material_type" class="form-select" required>
+                        <?php foreach ($materialTypes as $value => $label): ?>
+                            <option value="<?= htmlspecialchars($value) ?>" <?= ((string)($study['material_type'] ?? 'Estudo') === (string)$value) ? 'selected' : '' ?>><?= htmlspecialchars($label) ?></option>
+                        <?php endforeach; ?>
+                    </select>
                 </div>
 
                 <div class="col-12">

@@ -19,6 +19,17 @@
 <?php $isAdmin = ($_SESSION['user_role'] ?? '') === 'admin'; ?>
 <?php $userId = $_SESSION['user_id'] ?? null; ?>
 <?php $canManagePermission = function_exists('hasPermission') ? hasPermission('studies.manage') : false; ?>
+<?php
+function studyTypeMeta($type) {
+    $map = [
+        'Estudo' => ['label' => 'Estudos', 'class' => 'type-estudo'],
+        'Esboço' => ['label' => 'Esboços', 'class' => 'type-esboco'],
+        'EBD' => ['label' => 'EBD', 'class' => 'type-ebd'],
+        'Livro' => ['label' => 'Livros', 'class' => 'type-livro'],
+    ];
+    return $map[$type] ?? $map['Estudo'];
+}
+?>
 
 <style>
     .member-form-card {
@@ -72,6 +83,17 @@
     }
     .visibility-pill.pill-cong { background: rgba(13,110,253,0.10); color: #0d6efd; }
     .visibility-pill.pill-general { background: #eef0f2; color: #495057; }
+    .type-pill {
+        display: inline-block;
+        padding: .2rem .6rem;
+        border-radius: 999px;
+        font-size: .7rem;
+        font-weight: 700;
+    }
+    .type-pill.type-estudo { background: rgba(179,0,0,0.10); color: #b30000; }
+    .type-pill.type-esboco { background: rgba(255,153,0,0.14); color: #b36b00; }
+    .type-pill.type-ebd { background: rgba(25,135,84,0.12); color: #198754; }
+    .type-pill.type-livro { background: rgba(111,66,193,0.12); color: #6f42c1; }
     .date-pill {
         display: inline-block;
         padding: .2rem .6rem;
@@ -170,6 +192,8 @@
                                     <?php endif; ?>
                                 </div>
                                 <div class="mt-2 d-flex flex-wrap gap-2 align-items-center">
+                                    <?php $typeMeta = studyTypeMeta($s['material_type'] ?? null); ?>
+                                    <span class="type-pill <?= $typeMeta['class'] ?>"><?= htmlspecialchars($typeMeta['label']) ?></span>
                                     <?php if ($s['congregation_name']): ?>
                                         <span class="visibility-pill pill-cong"><?= htmlspecialchars($s['congregation_name']) ?></span>
                                     <?php else: ?>
@@ -206,6 +230,7 @@
                 <tr>
                     <th style="width: 70px;"></th>
                     <th>Título</th>
+                    <th>Tipo</th>
                     <th>Descrição</th>
                     <th>Congregação</th>
                     <th>Data</th>
@@ -215,7 +240,7 @@
             </thead>
             <tbody>
                 <?php if (empty($studies)): ?>
-                    <tr><td colspan="7" class="text-center py-4 text-muted">Nenhum estudo cadastrado.</td></tr>
+                    <tr><td colspan="8" class="text-center py-4 text-muted">Nenhum estudo cadastrado.</td></tr>
                 <?php else: ?>
                     <?php foreach ($studies as $s): ?>
                     <?php
@@ -246,6 +271,10 @@
                             <?php endif; ?>
                         </td>
                         <td class="fw-bold"><?= htmlspecialchars($s['title']) ?></td>
+                        <td>
+                            <?php $typeMeta = studyTypeMeta($s['material_type'] ?? null); ?>
+                            <span class="type-pill <?= $typeMeta['class'] ?>"><?= htmlspecialchars($typeMeta['label']) ?></span>
+                        </td>
                         <td>
                             <?php
                             $studyDescription = trim((string)($s['description'] ?? ''));

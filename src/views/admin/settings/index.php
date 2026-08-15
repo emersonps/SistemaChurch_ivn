@@ -50,6 +50,11 @@
                         <label class="form-label">URL da Logo</label>
                         <input type="text" class="form-control" name="church_logo_url" value="<?= htmlspecialchars($settings['church_logo_url'] ?? '') ?>" placeholder="Ex: /assets/img/logo.png">
                     </div>
+                    <div class="mb-3">
+                        <label class="form-label">Versão do Sistema</label>
+                        <input type="text" class="form-control" name="system_version" value="<?= htmlspecialchars($settings['system_version'] ?? '') ?>" placeholder="Ex: 1.8.0" style="max-width: 200px;">
+                        <div class="form-text">Exibida no rodapé dos painéis administrativo e do membro.</div>
+                    </div>
                     <button type="submit" class="btn btn-primary">Salvar Informações</button>
                 </form>
             </div>
