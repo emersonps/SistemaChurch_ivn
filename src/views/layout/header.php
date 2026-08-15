@@ -552,12 +552,142 @@ $mobileLauncherHref = '/admin?launcher=1';
                 <?php
                 $loggedUserName = $_SESSION['user_name'] ?? $_SESSION['username'] ?? '';
                 $loggedUserRole = $_SESSION['user_role'] ?? '';
+
+                $topbarRoleLabels = ['admin' => 'Administrador', 'secretary' => 'Secretária(o)', 'accountant' => 'Contador'];
+                $topbarRoleLabel = $topbarRoleLabels[$loggedUserRole] ?? ucfirst((string)$loggedUserRole);
+
+                $topbarWeekDays = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
+                $topbarMonthNames = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+                $topbarDateFormatted = $topbarWeekDays[(int)date('w')] . ', ' . (int)date('j') . ' de ' . $topbarMonthNames[(int)date('n') - 1] . ' de ' . date('Y');
+
+                $topbarNameParts = preg_split('/\s+/', trim((string)$loggedUserName));
+                $topbarInitials = '';
+                if (!empty($topbarNameParts[0])) $topbarInitials .= mb_substr($topbarNameParts[0], 0, 1);
+                if (count($topbarNameParts) > 1) $topbarInitials .= mb_substr(end($topbarNameParts), 0, 1);
+                $topbarInitials = mb_strtoupper($topbarInitials !== '' ? $topbarInitials : '?');
                 ?>
-                <div class="d-none d-md-flex justify-content-end mb-1">
-                    <span class="small text-muted">
-                        Usuário: <strong><?= htmlspecialchars((string)$loggedUserName) ?></strong>
-                        <span class="ms-2 badge bg-secondary"><?= htmlspecialchars((string)$loggedUserRole) ?></span>
-                    </span>
+                <style>
+                    .app-topbar {
+                        position: sticky;
+                        top: 0;
+                        z-index: 1025;
+                        background: #fff;
+                        border: 1px solid rgba(0,0,0,0.07);
+                        border-radius: 14px;
+                        padding: .65rem 1.1rem;
+                        box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+                    }
+                    .app-topbar-mark {
+                        width: 38px;
+                        height: 38px;
+                        border-radius: 10px;
+                        background: linear-gradient(135deg, #b30000, #7a0000);
+                        color: #fff;
+                        font-weight: 800;
+                        font-size: .85rem;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        letter-spacing: .02em;
+                        flex: 0 0 auto;
+                    }
+                    .app-topbar-product {
+                        font-weight: 800;
+                        font-size: .92rem;
+                        color: #1a1a1a;
+                        line-height: 1.1;
+                    }
+                    .app-topbar-tagline {
+                        font-size: .7rem;
+                        color: #adb5bd;
+                        font-weight: 600;
+                        letter-spacing: .01em;
+                    }
+                    .app-topbar-date {
+                        font-size: .85rem;
+                        font-weight: 600;
+                        color: #495057;
+                    }
+                    .app-topbar-date i { color: #b30000; }
+                    .app-topbar-user-btn {
+                        display: flex;
+                        align-items: center;
+                        gap: .6rem;
+                        border: 1px solid rgba(0,0,0,0.08);
+                        border-radius: 999px;
+                        padding: .3rem .6rem .3rem .3rem;
+                        background: #fafafa;
+                    }
+                    .app-topbar-user-btn:hover { background: #f1f1f1; }
+                    .app-topbar-user-btn::after { display: none; }
+                    .app-topbar-avatar {
+                        width: 32px;
+                        height: 32px;
+                        border-radius: 50%;
+                        background: rgba(179,0,0,0.10);
+                        color: #b30000;
+                        font-weight: 800;
+                        font-size: .82rem;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        flex: 0 0 auto;
+                    }
+                    .app-topbar-user-name {
+                        font-size: .84rem;
+                        font-weight: 700;
+                        color: #1a1a1a;
+                        line-height: 1.1;
+                    }
+                    .app-topbar-user-btn .fa-chevron-down {
+                        transition: transform .2s ease;
+                        color: #6c757d;
+                        font-size: .7rem;
+                    }
+                    .dropdown.show .app-topbar-user-btn .fa-chevron-down {
+                        transform: rotate(180deg);
+                    }
+                    .app-topbar .role-pill {
+                        display: inline-block;
+                        padding: .1rem .5rem;
+                        border-radius: 999px;
+                        font-size: .66rem;
+                        font-weight: 700;
+                        margin-top: .1rem;
+                    }
+                    .app-topbar .role-pill.role-admin { background: rgba(179,0,0,0.10); color: #b30000; }
+                    .app-topbar .role-pill.role-secretary { background: rgba(13,110,253,0.10); color: #0d6efd; }
+                    .app-topbar .role-pill.role-accountant { background: rgba(25,135,84,0.10); color: #198754; }
+                </style>
+                <div class="app-topbar d-none d-md-flex align-items-center justify-content-between mb-3">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="app-topbar-mark">SC</div>
+                        <div>
+                            <div class="app-topbar-product">SistemaChurch</div>
+                            <div class="app-topbar-tagline">PAINEL DE GESTÃO ECLESIÁSTICA</div>
+                        </div>
+                    </div>
+                    <div class="app-topbar-date d-none d-lg-flex align-items-center gap-2">
+                        <i class="far fa-calendar-alt"></i>
+                        <span><?= htmlspecialchars($topbarDateFormatted) ?></span>
+                    </div>
+                    <div class="dropdown">
+                        <button class="btn app-topbar-user-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <span class="app-topbar-avatar"><?= htmlspecialchars($topbarInitials) ?></span>
+                            <span class="d-none d-lg-flex flex-column align-items-start">
+                                <span class="app-topbar-user-name"><?= htmlspecialchars((string)$loggedUserName) ?></span>
+                                <span class="role-pill role-<?= htmlspecialchars((string)$loggedUserRole) ?>"><?= htmlspecialchars($topbarRoleLabel) ?></span>
+                            </span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                            <li><a class="dropdown-item" href="/admin/change-password"><i class="fas fa-key me-2 text-muted"></i> Alterar Senha</a></li>
+                            <li><a class="dropdown-item" href="/admin/manual"><i class="fas fa-book me-2 text-muted"></i> Manual / Ajuda</a></li>
+                            <li><a class="dropdown-item" href="/" target="_blank"><i class="fas fa-arrow-up-right-from-square me-2 text-muted"></i> Ver Site</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item text-danger" href="/admin/logout"><i class="fas fa-sign-out-alt me-2"></i> Sair</a></li>
+                        </ul>
+                    </div>
                 </div>
 
                 <?php if ($isMobileLauncherPage): ?>
