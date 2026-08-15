@@ -82,7 +82,7 @@ function userRolePillClass($role) {
     $known = ['admin', 'developer', 'secretary', 'accountant'];
     return in_array($role, $known, true) ? 'role-' . $role : 'role-default';
 }
-$rbac = require __DIR__ . '/../../../config/rbac.php';
+$rbac = require __DIR__ . '/../../../../config/rbac.php';
 ?>
 
 <div class="member-form-card filter-card mb-3">
