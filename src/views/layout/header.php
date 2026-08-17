@@ -855,6 +855,15 @@ $mobileLauncherHref = '/admin?launcher=1';
 
                 <script>
                     document.addEventListener('DOMContentLoaded', function () {
+                        // A birthday-card link (gift button, own sheet/modal) already targets one
+                        // specific person and opens its own #birthdayModal on load — showing the
+                        // general "aniversariantes de hoje" reminder on top of that at the same
+                        // time stacks two Bootstrap overlays (two backdrops, competing body
+                        // scroll-lock), which can leave the page looking broken instead of
+                        // showing either one cleanly. Skip the reminder whenever we've just
+                        // navigated somewhere to show a specific person's card.
+                        if (new URLSearchParams(window.location.search).has('birthday_card')) return;
+
                         var isDesktop = window.matchMedia('(min-width: 992px)').matches;
                         var elId = isDesktop ? 'todayBirthdaysModal' : 'todayBirthdaysSheetMobile';
                         var el = document.getElementById(elId);
