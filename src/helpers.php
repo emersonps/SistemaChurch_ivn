@@ -1147,3 +1147,38 @@ function eventNextOccurrence(array $event, $now = null) {
 function eventHasFutureOccurrence(array $event, $now = null) {
     return eventNextOccurrence($event, $now) instanceof DateTimeImmutable;
 }
+
+/**
+ * Multa (one-time, 2%) + juros de mora (1%/month, prorated per day overdue) on
+ * a system_payments / instance_billings charge — the standard Brazilian boleto
+ * late-fee convention. Computed fresh from $baseAmount/$dueDate/$today every
+ * call (nothing is persisted), so the total always reflects "as of right now"
+ * without needing a background job to keep a stored value in sync.
+ */
+function calculateOverdueCharge($baseAmount, $dueDate, $today = null) {
+    $baseAmount = (float)$baseAmount;
+    $today = $today ?? date('Y-m-d');
+
+    $dueTs = strtotime(date('Y-m-d', strtotime($dueDate)));
+    $todayTs = strtotime(date('Y-m-d', strtotime($today)));
+    $daysOverdue = ($dueTs && $todayTs) ? (int)floor(($todayTs - $dueTs) / 86400) : 0;
+
+    if ($daysOverdue <= 0) {
+        return [
+            'days_overdue' => 0,
+            'late_fee' => 0.0,
+            'interest' => 0.0,
+            'total' => round($baseAmount, 2),
+        ];
+    }
+
+    $lateFee = round($baseAmount * 0.02, 2);
+    $interest = round($baseAmount * 0.01 * ($daysOverdue / 30), 2);
+
+    return [
+        'days_overdue' => $daysOverdue,
+        'late_fee' => $lateFee,
+        'interest' => $interest,
+        'total' => round($baseAmount + $lateFee + $interest, 2),
+    ];
+}

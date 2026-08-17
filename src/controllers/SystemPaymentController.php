@@ -65,6 +65,20 @@ class SystemPaymentController {
             : '-';
         $payment['display_status'] = $displayStatus;
 
+        // Multa + juros de mora on unpaid charges past due — recomputed on every
+        // load, never stored (see calculateOverdueCharge() in helpers.php).
+        $baseAmount = (float)($payment['amount'] ?? 59.99);
+        if (!$isPaid) {
+            $overdueCharge = calculateOverdueCharge($baseAmount, $effectiveDueDate, $today);
+        } else {
+            $overdueCharge = ['days_overdue' => 0, 'late_fee' => 0.0, 'interest' => 0.0, 'total' => round($baseAmount, 2)];
+        }
+        $payment['days_overdue'] = $overdueCharge['days_overdue'];
+        $payment['late_fee'] = $overdueCharge['late_fee'];
+        $payment['interest_amount'] = $overdueCharge['interest'];
+        $payment['amount_with_interest'] = $overdueCharge['total'];
+        $payment['has_interest'] = $overdueCharge['days_overdue'] > 0;
+
         return $payment;
     }
     
@@ -146,7 +160,7 @@ class SystemPaymentController {
         $pixKey = '85258598268';
         $pixName = 'EMERSON PINHEIRO DE SOUZA';
         $pixCity = 'SAO PAULO';
-        $pixAmount = $billToPay['amount'] ?? 59.99;
+        $pixAmount = $billToPay['amount_with_interest'] ?? ($billToPay['amount'] ?? 59.99);
         $pixTxid = '***';
         
         $pixPayload = generatePixPayload($pixKey, $pixName, $pixCity, $pixAmount, $pixTxid);
@@ -199,28 +213,33 @@ class SystemPaymentController {
             
             $db = (new Database())->connect();
             $hasDueDateColumn = $this->tableHasColumn($db, 'system_payments', 'due_date');
-            
+
             // Check if already exists (paid or pending)
-            $stmt = $db->prepare("SELECT id, status, amount FROM system_payments WHERE reference_month = ?");
+            $stmt = $db->prepare("SELECT id, status, amount, due_date FROM system_payments WHERE reference_month = ?");
             $stmt->execute([$month]);
             $existingPayment = $stmt->fetch();
-            
+
             $now = date('Y-m-d H:i:s');
             $dueDate = $month . '-05 00:00:00';
-            
+
+            // Freeze whatever multa/juros is owed AT THE MOMENT OF PAYMENT into the
+            // stored amount — history/expense records must reflect what was actually
+            // paid, not silently keep tracking a "live" total after settlement.
+            $currentPaymentAmount = 59.99;
+
             if ($existingPayment) {
                 if ($existingPayment['status'] === 'paid') {
                      // redirect('/admin/system-payments?error=already_paid');
                      // DEBUG: Allow execution even if paid to force expense check
+                    $currentPaymentAmount = (float)$existingPayment['amount'];
                 } else {
-                    // Update pending to paid
-                    if ($hasDueDateColumn) {
-                        $stmt = $db->prepare("UPDATE system_payments SET status = 'paid', payment_date = ? WHERE id = ?");
-                        $stmt->execute([$now, $existingPayment['id']]);
-                    } else {
-                        $stmt = $db->prepare("UPDATE system_payments SET status = 'paid', payment_date = ? WHERE id = ?");
-                        $stmt->execute([$now, $existingPayment['id']]);
-                    }
+                    $effectiveDueDate = $hasDueDateColumn && !empty($existingPayment['due_date']) ? $existingPayment['due_date'] : $dueDate;
+                    $overdueCharge = calculateOverdueCharge((float)$existingPayment['amount'], $effectiveDueDate, date('Y-m-d'));
+                    $currentPaymentAmount = $overdueCharge['total'];
+
+                    // Update pending to paid, freezing the interest-inclusive total
+                    $stmt = $db->prepare("UPDATE system_payments SET status = 'paid', amount = ?, payment_date = ? WHERE id = ?");
+                    $stmt->execute([$currentPaymentAmount, $now, $existingPayment['id']]);
                 }
             } else {
                 // Insert New Payment Record
@@ -231,20 +250,6 @@ class SystemPaymentController {
                     $stmt = $db->prepare("INSERT INTO system_payments (reference_month, status, amount, payment_date) VALUES (?, 'paid', 59.99, ?)");
                     $stmt->execute([$month, $now]);
                 }
-            }
-
-            // AUTOMATIC EXPENSE RECORDING FOR HEADQUARTERS
-            // Use helper function for consistency, passing the current payment amount
-            $currentPaymentAmount = $existingPayment['amount'] ?? 59.99;
-            
-            // If we just inserted a new record (else block above), use the default 59.99 or whatever logic
-            if (!$existingPayment) {
-                $currentPaymentAmount = 59.99;
-            } else {
-                // If existing payment, fetch fresh amount just in case it was updated
-                $stmtAmt = $db->prepare("SELECT amount FROM system_payments WHERE id = ?");
-                $stmtAmt->execute([$existingPayment['id']]);
-                $currentPaymentAmount = $stmtAmt->fetchColumn();
             }
 
             if (!registerSystemPaymentExpense($month, $currentPaymentAmount)) {

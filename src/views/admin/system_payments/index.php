@@ -229,7 +229,15 @@ $hero = ($status === 'paid' && !empty($latestPaidPayment)) ? $heroMap['paid'] : 
                         referente a <?= htmlspecialchars(date('m/Y', strtotime(($latestPaidPayment['reference_month'] ?? date('Y-m')) . '-01'))) ?>.
                     </p>
                 <?php elseif ($status == 'overdue'): ?>
-                    <p class="payment-hero-desc fw-bold">O vencimento foi em <?= htmlspecialchars($dueDateDisplay ?? ('05/' . date('m/Y'))) ?>!</p>
+                    <p class="payment-hero-desc fw-bold mb-1">O vencimento foi em <?= htmlspecialchars($dueDateDisplay ?? ('05/' . date('m/Y'))) ?>!</p>
+                    <?php if (!empty($nextPendingPayment['amount_with_interest'])): ?>
+                        <p class="amount-highlight mb-0">R$ <?= number_format((float)$nextPendingPayment['amount_with_interest'], 2, ',', '.') ?></p>
+                        <?php if (!empty($nextPendingPayment['has_interest'])): ?>
+                            <p class="small text-danger mb-0 mt-1">
+                                <?= (int)$nextPendingPayment['days_overdue'] ?> dia(s) em atraso · já inclui multa (R$ <?= number_format($nextPendingPayment['late_fee'], 2, ',', '.') ?>) + juros (R$ <?= number_format($nextPendingPayment['interest_amount'], 2, ',', '.') ?>)
+                            </p>
+                        <?php endif; ?>
+                    <?php endif; ?>
                 <?php elseif ($status == 'today'): ?>
                     <p class="payment-hero-desc fw-bold">A fatura vence hoje (<?= htmlspecialchars($dueDateDisplay ?? ('05/' . date('m/Y'))) ?>).</p>
                 <?php elseif ($status == 'alert'): ?>
@@ -237,7 +245,7 @@ $hero = ($status === 'paid' && !empty($latestPaidPayment)) ? $heroMap['paid'] : 
                 <?php elseif ($status == 'pending'): ?>
                     <p class="payment-hero-desc">Fatura gerada. Vencimento: <?= htmlspecialchars($dueDateDisplay ?? ('05/' . date('m/Y'))) ?></p>
                     <?php if (isset($nextPendingPayment['amount'])): ?>
-                        <p class="amount-highlight mb-0 mt-1">R$ <?= number_format((float)($nextPendingPayment['amount'] ?? 0), 2, ',', '.') ?></p>
+                        <p class="amount-highlight mb-0 mt-1">R$ <?= number_format((float)($nextPendingPayment['amount_with_interest'] ?? $nextPendingPayment['amount'] ?? 0), 2, ',', '.') ?></p>
                     <?php endif; ?>
                 <?php elseif ($status == 'no_charge'): ?>
                     <p class="payment-hero-desc">Nenhuma cobrança gerada para este mês ainda.</p>
@@ -292,8 +300,14 @@ $hero = ($status === 'paid' && !empty($latestPaidPayment)) ? $heroMap['paid'] : 
                             <div class="mt-1">
                                 <span class="text-muted">Valor:</span>
                                 <span class="amount-highlight">
-                                    R$ <?= number_format((float)($billToPay['amount'] ?? 59.99), 2, ',', '.') ?>
+                                    R$ <?= number_format((float)($billToPay['amount_with_interest'] ?? $billToPay['amount'] ?? 59.99), 2, ',', '.') ?>
                                 </span>
+                                <?php if (!empty($billToPay['has_interest'])): ?>
+                                    <div class="small text-danger mt-1">
+                                        <i class="fas fa-exclamation-triangle me-1"></i>
+                                        Inclui multa (R$ <?= number_format($billToPay['late_fee'], 2, ',', '.') ?>) + juros de <?= (int)$billToPay['days_overdue'] ?> dia(s) (R$ <?= number_format($billToPay['interest_amount'], 2, ',', '.') ?>)
+                                    </div>
+                                <?php endif; ?>
                             </div>
                         </div>
                     </div>
@@ -322,7 +336,12 @@ $hero = ($status === 'paid' && !empty($latestPaidPayment)) ? $heroMap['paid'] : 
         <div class="info-accent-card accent-warning">
             <div class="info-accent-header"><i class="fas fa-hourglass-half"></i> Próxima Cobrança</div>
             <div class="info-field-row"><span class="label">Referência</span><span class="value"><?= htmlspecialchars(date('m/Y', strtotime(($nextPendingPayment['reference_month'] ?? date('Y-m')) . '-01'))) ?></span></div>
-            <div class="info-field-row"><span class="label">Valor</span><span class="value">R$ <?= number_format((float)($nextPendingPayment['amount'] ?? 0), 2, ',', '.') ?></span></div>
+            <?php if (!empty($nextPendingPayment['has_interest'])): ?>
+                <div class="info-field-row"><span class="label">Valor original</span><span class="value text-muted"><del>R$ <?= number_format((float)($nextPendingPayment['amount'] ?? 0), 2, ',', '.') ?></del></span></div>
+                <div class="info-field-row"><span class="label">Valor com multa + juros</span><span class="value text-danger">R$ <?= number_format((float)$nextPendingPayment['amount_with_interest'], 2, ',', '.') ?></span></div>
+            <?php else: ?>
+                <div class="info-field-row"><span class="label">Valor</span><span class="value">R$ <?= number_format((float)($nextPendingPayment['amount'] ?? 0), 2, ',', '.') ?></span></div>
+            <?php endif; ?>
             <div class="info-field-row"><span class="label">Vencimento</span><span class="value"><?= htmlspecialchars($nextPendingPayment['due_date_display'] ?? '-') ?></span></div>
             <div class="info-field-row">
                 <span class="label">Status</span>
@@ -381,9 +400,9 @@ $hero = ($status === 'paid' && !empty($latestPaidPayment)) ? $heroMap['paid'] : 
                                         : (!empty($p['payment_date'])
                                             ? date('d/m/Y H:i', strtotime($p['payment_date']))
                                             : '-'));
-                                $historyAmountValue = isset($p['amount']) && $p['amount'] !== '' && $p['amount'] !== null
-                                    ? (float)$p['amount']
-                                    : 59.99;
+                                $historyAmountValue = isset($p['amount_with_interest']) && $p['amount_with_interest'] !== null
+                                    ? (float)$p['amount_with_interest']
+                                    : (isset($p['amount']) && $p['amount'] !== '' && $p['amount'] !== null ? (float)$p['amount'] : 59.99);
                                 $rowStatus = $p['display_status'] ?? $p['status'];
                                 $rowLabels = ['paid' => 'Pago', 'overdue' => 'Atrasado', 'today' => 'Vence Hoje', 'alert' => 'Vence em Breve'];
                                 $rowClass = ['paid' => 'st-paid', 'overdue' => 'st-overdue', 'today' => 'st-today', 'alert' => 'st-alert'];
@@ -391,7 +410,12 @@ $hero = ($status === 'paid' && !empty($latestPaidPayment)) ? $heroMap['paid'] : 
                                 <tr>
                                     <td class="fw-bold"><?= htmlspecialchars(date('m/Y', strtotime($p['reference_month'] . '-01'))) ?></td>
                                     <td><?= htmlspecialchars($historyDueDateText) ?></td>
-                                    <td>R$ <?= number_format($historyAmountValue, 2, ',', '.') ?></td>
+                                    <td>
+                                        R$ <?= number_format($historyAmountValue, 2, ',', '.') ?>
+                                        <?php if (!empty($p['has_interest'])): ?>
+                                            <span class="text-danger small ms-1" title="Inclui multa + juros por <?= (int)$p['days_overdue'] ?> dia(s) de atraso"><i class="fas fa-triangle-exclamation"></i></span>
+                                        <?php endif; ?>
+                                    </td>
                                     <td><?= !empty($p['is_paid']) ? htmlspecialchars($historyPaymentDateText) : '-' ?></td>
                                     <td><span class="status-pill <?= $rowClass[$rowStatus] ?? 'st-pending' ?>"><?= $rowLabels[$rowStatus] ?? 'Pendente' ?></span></td>
                                 </tr>
