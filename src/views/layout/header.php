@@ -742,46 +742,93 @@ $mobileLauncherHref = '/admin?launcher=1';
             ?>
 
             <?php if (!empty($todayBirthdays ?? [])): ?>
-                <!-- Desktop: classic centered modal -->
-                <div class="modal fade d-none d-lg-block" id="todayBirthdaysModal" tabindex="-1" aria-hidden="true">
-                    <div class="modal-dialog modal-dialog-centered modal-lg">
-                        <div class="modal-content border-0 shadow-lg">
-                            <div class="modal-header border-0">
-                                <h5 class="modal-title text-warning">
-                                    <i class="fas fa-birthday-cake me-2"></i> Aniversariantes de Hoje
-                                </h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body pt-0">
-                                <ul class="list-group list-group-flush">
+                <!-- Desktop: celebratory centered modal -->
+                <style>
+                    .bdayd-modal .modal-dialog { max-width: 420px; }
+                    .bdayd-modal .modal-content { border: none; border-radius: 22px; overflow: hidden; box-shadow: 0 25px 60px rgba(0,0,0,.25); }
+                    .bdayd-body { position: relative; padding: 34px 30px 28px; text-align: center; overflow: hidden; }
+                    .bdayd-close { position: absolute; top: 16px; right: 16px; width: 30px; height: 30px; border-radius: 50%; border: none; background: #f1f2f5; color: #5b6472; display: flex; align-items: center; justify-content: center; font-size: .85rem; z-index: 2; }
+                    .bdayd-confetti { position: absolute; border-radius: 50%; }
+                    .bdayd-confetti.c1 { top: 20px; left: 30px; width: 8px; height: 8px; background: #ffc107; }
+                    .bdayd-confetti.c2 { top: 55px; left: 16px; width: 5px; height: 5px; background: #3b6fef; }
+                    .bdayd-confetti.c3 { top: 14px; left: 80px; width: 4px; height: 4px; background: #7c4fd1; }
+                    .bdayd-confetti.c4 { top: 24px; right: 74px; width: 6px; height: 6px; background: #e0533c; }
+                    .bdayd-confetti.c5 { top: 60px; right: 30px; width: 5px; height: 5px; background: #18a558; }
+                    .bdayd-confetti.c6 { top: 10px; right: 110px; width: 4px; height: 4px; background: #ffc107; }
+                    .bdayd-icon { width: 76px; height: 76px; margin: 6px auto 16px; border-radius: 22px; background: linear-gradient(135deg, #ffd76a, #ffb238); display: flex; align-items: center; justify-content: center; font-size: 2rem; box-shadow: 0 10px 22px rgba(255,178,56,.35); }
+                    .bdayd-title { font-weight: 800; font-size: 1.3rem; color: #101828; margin-bottom: .3rem; }
+                    .bdayd-subtitle { font-size: .9rem; color: #8b93a3; margin-bottom: 22px; }
+                    .bdayd-cards { display: flex; flex-direction: column; gap: .6rem; margin-bottom: 22px; max-height: 320px; overflow-y: auto; text-align: left; }
+                    .bdayd-card { display: flex; align-items: center; gap: .8rem; border: 1px solid #eef1f5; border-radius: 16px; padding: .85rem 1rem; }
+                    .bdayd-avatar { flex: 0 0 auto; width: 46px; height: 46px; border-radius: 50%; background: linear-gradient(135deg, #ff6fa5, #b06fff); color: #fff; font-weight: 800; font-size: .85rem; display: flex; align-items: center; justify-content: center; }
+                    .bdayd-info { flex: 1 1 auto; min-width: 0; }
+                    .bdayd-name { font-weight: 800; font-size: .95rem; color: #101828; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+                    .bdayd-meta { font-size: .78rem; color: #8b93a3; margin-top: 2px; display: flex; align-items: center; gap: .35rem; }
+                    .bdayd-meta-dot { width: 6px; height: 6px; border-radius: 50%; background: #18a558; flex: 0 0 auto; }
+                    .bdayd-gift-btn { flex: 0 0 auto; width: 36px; height: 36px; border-radius: 50%; background: rgba(24,165,88,.12); color: #18a558; border: none; display: flex; align-items: center; justify-content: center; font-size: 1rem; }
+                    .bdayd-actions { display: flex; gap: .7rem; margin-bottom: 16px; }
+                    .bdayd-btn { flex: 1 1 0; border: none; border-radius: 999px; padding: .75rem 0; font-weight: 700; font-size: .88rem; color: #fff; display: flex; align-items: center; justify-content: center; gap: .4rem; }
+                    .bdayd-btn.is-card { background: linear-gradient(135deg, #ffd76a, #ffb238); color: #7a4a00; }
+                    .bdayd-btn.is-whatsapp { background: #18a558; }
+                    .bdayd-viewall-link { display: block; font-size: .86rem; font-weight: 700; color: #3b6fef; text-decoration: none; }
+                </style>
+                <div class="modal fade bdayd-modal d-none d-lg-block" id="todayBirthdaysModal" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="bdayd-body">
+                                <button type="button" class="bdayd-close" data-bs-dismiss="modal" aria-label="Fechar"><i class="fas fa-times"></i></button>
+                                <span class="bdayd-confetti c1"></span><span class="bdayd-confetti c2"></span><span class="bdayd-confetti c3"></span>
+                                <span class="bdayd-confetti c4"></span><span class="bdayd-confetti c5"></span><span class="bdayd-confetti c6"></span>
+                                <div class="bdayd-icon"><i class="fas fa-birthday-cake"></i></div>
+                                <?php
+                                    $bdayDCount = count($todayBirthdays ?? []);
+                                    $bdayDFirst = $bdayDCount === 1 ? (string)(($todayBirthdays[0]['name'] ?? '')) : '';
+                                    $bdayDFirstName = trim(explode(' ', trim($bdayDFirst))[0] ?? '');
+                                ?>
+                                <?php if ($bdayDCount === 1): ?>
+                                    <div class="bdayd-title">Feliz aniversário, <?= htmlspecialchars($bdayDFirstName) ?>!</div>
+                                    <div class="bdayd-subtitle">Hoje é dia de celebrar 🎉</div>
+                                <?php else: ?>
+                                    <div class="bdayd-title">Aniversariantes de Hoje</div>
+                                    <div class="bdayd-subtitle"><?= $bdayDCount ?> pessoas fazendo aniversário hoje</div>
+                                <?php endif; ?>
+
+                                <div class="bdayd-cards">
                                     <?php foreach (($todayBirthdays ?? []) as $b): ?>
-                                        <?php $memberName = (string)($b['name'] ?? ''); ?>
                                         <?php
-                                        $parts = preg_split('/\s+/', trim($memberName));
-                                        $memberShort = $memberName;
-                                        if (is_array($parts) && count($parts) >= 2) {
-                                            $memberShort = $parts[0] . ' ' . $parts[count($parts) - 1];
-                                        } elseif (is_array($parts) && count($parts) === 1) {
-                                            $memberShort = $parts[0];
-                                        }
+                                        $memberName = (string)($b['name'] ?? '');
+                                        $dParts = preg_split('/\s+/', trim($memberName));
+                                        $dInitials = mb_strtoupper(mb_substr($dParts[0], 0, 1) . (count($dParts) > 1 ? mb_substr(end($dParts), 0, 1) : ''), 'UTF-8');
                                         ?>
-                                        <li class="list-group-item d-flex justify-content-between align-items-center bg-light border-start border-warning border-4">
-                                            <div class="fw-semibold text-truncate me-2" style="min-width: 0;">
-                                                <span class="d-inline d-sm-none"><?= htmlspecialchars($memberShort) ?></span>
-                                                <span class="d-none d-sm-inline"><?= htmlspecialchars($memberName) ?></span>
-                                                <span class="badge bg-warning text-dark ms-2">Hoje!</span>
+                                        <div class="bdayd-card">
+                                            <span class="bdayd-avatar"><?= htmlspecialchars($dInitials) ?></span>
+                                            <div class="bdayd-info">
+                                                <div class="bdayd-name"><?= htmlspecialchars($memberName) ?></div>
+                                                <?php
+                                                    $dMesesPt = [1=>'Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+                                                    $dBirthTs = strtotime($b['birth_date']);
+                                                    $dDateLabel = date('d', $dBirthTs) . ' de ' . $dMesesPt[(int)date('n', $dBirthTs)];
+                                                ?>
+                                                <div class="bdayd-meta">
+                                                    <span class="bdayd-meta-dot"></span>
+                                                    <?= $dDateLabel ?><?= !empty($b['congregation_name']) ? ' • ' . htmlspecialchars($b['congregation_name']) : '' ?> • Hoje
+                                                </div>
                                             </div>
-                                            <div class="d-flex align-items-center gap-2 flex-shrink-0">
-                                                <span class="badge bg-info rounded-pill">
-                                                    <?= date('d/m', strtotime($b['birth_date'])) ?>
-                                                </span>
-                                                <a class="btn btn-sm btn-outline-success" href="/admin/dashboard?birthday_card=<?= urlencode($memberName) ?>" title="Gerar Cartão">
-                                                    <i class="fas fa-gift"></i>
-                                                </a>
-                                            </div>
-                                        </li>
+                                            <?php if ($bdayDCount > 1): ?>
+                                                <button type="button" class="bdayd-gift-btn bdayd-open-card" data-birthday-name="<?= htmlspecialchars($memberName, ENT_QUOTES) ?>" title="Gerar Cartão"><i class="fas fa-gift"></i></button>
+                                            <?php endif; ?>
+                                        </div>
                                     <?php endforeach; ?>
-                                </ul>
+                                </div>
+
+                                <?php if ($bdayDCount === 1): ?>
+                                    <div class="bdayd-actions">
+                                        <button type="button" class="bdayd-btn is-card bdayd-download-card" data-birthday-name="<?= htmlspecialchars($bdayDFirst, ENT_QUOTES) ?>"><i class="fas fa-gift"></i> Baixar Cartão</button>
+                                        <button type="button" class="bdayd-btn is-whatsapp bdayd-whatsapp-card" data-birthday-name="<?= htmlspecialchars($bdayDFirst, ENT_QUOTES) ?>"><i class="fab fa-whatsapp"></i> WhatsApp</button>
+                                    </div>
+                                <?php endif; ?>
+
+                                <a href="/admin?view=aniversariantes" class="bdayd-viewall-link">Ver lista completa do mês</a>
                             </div>
                         </div>
                     </div>
@@ -924,6 +971,46 @@ $mobileLauncherHref = '/admin?launcher=1';
                         document.querySelectorAll('.offcanvas-backdrop').forEach(function (bd) { bd.remove(); });
 
                         window.openBirthdayCard(btn.getAttribute('data-birthday-name') || '');
+                    });
+
+                    // Desktop reminder modal actions: reuse the exact same card-generator
+                    // modal/functions the gift button already opens rather than re-implementing
+                    // image capture or WhatsApp sharing here.
+                    function bdaydCloseReminder() {
+                        var el = document.getElementById('todayBirthdaysModal');
+                        var inst = el && window.bootstrap ? bootstrap.Modal.getInstance(el) : null;
+                        if (inst) { try { inst.hide(); } catch (err) {} }
+                        if (el) el.classList.remove('show');
+                        document.querySelectorAll('.modal-backdrop').forEach(function (bd) { bd.remove(); });
+                    }
+
+                    document.addEventListener('click', function (e) {
+                        var openBtn = e.target.closest('.bdayd-open-card');
+                        if (openBtn && typeof window.openBirthdayCard === 'function') {
+                            bdaydCloseReminder();
+                            window.openBirthdayCard(openBtn.getAttribute('data-birthday-name') || '');
+                            return;
+                        }
+
+                        var dlBtn = e.target.closest('.bdayd-download-card');
+                        if (dlBtn && typeof window.openBirthdayCard === 'function') {
+                            bdaydCloseReminder();
+                            window.openBirthdayCard(dlBtn.getAttribute('data-birthday-name') || '');
+                            // Give the modal/background image a moment to render before
+                            // html2canvas captures it.
+                            setTimeout(function () {
+                                if (typeof window.downloadCard === 'function') window.downloadCard();
+                            }, 450);
+                            return;
+                        }
+
+                        var waBtn = e.target.closest('.bdayd-whatsapp-card');
+                        if (waBtn && typeof window.openBirthdayCard === 'function') {
+                            bdaydCloseReminder();
+                            window.openBirthdayCard(waBtn.getAttribute('data-birthday-name') || '');
+                            if (typeof window.shareWhatsApp === 'function') window.shareWhatsApp();
+                            return;
+                        }
                     });
                 </script>
             <?php endif; ?>
