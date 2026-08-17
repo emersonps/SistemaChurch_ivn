@@ -1123,6 +1123,7 @@ $mobileLauncherHref = '/admin?launcher=1';
                         <div>
                             <div class="fw-bold"><?= htmlspecialchars($paymentAlertTitle) ?></div>
                             <div class="small"><?= htmlspecialchars($paymentAlertMainText) ?></div>
+                            <div class="small opacity-75 mt-1">Após a confirmação do pagamento, este aviso desaparece automaticamente em até 24 horas.</div>
                         </div>
                     </div>
                     <a href="/admin/system-payments" class="btn btn-sm <?= $paymentAlertIsDanger ? 'btn-danger' : 'btn-dark' ?> fw-semibold text-nowrap">Ir para Pagamento</a>
