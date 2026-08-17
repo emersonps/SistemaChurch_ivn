@@ -318,7 +318,12 @@ $includes = [
     'harpa_crista',
 ];
 
+// config/database.php holds per-instance DB credentials (gitignored, never the
+// same across instances) — it must never be overwritten by this sync.
+$excludes = ['config/database.php'];
+
 $sourceFiles = collectSourceFiles($sourceDir, $includes);
+$sourceFiles = array_values(array_diff($sourceFiles, $excludes));
 
 if (count($sourceFiles) === 0) {
     fail('Nenhum arquivo encontrado para sincronizar. Verifique os caminhos de include.');
