@@ -845,7 +845,7 @@ $mobileLauncherHref = '/admin?launcher=1';
                                         <span class="bday-pill-today">Hoje</span>
                                         <div class="bday-date"><?= date('d/m', strtotime($b['birth_date'])) ?><span class="bday-date-sub">hoje</span></div>
                                     </div>
-                                    <a class="bday-gift-btn" href="/admin/dashboard?birthday_card=<?= urlencode($memberName) ?>" title="Gerar Cartão"><i class="fas fa-gift"></i></a>
+                                    <a class="bday-gift-btn" href="/admin/dashboard?birthday_card=<?= urlencode($memberName) ?>" data-birthday-name="<?= htmlspecialchars($memberName, ENT_QUOTES) ?>" title="Gerar Cartão"><i class="fas fa-gift"></i></a>
                                 </div>
                             <?php endforeach; ?>
                         </div>
@@ -894,6 +894,28 @@ $mobileLauncherHref = '/admin?launcher=1';
                             }
                         }
                         tryShow();
+                    });
+
+                    // The gift button's href is a fallback (/admin/dashboard?birthday_card=NAME)
+                    // for whichever admin page doesn't happen to already render dashboard.php's
+                    // #birthdayModal underneath it. Most of the time it does (e.g. the launcher,
+                    // which is dashboard.php with the launcher grid drawn on top via CSS), so open
+                    // the card modal in place instead of navigating away just to show a popup.
+                    document.addEventListener('click', function (e) {
+                        var btn = e.target.closest('.bday-gift-btn');
+                        if (!btn || typeof window.openBirthdayCard !== 'function') return;
+                        e.preventDefault();
+
+                        var sheetEl = document.getElementById('todayBirthdaysSheetMobile');
+                        var sheetInst = sheetEl && window.bootstrap ? bootstrap.Offcanvas.getInstance(sheetEl) : null;
+                        if (sheetInst) sheetInst.hide();
+
+                        var openCard = function () { window.openBirthdayCard(btn.getAttribute('data-birthday-name') || ''); };
+                        if (sheetInst) {
+                            sheetEl.addEventListener('hidden.bs.offcanvas', openCard, { once: true });
+                        } else {
+                            openCard();
+                        }
                     });
                 </script>
             <?php endif; ?>
