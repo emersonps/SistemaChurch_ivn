@@ -208,6 +208,9 @@ elseif ($uri == '/harpa/hino') {
     readfile($targetPath);
     exit;
 }
+elseif ($uri == '/api/v1/users/sync-now' && $method == 'POST') {
+    (new SyncTriggerController())->usersSyncNow();
+}
 elseif ($uri == '/harpa/letra') {
     $num = (int)($_GET['n'] ?? $_GET['num'] ?? $_GET['numero'] ?? 0);
     if ($num <= 0) {

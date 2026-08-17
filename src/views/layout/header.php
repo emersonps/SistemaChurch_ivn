@@ -1034,6 +1034,15 @@ $mobileLauncherHref = '/admin?launcher=1';
                         $billingSyncService->syncFromCentral();
                     }
 
+                    try {
+                        $usersSyncService = new CentralUsersSyncService();
+                        if ($usersSyncService->hasRemoteConfig()) {
+                            $usersSyncService->syncSilently();
+                        }
+                    } catch (Exception $e) {
+                        // Never block page render on a users-sync failure.
+                    }
+
                     $db = (new Database())->connect();
                     $currentMonth = date('Y-m');
                     
