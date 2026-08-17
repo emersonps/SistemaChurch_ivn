@@ -906,16 +906,24 @@ $mobileLauncherHref = '/admin?launcher=1';
                         if (!btn || typeof window.openBirthdayCard !== 'function') return;
                         e.preventDefault();
 
+                        // Force-close the reminder sheet synchronously — don't wait on its
+                        // hidden.bs.offcanvas event before opening the card modal. That event
+                        // depends on the CSS transition actually completing, and if it doesn't
+                        // fire (interrupted transition, reduced-motion, etc.) the modal never
+                        // opens and the user is left staring at a stray backdrop. Bootstrap's
+                        // hide() plus stripping the classes/backdrop by hand guarantees the
+                        // sheet is gone right away regardless of animation state.
                         var sheetEl = document.getElementById('todayBirthdaysSheetMobile');
-                        var sheetInst = sheetEl && window.bootstrap ? bootstrap.Offcanvas.getInstance(sheetEl) : null;
-                        if (sheetInst) sheetInst.hide();
-
-                        var openCard = function () { window.openBirthdayCard(btn.getAttribute('data-birthday-name') || ''); };
-                        if (sheetInst) {
-                            sheetEl.addEventListener('hidden.bs.offcanvas', openCard, { once: true });
-                        } else {
-                            openCard();
+                        if (sheetEl) {
+                            var sheetInst = window.bootstrap ? bootstrap.Offcanvas.getInstance(sheetEl) : null;
+                            if (sheetInst) {
+                                try { sheetInst.hide(); } catch (err) {}
+                            }
+                            sheetEl.classList.remove('show', 'showing', 'hiding');
                         }
+                        document.querySelectorAll('.offcanvas-backdrop').forEach(function (bd) { bd.remove(); });
+
+                        window.openBirthdayCard(btn.getAttribute('data-birthday-name') || '');
                     });
                 </script>
             <?php endif; ?>
