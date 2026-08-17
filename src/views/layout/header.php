@@ -1109,13 +1109,13 @@ $mobileLauncherHref = '/admin?launcher=1';
                 <!-- Banner de pagamento (topo da tela, substitui o antigo modal) -->
                 <?php
                     $paymentAlertIsDanger = $systemPaymentAlertType == 'overdue';
-                    $paymentAlertTitle = $paymentAlertIsDanger ? 'Pagamento Atrasado' : ($systemPaymentAlertType == 'today' ? 'Pagamento Vence Hoje' : 'Lembrete de Pagamento');
+                    $paymentAlertTitle = $paymentAlertIsDanger ? 'Mensalidade em Aberto' : ($systemPaymentAlertType == 'today' ? 'Mensalidade Vence Hoje' : 'Lembrete de Mensalidade');
                     $paymentAlertIcon = $paymentAlertIsDanger ? 'fa-exclamation-circle' : ($systemPaymentAlertType == 'today' ? 'fa-exclamation-triangle' : 'fa-clock');
                     $paymentAlertMainText = $paymentAlertIsDanger
-                        ? 'O pagamento da hospedagem/domínio venceu em ' . $systemPaymentDueDateText . ' e ainda não consta no sistema.'
+                        ? 'Sua mensalidade venceu em ' . $systemPaymentDueDateText . ' e ainda não identificamos o pagamento.'
                         : ($systemPaymentAlertType == 'today'
-                            ? 'O pagamento da hospedagem/domínio vence hoje (' . $systemPaymentDueDateText . ').'
-                            : 'O pagamento da hospedagem/domínio vence em ' . $systemPaymentDueDateText . '.');
+                            ? 'Sua mensalidade vence hoje (' . $systemPaymentDueDateText . ').'
+                            : 'Sua mensalidade vence em ' . $systemPaymentDueDateText . '.');
                 ?>
                 <div class="alert <?= $paymentAlertIsDanger ? 'alert-danger' : 'alert-warning' ?> d-flex align-items-center justify-content-between flex-wrap gap-3 shadow-sm mb-3">
                     <div class="d-flex align-items-start gap-2">
