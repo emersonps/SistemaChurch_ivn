@@ -772,7 +772,7 @@ $mobileLauncherHref = '/admin?launcher=1';
                     .bdayd-btn.is-whatsapp { background: #18a558; }
                     .bdayd-viewall-link { display: block; font-size: .86rem; font-weight: 700; color: #3b6fef; text-decoration: none; }
                 </style>
-                <div class="modal fade bdayd-modal d-none d-lg-block" id="todayBirthdaysModal" tabindex="-1" aria-hidden="true">
+                <div class="modal fade bdayd-modal" id="todayBirthdaysModal" tabindex="-1" aria-hidden="true">
                     <div class="modal-dialog modal-dialog-centered">
                         <div class="modal-content">
                             <div class="bdayd-body">
@@ -863,7 +863,7 @@ $mobileLauncherHref = '/admin?launcher=1';
                     .bday-gift-btn { flex: 0 0 auto; width: 34px; height: 34px; border-radius: 50%; background: rgba(24,165,88,.12); color: #18a558; display: flex; align-items: center; justify-content: center; text-decoration: none; font-size: .95rem; }
                     .bday-viewall-link { display: block; text-align: center; font-size: .84rem; font-weight: 700; color: #3b6fef; text-decoration: none; }
                 </style>
-                <div class="offcanvas offcanvas-bottom bday-sheet d-lg-none" tabindex="-1" id="todayBirthdaysSheetMobile">
+                <div class="offcanvas offcanvas-bottom bday-sheet" tabindex="-1" id="todayBirthdaysSheetMobile">
                     <div class="bday-sheet-inner">
                         <div class="bday-drag-handle"></div>
                         <button type="button" class="bday-close-btn" data-bs-dismiss="offcanvas" aria-label="Fechar"><i class="fas fa-times"></i></button>

@@ -214,6 +214,42 @@ $systemVersion = $systemVersion !== '' ? $systemVersion : '1.0.0';
         });
     })();
 
+    // Safety net: Bootstrap only resets a modal/offcanvas's inline display and
+    // strips its backdrop once the CSS transition finishes (a `transitionend`
+    // listener queued behind the fade/slide animation). If that event never
+    // fires for any reason, the element is left with `display:block` (or the
+    // offcanvas equivalent) — invisible, but still a fixed full-viewport layer
+    // silently blocking every click on the page. Force the cleanup a moment
+    // after hide() is called, in case Bootstrap's own transition-driven
+    // cleanup hasn't already done it by then.
+    document.addEventListener('hide.bs.modal', function (e) {
+        var el = e.target;
+        setTimeout(function () {
+            if (el.classList.contains('show') || getComputedStyle(el).display === 'none') return;
+            el.style.display = 'none';
+            el.setAttribute('aria-hidden', 'true');
+            el.removeAttribute('aria-modal');
+            el.removeAttribute('role');
+            if (!document.querySelector('.modal.show')) {
+                document.body.classList.remove('modal-open');
+                document.body.style.removeProperty('overflow');
+                document.body.style.removeProperty('padding-right');
+                document.querySelectorAll('.modal-backdrop').forEach(function (bd) { bd.remove(); });
+            }
+        }, 400);
+    });
+    document.addEventListener('hide.bs.offcanvas', function (e) {
+        var el = e.target;
+        setTimeout(function () {
+            if (el.classList.contains('show')) return;
+            el.classList.remove('showing', 'hiding');
+            if (!document.querySelector('.offcanvas.show')) {
+                document.body.classList.remove('offcanvas-backdrop');
+                document.querySelectorAll('.offcanvas-backdrop').forEach(function (bd) { bd.remove(); });
+            }
+        }, 400);
+    });
+
     // Fechar menu mobile automaticamente ao clicar em um link
     document.addEventListener('DOMContentLoaded', function() {
         const navLinks = document.querySelectorAll('.navbar-collapse .nav-link');
