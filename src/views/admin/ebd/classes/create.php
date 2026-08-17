@@ -106,37 +106,33 @@
         color: #868e96;
     }
 
-    .ecm-select-btn { display: flex; align-items: center; justify-content: space-between; gap: .5rem; width: 100%; height: 44px; border-radius: 12px; border: 1px solid rgba(17,24,39,.08); background: #f8f9fb; color: #16213e; font-size: .86rem; font-weight: 600; padding: 0 .9rem; text-align: left; }
-    .ecm-select-btn .ecm-select-label { display: flex; align-items: center; gap: .5rem; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .ecm-select-btn .ecm-select-label i:first-child { color: #8b93a7; flex: 0 0 auto; }
-    .ecm-select-btn .fa-chevron-down { color: #adb5bd; flex: 0 0 auto; font-size: .78rem; }
+    .ecm-add-teacher-btn { display: block; width: 100%; border: 1.5px dashed #d3d8e0; border-radius: 12px; padding: 13px 14px; text-align: center; color: #3b6fef; font-size: .84rem; font-weight: 700; background: transparent; text-decoration: none; }
 
-    .ecm-cong-sheet.offcanvas-bottom { border-top-left-radius: 20px; border-top-right-radius: 20px; height: auto; max-height: 85vh; }
-    .ecm-pick-row { display: flex; align-items: center; gap: .6rem; width: 100%; text-align: left; border: 1px solid rgba(17,24,39,.08); background: #fff; color: #16213e; font-size: .86rem; font-weight: 600; padding: .7rem .9rem; border-radius: 12px; margin-bottom: .5rem; }
-    .ecm-pick-row i:first-child { color: #8b93a7; }
-    .ecm-pick-row.active { border-color: #2563eb; background: rgba(37,99,235,.06); color: #2563eb; }
-    .ecm-pick-row.active i:first-child { color: #2563eb; }
-    .ecm-pick-row .fa-check { margin-left: auto; color: #2563eb; display: none; }
-    .ecm-pick-row.active .fa-check { display: inline; }
+    .ecm-bottom-cta { padding: 14px 0 22px; }
+    .ecm-bottom-cta button { display: block; width: 100%; background: #18a558; color: #fff; text-align: center; font-weight: 700; font-size: .95rem; padding: 15px 0; border-radius: 999px; box-shadow: 0 10px 20px rgba(24,165,88,.3); border: none; }
 
     @media (max-width: 991.98px) {
+        .member-form-card-body .form-label { color: #3b6fef; font-size: .68rem; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; }
         .member-form-card-body .form-control,
         .member-form-card-body .form-select {
             height: 44px;
             border-radius: 12px;
-            border-color: rgba(17,24,39,.08);
-            background: #f8f9fb;
+            border-color: #e3e7ee;
+            background: #fff;
+            color: #101828;
         }
         .member-form-card-body textarea.form-control { height: auto; }
+        .member-form-card-body .form-control::placeholder { color: #c2c8d2; }
         .member-form-card-body .form-control:focus,
         .member-form-card-body .form-select:focus {
-            border-color: #2563eb;
-            box-shadow: 0 0 0 .2rem rgba(37,99,235,.1);
+            border-color: #18a558;
+            box-shadow: 0 0 0 .2rem rgba(24,165,88,.12);
             background: #fff;
         }
         .member-form-card-body .row.g-3 { row-gap: 1.1rem !important; }
-        .progress-bar.bg-dark { background-color: #16a34a !important; }
+        .progress-bar.bg-dark { background-color: #18a558 !important; }
         .progress { height: 4px !important; background: #eef0f2; }
+        .d-lg-none .btn-primary { background-color: #18a558; border-color: #18a558; }
     }
 </style>
 
@@ -175,8 +171,8 @@
                 </div>
 
                 <div class="col-12">
-                    <label for="congregation_id" class="form-label d-none d-lg-block">Congregação</label>
-                    <select class="form-select d-none d-lg-block" id="congregation_id" name="congregation_id">
+                    <label for="congregation_id" class="form-label">Congregação</label>
+                    <select class="form-select" id="congregation_id" name="congregation_id">
                         <?php if (empty($_SESSION['user_congregation_id'])): ?>
                             <option value="">Global (Todas)</option>
                         <?php endif; ?>
@@ -185,22 +181,21 @@
                         <?php endforeach; ?>
                     </select>
                     <div class="form-text d-none d-lg-block">Selecione se a classe for específica de uma congregação.</div>
+                </div>
 
-                    <div class="d-lg-none">
-                        <label class="form-label">Congregação</label>
-                        <button type="button" class="ecm-select-btn" data-bs-toggle="offcanvas" data-bs-target="#ecmCongSheet">
-                            <span class="ecm-select-label" id="ecmCongLabel"><i class="fas fa-globe"></i><span>Global (Todas)</span></span>
-                            <i class="fas fa-chevron-down"></i>
-                        </button>
-                    </div>
+                <div class="col-12 d-lg-none">
+                    <button type="button" class="ecm-add-teacher-btn" id="ecmAddTeacherBtn"><i class="fas fa-plus me-1"></i> Adicionar Professor</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="d-flex justify-content-end gap-2 mb-5 d-lg-none">
+    <div class="d-none d-lg-flex justify-content-end gap-2 mb-5">
         <a href="/admin/ebd/classes" class="btn btn-outline-secondary px-4">Cancelar</a>
         <button type="submit" class="btn btn-primary px-4">Salvar</button>
+    </div>
+    <div class="ecm-bottom-cta d-lg-none">
+        <button type="submit">Salvar Classe</button>
     </div>
 </form>
 </div>
@@ -237,25 +232,6 @@
         </div>
     </div>
 </div>
-</div>
-
-<div class="offcanvas offcanvas-bottom ecm-cong-sheet" tabindex="-1" id="ecmCongSheet">
-    <div class="offcanvas-header">
-        <h6 class="offcanvas-title fw-bold">Congregação</h6>
-        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Fechar"></button>
-    </div>
-    <div class="offcanvas-body">
-        <?php if (empty($_SESSION['user_congregation_id'])): ?>
-            <button type="button" class="ecm-pick-row active" data-value="" data-icon="fa-globe">
-                <i class="fas fa-globe"></i> Global (Todas) <i class="fas fa-check"></i>
-            </button>
-        <?php endif; ?>
-        <?php foreach ($congregations as $cong): ?>
-            <button type="button" class="ecm-pick-row" data-value="<?= $cong['id'] ?>" data-icon="fa-church">
-                <i class="fas fa-church"></i> <?= htmlspecialchars($cong['name']) ?> <i class="fas fa-check"></i>
-            </button>
-        <?php endforeach; ?>
-    </div>
 </div>
 
 <script>
@@ -297,18 +273,15 @@
     ebdForm.addEventListener('change', updateEbdSummary);
     updateEbdSummary();
 
-    var ecmCongSheet = document.getElementById('ecmCongSheet');
-    var ecmCongLabel = document.getElementById('ecmCongLabel');
-    if (ecmCongSheet) {
-        ecmCongSheet.querySelectorAll('.ecm-pick-row').forEach(function (row) {
-            row.addEventListener('click', function () {
-                ecmCongSheet.querySelectorAll('.ecm-pick-row').forEach(function (r) { r.classList.remove('active'); });
-                row.classList.add('active');
-                congregationSelect.value = row.getAttribute('data-value');
-                congregationSelect.dispatchEvent(new Event('change'));
-                ecmCongLabel.innerHTML = '<i class="fas ' + row.getAttribute('data-icon') + '"></i><span>' + row.textContent.trim().replace(/\s*$/, '') + '</span>';
-                var inst = bootstrap.Offcanvas.getInstance(ecmCongSheet);
-                if (inst) inst.hide();
+    var ecmAddTeacherBtn = document.getElementById('ecmAddTeacherBtn');
+    if (ecmAddTeacherBtn) {
+        ecmAddTeacherBtn.addEventListener('click', function () {
+            Swal.fire({
+                icon: 'info',
+                title: 'Salve a classe primeiro',
+                text: 'Você poderá adicionar professores na tela da classe depois de criá-la.',
+                confirmButtonColor: '#18a558',
+                confirmButtonText: 'Entendi'
             });
         });
     }

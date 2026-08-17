@@ -123,48 +123,66 @@ $rpmMobileMenuItems = [
     }
     .count-pill.pill-danger { background: rgba(220,53,69,0.10); color: #dc3545; }
 
-    /* ---------- Mobile (Relatórios) ---------- */
+    /* ---------- Mobile (Relatórios) — EBD Mobile design tokens ---------- */
     .rpm-wrap { padding-bottom: 40px; }
-    .rpm-pill { display: block; width: 100%; background: #16213e; color: #fff; font-weight: 700; font-size: .82rem; padding: .65rem .9rem; border-radius: 12px; text-align: center; border: none; margin-bottom: 1rem; }
-    .rpm-kpiline { display: flex; flex-wrap: wrap; align-items: center; gap: .45rem; font-size: .72rem; color: #8b93a7; margin-bottom: 1.2rem; padding: 0 .1rem; }
-    .rpm-kpiline b { color: #16213e; font-weight: 800; }
-    .rpm-kpiline .sep { color: rgba(17,24,39,.18); }
-    .rpm-segmented { display: flex; background: #f1f3f7; border-radius: 999px; padding: .25rem; margin-bottom: 1rem; }
-    .rpm-seg-btn { flex: 1 1 0; border: none; background: transparent; color: #6c757d; font-weight: 700; font-size: .78rem; padding: .5rem .3rem; border-radius: 999px; }
-    .rpm-seg-btn.active { background: #fff; color: #16213e; box-shadow: 0 2px 6px rgba(17,24,39,.08); }
+    .rpm-pill { display: flex; align-items: center; justify-content: center; gap: .4rem; width: 100%; background: #fff; border: 1px solid #eef1f5; color: #c2790a; font-weight: 700; font-size: .8rem; padding: .65rem .9rem; border-radius: 12px; text-align: center; margin-bottom: 1rem; }
+    .rpm-pill .rpm-pill-sep { color: #c2c8d2; font-weight: 400; }
+    .rpm-pill .rpm-pill-link { color: #3b6fef; font-weight: 600; }
+    .rpm-stat-grid-top { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 1rem; }
+    .rpm-stat-tile { background: #fff; border: 1px solid #eef1f5; border-radius: 14px; padding: 14px; }
+    .rpm-stat-tile-label { font-size: 12px; font-weight: 600; margin-bottom: 6px; }
+    .rpm-stat-tile-value { color: #101828; font-size: 20px; font-weight: 800; }
+    .rpm-stat-tile.is-amber .rpm-stat-tile-label { color: #c2790a; }
+    .rpm-stat-tile.is-green .rpm-stat-tile-label { color: #18a558; }
+    .rpm-stat-tile.is-blue .rpm-stat-tile-label { color: #3b6fef; }
+    .rpm-stat-tile.is-purple .rpm-stat-tile-label { color: #7c4fd1; }
+    .rpm-segmented { display: flex; background: #e7e9ee; border-radius: 12px; padding: 4px; margin-bottom: 1rem; }
+    .rpm-seg-btn { flex: 1 1 0; border: none; background: transparent; color: #8b93a3; font-weight: 600; font-size: .82rem; padding: 9px 0; border-radius: 9px; }
+    .rpm-seg-btn.active { background: #fff; color: #101828; font-weight: 700; box-shadow: 0 2px 6px rgba(0,0,0,.06); }
     .rpm-panel.d-none { display: none !important; }
     .rpm-empty { padding: 2.4rem 0; text-align: center; color: #adb5bd; font-size: .84rem; }
     .rpm-empty i { font-size: 2.1rem; margin-bottom: .6rem; display: block; color: #ced4da; }
 
-    .rpm-day-card, .rpm-cls-card { background: #fff; border: 1px solid rgba(17,24,39,.06); border-radius: 14px; padding: .8rem .9rem; margin-bottom: .55rem; }
+    .rpm-day-card, .rpm-cls-card { background: #fff; border: 1px solid #eef1f5; border-radius: 14px; padding: .8rem .9rem; margin-bottom: .55rem; }
     .rpm-day-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: .55rem; }
-    .rpm-day-date, .rpm-cls-name { font-weight: 800; font-size: .86rem; color: #16213e; }
-    .rpm-day-classes { font-size: .68rem; font-weight: 700; color: #8b93a7; background: #f1f3f7; padding: .18rem .55rem; border-radius: 999px; }
+    .rpm-day-date, .rpm-cls-name { font-weight: 800; font-size: .86rem; color: #101828; }
+    .rpm-day-classes { font-size: .68rem; font-weight: 700; color: #8b93a3; background: #f1f2f5; padding: .18rem .55rem; border-radius: 999px; }
     .rpm-stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: .5rem; margin-bottom: .55rem; }
     .rpm-cls-card .rpm-stat-grid { grid-template-columns: repeat(3, 1fr); }
     .rpm-stat-label { font-size: .58rem; font-weight: 700; text-transform: uppercase; color: #adb5bd; }
-    .rpm-stat-value { font-size: .8rem; font-weight: 800; color: #16213e; }
-    .rpm-offering { text-align: right; font-size: .8rem; font-weight: 800; color: #16a34a; }
+    .rpm-stat-value { font-size: .8rem; font-weight: 800; color: #101828; }
+    .rpm-offering { text-align: right; font-size: .8rem; font-weight: 800; color: #18a558; }
     .rpm-absences { color: #dc3545; }
 
     .rpm-sheet.offcanvas-bottom { border-top-left-radius: 20px; border-top-right-radius: 20px; height: auto; max-height: 92vh; }
     .rpm-chip-row { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: .6rem; margin-bottom: 1rem; }
-    .rpm-chip { border: 1px solid rgba(17,24,39,.1); background: #fff; color: #16213e; font-size: .78rem; font-weight: 700; padding: .45rem .9rem; border-radius: 999px; text-decoration: none; }
+    .rpm-chip { border: 1px solid #e3e7ee; background: #fff; color: #101828; font-size: .78rem; font-weight: 700; padding: .45rem .9rem; border-radius: 999px; text-decoration: none; }
 </style>
 
 <div class="d-lg-none rpm-wrap">
     <button type="button" class="rpm-pill" data-bs-toggle="offcanvas" data-bs-target="#rpmFilterSheet">
-        <i class="far fa-calendar me-1"></i> <?= date('d/m', strtotime($start_date)) ?> - <?= date('d/m', strtotime($end_date)) ?>
+        <i class="far fa-calendar"></i> <?= date('d/m', strtotime($start_date)) ?> - <?= date('d/m', strtotime($end_date)) ?>
+        <span class="rpm-pill-sep">•</span>
+        <span class="rpm-pill-link">Períodos Rápidos</span>
     </button>
 
-    <div class="rpm-kpiline">
-        <span><b><?= $period_stats['total_attendance'] ?: 0 ?></b> presenças</span>
-        <span class="sep">•</span>
-        <span><b>R$ <?= number_format($period_stats['total_offerings'] ?: 0, 2, ',', '.') ?></b></span>
-        <span class="sep">•</span>
-        <span><b><?= $period_stats['total_visitors'] ?: 0 ?></b> visitantes</span>
-        <span class="sep">•</span>
-        <span><b><?= $period_stats['total_bibles'] ?: 0 ?>/<?= $period_stats['total_magazines'] ?: 0 ?></b> bíblias/revistas</span>
+    <div class="rpm-stat-grid-top">
+        <div class="rpm-stat-tile is-amber">
+            <div class="rpm-stat-tile-label">Total Presenças</div>
+            <div class="rpm-stat-tile-value"><?= $period_stats['total_attendance'] ?: 0 ?></div>
+        </div>
+        <div class="rpm-stat-tile is-green">
+            <div class="rpm-stat-tile-label">Ofertas</div>
+            <div class="rpm-stat-tile-value">R$ <?= number_format($period_stats['total_offerings'] ?: 0, 2, ',', '.') ?></div>
+        </div>
+        <div class="rpm-stat-tile is-blue">
+            <div class="rpm-stat-tile-label">Visitantes</div>
+            <div class="rpm-stat-tile-value"><?= $period_stats['total_visitors'] ?: 0 ?></div>
+        </div>
+        <div class="rpm-stat-tile is-purple">
+            <div class="rpm-stat-tile-label">Bíblias/Revistas</div>
+            <div class="rpm-stat-tile-value"><?= $period_stats['total_bibles'] ?: 0 ?>/<?= $period_stats['total_magazines'] ?: 0 ?></div>
+        </div>
     </div>
 
     <div class="rpm-segmented" id="rpmSegmented">

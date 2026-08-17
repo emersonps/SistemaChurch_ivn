@@ -28,7 +28,6 @@
     $mobilePageCategory = 'Ensino';
     $mobilePageTitle = $class['name'];
     $mobilePageMenuItems = [
-        ['icon' => 'fa-plus-circle', 'label' => 'Nova Aula/Chamada', 'href' => '/admin/ebd/lessons/create/' . $class['id']],
         ['icon' => 'fa-edit', 'label' => 'Editar Classe', 'href' => '/admin/ebd/classes/edit/' . $class['id']],
     ];
     include __DIR__ . '/../../../layout/mobile_page_header.php';
@@ -167,39 +166,59 @@
         box-shadow: 0 0 0 .2rem rgba(179,0,0,0.12);
     }
 
-    /* ---------- Mobile (Detalhes da Classe) ---------- */
-    .ecs-wrap { padding-bottom: 40px; }
-    .ecs-desc { font-size: .84rem; color: #8b93a7; margin-bottom: 1rem; }
-    .ecs-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; background: #fff; border: 1px solid rgba(17,24,39,.06); border-radius: 16px; padding: 1rem; margin-bottom: 1rem; }
-    .ecs-grid-label { font-size: .62rem; font-weight: 700; text-transform: uppercase; letter-spacing: .03em; color: #adb5bd; margin-bottom: .3rem; }
-    .ecs-grid-value { font-size: .86rem; font-weight: 800; color: #16213e; }
-    .ecs-grid-value .status-pill { font-size: .68rem; }
+    /* ---------- Mobile (Detalhes da Classe) — EBD Mobile design tokens ---------- */
+    .ecs-wrap { padding-bottom: 110px; }
+    .ecs-desc { font-size: .84rem; color: #8b93a3; margin-bottom: 1rem; }
+
+    .ecs-info-card { background: #fff; border: 1px solid #eef1f5; border-radius: 16px; padding: 14px 16px; margin-bottom: 1rem; }
+    .ecs-info-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; gap: .5rem; }
+    .ecs-info-sub { color: #9aa4b2; font-size: 12.5px; }
+    .ecs-info-status { background: rgba(24,165,88,.12); color: #18a558; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 999px; flex: 0 0 auto; }
+    .ecs-info-status.is-inactive { background: rgba(0,0,0,.06); color: #6c757d; }
+    .ecs-info-line { font-size: 14px; }
+    .ecs-info-line .num { color: #3b6fef; font-weight: 800; }
+    .ecs-info-line .sep { color: #c2c8d2; }
+    .ecs-info-line .name { color: #3b6fef; font-weight: 600; }
 
     .ecs-section-header { display: flex; align-items: center; justify-content: space-between; margin: 1.2rem 0 .7rem; }
-    .ecs-section-title { font-weight: 800; font-size: .9rem; color: #16213e; }
-    .ecs-add-btn { border: 1px solid rgba(17,24,39,.1); background: #fff; color: #16213e; font-size: .74rem; font-weight: 700; padding: .35rem .75rem; border-radius: 999px; }
+    .ecs-section-title { font-weight: 800; font-size: .9rem; color: #101828; }
+    .ecs-add-btn { border: 1px solid #eef1f5; background: #fff; color: #101828; font-size: .74rem; font-weight: 700; padding: .35rem .75rem; border-radius: 999px; }
 
-    .ecs-teacher-row { display: flex; align-items: center; gap: .7rem; background: #fff; border: 1px solid rgba(17,24,39,.06); border-radius: 14px; padding: .55rem .7rem; margin-bottom: .5rem; min-height: 48px; }
-    .ecs-avatar { flex: 0 0 auto; width: 40px; height: 40px; border-radius: 50%; background: rgba(37,99,235,.1); color: #2563eb; font-weight: 800; font-size: .78rem; display: flex; align-items: center; justify-content: center; }
-    .ecs-teacher-name { flex: 1 1 auto; min-width: 0; font-weight: 700; font-size: .86rem; color: #16213e; }
+    .ecs-teacher-row { display: flex; align-items: center; gap: .7rem; background: #fff; border: 1px solid #eef1f5; border-radius: 14px; padding: .55rem .7rem; margin-bottom: .5rem; min-height: 48px; }
+    .ecs-avatar { flex: 0 0 auto; width: 40px; height: 40px; border-radius: 50%; background: #e7ebf5; color: #5b6472; font-weight: 800; font-size: .78rem; display: flex; align-items: center; justify-content: center; }
+    .ecs-teacher-name { flex: 1 1 auto; min-width: 0; font-weight: 700; font-size: .86rem; color: #101828; }
     .ecs-x-btn { flex: 0 0 auto; width: 26px; height: 26px; border-radius: 50%; border: none; background: transparent; color: #ced4da; display: flex; align-items: center; justify-content: center; font-size: .8rem; }
 
-    .ecs-segmented { display: flex; background: #f1f3f7; border-radius: 999px; padding: .25rem; margin-bottom: 1rem; }
-    .ecs-seg-btn { flex: 1 1 0; border: none; background: transparent; color: #6c757d; font-weight: 700; font-size: .78rem; padding: .5rem .3rem; border-radius: 999px; }
-    .ecs-seg-btn.active { background: #fff; color: #16213e; box-shadow: 0 2px 6px rgba(17,24,39,.08); }
+    .ecs-segmented { display: flex; background: #e7e9ee; border-radius: 14px; padding: 4px; margin-bottom: 1rem; }
+    .ecs-seg-btn { flex: 1 1 0; border: none; background: transparent; color: #8b93a3; font-weight: 700; font-size: .82rem; padding: 9px 0; border-radius: 11px; }
+    .ecs-seg-btn.active { background: #fff; color: #101828; box-shadow: 0 2px 6px rgba(0,0,0,.06); }
     .ecs-panel.d-none { display: none !important; }
+
+    .ecs-enroll-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: .7rem; gap: .5rem; }
+    .ecs-enroll-btn { display: flex; align-items: center; gap: .35rem; border: 1.5px solid #18a558; color: #18a558; background: #fff; font-weight: 700; font-size: .8rem; padding: .4rem .8rem; border-radius: 999px; }
+    .ecs-swipe-hint { color: #b7bec8; font-size: .68rem; white-space: nowrap; }
 
     .ecs-swipe { position: relative; margin-bottom: .5rem; border-radius: 14px; overflow: hidden; }
     .ecs-swipe-actions { position: absolute; top: 0; right: 0; bottom: 0; display: flex; }
     .ecs-swipe-actions .ecs-action { width: 64px; display: flex; align-items: center; justify-content: center; color: #fff; background: #dc3545; text-decoration: none; font-size: 1rem; }
-    .ecs-student-card { position: relative; z-index: 1; display: flex; align-items: center; gap: .7rem; background: #fff; border: 1px solid rgba(17,24,39,.06); border-radius: 14px; padding: .7rem .85rem; touch-action: pan-y; }
+    .ecs-student-card { position: relative; z-index: 1; display: flex; align-items: center; gap: .7rem; background: #fff; padding: .55rem .2rem; border-bottom: 1px solid #eef1f5; touch-action: pan-y; }
     .ecs-student-id { flex: 1 1 auto; min-width: 0; }
-    .ecs-student-name { font-weight: 700; font-size: .86rem; color: #16213e; }
-    .ecs-student-meta { font-size: .74rem; color: #8b93a7; margin-top: .1rem; }
-    .ecs-student-meta .role-pill { font-size: .62rem; padding: .12rem .45rem; }
-    .ecs-chev { flex: 0 0 auto; color: #ced4da; }
+    .ecs-student-name { font-weight: 800; font-size: .86rem; color: #101828; }
+    .ecs-student-meta { font-size: .74rem; color: #8b93a3; margin-top: .1rem; }
+    .ecs-student-meta .role-pill { font-size: .62rem; padding: .12rem .45rem; background: rgba(59,111,239,.12); color: #3b6fef; }
+    .ecs-chev { flex: 0 0 auto; color: #c2c8d2; }
+
+    .ecs-hist-card { background: #fff; border: 1px solid #eef1f5; border-radius: 14px; padding: 12px 14px; display: flex; align-items: center; justify-content: space-between; margin-bottom: .6rem; text-decoration: none; }
+    .ecs-hist-date { font-weight: 800; font-size: .86rem; color: #101828; }
+    .ecs-hist-sub { color: #9aa4b2; font-size: .74rem; margin-top: .1rem; }
+    .ecs-hist-right { text-align: right; }
+    .ecs-hist-pres { color: #3b6fef; font-size: .78rem; font-weight: 700; }
+    .ecs-hist-valor { color: #101828; font-size: .84rem; font-weight: 800; margin-top: .1rem; }
 
     .ecs-empty { text-align: center; color: #adb5bd; font-size: .84rem; padding: 2rem 0; }
+
+    .ecs-bottom-cta { position: fixed; left: 0; right: 0; bottom: 0; padding: 14px 18px calc(18px + env(safe-area-inset-bottom)); background: #f6f7f9; z-index: 1025; }
+    .ecs-bottom-cta a { display: block; background: #18a558; color: #fff; text-align: center; font-weight: 700; font-size: .95rem; padding: 15px 0; border-radius: 999px; box-shadow: 0 10px 20px rgba(24,165,88,.3); text-decoration: none; }
 
     .ecs-sheet.offcanvas-bottom { border-top-left-radius: 20px; border-top-right-radius: 20px; height: auto; max-height: 85vh; }
     .ecs-sheet-search { position: relative; margin-bottom: .8rem; }
@@ -207,7 +226,7 @@
     .ecs-sheet-search input { width: 100%; border: 1px solid rgba(17,24,39,.08); background: #f8f9fb; border-radius: 12px; padding: .6rem .8rem .6rem 2.3rem; font-size: .85rem; }
     .ecs-pick-row { display: flex; align-items: center; gap: .65rem; width: 100%; text-align: left; border: none; background: #fff; padding: .6rem .3rem; border-radius: 10px; border-bottom: 1px solid rgba(17,24,39,.05); }
     .ecs-pick-row:hover { background: #f8f9fb; }
-    .ecs-pick-name { font-weight: 600; font-size: .86rem; color: #16213e; }
+    .ecs-pick-name { font-weight: 600; font-size: .86rem; color: #101828; }
 
     @media (max-width: 991.98px) {
         .ebd-lessons-table thead { display: none; }
@@ -243,23 +262,13 @@
 <div class="ecs-wrap d-lg-none">
     <?php if (!empty($class['description'])): ?><p class="ecs-desc"><?= htmlspecialchars($class['description']) ?></p><?php endif; ?>
 
-    <div class="ecs-grid">
-        <div>
-            <div class="ecs-grid-label">Congregação</div>
-            <div class="ecs-grid-value"><?= htmlspecialchars($class['congregation_name'] ?? 'Todas') ?></div>
+    <?php $ecsIsActive = $class['status'] == 'active'; ?>
+    <div class="ecs-info-card">
+        <div class="ecs-info-top">
+            <span class="ecs-info-sub"><?= htmlspecialchars($class['congregation_name'] ?? 'Todas') ?> • <?= $class['min_age'] ?>-<?= $class['max_age'] ?> anos</span>
+            <span class="ecs-info-status <?= $ecsIsActive ? '' : 'is-inactive' ?>"><?= $ecsIsActive ? 'Active' : 'Inativa' ?></span>
         </div>
-        <div>
-            <div class="ecs-grid-label">Faixa Etária</div>
-            <div class="ecs-grid-value"><?= $class['min_age'] ?> - <?= $class['max_age'] ?> anos</div>
-        </div>
-        <div>
-            <div class="ecs-grid-label">Alunos Matriculados</div>
-            <div class="ecs-grid-value"><?= count($students) ?></div>
-        </div>
-        <div>
-            <div class="ecs-grid-label">Status</div>
-            <div class="ecs-grid-value"><span class="status-pill <?= $class['status'] == 'active' ? 'is-active' : 'is-inactive' ?>"><?= ucfirst($class['status']) ?></span></div>
-        </div>
+        <div class="ecs-info-line"><span class="num"><?= count($students) ?> matriculados</span><span class="sep"> • </span><span class="name"><?= htmlspecialchars($class['name']) ?></span></div>
     </div>
 
     <div class="ecs-section-header">
@@ -285,13 +294,13 @@
     </div>
     <div class="ecs-segmented" id="ecsSegmented">
         <button type="button" class="ecs-seg-btn active" data-panel="ecsStudents">Alunos (<?= count($students) ?>)</button>
-        <button type="button" class="ecs-seg-btn" data-panel="ecsLessons">Histórico de Aulas</button>
+        <button type="button" class="ecs-seg-btn" data-panel="ecsLessons">Histórico</button>
     </div>
 
     <div class="ecs-panel" id="ecsStudents">
-        <div class="ecs-section-header mt-0">
-            <div></div>
-            <button type="button" class="ecs-add-btn" data-bs-toggle="offcanvas" data-bs-target="#ecsStudentSheet"><i class="fas fa-user-plus me-1"></i>Matricular</button>
+        <div class="ecs-enroll-row">
+            <button type="button" class="ecs-enroll-btn" data-bs-toggle="offcanvas" data-bs-target="#ecsStudentSheet"><span>+</span> Matricular Aluno</button>
+            <span class="ecs-swipe-hint">deslize para excluir</span>
         </div>
         <?php foreach ($students as $student):
             $ecsSParts = preg_split('/\s+/', trim((string)$student['member_name']));
@@ -326,38 +335,28 @@
     </div>
 
     <div class="ecs-panel d-none" id="ecsLessons">
-        <div class="table-responsive">
-            <table class="table ebd-lessons-table align-middle mb-0">
-                <tbody>
-                    <?php foreach ($lessons as $lesson): ?>
-                    <tr>
-                        <td data-label="Data" class="fw-bold"><?= date('d/m/Y', strtotime($lesson['lesson_date'])) ?></td>
-                        <td data-label="Tema"><?= htmlspecialchars($lesson['topic']) ?></td>
-                        <td data-label="Presentes">
-                            <span class="count-pill">
-                                <?= (new Database())->connect()->query("SELECT COUNT(*) FROM ebd_attendance WHERE lesson_id = {$lesson['id']} AND present = 1")->fetchColumn() ?>
-                            </span>
-                        </td>
-                        <td data-label="Oferta">R$ <?= number_format($lesson['offerings'], 2, ',', '.') ?></td>
-                        <td data-label="Ações" class="text-end">
-                            <a href="/admin/ebd/lessons/show/<?= $lesson['id'] ?>" class="btn btn-sm btn-outline-primary icon-btn" title="Ver Detalhes"><i class="fas fa-eye"></i></a>
-                            <a href="/admin/ebd/lessons/edit/<?= $lesson['id'] ?>" class="btn btn-sm btn-outline-secondary icon-btn" title="Editar"><i class="fas fa-edit"></i></a>
-                            <a href="/admin/ebd/lessons/delete/<?= $lesson['id'] ?>" class="btn btn-sm btn-outline-danger icon-btn btn-delete-lesson" data-topic="<?= htmlspecialchars($lesson['topic']) ?>" title="Excluir"><i class="fas fa-trash"></i></a>
-                        </td>
-                    </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
-        </div>
+        <?php foreach ($lessons as $lesson):
+            $ecsPresCount = (new Database())->connect()->query("SELECT COUNT(*) FROM ebd_attendance WHERE lesson_id = {$lesson['id']} AND present = 1")->fetchColumn();
+        ?>
+            <a href="/admin/ebd/lessons/show/<?= $lesson['id'] ?>" class="ecs-hist-card">
+                <div>
+                    <div class="ecs-hist-date"><?= date('d/m/Y', strtotime($lesson['lesson_date'])) ?></div>
+                    <div class="ecs-hist-sub"><?= !empty($lesson['topic']) ? htmlspecialchars($lesson['topic']) : $ecsPresCount . ' presentes' ?></div>
+                </div>
+                <div class="ecs-hist-right">
+                    <div class="ecs-hist-pres"><?= $ecsPresCount ?> pres.</div>
+                    <div class="ecs-hist-valor">R$ <?= number_format($lesson['offerings'], 2, ',', '.') ?></div>
+                </div>
+            </a>
+        <?php endforeach; ?>
         <?php if (empty($lessons)): ?>
             <div class="ecs-empty">Nenhuma aula registrada.</div>
         <?php endif; ?>
     </div>
+</div>
 
-    <?php
-    $mobilePageFooterLabel = $class['name'];
-    include __DIR__ . '/../../../layout/mobile_page_footer.php';
-    ?>
+<div class="ecs-bottom-cta d-lg-none">
+    <a href="/admin/ebd/lessons/create/<?= $class['id'] ?>">Nova Aula/Chamada</a>
 </div>
 
 <div class="row g-3 d-none d-lg-flex">

@@ -3,140 +3,128 @@
 // Mobile/tablet (<992px) card-based presentation of the same $classes data already
 // loaded by EbdController::index(). Desktop keeps the classic card grid untouched
 // (hidden via d-none d-lg-flex there).
+// Visual language matches the EBD Mobile design handoff (navy/green/blue palette),
+// distinct from the rest of the admin's blue mobile theme — see design_handoff_ebd_mobile.
 
 $ebmActiveCount = 0;
-$ebmInactiveCount = 0;
 foreach ($classes as $c) {
-    if (($c['status'] ?? '') === 'active') $ebmActiveCount++; else $ebmInactiveCount++;
+    if (($c['status'] ?? '') === 'active') $ebmActiveCount++;
 }
-
-$mobilePageCategory = 'Ensino';
-$mobilePageTitle = null;
-include __DIR__ . '/../../../layout/mobile_page_header.php';
+$ebmTotalCount = count($classes);
 ?>
 <style>
-    .ebm-wrap { padding-bottom: 90px; }
-    .ebm-toolbar { display: flex; gap: .5rem; margin-bottom: 1rem; }
-    .ebm-search-btn { flex: 0 0 auto; width: 42px; height: 42px; border-radius: 12px; border: 1px solid rgba(17,24,39,.1); background: #fff; color: #16213e; }
-    .ebm-search-btn.is-active { background: #16213e; color: #fff; border-color: #16213e; }
-    .ebm-toolbar-btn { flex: 1 1 0; display: flex; align-items: center; justify-content: center; gap: .4rem; border-radius: 12px; padding: 0 .6rem; font-size: .78rem; font-weight: 700; text-decoration: none; white-space: nowrap; }
-    .ebm-toolbar-btn.is-outline { border: 1px solid rgba(17,24,39,.1); background: #fff; color: #16213e; }
-    .ebm-fab { position: fixed; right: 1rem; bottom: calc(1rem + env(safe-area-inset-bottom)); width: 54px; height: 54px; border-radius: 50%; background: #2563eb; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; box-shadow: 0 6px 16px rgba(37,99,235,.3); z-index: 1030; text-decoration: none; }
+    .ebm-wrap { padding: 20px 18px 90px; }
+    .ebm-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+    .ebm-head-left { display: flex; align-items: center; gap: 10px; }
+    .ebm-back { flex: 0 0 auto; width: 34px; height: 34px; border-radius: 50%; background: #fff; border: 1px solid #eef1f5; color: #101828; display: flex; align-items: center; justify-content: center; }
+    .ebm-head-title { font-size: 22px; font-weight: 800; color: #101828; }
+    .ebm-head-pill { background: #10162b; color: #fff; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 999px; }
+    .ebm-reports-btn { width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; color: #101828; font-size: 1.05rem; text-decoration: none; }
 
-    .ebm-search { position: relative; margin-bottom: 1rem; }
-    .ebm-search i { position: absolute; left: .85rem; top: 50%; transform: translateY(-50%); color: #adb5bd; }
-    .ebm-search input { width: 100%; border: 1px solid rgba(17,24,39,.08); background: #fff; border-radius: 12px; padding: .55rem .8rem .55rem 2.3rem; font-size: .85rem; }
-    .ebm-search input:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,.1); }
+    .ebm-search { position: relative; margin-bottom: 14px; }
+    .ebm-search i { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #9aa4b2; font-size: .82rem; }
+    .ebm-search input { width: 100%; border: none; background: #eef1f4; border-radius: 14px; padding: 12px 14px 12px 2.4rem; font-size: 14px; color: #101828; }
+    .ebm-search input::placeholder { color: #9aa4b2; }
+    .ebm-search input:focus { outline: none; box-shadow: 0 0 0 2px rgba(24,165,88,.25); }
 
-    .ebm-segmented { display: flex; background: #f1f3f7; border-radius: 999px; padding: .25rem; margin-bottom: 1rem; }
-    .ebm-seg-btn { flex: 1 1 0; border: none; background: transparent; color: #6c757d; font-weight: 700; font-size: .78rem; padding: .5rem .3rem; border-radius: 999px; white-space: nowrap; }
-    .ebm-seg-btn.active { background: #fff; color: #16213e; box-shadow: 0 2px 6px rgba(17,24,39,.08); }
+    .ebm-filters { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; }
+    .ebm-seg-btn { border: none; font-weight: 700; font-size: 13px; padding: 8px 20px; border-radius: 999px; background: #e7e9ee; color: #5b6472; }
+    .ebm-seg-btn.active { background: #10162b; color: #fff; }
+    .ebm-cong-btn { flex: 0 0 auto; width: 38px; height: 38px; border-radius: 50%; border: 1px solid #eef1f5; background: #fff; color: #5b6472; display: flex; align-items: center; justify-content: center; margin-left: auto; }
+    .ebm-cong-btn.is-active { background: #10162b; border-color: #10162b; color: #fff; }
 
-    .ebm-card { background: #fff; border: 1px solid rgba(17,24,39,.06); border-radius: 16px; padding: .9rem 1rem; margin-bottom: .7rem; }
-    .ebm-card.ebm-hidden { display: none; }
-    .ebm-card-top { display: flex; align-items: center; gap: .6rem; }
-    .ebm-icon { flex: 0 0 auto; width: 40px; height: 40px; border-radius: 12px; background: rgba(37,99,235,.1); color: #2563eb; display: flex; align-items: center; justify-content: center; font-size: 1rem; }
-    .ebm-card-id { min-width: 0; flex: 1 1 auto; cursor: pointer; }
-    .ebm-card-name { font-weight: 800; font-size: .92rem; color: #16213e; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .ebm-delete-btn { flex: 0 0 auto; width: 30px; height: 30px; border-radius: 50%; border: none; background: transparent; color: #ced4da; }
-    .ebm-chev { flex: 0 0 auto; color: #ced4da; }
+    .ebm-swipe { position: relative; margin-bottom: 12px; border-radius: 16px; overflow: hidden; }
+    .ebm-swipe.ebm-hidden { display: none; }
+    .ebm-swipe-actions { position: absolute; top: 0; right: 0; bottom: 0; display: flex; }
+    .ebm-swipe-actions .ebm-action { width: 64px; display: flex; align-items: center; justify-content: center; color: #fff; background: #dc3545; text-decoration: none; font-size: 1rem; }
+    .ebm-card { position: relative; z-index: 1; background: #fff; border: 1px solid #eef1f5; border-radius: 16px; padding: 14px 16px; touch-action: pan-y; }
+    .ebm-card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px; }
+    .ebm-card-name { font-weight: 800; font-size: 15px; color: #101828; }
+    .ebm-status { display: flex; align-items: center; gap: 5px; flex: 0 0 auto; }
+    .ebm-status-dot { width: 6px; height: 6px; border-radius: 50%; background: #18a558; }
+    .ebm-status.is-inactive .ebm-status-dot { background: #adb5bd; }
+    .ebm-status-label { color: #18a558; font-size: 12px; font-weight: 700; }
+    .ebm-status.is-inactive .ebm-status-label { color: #8b93a3; }
+    .ebm-card-sub { color: #8b93a3; font-size: 12.5px; margin-bottom: 8px; }
+    .ebm-card-bottom { display: flex; align-items: center; justify-content: space-between; }
+    .ebm-card-meta { display: flex; align-items: center; gap: 14px; min-width: 0; }
+    .ebm-card-students { display: flex; align-items: center; gap: 5px; color: #5b6472; font-size: 12.5px; }
+    .ebm-card-prof { color: #3b6fef; font-size: 12.5px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .ebm-chev { color: #c2c8d2; font-size: 16px; flex: 0 0 auto; }
 
-    .ebm-tags { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; margin-top: .55rem; }
-    .ebm-tag { font-size: .68rem; font-weight: 700; padding: .22rem .6rem; border-radius: 999px; }
-    .ebm-tag.is-active { background: rgba(22,163,74,.12); color: #16a34a; }
-    .ebm-tag.is-inactive { background: rgba(0,0,0,.06); color: #6c757d; }
-    .ebm-tag.is-neutral { background: #eef0f2; color: #6c757d; }
-    .ebm-meta-text { font-size: .74rem; color: #8b93a7; }
-
-    .ebm-card-bottom { display: flex; align-items: center; justify-content: space-between; gap: .6rem; margin-top: .8rem; padding-top: .75rem; border-top: 1px dashed rgba(17,24,39,.08); }
-    .ebm-students { display: flex; align-items: center; gap: .35rem; font-size: .76rem; font-weight: 700; color: #16213e; }
-    .ebm-lessonbtn { flex: 0 0 auto; width: 32px; height: 32px; border-radius: 50%; background: #16a34a; color: #fff; display: flex; align-items: center; justify-content: center; font-size: .82rem; text-decoration: none; }
-
-    .ebm-pagerow { display: flex; align-items: center; justify-content: center; gap: .8rem; margin-top: .8rem; }
-    .ebm-pager-arrow { flex: 0 0 auto; width: 34px; height: 34px; border-radius: 50%; border: 1px solid rgba(17,24,39,.1); background: #fff; color: #16213e; }
-    .ebm-pager-arrow:disabled { opacity: .35; }
-    .ebm-dots { display: flex; gap: .35rem; }
-    .ebm-dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(17,24,39,.15); }
-    .ebm-dot.active { background: #16213e; width: 16px; border-radius: 4px; }
-    .ebm-pager-count { text-align: center; font-size: .7rem; font-weight: 700; color: #8b93a7; margin-top: .5rem; }
+    .ebm-fab { position: fixed; right: 22px; bottom: calc(30px + env(safe-area-inset-bottom)); width: 56px; height: 56px; border-radius: 50%; background: #18a558; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 1.55rem; font-weight: 400; box-shadow: 0 10px 24px rgba(24,165,88,.4); z-index: 1030; text-decoration: none; }
 
     .ebm-empty { text-align: center; color: #adb5bd; font-size: .85rem; padding: 2rem 0; }
 
-    .ebm-cong-sheet.offcanvas-bottom { border-top-left-radius: 20px; border-top-right-radius: 20px; height: auto; max-height: 92vh; }
-    .ebm-cong-chip { display: flex; align-items: center; gap: .55rem; width: 100%; text-align: left; border: 1px solid rgba(17,24,39,.08); background: #fff; color: #16213e; font-size: .84rem; font-weight: 600; padding: .65rem .9rem; border-radius: 12px; margin-bottom: .5rem; text-decoration: none; }
-    .ebm-cong-chip.active { border-color: #2563eb; background: rgba(37,99,235,.06); color: #2563eb; font-weight: 700; }
-    .ebm-cong-chip i:first-child { color: #8b93a7; width: 1.1em; }
-    .ebm-cong-chip.active i:first-child { color: #2563eb; }
+    .ebm-cong-sheet.offcanvas-bottom { border-top-left-radius: 20px; border-top-right-radius: 20px; height: auto; max-height: 85vh; }
+    .ebm-cong-chip { display: flex; align-items: center; gap: .55rem; width: 100%; text-align: left; border: 1px solid #eef1f5; background: #fff; color: #101828; font-size: .84rem; font-weight: 600; padding: .65rem .9rem; border-radius: 12px; margin-bottom: .5rem; text-decoration: none; }
+    .ebm-cong-chip.active { border-color: #10162b; background: rgba(16,22,43,.05); font-weight: 700; }
+    .ebm-cong-chip i:first-child { color: #8b93a3; width: 1.1em; }
+    .ebm-cong-chip.active i:first-child { color: #10162b; }
 </style>
 
 <div class="ebm-wrap d-lg-none">
-    <div class="ebm-toolbar">
-        <button type="button" class="ebm-search-btn" id="ebmSearchToggle" aria-label="Buscar"><i class="fas fa-search"></i></button>
-        <?php if (!empty($congregations)): ?>
-            <button type="button" class="ebm-search-btn <?= $selected_congregation_id ? 'is-active' : '' ?>" data-bs-toggle="offcanvas" data-bs-target="#ebmCongSheet" aria-label="Filtrar por congregação"><i class="fas fa-church"></i></button>
-        <?php endif; ?>
-        <a href="/admin/ebd/reports" class="ebm-toolbar-btn is-outline"><i class="fas fa-chart-bar"></i> Relatórios</a>
+    <div class="ebm-head">
+        <div class="ebm-head-left">
+            <button type="button" id="ebmBackBtn" class="ebm-back" data-fallback="<?= htmlspecialchars($mobileLauncherHref ?? '/admin?launcher=1') ?>" aria-label="Voltar"><i class="fas fa-arrow-left"></i></button>
+            <span class="ebm-head-title">EBD</span>
+            <span class="ebm-head-pill"><?= $ebmTotalCount ?> turma<?= $ebmTotalCount === 1 ? '' : 's' ?></span>
+        </div>
+        <a href="/admin/ebd/reports" class="ebm-reports-btn" aria-label="Relatórios"><i class="fas fa-chart-bar"></i></a>
     </div>
 
-    <div class="ebm-search d-none" id="ebmSearchRow">
+    <div class="ebm-search">
         <i class="fas fa-search"></i>
-        <input type="text" id="ebmSearchInput" placeholder="Buscar classe, professor...">
+        <input type="text" id="ebmSearchInput" placeholder="Buscar turma...">
     </div>
 
-    <div class="ebm-segmented" id="ebmSegmented">
-        <button type="button" class="ebm-seg-btn active" data-status="">Todas</button>
-        <button type="button" class="ebm-seg-btn" data-status="active">Ativas (<?= $ebmActiveCount ?>)</button>
-        <button type="button" class="ebm-seg-btn" data-status="inactive">Inativas (<?= $ebmInactiveCount ?>)</button>
+    <div class="ebm-filters">
+        <div class="d-flex gap-2" id="ebmSegmented">
+            <button type="button" class="ebm-seg-btn active" data-status="">Todas</button>
+            <button type="button" class="ebm-seg-btn" data-status="active">Ativas</button>
+        </div>
+        <?php if (!empty($congregations)): ?>
+            <button type="button" class="ebm-cong-btn <?= $selected_congregation_id ? 'is-active' : '' ?>" data-bs-toggle="offcanvas" data-bs-target="#ebmCongSheet" aria-label="Filtrar por congregação"><i class="fas fa-church"></i></button>
+        <?php endif; ?>
     </div>
 
     <?php if (empty($classes)): ?>
         <div class="ebm-empty">Nenhuma classe cadastrada.</div>
     <?php else: ?>
         <div id="ebmCardList">
-            <?php foreach ($classes as $idx => $class):
+            <?php foreach ($classes as $class):
                 $isActive = ($class['status'] ?? '') === 'active';
                 $teachers = trim((string)($class['teachers_names'] ?? ''));
                 $term = mb_strtolower($class['name'] . ' ' . $teachers . ' ' . ($class['congregation_name'] ?? ''), 'UTF-8');
             ?>
-                <div class="ebm-card" data-status="<?= $isActive ? 'active' : 'inactive' ?>" data-term="<?= htmlspecialchars($term) ?>" data-page="<?= (int)floor($idx / 3) ?>">
-                    <div class="ebm-card-top">
-                        <span class="ebm-icon"><i class="fas fa-book-reader"></i></span>
-                        <div class="ebm-card-id" onclick="window.location.href='/admin/ebd/classes/show/<?= $class['id'] ?>'">
-                            <div class="ebm-card-name"><?= htmlspecialchars($class['name']) ?></div>
+                <div class="ebm-swipe" data-status="<?= $isActive ? 'active' : 'inactive' ?>" data-term="<?= htmlspecialchars($term) ?>">
+                    <div class="ebm-swipe-actions">
+                        <a href="/admin/ebd/classes/delete/<?= $class['id'] ?>" class="ebm-action ebm-delete-btn" data-name="<?= htmlspecialchars($class['name']) ?>" aria-label="Excluir"><i class="fas fa-trash"></i></a>
+                    </div>
+                    <div class="ebm-card" onclick="window.location.href='/admin/ebd/classes/show/<?= $class['id'] ?>'">
+                        <div class="ebm-card-top">
+                            <span class="ebm-card-name"><?= htmlspecialchars($class['name']) ?></span>
+                            <span class="ebm-status <?= $isActive ? '' : 'is-inactive' ?>">
+                                <span class="ebm-status-dot"></span>
+                                <span class="ebm-status-label"><?= $isActive ? 'Ativa' : 'Inativa' ?></span>
+                            </span>
                         </div>
-                        <button type="button" class="ebm-delete-btn" data-name="<?= htmlspecialchars($class['name']) ?>" data-href="/admin/ebd/classes/delete/<?= $class['id'] ?>" aria-label="Excluir"><i class="fas fa-trash"></i></button>
-                        <i class="fas fa-chevron-right ebm-chev"></i>
-                    </div>
-                    <div class="ebm-tags">
-                        <span class="ebm-tag <?= $isActive ? 'is-active' : 'is-inactive' ?>"><?= $isActive ? 'Ativa' : 'Inativa' ?></span>
-                        <span class="ebm-meta-text"><i class="fas fa-church me-1"></i><?= htmlspecialchars($class['congregation_name'] ?? 'Todas') ?></span>
-                    </div>
-                    <div class="ebm-tags">
-                        <span class="ebm-tag is-neutral">Faixa <?= $class['min_age'] ?? 0 ?> a <?= $class['max_age'] ?? 99 ?> anos</span>
-                        <span class="ebm-meta-text"><?= $teachers !== '' ? 'Prof. ' . htmlspecialchars($teachers) : 'Sem professor' ?></span>
-                    </div>
-                    <div class="ebm-card-bottom">
-                        <span class="ebm-students"><i class="fas fa-user-group"></i> <?= (int)$class['students_count'] ?> alunos</span>
-                        <a href="/admin/ebd/lessons/create/<?= $class['id'] ?>" class="ebm-lessonbtn" aria-label="Lançar aula" onclick="event.stopPropagation()"><i class="fas fa-clipboard-check"></i></a>
+                        <div class="ebm-card-sub"><?= htmlspecialchars($class['congregation_name'] ?? 'Todas') ?> • <?= $class['min_age'] ?? 0 ?>-<?= $class['max_age'] ?? 99 ?> anos</div>
+                        <div class="ebm-card-bottom">
+                            <div class="ebm-card-meta">
+                                <span class="ebm-card-students"><i class="fas fa-user-group"></i> <?= (int)$class['students_count'] ?> alunos</span>
+                                <span class="ebm-card-prof">Prof. <?= $teachers !== '' ? htmlspecialchars($teachers) : 'Nenhum' ?></span>
+                            </div>
+                            <i class="fas fa-chevron-right ebm-chev"></i>
+                        </div>
                     </div>
                 </div>
             <?php endforeach; ?>
         </div>
-
-        <div class="ebm-pagerow">
-            <button type="button" class="ebm-pager-arrow" id="ebmPrev" aria-label="Anterior"><i class="fas fa-chevron-left"></i></button>
-            <div class="ebm-dots" id="ebmDots"></div>
-            <button type="button" class="ebm-pager-arrow" id="ebmNext" aria-label="Próximo"><i class="fas fa-chevron-right"></i></button>
-        </div>
-        <div class="ebm-pager-count" id="ebmPagerCount"></div>
+        <div class="ebm-empty d-none" id="ebmNoResults">Nenhuma classe encontrada.</div>
     <?php endif; ?>
 
-    <?php
-    $mobilePageFooterLabel = 'EBD';
-    include __DIR__ . '/../../../layout/mobile_page_footer.php';
-    ?>
-
-    <a href="/admin/ebd/classes/create" class="ebm-fab" aria-label="Nova classe"><i class="fas fa-plus"></i></a>
+    <a href="/admin/ebd/classes/create" class="ebm-fab" aria-label="Nova classe">+</a>
 </div>
 
 <?php if (!empty($congregations)): ?>
@@ -163,75 +151,41 @@ include __DIR__ . '/../../../layout/mobile_page_header.php';
     var wrap = document.querySelector('.ebm-wrap');
     if (!wrap) return;
 
-    var PAGE_SIZE = 3;
+    var backBtn = document.getElementById('ebmBackBtn');
+    if (backBtn) {
+        backBtn.addEventListener('click', function () {
+            var cameFromSameSite = document.referrer && document.referrer.indexOf(window.location.origin) === 0;
+            if (cameFromSameSite && window.history.length > 1) {
+                window.history.back();
+            } else {
+                window.location.href = backBtn.getAttribute('data-fallback');
+            }
+        });
+    }
+
     var activeStatus = '';
 
     function normalize(str) {
         return (str || '').toString().normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
     }
 
-    function matchingCards() {
+    function render() {
         var term = normalize(document.getElementById('ebmSearchInput') ? document.getElementById('ebmSearchInput').value.trim() : '');
-        return Array.prototype.filter.call(document.querySelectorAll('#ebmCardList .ebm-card'), function (card) {
+        var cards = Array.prototype.slice.call(document.querySelectorAll('#ebmCardList .ebm-swipe'));
+        var visibleCount = 0;
+        cards.forEach(function (card) {
             var matchesTerm = term === '' || normalize(card.getAttribute('data-term')).indexOf(term) !== -1;
             var matchesStatus = activeStatus === '' || card.getAttribute('data-status') === activeStatus;
-            return matchesTerm && matchesStatus;
+            var show = matchesTerm && matchesStatus;
+            card.classList.toggle('ebm-hidden', !show);
+            if (show) visibleCount++;
         });
+        var noResults = document.getElementById('ebmNoResults');
+        if (noResults) noResults.classList.toggle('d-none', visibleCount > 0 || cards.length === 0);
     }
 
-    var currentPage = 0;
-    var dotsWrap = document.getElementById('ebmDots');
-    var countEl = document.getElementById('ebmPagerCount');
-    var prevBtn = document.getElementById('ebmPrev');
-    var nextBtn = document.getElementById('ebmNext');
-
-    function render() {
-        var matches = matchingCards();
-        var totalPages = Math.max(1, Math.ceil(matches.length / PAGE_SIZE));
-        if (currentPage >= totalPages) currentPage = totalPages - 1;
-        if (currentPage < 0) currentPage = 0;
-
-        document.querySelectorAll('#ebmCardList .ebm-card').forEach(function (card) {
-            card.classList.add('ebm-hidden');
-        });
-        matches.forEach(function (card, i) {
-            if (Math.floor(i / PAGE_SIZE) === currentPage) card.classList.remove('ebm-hidden');
-        });
-
-        if (dotsWrap) {
-            dotsWrap.innerHTML = '';
-            for (var p = 0; p < totalPages; p++) {
-                var dot = document.createElement('span');
-                dot.className = 'ebm-dot' + (p === currentPage ? ' active' : '');
-                dotsWrap.appendChild(dot);
-            }
-        }
-        if (countEl) {
-            countEl.textContent = matches.length
-                ? (currentPage + 1) + ' DE ' + totalPages + ' • ' + matches.length + ' NO TOTAL'
-                : 'Nenhum resultado';
-        }
-        if (prevBtn) prevBtn.disabled = currentPage <= 0;
-        if (nextBtn) nextBtn.disabled = currentPage >= totalPages - 1;
-    }
-
-    if (prevBtn) prevBtn.addEventListener('click', function () { currentPage--; render(); });
-    if (nextBtn) nextBtn.addEventListener('click', function () { currentPage++; render(); });
-
-    var searchToggle = document.getElementById('ebmSearchToggle');
-    var searchRow = document.getElementById('ebmSearchRow');
     var searchInput = document.getElementById('ebmSearchInput');
-    if (searchToggle) {
-        searchToggle.addEventListener('click', function () {
-            var open = searchRow.classList.contains('d-none');
-            searchRow.classList.toggle('d-none', !open);
-            searchToggle.classList.toggle('is-active', open);
-            if (open) searchInput.focus();
-        });
-    }
-    if (searchInput) {
-        searchInput.addEventListener('input', function () { currentPage = 0; render(); });
-    }
+    if (searchInput) searchInput.addEventListener('input', render);
 
     var segmented = document.getElementById('ebmSegmented');
     if (segmented) {
@@ -240,17 +194,57 @@ include __DIR__ . '/../../../layout/mobile_page_header.php';
                 segmented.querySelectorAll('.ebm-seg-btn').forEach(function (b) { b.classList.remove('active'); });
                 btn.classList.add('active');
                 activeStatus = btn.getAttribute('data-status') || '';
-                currentPage = 0;
                 render();
             });
         });
     }
 
+    // Swipe-to-reveal delete action on class cards (same pattern used for students in classes/show.php)
+    document.querySelectorAll('.ebm-swipe').forEach(function (swipe) {
+        var card = swipe.querySelector('.ebm-card');
+        var actionsWidth = swipe.querySelectorAll('.ebm-action').length * 64;
+        var startX = 0, currentX = 0, dragging = false, open = false;
+
+        function setOpen(state) {
+            open = state;
+            card.style.transform = open ? 'translateX(-' + actionsWidth + 'px)' : 'translateX(0)';
+        }
+        function closeOthers() {
+            document.querySelectorAll('.ebm-swipe .ebm-card').forEach(function (c) {
+                if (c !== card) c.style.transform = 'translateX(0)';
+            });
+        }
+
+        card.addEventListener('touchstart', function (e) {
+            startX = e.touches[0].clientX;
+            dragging = true;
+            card.style.transition = 'none';
+            closeOthers();
+        }, { passive: true });
+
+        card.addEventListener('touchmove', function (e) {
+            if (!dragging) return;
+            currentX = e.touches[0].clientX - startX;
+            var base = open ? -actionsWidth : 0;
+            var next = Math.min(0, Math.max(-actionsWidth, base + currentX));
+            card.style.transform = 'translateX(' + next + 'px)';
+        }, { passive: true });
+
+        card.addEventListener('touchend', function () {
+            dragging = false;
+            card.style.transition = '';
+            var base = open ? -actionsWidth : 0;
+            var moved = base + currentX;
+            setOpen(moved < -(actionsWidth / 2));
+            currentX = 0;
+        });
+    });
+
     document.querySelectorAll('.ebm-delete-btn').forEach(function (btn) {
         btn.addEventListener('click', function (e) {
             e.preventDefault();
             e.stopPropagation();
-            var href = btn.getAttribute('data-href');
+            var href = btn.getAttribute('href');
             var name = btn.getAttribute('data-name');
             Swal.fire({
                 title: 'Excluir classe?',
@@ -262,11 +256,9 @@ include __DIR__ . '/../../../layout/mobile_page_header.php';
                 confirmButtonText: 'Sim, excluir',
                 cancelButtonText: 'Cancelar'
             }).then(function (result) {
-                if (result.isConfirmed) window.location.replace(href);
+                if (result.isConfirmed) window.location.href = href;
             });
         });
     });
-
-    render();
 })();
 </script>
