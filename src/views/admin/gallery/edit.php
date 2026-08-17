@@ -103,11 +103,11 @@
                 </div>
                 <div class="col-md-3">
                     <label class="form-label">Local</label>
-                    <input type="text" class="form-control" name="location" value="<?= htmlspecialchars($album['location']) ?>">
+                    <input type="text" class="form-control" name="location" value="<?= htmlspecialchars($album['location'] ?? '') ?>">
                 </div>
                 <div class="col-md-12">
                     <label class="form-label">Descrição</label>
-                    <textarea class="form-control" name="description" rows="3"><?= htmlspecialchars($album['description']) ?></textarea>
+                    <textarea class="form-control" name="description" rows="3"><?= htmlspecialchars($album['description'] ?? '') ?></textarea>
                 </div>
             </div>
         </div>

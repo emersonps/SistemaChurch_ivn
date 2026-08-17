@@ -1,6 +1,6 @@
-<?php include __DIR__ . '/../../layout/header.php'; ?>
+<?php $suppressMobileTopbar = true; include __DIR__ . '/../../layout/header.php'; ?>
 
-<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+<div class="d-none d-lg-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
     <h1 class="h2">Fechamentos Financeiros</h1>
     <div class="btn-toolbar mb-2 mb-md-0">
         <button type="button" class="btn btn-sm btn-success rounded-pill fw-semibold px-3" data-bs-toggle="modal" data-bs-target="#newClosureModal">
@@ -60,6 +60,8 @@ ksort($groupedClosures);
 $tabTotal = count($groupedClosures);
 $hasMultipleCongregations = $tabTotal > 1;
 ?>
+
+<?php include __DIR__ . '/_mobile_list.php'; ?>
 
 <style>
     #closureTabs.nav-tabs {
@@ -160,7 +162,7 @@ $hasMultipleCongregations = $tabTotal > 1;
     <?php $first = false; endforeach; ?>
 </ul>
 
-<div class="closure-tabs-carousel <?= $hasMultipleCongregations ? 'multi' : '' ?>">
+<div class="closure-tabs-carousel d-none d-lg-block <?= $hasMultipleCongregations ? 'multi' : '' ?>">
 <div class="tab-content" id="closureTabsContent">
     <?php $first = true; $tabStep = 1; foreach ($groupedClosures as $congregationName => $items): 
         $tabId = 'tab-' . md5($congregationName);
@@ -230,7 +232,7 @@ $hasMultipleCongregations = $tabTotal > 1;
 </div>
 
 <?php if (empty($groupedClosures)): ?>
-    <div class="alert alert-info text-center">
+    <div class="alert alert-info text-center d-none d-lg-block">
         <i class="fas fa-info-circle me-2"></i> Nenhum fechamento financeiro registrado.
     </div>
 <?php endif; ?>
@@ -318,7 +320,7 @@ document.querySelectorAll('.btn-delete-closure').forEach(function (btn) {
             cancelButtonText: 'Cancelar'
         }).then((result) => {
             if (result.isConfirmed) {
-                window.location.href = href;
+                window.location.replace(href);
             }
         });
     });

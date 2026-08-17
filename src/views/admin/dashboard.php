@@ -1,4 +1,4 @@
-<?php include __DIR__ . '/../layout/header.php'; ?>
+<?php $suppressMobileTopbar = true; include __DIR__ . '/../layout/header.php'; ?>
 <?php
 $canToggleFinancialValues = in_array($_SESSION['user_role'] ?? '', ['admin', 'secretary'], true);
 $tithesSumFormatted = 'R$ ' . number_format($tithes_sum, 2, ',', '.');
@@ -6,7 +6,9 @@ $offeringsSumFormatted = 'R$ ' . number_format($offerings_sum, 2, ',', '.');
 $totalFinancialFormatted = 'R$ ' . number_format($total_financial, 2, ',', '.');
 ?>
 
-<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+<?php include __DIR__ . '/_mobile_dashboard.php'; ?>
+
+<div class="d-none d-lg-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
     <h1 class="h2 mb-0">Painel</h1>
     <div class="d-flex align-items-center gap-2">
         <?php if ($canToggleFinancialValues): ?>
@@ -211,7 +213,7 @@ $totalFinancialFormatted = 'R$ ' . number_format($total_financial, 2, ',', '.');
     #birthdayModal .modal-content { border-radius: 16px; border: none; overflow: hidden; }
 </style>
 
-<div class="dashboard-cards-carousel d-md-none mb-2">
+<div class="dashboard-cards-carousel d-none mb-2">
     <div class="px-2 pt-2">
         <div class="d-flex justify-content-between align-items-center">
             <span class="text-muted small">Dashboard</span>
@@ -258,7 +260,7 @@ $totalFinancialFormatted = 'R$ ' . number_format($total_financial, 2, ',', '.');
     </div>
 </div>
 
-<div class="row d-none d-md-flex g-3 mb-1">
+<div class="row d-none d-lg-flex g-3 mb-1">
     <div class="col-md-3">
         <div class="stat-box stat-members">
             <div class="stat-icon"><i class="fas fa-users"></i></div>
@@ -300,13 +302,15 @@ $totalFinancialFormatted = 'R$ ' . number_format($total_financial, 2, ',', '.');
 <?php if ($canToggleFinancialValues): ?>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        var toggleButton = document.getElementById('toggle-dashboard-values');
+        var toggleButtons = [
+            document.getElementById('toggle-dashboard-values'),
+            document.getElementById('toggle-dashboard-values-mobile')
+        ].filter(Boolean);
         var valueNodes = document.querySelectorAll('.sensitive-dashboard-value');
-        if (!toggleButton || !valueNodes.length) {
+        if (!toggleButtons.length || !valueNodes.length) {
             return;
         }
 
-        var icon = toggleButton.querySelector('i');
         var storageKey = 'dashboard_financial_values_visible_' + <?= (int)($_SESSION['user_id'] ?? 0) ?>;
         var isVisible = localStorage.getItem(storageKey) === '1';
 
@@ -315,15 +319,19 @@ $totalFinancialFormatted = 'R$ ' . number_format($total_financial, 2, ',', '.');
                 node.textContent = isVisible ? node.dataset.value : 'R$ ••••••';
             });
             var title = isVisible ? 'Ocultar valores' : 'Exibir valores';
-            toggleButton.setAttribute('title', title);
-            toggleButton.setAttribute('aria-label', title);
-            icon.className = isVisible ? 'fas fa-eye-slash' : 'fas fa-eye';
+            toggleButtons.forEach(function (btn) {
+                btn.setAttribute('title', title);
+                btn.setAttribute('aria-label', title);
+                btn.querySelector('i').className = isVisible ? 'fas fa-eye-slash' : 'fas fa-eye';
+            });
         }
 
-        toggleButton.addEventListener('click', function () {
-            isVisible = !isVisible;
-            localStorage.setItem(storageKey, isVisible ? '1' : '0');
-            renderValues();
+        toggleButtons.forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                isVisible = !isVisible;
+                localStorage.setItem(storageKey, isVisible ? '1' : '0');
+                renderValues();
+            });
         });
 
         renderValues();
@@ -331,7 +339,7 @@ $totalFinancialFormatted = 'R$ ' . number_format($total_financial, 2, ',', '.');
 </script>
 <?php endif; ?>
 
-<div class="row mt-4">
+<div class="row mt-4 d-none d-lg-flex">
     <div class="col-12 mb-4">
         <div class="member-form-card">
             <div class="member-form-card-header">
@@ -374,7 +382,7 @@ $totalFinancialFormatted = 'R$ ' . number_format($total_financial, 2, ',', '.');
     </div>
 </div>
 
-<div class="row">
+<div class="row d-none d-lg-flex">
     <?php if (hasPermission('members.view')): ?>
     <div class="col-md-6 mb-4">
         <div class="member-form-card h-100">
@@ -401,7 +409,7 @@ $totalFinancialFormatted = 'R$ ' . number_format($total_financial, 2, ',', '.');
                             <div class="d-flex align-items-center gap-2">
                                 <span class="date-pill"><?= date('d/m', strtotime($b['birth_date'])) ?></span>
                                 <?php if ($is_today): ?>
-                                    <button class="btn btn-sm btn-outline-success icon-btn" style="width:30px;height:30px;" onclick="openBirthdayCard('<?= addslashes(htmlspecialchars($b['name'])) ?>')" title="Gerar Cartão">
+                                    <button class="btn btn-sm btn-outline-success icon-btn" style="width:30px;height:30px;" onclick="openBirthdayCard('<?= addslashes(htmlspecialchars($b['name'])) ?>', <?= (int)$b['id'] ?>)" title="Gerar Cartão">
                                         <i class="fas fa-gift"></i>
                                     </button>
                                 <?php endif; ?>
@@ -507,9 +515,11 @@ $totalFinancialFormatted = 'R$ ' . number_format($total_financial, 2, ',', '.');
 
 <script>
     let currentMemberName = '';
+    let currentMemberId = null;
 
-    function openBirthdayCard(name) {
+    function openBirthdayCard(name, id) {
         currentMemberName = name;
+        currentMemberId = id || null;
         document.getElementById('cardMemberName').innerText = name;
         new bootstrap.Modal(document.getElementById('birthdayModal')).show();
     }
@@ -527,10 +537,36 @@ $totalFinancialFormatted = 'R$ ' . number_format($total_financial, 2, ',', '.');
         }
     });
 
+    // Lightweight client-side "already greeted today" tracker (localStorage only —
+    // there's no backend field for this). Keyed by member id + today's MM-DD so it
+    // naturally resets next year. Used so staff don't accidentally re-send by mistake.
+    function birthdayGreetedKey(id) {
+        if (!id) return null;
+        var now = new Date();
+        var md = String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0');
+        return 'birthday_greeted_' + id + '_' + md;
+    }
+
+    function isBirthdayGreeted(id) {
+        var key = birthdayGreetedKey(id);
+        if (!key) return false;
+        try { return localStorage.getItem(key) === '1'; } catch (e) { return false; }
+    }
+
+    function markBirthdayGreeted(id) {
+        var key = birthdayGreetedKey(id);
+        if (!key) return;
+        try { localStorage.setItem(key, '1'); } catch (e) {}
+        document.querySelectorAll('[data-birthday-id="' + id + '"]').forEach(function (el) {
+            el.classList.add('is-greeted');
+        });
+    }
+
     function shareWhatsApp() {
         const message = `🎉 *Parabéns, ${currentMemberName}!* 🎉\n\nNeste dia especial, louvamos a Deus pela sua vida! Que o Senhor continue te abençoando grandemente.\n\n"O Senhor te abençoe e te guarde..." (Nm 6:24)\n\nCom carinho,\n*Família <?= addslashes($siteProfile['alias'] ?? 'IVN') ?>*`;
         const url = `https://wa.me/?text=${encodeURIComponent(message)}`;
         window.open(url, '_blank');
+        markBirthdayGreeted(currentMemberId);
     }
 
     function downloadCard() {

@@ -1,6 +1,6 @@
-<?php include __DIR__ . '/../../layout/header.php'; ?>
+<?php $suppressMobileTopbar = true; include __DIR__ . '/../../layout/header.php'; ?>
 
-<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+<div class="d-none d-lg-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
     <h1 class="h2">Membros</h1>
     <div class="btn-toolbar mb-2 mb-md-0 gap-2">
         <?php if (hasPermission('members.manage')): ?>
@@ -235,6 +235,8 @@ $hasMultipleCongregations = count($groupedMembers) > 1;
     }
 </style>
 
+<?php include __DIR__ . '/_mobile_list.php'; ?>
+
 <ul class="nav nav-tabs mb-3 d-none d-lg-flex" id="memberTabs" role="tablist">
     <?php $first = true; foreach ($groupedMembers as $congregationName => $congregationMembers): 
         $tabId = 'tab-' . md5($congregationName);
@@ -251,7 +253,7 @@ $hasMultipleCongregations = count($groupedMembers) > 1;
 <!-- DataTables CSS -->
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
 
-<div class="member-tabs-carousel <?= $hasMultipleCongregations ? 'multi' : '' ?>">
+<div class="member-tabs-carousel d-none d-lg-block <?= $hasMultipleCongregations ? 'multi' : '' ?>">
 <div class="tab-content" id="memberTabsContent">
     <?php 
     $first = true;

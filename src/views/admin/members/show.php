@@ -418,7 +418,7 @@ document.querySelectorAll('.btn-delete-member').forEach(function (btn) {
             cancelButtonText: 'Cancelar'
         }).then((result) => {
             if (result.isConfirmed) {
-                window.location.href = href;
+                window.location.replace(href);
             }
         });
     });

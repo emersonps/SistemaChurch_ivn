@@ -8,28 +8,42 @@ class EbdController {
         requirePermission('ebd.view');
         $db = (new Database())->connect();
         
+        // A congregation-scoped user (e.g. secretary) always sees only their own
+        // congregation's classes — that filter comes from the session and cannot be
+        // overridden by the GET param below. Global users (no session congregation)
+        // may optionally narrow the list to one congregation via ?congregation_id=.
         $congregation_id = $_SESSION['user_congregation_id'] ?? null;
-        
+        $selectedCongregationId = $congregation_id ?: ($_GET['congregation_id'] ?? null);
+
         $sql = "SELECT c.*, cong.name as congregation_name,
                 (SELECT COUNT(*) FROM ebd_students s WHERE s.class_id = c.id AND s.status = 'active') as students_count,
                 (SELECT GROUP_CONCAT(m.name SEPARATOR ', ') FROM ebd_teachers t JOIN members m ON t.member_id = m.id WHERE t.class_id = c.id AND t.status = 'active') as teachers_names
-                FROM ebd_classes c 
+                FROM ebd_classes c
                 LEFT JOIN congregations cong ON c.congregation_id = cong.id
                 WHERE 1=1";
-        
+
         $params = [];
-        if ($congregation_id) {
+        if ($selectedCongregationId) {
             $sql .= " AND c.congregation_id = ?";
-            $params[] = $congregation_id;
+            $params[] = $selectedCongregationId;
         }
-        
+
         $sql .= " ORDER BY c.name ASC";
-        
+
         $stmt = $db->prepare($sql);
         $stmt->execute($params);
         $classes = $stmt->fetchAll();
-        
-        view('admin/ebd/classes/index', ['classes' => $classes]);
+
+        $congregations = [];
+        if (!$congregation_id) {
+            $congregations = $db->query("SELECT id, name FROM congregations ORDER BY name ASC")->fetchAll();
+        }
+
+        view('admin/ebd/classes/index', [
+            'classes' => $classes,
+            'congregations' => $congregations,
+            'selected_congregation_id' => $selectedCongregationId,
+        ]);
     }
 
     // Relatórios da EBD

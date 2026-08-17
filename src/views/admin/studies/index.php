@@ -1,6 +1,6 @@
-<?php include __DIR__ . '/../../layout/header.php'; ?>
+<?php $suppressMobileTopbar = true; include __DIR__ . '/../../layout/header.php'; ?>
 
-<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+<div class="d-none d-lg-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
     <h1 class="h2">Estudos Bíblicos e Esboços</h1>
     <div class="btn-toolbar mb-2 mb-md-0">
         <a href="/admin/studies/create" class="btn btn-sm btn-primary rounded-pill fw-semibold px-3">
@@ -134,93 +134,12 @@ function studyTypeMeta($type) {
     }
 </style>
 
-<div class="member-form-card filter-card mb-3">
+<?php include __DIR__ . '/_mobile_list.php'; ?>
+
+<div class="member-form-card filter-card mb-3 d-none d-lg-block">
     <div class="p-3">
         <input type="search" class="form-control" id="studiesSearch" placeholder="Pesquisar por título, descrição, congregação..." autocomplete="off">
     </div>
-</div>
-
-<div class="d-lg-none">
-    <?php if (empty($studies)): ?>
-        <div class="member-form-card">
-            <div class="text-center py-5">
-                <i class="fas fa-book fa-3x text-muted mb-3"></i>
-                <p class="text-muted mb-0">Nenhum estudo cadastrado.</p>
-            </div>
-        </div>
-    <?php else: ?>
-        <div class="d-grid gap-2">
-            <?php foreach ($studies as $s): ?>
-                <?php
-                $studyDescription = trim((string)($s['description'] ?? ''));
-                $studyDescriptionText = $studyDescription === '' ? '-' : $studyDescription;
-                $studyDescriptionShort = $studyDescription === '' ? '-' : mb_strimwidth($studyDescription, 0, 30, '...');
-                $studyHasMoreDescription = $studyDescription !== '' && mb_strlen($studyDescription, 'UTF-8') > 30;
-                $baseName = pathinfo((string)($s['file_path'] ?? ''), PATHINFO_FILENAME);
-                $coverUrl = null;
-                if ($baseName !== '') {
-                    $coverDir = __DIR__ . '/../../../../public/uploads/studies/covers/';
-                    foreach (['jpg', 'jpeg', 'png', 'webp'] as $ext) {
-                        $candidate = $coverDir . $baseName . '.' . $ext;
-                        if (is_file($candidate)) {
-                            $coverUrl = '/uploads/studies/covers/' . $baseName . '.' . $ext;
-                            break;
-                        }
-                    }
-                }
-                $isUnowned = !isset($s['created_by']) || $s['created_by'] === null || $s['created_by'] === '';
-                $isOwner = $userId !== null && isset($s['created_by']) && (string)$s['created_by'] === (string)$userId;
-                $canManage = $canManagePermission && ($isAdmin || ($userId !== null && $isUnowned) || $isOwner);
-                ?>
-                <div class="member-form-card study-item" data-search="<?= htmlspecialchars(mb_strtolower(($s['title'] ?? '') . ' ' . ($s['description'] ?? '') . ' ' . ($s['congregation_name'] ?? '') . ' ' . ($s['created_at'] ?? ''), 'UTF-8')) ?>">
-                    <div class="p-3">
-                        <div class="d-flex justify-content-between align-items-start gap-3">
-                            <?php if ($coverUrl): ?>
-                                <img src="<?= htmlspecialchars($coverUrl) ?>" alt="Capa" class="study-cover">
-                            <?php else: ?>
-                                <div class="study-cover study-cover-placeholder">
-                                    <i class="fas fa-book"></i>
-                                </div>
-                            <?php endif; ?>
-                            <div class="flex-grow-1">
-                                <div class="fw-bold"><?= htmlspecialchars($s['title']) ?></div>
-                                <div class="small text-muted" title="<?= htmlspecialchars($studyDescription) ?>">
-                                    <span class="study-desc-short"><?= htmlspecialchars($studyDescriptionShort) ?></span>
-                                    <span class="study-desc-full d-none"><?= nl2br(htmlspecialchars($studyDescriptionText)) ?></span>
-                                    <?php if ($studyHasMoreDescription): ?>
-                                        <a href="#" class="study-desc-toggle ms-1" data-state="short">ver mais</a>
-                                    <?php endif; ?>
-                                </div>
-                                <div class="mt-2 d-flex flex-wrap gap-2 align-items-center">
-                                    <?php $typeMeta = studyTypeMeta($s['material_type'] ?? null); ?>
-                                    <span class="type-pill <?= $typeMeta['class'] ?>"><?= htmlspecialchars($typeMeta['label']) ?></span>
-                                    <?php if ($s['congregation_name']): ?>
-                                        <span class="visibility-pill pill-cong"><?= htmlspecialchars($s['congregation_name']) ?></span>
-                                    <?php else: ?>
-                                        <span class="visibility-pill pill-general">Geral (Todas)</span>
-                                    <?php endif; ?>
-                                    <span class="date-pill"><?= date('d/m/Y H:i', strtotime($s['created_at'])) ?></span>
-                                </div>
-                            </div>
-                            <div class="d-flex flex-column gap-2">
-                                <a href="/admin/studies/view/<?= $s['id'] ?>" target="_blank" class="btn btn-sm btn-outline-secondary rounded-pill fw-semibold px-3">
-                                    <i class="fas fa-file-pdf me-1"></i> PDF
-                                </a>
-                                <?php if ($canManage): ?>
-                                    <a href="/admin/studies/edit/<?= $s['id'] ?>" class="btn btn-sm btn-outline-primary rounded-pill fw-semibold px-3">
-                                        <i class="fas fa-edit me-1"></i> Editar
-                                    </a>
-                                    <a href="/admin/studies/delete/<?= $s['id'] ?>" class="btn btn-sm btn-danger rounded-pill fw-semibold px-3 btn-delete-study" data-title="<?= htmlspecialchars($s['title']) ?>">
-                                        <i class="fas fa-trash me-1"></i> Excluir
-                                    </a>
-                                <?php endif; ?>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            <?php endforeach; ?>
-        </div>
-    <?php endif; ?>
 </div>
 
 <div class="member-form-card d-none d-lg-block">
@@ -388,7 +307,7 @@ document.querySelectorAll('.btn-delete-study').forEach(function (btn) {
             cancelButtonText: 'Cancelar'
         }).then((result) => {
             if (result.isConfirmed) {
-                window.location.href = href;
+                window.location.replace(href);
             }
         });
     });

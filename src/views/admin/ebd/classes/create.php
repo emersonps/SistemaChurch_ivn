@@ -1,6 +1,6 @@
-<?php include __DIR__ . '/../../../layout/header.php'; ?>
+<?php $suppressMobileTopbar = true; include __DIR__ . '/../../../layout/header.php'; ?>
 
-<div class="member-form-topbar d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+<div class="member-form-topbar d-none d-lg-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
     <div>
         <nav aria-label="breadcrumb" class="mb-1">
             <ol class="breadcrumb small mb-0">
@@ -10,10 +10,18 @@
         </nav>
         <h1 class="h3 mb-0">Nova Classe EBD</h1>
     </div>
-    <div class="d-none d-md-flex gap-2">
+    <div class="d-none d-lg-flex gap-2">
         <a href="/admin/ebd/classes" class="btn btn-outline-secondary rounded-pill fw-semibold px-3">Cancelar</a>
         <button type="submit" form="ebdClassCreateForm" class="btn btn-dark rounded-pill fw-semibold px-3">Salvar</button>
     </div>
+</div>
+
+<div class="d-lg-none mb-2">
+    <?php
+    $mobilePageCategory = 'Ensino';
+    $mobilePageTitle = 'Nova Classe';
+    include __DIR__ . '/../../../layout/mobile_page_header.php';
+    ?>
 </div>
 
 <style>
@@ -97,10 +105,43 @@
         font-size: .8rem;
         color: #868e96;
     }
+
+    .ecm-select-btn { display: flex; align-items: center; justify-content: space-between; gap: .5rem; width: 100%; height: 44px; border-radius: 12px; border: 1px solid rgba(17,24,39,.08); background: #f8f9fb; color: #16213e; font-size: .86rem; font-weight: 600; padding: 0 .9rem; text-align: left; }
+    .ecm-select-btn .ecm-select-label { display: flex; align-items: center; gap: .5rem; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .ecm-select-btn .ecm-select-label i:first-child { color: #8b93a7; flex: 0 0 auto; }
+    .ecm-select-btn .fa-chevron-down { color: #adb5bd; flex: 0 0 auto; font-size: .78rem; }
+
+    .ecm-cong-sheet.offcanvas-bottom { border-top-left-radius: 20px; border-top-right-radius: 20px; height: auto; max-height: 85vh; }
+    .ecm-pick-row { display: flex; align-items: center; gap: .6rem; width: 100%; text-align: left; border: 1px solid rgba(17,24,39,.08); background: #fff; color: #16213e; font-size: .86rem; font-weight: 600; padding: .7rem .9rem; border-radius: 12px; margin-bottom: .5rem; }
+    .ecm-pick-row i:first-child { color: #8b93a7; }
+    .ecm-pick-row.active { border-color: #2563eb; background: rgba(37,99,235,.06); color: #2563eb; }
+    .ecm-pick-row.active i:first-child { color: #2563eb; }
+    .ecm-pick-row .fa-check { margin-left: auto; color: #2563eb; display: none; }
+    .ecm-pick-row.active .fa-check { display: inline; }
+
+    @media (max-width: 991.98px) {
+        .member-form-card-body .form-control,
+        .member-form-card-body .form-select {
+            height: 44px;
+            border-radius: 12px;
+            border-color: rgba(17,24,39,.08);
+            background: #f8f9fb;
+        }
+        .member-form-card-body textarea.form-control { height: auto; }
+        .member-form-card-body .form-control:focus,
+        .member-form-card-body .form-select:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 .2rem rgba(37,99,235,.1);
+            background: #fff;
+        }
+        .member-form-card-body .row.g-3 { row-gap: 1.1rem !important; }
+        .progress-bar.bg-dark { background-color: #16a34a !important; }
+        .progress { height: 4px !important; background: #eef0f2; }
+    }
 </style>
 
 <div class="row">
-<div class="col-lg-8">
+<div class="col-12 col-lg-8">
 <form action="/admin/ebd/classes/create" method="POST" class="app-form-with-bottom-actions" id="ebdClassCreateForm">
     <?= csrf_field() ?>
 
@@ -124,18 +165,18 @@
                     <textarea class="form-control" id="description" name="description" rows="3"></textarea>
                 </div>
 
-                <div class="col-md-6">
+                <div class="col-6">
                     <label for="min_age" class="form-label">Idade Mínima</label>
                     <input type="number" class="form-control" id="min_age" name="min_age" min="0">
                 </div>
-                <div class="col-md-6">
+                <div class="col-6">
                     <label for="max_age" class="form-label">Idade Máxima</label>
                     <input type="number" class="form-control" id="max_age" name="max_age" min="0">
                 </div>
 
                 <div class="col-12">
-                    <label for="congregation_id" class="form-label">Congregação</label>
-                    <select class="form-select" id="congregation_id" name="congregation_id">
+                    <label for="congregation_id" class="form-label d-none d-lg-block">Congregação</label>
+                    <select class="form-select d-none d-lg-block" id="congregation_id" name="congregation_id">
                         <?php if (empty($_SESSION['user_congregation_id'])): ?>
                             <option value="">Global (Todas)</option>
                         <?php endif; ?>
@@ -143,20 +184,28 @@
                             <option value="<?= $cong['id'] ?>"><?= htmlspecialchars($cong['name']) ?></option>
                         <?php endforeach; ?>
                     </select>
-                    <div class="form-text">Selecione se a classe for específica de uma congregação.</div>
+                    <div class="form-text d-none d-lg-block">Selecione se a classe for específica de uma congregação.</div>
+
+                    <div class="d-lg-none">
+                        <label class="form-label">Congregação</label>
+                        <button type="button" class="ecm-select-btn" data-bs-toggle="offcanvas" data-bs-target="#ecmCongSheet">
+                            <span class="ecm-select-label" id="ecmCongLabel"><i class="fas fa-globe"></i><span>Global (Todas)</span></span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="d-flex justify-content-end gap-2 mb-5 d-md-none">
+    <div class="d-flex justify-content-end gap-2 mb-5 d-lg-none">
         <a href="/admin/ebd/classes" class="btn btn-outline-secondary px-4">Cancelar</a>
         <button type="submit" class="btn btn-primary px-4">Salvar</button>
     </div>
 </form>
 </div>
 
-<div class="col-lg-4">
+<div class="col-lg-4 d-none d-lg-block">
     <div class="member-summary-box sticky-top" style="top: 1rem; z-index: 10;">
         <div class="member-form-card">
             <div class="member-form-card-body">
@@ -188,6 +237,25 @@
         </div>
     </div>
 </div>
+</div>
+
+<div class="offcanvas offcanvas-bottom ecm-cong-sheet" tabindex="-1" id="ecmCongSheet">
+    <div class="offcanvas-header">
+        <h6 class="offcanvas-title fw-bold">Congregação</h6>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Fechar"></button>
+    </div>
+    <div class="offcanvas-body">
+        <?php if (empty($_SESSION['user_congregation_id'])): ?>
+            <button type="button" class="ecm-pick-row active" data-value="" data-icon="fa-globe">
+                <i class="fas fa-globe"></i> Global (Todas) <i class="fas fa-check"></i>
+            </button>
+        <?php endif; ?>
+        <?php foreach ($congregations as $cong): ?>
+            <button type="button" class="ecm-pick-row" data-value="<?= $cong['id'] ?>" data-icon="fa-church">
+                <i class="fas fa-church"></i> <?= htmlspecialchars($cong['name']) ?> <i class="fas fa-check"></i>
+            </button>
+        <?php endforeach; ?>
+    </div>
 </div>
 
 <script>
@@ -228,6 +296,22 @@
     ebdForm.addEventListener('input', updateEbdSummary);
     ebdForm.addEventListener('change', updateEbdSummary);
     updateEbdSummary();
+
+    var ecmCongSheet = document.getElementById('ecmCongSheet');
+    var ecmCongLabel = document.getElementById('ecmCongLabel');
+    if (ecmCongSheet) {
+        ecmCongSheet.querySelectorAll('.ecm-pick-row').forEach(function (row) {
+            row.addEventListener('click', function () {
+                ecmCongSheet.querySelectorAll('.ecm-pick-row').forEach(function (r) { r.classList.remove('active'); });
+                row.classList.add('active');
+                congregationSelect.value = row.getAttribute('data-value');
+                congregationSelect.dispatchEvent(new Event('change'));
+                ecmCongLabel.innerHTML = '<i class="fas ' + row.getAttribute('data-icon') + '"></i><span>' + row.textContent.trim().replace(/\s*$/, '') + '</span>';
+                var inst = bootstrap.Offcanvas.getInstance(ecmCongSheet);
+                if (inst) inst.hide();
+            });
+        });
+    }
 </script>
 
 <?php include __DIR__ . '/../../../layout/footer.php'; ?>

@@ -206,7 +206,7 @@
 
                 <div class="col-12">
                     <label class="form-label">Descrição / Observações</label>
-                    <textarea name="description" class="form-control" rows="3"><?= htmlspecialchars($group['description']) ?></textarea>
+                    <textarea name="description" class="form-control" rows="3"><?= htmlspecialchars($group['description'] ?? '') ?></textarea>
                 </div>
             </div>
         </div>

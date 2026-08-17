@@ -1109,7 +1109,7 @@ document.querySelectorAll('.btn-delete-doc').forEach(btn => {
             cancelButtonText: 'Cancelar'
         }).then((result) => {
             if (result.isConfirmed) {
-                window.location.href = href;
+                window.location.replace(href);
             }
         });
     });

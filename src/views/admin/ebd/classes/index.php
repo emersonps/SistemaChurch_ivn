@@ -1,6 +1,8 @@
-<?php include __DIR__ . '/../../../layout/header.php'; ?>
+<?php $suppressMobileTopbar = true; include __DIR__ . '/../../../layout/header.php'; ?>
 
-<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+<?php include __DIR__ . '/_mobile_list.php'; ?>
+
+<div class="d-none d-lg-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
     <h1 class="h2">Escola Bíblica Dominical (EBD)</h1>
     <div class="btn-toolbar mb-2 mb-md-0 gap-2">
         <a href="/admin/ebd/reports" class="btn btn-sm btn-outline-secondary rounded-pill fw-semibold px-3">
@@ -59,7 +61,7 @@
     }
 </style>
 
-<div class="row g-3">
+<div class="row g-3 d-none d-lg-flex">
     <?php foreach ($classes as $class): ?>
     <div class="col-md-4">
         <div class="member-form-card h-100 d-flex flex-column">
@@ -129,7 +131,7 @@ document.querySelectorAll('.btn-delete-class').forEach(function (btn) {
             cancelButtonText: 'Cancelar'
         }).then((result) => {
             if (result.isConfirmed) {
-                window.location.href = href;
+                window.location.replace(href);
             }
         });
     });

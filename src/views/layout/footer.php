@@ -155,6 +155,47 @@ $systemVersion = $systemVersion !== '' ? $systemVersion : '1.0.0';
         });
     });
 
+    // Same-page GET links/forms (period pills, congregação/status filters, quick-range
+    // chips, pagination, etc.) navigate to a new URL on the SAME page, which by default
+    // pushes a new browser history entry per filter applied. That makes the mobile
+    // "Voltar" button have to unwind every filter step before it reaches the screen the
+    // user actually came from. Since these are all just re-filtered views of the same
+    // screen (not a distinct destination worth a back-stop), replace the current history
+    // entry instead of pushing a new one.
+    (function () {
+        function sameOriginUrl(href, base) {
+            try {
+                var url = new URL(href, base || window.location.href);
+                return url.origin === window.location.origin ? url : null;
+            } catch (err) {
+                return null;
+            }
+        }
+
+        document.addEventListener('click', function (e) {
+            var link = e.target.closest('a[href]');
+            if (!link || e.defaultPrevented) return;
+            if (link.target && link.target !== '' && link.target !== '_self') return;
+            if (link.hasAttribute('data-bs-toggle') || link.hasAttribute('data-bs-dismiss')) return;
+            var url = sameOriginUrl(link.href);
+            if (!url || url.pathname !== window.location.pathname || url.hash !== '') return;
+            if (url.href === window.location.href) return;
+            e.preventDefault();
+            window.location.replace(url.href);
+        });
+
+        document.addEventListener('submit', function (e) {
+            var form = e.target;
+            if (!(form instanceof HTMLFormElement) || e.defaultPrevented) return;
+            if ((form.getAttribute('method') || 'get').toLowerCase() !== 'get') return;
+            var url = sameOriginUrl(form.getAttribute('action') || window.location.pathname);
+            if (!url || url.pathname !== window.location.pathname) return;
+            e.preventDefault();
+            var params = new URLSearchParams(new FormData(form));
+            window.location.replace(url.pathname + (params.toString() ? '?' + params.toString() : ''));
+        });
+    })();
+
     // Fechar menu mobile automaticamente ao clicar em um link
     document.addEventListener('DOMContentLoaded', function() {
         const navLinks = document.querySelectorAll('.navbar-collapse .nav-link');

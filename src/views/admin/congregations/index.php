@@ -1,6 +1,8 @@
-<?php include __DIR__ . '/../../layout/header.php'; ?>
+<?php $suppressMobileTopbar = true; include __DIR__ . '/../../layout/header.php'; ?>
 
-<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+<?php include __DIR__ . '/_mobile_list.php'; ?>
+
+<div class="d-none d-lg-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
     <h1 class="h2">Congregações</h1>
     <div class="btn-toolbar mb-2 mb-md-0">
         <a href="/admin/congregations/create" class="btn btn-sm btn-primary rounded-pill fw-semibold px-3">
@@ -56,7 +58,7 @@
     </div>
 <?php endif; ?>
 
-<div class="member-form-card">
+<div class="member-form-card d-none d-lg-block">
     <div class="table-responsive p-2">
         <table class="table table-hover congregations-table" style="width:100%">
             <thead>
@@ -116,7 +118,7 @@ document.querySelectorAll('.btn-delete-congregation').forEach(function (btn) {
             cancelButtonText: 'Cancelar'
         }).then((result) => {
             if (result.isConfirmed) {
-                window.location.href = href;
+                window.location.replace(href);
             }
         });
     });

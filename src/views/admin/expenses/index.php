@@ -1,6 +1,6 @@
-<?php include __DIR__ . '/../../layout/header.php'; ?>
+<?php $suppressMobileTopbar = true; include __DIR__ . '/../../layout/header.php'; ?>
 
-<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+<div class="d-none d-lg-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
     <h1 class="h2">Saídas / Despesas</h1>
     <div class="btn-toolbar mb-2 mb-md-0">
         <a href="/admin/expenses/create" class="btn btn-sm btn-danger rounded-pill fw-semibold px-3">
@@ -63,7 +63,7 @@
     <?php unset($_SESSION['flash_error']); ?>
 <?php endif; ?>
 
-<div class="member-form-card filter-card mb-3">
+<div class="member-form-card filter-card mb-3 d-none d-lg-block">
     <div class="p-3">
         <form class="row g-2 align-items-end" method="GET" action="/admin/expenses">
             <?php if (empty($_SESSION['user_congregation_id'])): ?>
@@ -98,6 +98,8 @@
         </form>
     </div>
 </div>
+
+<?php include __DIR__ . '/_mobile_list.php'; ?>
 
 <?php
 // Agrupar Despesas por Congregação
@@ -238,7 +240,7 @@ $hasMultipleCongregations = $tabTotal > 1;
 <!-- DataTables CSS -->
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
 
-<div class="expense-tabs-carousel <?= $hasMultipleCongregations ? 'multi' : '' ?>">
+<div class="expense-tabs-carousel d-none d-lg-block <?= $hasMultipleCongregations ? 'multi' : '' ?>">
 <div class="tab-content" id="expenseTabsContent">
     <?php 
     $active = true;
@@ -358,7 +360,7 @@ $hasMultipleCongregations = $tabTotal > 1;
                     cancelButtonText: 'Cancelar'
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        window.location.href = href;
+                        window.location.replace(href);
                     }
                 });
             });

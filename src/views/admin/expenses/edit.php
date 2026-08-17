@@ -188,7 +188,7 @@
 
                 <div class="col-md-12">
                     <label class="form-label">Observações</label>
-                    <textarea class="form-control" name="notes" rows="3"><?= htmlspecialchars($expense['notes']) ?></textarea>
+                    <textarea class="form-control" name="notes" rows="3"><?= htmlspecialchars($expense['notes'] ?? '') ?></textarea>
                 </div>
             </div>
         </div>

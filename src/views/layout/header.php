@@ -124,7 +124,6 @@ if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'developer') {
             line-height: 1;
         }
         .sidebar-brand-logo { max-height: 42px; max-width: 100%; object-fit: contain; }
-        .mobile-launcher { }
         .dataTables_wrapper .dataTables_filter {
             width: 100%;
             text-align: left;
@@ -181,7 +180,7 @@ if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'developer') {
                 justify-content: center;
             }
         }
-        @media (max-width: 767.98px) {
+        @media (max-width: 991.98px) {
             body.mobile-launcher-page .app-page-content { display: none; }
             .dataTables_wrapper .dataTables_paginate .pagination {
                 flex-wrap: nowrap;
@@ -216,29 +215,46 @@ $mobileLauncherHref = '/admin?launcher=1';
 ?>
 <body class="<?= htmlspecialchars($bodyClass) ?>">
 <?php if ($isAdminOrDevArea): ?>
-    <nav class="navbar navbar-dark bg-primary mb-2 d-md-none">
-        <div class="container-fluid">
-            <?php 
-            $navTitle = ($siteProfile['alias'] ?? 'IVN') . ' Admin';
-            if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'secretary') {
-                $navTitle = ($siteProfile['alias'] ?? 'IVN') . ' Secretaria';
-            }
-            ?>
-            <?php if (!$isMobileLauncherPage): ?>
-                <a class="btn btn-sm btn-outline-light me-2 menu-attention-glow" href="<?= htmlspecialchars($mobileLauncherHref) ?>">
-                    <i class="fas fa-th-large me-1"></i> Menu
+    <?php if (!$isMobileLauncherPage && empty($suppressMobileTopbar)): ?>
+        <nav class="navbar navbar-dark bg-primary mb-2 d-lg-none">
+            <div class="container-fluid">
+                <?php
+                $navTitle = ($siteProfile['alias'] ?? 'IVN') . ' Admin';
+                if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'secretary') {
+                    $navTitle = ($siteProfile['alias'] ?? 'IVN') . ' Secretaria';
+                }
+                ?>
+                <button type="button" id="mobileBackBtn" class="btn btn-sm btn-outline-light me-2" aria-label="Voltar" data-fallback="<?= htmlspecialchars($mobileLauncherHref) ?>">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <a class="btn btn-sm btn-outline-light me-2 menu-attention-glow" href="<?= htmlspecialchars($mobileLauncherHref) ?>" aria-label="Menu">
+                    <i class="fas fa-th-large"></i>
                 </a>
-            <?php endif; ?>
-            <a class="navbar-brand flex-grow-1" href="<?= htmlspecialchars($mobileHomeHref) ?>"><?= htmlspecialchars($navTitle) ?></a>
-            <a class="btn btn-sm btn-outline-light" href="/admin/logout">
-                <i class="fas fa-sign-out-alt"></i>
-            </a>
-        </div>
-    </nav>
-    
+                <a class="navbar-brand flex-grow-1" href="<?= htmlspecialchars($mobileHomeHref) ?>"><?= htmlspecialchars($navTitle) ?></a>
+                <a class="btn btn-sm btn-outline-light" href="/admin/logout">
+                    <i class="fas fa-sign-out-alt"></i>
+                </a>
+            </div>
+        </nav>
+        <script>
+            (function () {
+                var btn = document.getElementById('mobileBackBtn');
+                if (!btn) return;
+                btn.addEventListener('click', function () {
+                    var cameFromSameSite = document.referrer && document.referrer.indexOf(window.location.origin) === 0;
+                    if (cameFromSameSite && window.history.length > 1) {
+                        window.history.back();
+                    } else {
+                        window.location.href = btn.getAttribute('data-fallback');
+                    }
+                });
+            })();
+        </script>
+    <?php endif; ?>
+
     <div class="container-fluid">
         <div class="row">
-            <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-white sidebar collapse">
+            <nav id="sidebarMenu" class="col-lg-2 d-lg-block bg-white sidebar collapse">
                 <div class="position-sticky pt-3">
                     <div class="sidebar-brand px-3 pb-3 border-bottom text-center">
                         <img src="<?= htmlspecialchars($siteProfile['logo_url'] ?? '/assets/img/logo.png') ?>" alt="<?= htmlspecialchars($siteProfile['alias'] ?? 'IVN') ?>" class="sidebar-brand-logo mb-2">
@@ -548,7 +564,7 @@ $mobileLauncherHref = '/admin?launcher=1';
                     </ul>
                 </div>
             </nav>
-            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-2 py-md-4">
+            <main class="ms-sm-auto col-lg-10 px-lg-4 py-2 py-lg-4">
                 <?php
                 $loggedUserName = $_SESSION['user_name'] ?? $_SESSION['username'] ?? '';
                 $loggedUserRole = $_SESSION['user_role'] ?? '';
@@ -659,7 +675,7 @@ $mobileLauncherHref = '/admin?launcher=1';
                     .app-topbar .role-pill.role-secretary { background: rgba(13,110,253,0.10); color: #0d6efd; }
                     .app-topbar .role-pill.role-accountant { background: rgba(25,135,84,0.10); color: #198754; }
                 </style>
-                <div class="app-topbar d-none d-md-flex align-items-center justify-content-between mb-3">
+                <div class="app-topbar d-none d-lg-flex align-items-center justify-content-between mb-3">
                     <div class="d-flex align-items-center gap-2">
                         <div class="app-topbar-mark">SC</div>
                         <div>
@@ -691,115 +707,8 @@ $mobileLauncherHref = '/admin?launcher=1';
                 </div>
 
                 <?php if ($isMobileLauncherPage): ?>
-                    <div class="d-md-none mb-3">
-                        <div class="card border-0 shadow-sm">
-                            <div class="card-body">
-                                <div class="d-flex justify-content-between align-items-center mb-3">
-                                    <div class="small text-muted">
-                                        Usuário: <strong><?= htmlspecialchars((string)$loggedUserName) ?></strong>
-                                        <?php if ((string)$loggedUserRole !== ''): ?>
-                                            <span class="ms-2 badge bg-secondary"><?= htmlspecialchars((string)$loggedUserRole) ?></span>
-                                        <?php endif; ?>
-                                    </div>
-                                </div>
-
-                                <div class="mobile-launcher">
-                                    <?php if (hasPermission('dashboard.view')): ?>
-                                        <div class="text-muted small fw-bold mb-2">Principal</div>
-                                        <div class="row g-2 mb-3">
-                                            <div class="col-6">
-                                                <a class="btn btn-primary btn-sm w-100" href="<?= htmlspecialchars($mobileHomeHref) ?>">
-                                                    <i class="fas fa-home me-2"></i>Painel
-                                                </a>
-                                            </div>
-                                        </div>
-                                    <?php endif; ?>
-
-                                    <?php if (hasPermission('members.view') || hasPermission('congregations.view') || hasPermission('events.view') || hasPermission('service_reports.view') || hasPermission('general_reports.view') || hasPermission('signatures.view') || hasPermission('signatures.manage') || hasPermission('groups.view') || hasPermission('groups.manage') || hasPermission('gallery.view') || hasPermission('banners.view')): ?>
-                                        <div class="text-muted small fw-bold mb-2">Secretaria</div>
-                                        <div class="row g-2 mb-3">
-                                            <?php if (hasPermission('members.view')): ?>
-                                                <div class="col-6"><a class="btn btn-primary btn-sm w-100" href="/admin/members"><i class="fas fa-users me-2"></i>Membros</a></div>
-                                            <?php endif; ?>
-                                            <?php if (hasPermission('congregations.view')): ?>
-                                                <div class="col-6"><a class="btn btn-primary btn-sm w-100" href="/admin/congregations"><i class="fas fa-church me-2"></i>Congregações</a></div>
-                                            <?php endif; ?>
-                                            <?php if (hasPermission('events.view') || hasPermission('events.manage')): ?>
-                                                <div class="col-6"><a class="btn btn-primary btn-sm w-100" href="/admin/events"><i class="fas fa-calendar-alt me-2"></i>Eventos</a></div>
-                                            <?php endif; ?>
-                                            <?php if (hasPermission('service_reports.view')): ?>
-                                                <div class="col-6"><a class="btn btn-primary btn-sm w-100" href="/admin/service_reports"><i class="fas fa-clipboard-list me-2"></i>Relatórios</a></div>
-                                            <?php endif; ?>
-                                            <?php if (hasPermission('general_reports.view')): ?>
-                                                <div class="col-6"><a class="btn btn-primary btn-sm w-100" href="/admin/reports/general"><i class="fas fa-chart-pie me-2"></i>Estatísticas</a></div>
-                                            <?php endif; ?>
-                                            <?php if (hasPermission('signatures.view') || hasPermission('signatures.manage')): ?>
-                                                <div class="col-6"><a class="btn btn-primary btn-sm w-100" href="/admin/signatures"><i class="fas fa-file-signature me-2"></i>Assinaturas</a></div>
-                                            <?php endif; ?>
-                                            <?php if (hasPermission('groups.view') || hasPermission('groups.manage')): ?>
-                                                <div class="col-6"><a class="btn btn-primary btn-sm w-100" href="/admin/groups"><i class="fas fa-users-cog me-2"></i>Grupos</a></div>
-                                            <?php endif; ?>
-                                            <?php if (hasPermission('gallery.view')): ?>
-                                                <div class="col-6"><a class="btn btn-primary btn-sm w-100" href="/admin/gallery"><i class="fas fa-images me-2"></i>Galeria</a></div>
-                                            <?php endif; ?>
-                                            <?php if (hasPermission('banners.view')): ?>
-                                                <div class="col-6"><a class="btn btn-primary btn-sm w-100" href="/admin/banners"><i class="fas fa-image me-2"></i>Banners</a></div>
-                                            <?php endif; ?>
-                                            <?php if (hasPermission('donations.view') || hasPermission('donations.manage')): ?>
-                                                <div class="col-6"><a class="btn btn-primary btn-sm w-100" href="/admin/donations"><i class="fas fa-hand-holding-heart me-2"></i>Doações</a></div>
-                                            <?php endif; ?>
-                                        </div>
-                                    <?php endif; ?>
-
-                                    <?php if (hasPermission('financial.view')): ?>
-                                        <div class="text-muted small fw-bold mb-2">Financeiro</div>
-                                        <div class="row g-2 mb-3">
-                                            <div class="col-6"><a class="btn btn-primary btn-sm w-100" href="/admin/tithes"><i class="fas fa-hand-holding-usd me-2"></i>Entradas</a></div>
-                                            <div class="col-6"><a class="btn btn-primary btn-sm w-100" href="/admin/expenses"><i class="fas fa-file-invoice-dollar me-2"></i>Saídas</a></div>
-                                            <div class="col-6"><a class="btn btn-primary btn-sm w-100" href="/admin/financial/report"><i class="fas fa-chart-line me-2"></i>Relatório</a></div>
-                                            <div class="col-6"><a class="btn btn-primary btn-sm w-100" href="/admin/financial/closures"><i class="fas fa-lock me-2"></i>Fechamentos</a></div>
-                                        </div>
-                                    <?php endif; ?>
-
-                                    <?php if (hasPermission('ebd.view') || hasPermission('ebd.manage') || hasPermission('studies.view')): ?>
-                                        <div class="text-muted small fw-bold mb-2">Ensino</div>
-                                        <div class="row g-2 mb-3">
-                                            <?php if (hasPermission('ebd.view') || hasPermission('ebd.manage')): ?>
-                                                <div class="col-6"><a class="btn btn-primary btn-sm w-100" href="/admin/ebd/classes"><i class="fas fa-book-open me-2"></i>EBD</a></div>
-                                            <?php endif; ?>
-                                            <?php if (hasPermission('studies.view')): ?>
-                                                <div class="col-6"><a class="btn btn-primary btn-sm w-100" href="/admin/studies"><i class="fas fa-book me-2"></i>Estudos</a></div>
-                                            <?php endif; ?>
-                                        </div>
-                                    <?php endif; ?>
-
-                                    <div class="text-muted small fw-bold mb-2">Sistema</div>
-                                    <div class="row g-2">
-                                        <?php if (hasPermission('users.manage')): ?>
-                                            <div class="col-6"><a class="btn btn-primary btn-sm w-100" href="/admin/users"><i class="fas fa-user me-2"></i>Usuários</a></div>
-                                        <?php endif; ?>
-                                        <?php if (hasPermission('permissions.manage') || (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'developer')): ?>
-                                            <div class="col-6"><a class="btn btn-primary btn-sm w-100" href="/admin/permissions"><i class="fas fa-key me-2"></i>Permissões</a></div>
-                                        <?php endif; ?>
-                                        <?php if (hasPermission('settings.system.view')): ?>
-                                            <div class="col-6"><a class="btn btn-primary btn-sm w-100" href="/admin/settings"><i class="fas fa-sliders-h me-2"></i>Sistema</a></div>
-                                        <?php endif; ?>
-                                        <?php if (hasPermission('settings.layout.view')): ?>
-                                            <div class="col-6"><a class="btn btn-primary btn-sm w-100" href="/admin/site-settings"><i class="fas fa-paint-roller me-2"></i>Layout</a></div>
-                                        <?php endif; ?>
-                                        <?php if (hasPermission('settings.card.view')): ?>
-                                            <div class="col-6"><a class="btn btn-primary btn-sm w-100" href="/admin/settings/card-layout"><i class="fas fa-id-card me-2"></i>Carteirinha</a></div>
-                                        <?php endif; ?>
-                                        <?php if (hasPermission('system_payments.view')): ?>
-                                            <div class="col-6"><a class="btn btn-primary btn-sm w-100" href="/admin/system-payments"><i class="fas fa-credit-card me-2"></i>Mensalidade</a></div>
-                                        <?php endif; ?>
-                                        <div class="col-6"><a class="btn btn-primary btn-sm w-100" href="/admin/manual"><i class="fas fa-question-circle me-2"></i>Manual</a></div>
-                                        <div class="col-6"><a class="btn btn-primary btn-sm w-100" href="/admin/change-password"><i class="fas fa-key me-2"></i>Senha</a></div>
-                                        <div class="col-12"><a class="btn btn-danger w-100" href="/admin/logout"><i class="fas fa-sign-out-alt me-2"></i>Sair</a></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                    <div class="d-lg-none">
+                        <?php include __DIR__ . '/mobile_launcher.php'; ?>
                     </div>
                 <?php endif; ?>
             

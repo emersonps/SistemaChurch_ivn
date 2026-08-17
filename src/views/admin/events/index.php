@@ -1,6 +1,6 @@
-<?php include __DIR__ . '/../../layout/header.php'; ?>
+<?php $suppressMobileTopbar = true; include __DIR__ . '/../../layout/header.php'; ?>
 
-<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+<div class="d-none d-lg-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
     <h1 class="h2">Eventos</h1>
     <div class="btn-toolbar mb-2 mb-md-0 gap-2">
         <a href="/admin/attendance" class="btn btn-sm btn-outline-dark rounded-pill fw-semibold px-3">
@@ -46,6 +46,8 @@ $tabTotal = count($categories);
 $hasMultipleCategories = $tabTotal > 1;
 $now = new DateTimeImmutable('now');
 ?>
+
+<?php include __DIR__ . '/_mobile_list.php'; ?>
 
 <style>
     #eventTabs.nav-tabs {
@@ -234,7 +236,7 @@ $now = new DateTimeImmutable('now');
 <!-- DataTables CSS -->
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
 
-<div class="event-tabs-carousel <?= $hasMultipleCategories ? 'multi' : '' ?>">
+<div class="event-tabs-carousel d-none d-lg-block <?= $hasMultipleCategories ? 'multi' : '' ?>">
 <div class="tab-content" id="eventTabsContent">
     <?php
     $first = true;
@@ -417,7 +419,7 @@ $now = new DateTimeImmutable('now');
                 cancelButtonText: 'Cancelar'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    window.location.href = href;
+                    window.location.replace(href);
                 }
             });
         });

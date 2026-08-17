@@ -1,7 +1,7 @@
-<?php include __DIR__ . '/../../layout/header.php'; ?>
+<?php $suppressMobileTopbar = true; include __DIR__ . '/../../layout/header.php'; ?>
 <?php $siteProfile = getChurchSiteProfileSettings(); ?>
 
-<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+<div class="d-none d-lg-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
     <h1 class="h2">Relatório Financeiro</h1>
     <div class="btn-toolbar mb-2 mb-md-0 d-print-none">
         <a href="/admin/financial/report/print?start_date=<?= $filters['start_date'] ?>&end_date=<?= $filters['end_date'] ?>&congregation_id=<?= $filters['congregation_id'] ?>" target="_blank" class="btn btn-sm btn-outline-secondary rounded-pill fw-semibold px-3">
@@ -85,8 +85,10 @@
     }
 </style>
 
+<?php include __DIR__ . '/_mobile_report.php'; ?>
+
 <!-- Filters -->
-<div class="member-form-card filter-card mb-3 d-print-none">
+<div class="member-form-card filter-card mb-3 d-print-none d-none d-lg-block">
     <div class="p-3">
         <form class="row g-3" method="GET">
             <div class="col-6 col-md-3">
@@ -127,7 +129,7 @@
 </div>
 
 <!-- Report Content -->
-<div class="member-form-card">
+<div class="member-form-card d-none d-lg-block">
     <div class="p-4">
         <div class="text-center mb-4">
             <h4>Relatório Financeiro - <?= htmlspecialchars($siteProfile['alias'] ?? 'IVN') ?></h4>
@@ -282,18 +284,23 @@
         function toggleTithes() {
             var values = document.querySelectorAll('.tithe-value');
             var masks = document.querySelectorAll('.tithe-mask');
-            var icon = document.getElementById('toggleTithesIcon');
+            var icons = [
+                document.getElementById('toggleTithesIcon'),
+                document.getElementById('toggleTithesIconMobile')
+            ].filter(Boolean);
 
             values.forEach(function(el) { el.classList.toggle('d-none'); });
             masks.forEach(function(el) { el.classList.toggle('d-none'); });
 
-            if (icon.classList.contains('fa-eye')) {
-                icon.classList.remove('fa-eye');
-                icon.classList.add('fa-eye-slash');
-            } else {
-                icon.classList.remove('fa-eye-slash');
-                icon.classList.add('fa-eye');
-            }
+            icons.forEach(function (icon) {
+                if (icon.classList.contains('fa-eye')) {
+                    icon.classList.remove('fa-eye');
+                    icon.classList.add('fa-eye-slash');
+                } else {
+                    icon.classList.remove('fa-eye-slash');
+                    icon.classList.add('fa-eye');
+                }
+            });
         }
         </script>
 

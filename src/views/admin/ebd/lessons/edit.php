@@ -56,7 +56,7 @@
                         
                         <div class="col-12">
                             <label for="notes" class="form-label">Observações</label>
-                            <textarea class="form-control" id="notes" name="notes" rows="2"><?= htmlspecialchars($lesson['notes']) ?></textarea>
+                            <textarea class="form-control" id="notes" name="notes" rows="2"><?= htmlspecialchars($lesson['notes'] ?? '') ?></textarea>
                         </div>
                     </div>
                 </div>

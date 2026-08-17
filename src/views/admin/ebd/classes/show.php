@@ -1,6 +1,6 @@
-<?php include __DIR__ . '/../../../layout/header.php'; ?>
+<?php $suppressMobileTopbar = true; include __DIR__ . '/../../../layout/header.php'; ?>
 
-<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+<div class="d-none d-lg-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
     <div>
         <nav aria-label="breadcrumb" class="mb-1">
             <ol class="breadcrumb small mb-0">
@@ -21,6 +21,18 @@
             <i class="fas fa-arrow-left me-1"></i> Voltar
         </a>
     </div>
+</div>
+
+<div class="d-lg-none mb-2">
+    <?php
+    $mobilePageCategory = 'Ensino';
+    $mobilePageTitle = $class['name'];
+    $mobilePageMenuItems = [
+        ['icon' => 'fa-plus-circle', 'label' => 'Nova Aula/Chamada', 'href' => '/admin/ebd/lessons/create/' . $class['id']],
+        ['icon' => 'fa-edit', 'label' => 'Editar Classe', 'href' => '/admin/ebd/classes/edit/' . $class['id']],
+    ];
+    include __DIR__ . '/../../../layout/mobile_page_header.php';
+    ?>
 </div>
 
 <style>
@@ -154,9 +166,201 @@
         border-color: #b30000;
         box-shadow: 0 0 0 .2rem rgba(179,0,0,0.12);
     }
+
+    /* ---------- Mobile (Detalhes da Classe) ---------- */
+    .ecs-wrap { padding-bottom: 40px; }
+    .ecs-desc { font-size: .84rem; color: #8b93a7; margin-bottom: 1rem; }
+    .ecs-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; background: #fff; border: 1px solid rgba(17,24,39,.06); border-radius: 16px; padding: 1rem; margin-bottom: 1rem; }
+    .ecs-grid-label { font-size: .62rem; font-weight: 700; text-transform: uppercase; letter-spacing: .03em; color: #adb5bd; margin-bottom: .3rem; }
+    .ecs-grid-value { font-size: .86rem; font-weight: 800; color: #16213e; }
+    .ecs-grid-value .status-pill { font-size: .68rem; }
+
+    .ecs-section-header { display: flex; align-items: center; justify-content: space-between; margin: 1.2rem 0 .7rem; }
+    .ecs-section-title { font-weight: 800; font-size: .9rem; color: #16213e; }
+    .ecs-add-btn { border: 1px solid rgba(17,24,39,.1); background: #fff; color: #16213e; font-size: .74rem; font-weight: 700; padding: .35rem .75rem; border-radius: 999px; }
+
+    .ecs-teacher-row { display: flex; align-items: center; gap: .7rem; background: #fff; border: 1px solid rgba(17,24,39,.06); border-radius: 14px; padding: .55rem .7rem; margin-bottom: .5rem; min-height: 48px; }
+    .ecs-avatar { flex: 0 0 auto; width: 40px; height: 40px; border-radius: 50%; background: rgba(37,99,235,.1); color: #2563eb; font-weight: 800; font-size: .78rem; display: flex; align-items: center; justify-content: center; }
+    .ecs-teacher-name { flex: 1 1 auto; min-width: 0; font-weight: 700; font-size: .86rem; color: #16213e; }
+    .ecs-x-btn { flex: 0 0 auto; width: 26px; height: 26px; border-radius: 50%; border: none; background: transparent; color: #ced4da; display: flex; align-items: center; justify-content: center; font-size: .8rem; }
+
+    .ecs-segmented { display: flex; background: #f1f3f7; border-radius: 999px; padding: .25rem; margin-bottom: 1rem; }
+    .ecs-seg-btn { flex: 1 1 0; border: none; background: transparent; color: #6c757d; font-weight: 700; font-size: .78rem; padding: .5rem .3rem; border-radius: 999px; }
+    .ecs-seg-btn.active { background: #fff; color: #16213e; box-shadow: 0 2px 6px rgba(17,24,39,.08); }
+    .ecs-panel.d-none { display: none !important; }
+
+    .ecs-swipe { position: relative; margin-bottom: .5rem; border-radius: 14px; overflow: hidden; }
+    .ecs-swipe-actions { position: absolute; top: 0; right: 0; bottom: 0; display: flex; }
+    .ecs-swipe-actions .ecs-action { width: 64px; display: flex; align-items: center; justify-content: center; color: #fff; background: #dc3545; text-decoration: none; font-size: 1rem; }
+    .ecs-student-card { position: relative; z-index: 1; display: flex; align-items: center; gap: .7rem; background: #fff; border: 1px solid rgba(17,24,39,.06); border-radius: 14px; padding: .7rem .85rem; touch-action: pan-y; }
+    .ecs-student-id { flex: 1 1 auto; min-width: 0; }
+    .ecs-student-name { font-weight: 700; font-size: .86rem; color: #16213e; }
+    .ecs-student-meta { font-size: .74rem; color: #8b93a7; margin-top: .1rem; }
+    .ecs-student-meta .role-pill { font-size: .62rem; padding: .12rem .45rem; }
+    .ecs-chev { flex: 0 0 auto; color: #ced4da; }
+
+    .ecs-empty { text-align: center; color: #adb5bd; font-size: .84rem; padding: 2rem 0; }
+
+    .ecs-sheet.offcanvas-bottom { border-top-left-radius: 20px; border-top-right-radius: 20px; height: auto; max-height: 85vh; }
+    .ecs-sheet-search { position: relative; margin-bottom: .8rem; }
+    .ecs-sheet-search i { position: absolute; left: .85rem; top: 50%; transform: translateY(-50%); color: #adb5bd; }
+    .ecs-sheet-search input { width: 100%; border: 1px solid rgba(17,24,39,.08); background: #f8f9fb; border-radius: 12px; padding: .6rem .8rem .6rem 2.3rem; font-size: .85rem; }
+    .ecs-pick-row { display: flex; align-items: center; gap: .65rem; width: 100%; text-align: left; border: none; background: #fff; padding: .6rem .3rem; border-radius: 10px; border-bottom: 1px solid rgba(17,24,39,.05); }
+    .ecs-pick-row:hover { background: #f8f9fb; }
+    .ecs-pick-name { font-weight: 600; font-size: .86rem; color: #16213e; }
+
+    @media (max-width: 991.98px) {
+        .ebd-lessons-table thead { display: none; }
+        .ebd-lessons-table, .ebd-lessons-table tbody, .ebd-lessons-table tr, .ebd-lessons-table td {
+            display: block;
+            width: 100%;
+        }
+        .ebd-lessons-table tr {
+            background: #fff;
+            border: 1px solid rgba(17,24,39,.06);
+            border-radius: 14px;
+            padding: .8rem .9rem;
+            margin-bottom: .55rem;
+        }
+        .ebd-lessons-table td {
+            padding: .15rem 0;
+            border: none;
+            text-align: left !important;
+        }
+        .ebd-lessons-table td::before {
+            content: attr(data-label);
+            display: inline-block;
+            min-width: 90px;
+            font-size: .62rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: #adb5bd;
+        }
+        .ebd-lessons-table td.text-end { text-align: left !important; }
+    }
 </style>
 
-<div class="row g-3">
+<div class="ecs-wrap d-lg-none">
+    <?php if (!empty($class['description'])): ?><p class="ecs-desc"><?= htmlspecialchars($class['description']) ?></p><?php endif; ?>
+
+    <div class="ecs-grid">
+        <div>
+            <div class="ecs-grid-label">Congregação</div>
+            <div class="ecs-grid-value"><?= htmlspecialchars($class['congregation_name'] ?? 'Todas') ?></div>
+        </div>
+        <div>
+            <div class="ecs-grid-label">Faixa Etária</div>
+            <div class="ecs-grid-value"><?= $class['min_age'] ?> - <?= $class['max_age'] ?> anos</div>
+        </div>
+        <div>
+            <div class="ecs-grid-label">Alunos Matriculados</div>
+            <div class="ecs-grid-value"><?= count($students) ?></div>
+        </div>
+        <div>
+            <div class="ecs-grid-label">Status</div>
+            <div class="ecs-grid-value"><span class="status-pill <?= $class['status'] == 'active' ? 'is-active' : 'is-inactive' ?>"><?= ucfirst($class['status']) ?></span></div>
+        </div>
+    </div>
+
+    <div class="ecs-section-header">
+        <div class="ecs-section-title">Professores</div>
+        <button type="button" class="ecs-add-btn" data-bs-toggle="offcanvas" data-bs-target="#ecsTeacherSheet"><i class="fas fa-plus me-1"></i>Adicionar</button>
+    </div>
+    <?php foreach ($teachers as $teacher):
+        $ecsTParts = preg_split('/\s+/', trim((string)$teacher['member_name']));
+        $ecsTInitials = mb_strtoupper(mb_substr($ecsTParts[0], 0, 1) . (count($ecsTParts) > 1 ? mb_substr(end($ecsTParts), 0, 1) : ''));
+    ?>
+        <div class="ecs-teacher-row">
+            <span class="ecs-avatar"><?= htmlspecialchars($ecsTInitials) ?></span>
+            <span class="ecs-teacher-name"><?= htmlspecialchars($teacher['member_name']) ?></span>
+            <a href="/admin/ebd/teachers/remove/<?= $teacher['id'] ?>" class="ecs-x-btn btn-remove-teacher" data-name="<?= htmlspecialchars($teacher['member_name']) ?>" aria-label="Remover"><i class="fas fa-xmark"></i></a>
+        </div>
+    <?php endforeach; ?>
+    <?php if (empty($teachers)): ?>
+        <div class="ecs-empty">Nenhum professor atribuído.</div>
+    <?php endif; ?>
+
+    <div class="ecs-section-header">
+        <div class="ecs-section-title">Alunos e Aulas</div>
+    </div>
+    <div class="ecs-segmented" id="ecsSegmented">
+        <button type="button" class="ecs-seg-btn active" data-panel="ecsStudents">Alunos (<?= count($students) ?>)</button>
+        <button type="button" class="ecs-seg-btn" data-panel="ecsLessons">Histórico de Aulas</button>
+    </div>
+
+    <div class="ecs-panel" id="ecsStudents">
+        <div class="ecs-section-header mt-0">
+            <div></div>
+            <button type="button" class="ecs-add-btn" data-bs-toggle="offcanvas" data-bs-target="#ecsStudentSheet"><i class="fas fa-user-plus me-1"></i>Matricular</button>
+        </div>
+        <?php foreach ($students as $student):
+            $ecsSParts = preg_split('/\s+/', trim((string)$student['member_name']));
+            $ecsSInitials = mb_strtoupper(mb_substr($ecsSParts[0], 0, 1) . (count($ecsSParts) > 1 ? mb_substr(end($ecsSParts), 0, 1) : ''));
+            $ecsAge = null;
+            if (!empty($student['birth_date'])) {
+                $ecsDob = new DateTime($student['birth_date']);
+                $ecsNow = new DateTime();
+                $ecsAge = $ecsNow->diff($ecsDob)->y . ' anos';
+            }
+        ?>
+            <div class="ecs-swipe">
+                <div class="ecs-swipe-actions">
+                    <a href="/admin/ebd/students/remove/<?= $student['id'] ?>" class="ecs-action btn-remove-student" data-name="<?= htmlspecialchars($student['member_name']) ?>"><i class="fas fa-user-minus"></i></a>
+                </div>
+                <div class="ecs-student-card">
+                    <span class="ecs-avatar"><?= htmlspecialchars($ecsSInitials) ?></span>
+                    <div class="ecs-student-id">
+                        <div class="ecs-student-name"><?= htmlspecialchars($student['member_name']) ?></div>
+                        <div class="ecs-student-meta">
+                            <?php if (!empty($student['is_teacher'])): ?><span class="role-pill">Professor</span> • <?php endif; ?>
+                            <?= $ecsAge ? htmlspecialchars($ecsAge) . ' • ' : '' ?><?= date('d/m/Y', strtotime($student['enrolled_at'])) ?>
+                        </div>
+                    </div>
+                    <i class="fas fa-chevron-right ecs-chev"></i>
+                </div>
+            </div>
+        <?php endforeach; ?>
+        <?php if (empty($students)): ?>
+            <div class="ecs-empty">Nenhum aluno matriculado nesta classe.</div>
+        <?php endif; ?>
+    </div>
+
+    <div class="ecs-panel d-none" id="ecsLessons">
+        <div class="table-responsive">
+            <table class="table ebd-lessons-table align-middle mb-0">
+                <tbody>
+                    <?php foreach ($lessons as $lesson): ?>
+                    <tr>
+                        <td data-label="Data" class="fw-bold"><?= date('d/m/Y', strtotime($lesson['lesson_date'])) ?></td>
+                        <td data-label="Tema"><?= htmlspecialchars($lesson['topic']) ?></td>
+                        <td data-label="Presentes">
+                            <span class="count-pill">
+                                <?= (new Database())->connect()->query("SELECT COUNT(*) FROM ebd_attendance WHERE lesson_id = {$lesson['id']} AND present = 1")->fetchColumn() ?>
+                            </span>
+                        </td>
+                        <td data-label="Oferta">R$ <?= number_format($lesson['offerings'], 2, ',', '.') ?></td>
+                        <td data-label="Ações" class="text-end">
+                            <a href="/admin/ebd/lessons/show/<?= $lesson['id'] ?>" class="btn btn-sm btn-outline-primary icon-btn" title="Ver Detalhes"><i class="fas fa-eye"></i></a>
+                            <a href="/admin/ebd/lessons/edit/<?= $lesson['id'] ?>" class="btn btn-sm btn-outline-secondary icon-btn" title="Editar"><i class="fas fa-edit"></i></a>
+                            <a href="/admin/ebd/lessons/delete/<?= $lesson['id'] ?>" class="btn btn-sm btn-outline-danger icon-btn btn-delete-lesson" data-topic="<?= htmlspecialchars($lesson['topic']) ?>" title="Excluir"><i class="fas fa-trash"></i></a>
+                        </td>
+                    </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+        <?php if (empty($lessons)): ?>
+            <div class="ecs-empty">Nenhuma aula registrada.</div>
+        <?php endif; ?>
+    </div>
+
+    <?php
+    $mobilePageFooterLabel = $class['name'];
+    include __DIR__ . '/../../../layout/mobile_page_footer.php';
+    ?>
+</div>
+
+<div class="row g-3 d-none d-lg-flex">
     <!-- Informações -->
     <div class="col-md-4">
         <div class="member-form-card mb-3">
@@ -395,7 +599,137 @@
     </div>
 </div>
 
+<!-- Mobile: Adicionar Professor (bottom sheet, sem fundo escuro) -->
+<div class="offcanvas offcanvas-bottom ecs-sheet" tabindex="-1" id="ecsTeacherSheet" data-bs-backdrop="false">
+    <div class="offcanvas-header">
+        <h6 class="offcanvas-title fw-bold">Adicionar Professor</h6>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Fechar"></button>
+    </div>
+    <div class="offcanvas-body">
+        <form id="ecsTeacherForm" action="/admin/ebd/classes/assign-teacher/<?= $class['id'] ?>" method="POST">
+            <?= csrf_field() ?>
+            <input type="hidden" name="member_id" id="ecsTeacherMemberId">
+        </form>
+        <div class="ecs-sheet-search">
+            <i class="fas fa-search"></i>
+            <input type="text" id="ecsTeacherSearch" placeholder="Buscar...">
+        </div>
+        <div class="small text-muted mb-2">Apenas membros marcados como "Professor de EBD" aparecem aqui.</div>
+        <div id="ecsTeacherList">
+            <?php foreach ($ebd_teachers_list as $m): ?>
+                <button type="button" class="ecs-pick-row" data-value="<?= $m['id'] ?>" data-term="<?= mb_strtolower(htmlspecialchars($m['name']), 'UTF-8') ?>">
+                    <span class="ecs-pick-name"><?= htmlspecialchars($m['name']) ?></span>
+                </button>
+            <?php endforeach; ?>
+        </div>
+    </div>
+</div>
+
+<!-- Mobile: Matricular Aluno (bottom sheet, sem fundo escuro) -->
+<div class="offcanvas offcanvas-bottom ecs-sheet" tabindex="-1" id="ecsStudentSheet" data-bs-backdrop="false">
+    <div class="offcanvas-header">
+        <h6 class="offcanvas-title fw-bold">Matricular Aluno</h6>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Fechar"></button>
+    </div>
+    <div class="offcanvas-body">
+        <form id="ecsStudentForm" action="/admin/ebd/classes/enroll/<?= $class['id'] ?>" method="POST">
+            <?= csrf_field() ?>
+            <input type="hidden" name="member_id" id="ecsStudentMemberId">
+        </form>
+        <div class="ecs-sheet-search">
+            <i class="fas fa-search"></i>
+            <input type="text" id="ecsStudentSearch" placeholder="Buscar...">
+        </div>
+        <div id="ecsStudentList">
+            <?php foreach ($all_members as $m): ?>
+                <button type="button" class="ecs-pick-row" data-value="<?= $m['id'] ?>" data-term="<?= mb_strtolower(htmlspecialchars($m['name']), 'UTF-8') ?>">
+                    <span class="ecs-pick-name"><?= htmlspecialchars($m['name']) ?></span>
+                </button>
+            <?php endforeach; ?>
+        </div>
+    </div>
+</div>
+
 <script>
+(function () {
+    var segmented = document.getElementById('ecsSegmented');
+    if (segmented) {
+        segmented.querySelectorAll('.ecs-seg-btn').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                segmented.querySelectorAll('.ecs-seg-btn').forEach(function (b) { b.classList.remove('active'); });
+                btn.classList.add('active');
+                document.querySelectorAll('.ecs-panel').forEach(function (p) { p.classList.add('d-none'); });
+                document.getElementById(btn.getAttribute('data-panel')).classList.remove('d-none');
+            });
+        });
+    }
+
+    // Swipe-to-reveal remove action on student rows (iOS Mail style)
+    document.querySelectorAll('.ecs-swipe').forEach(function (swipe) {
+        var card = swipe.querySelector('.ecs-student-card');
+        var actionsWidth = swipe.querySelectorAll('.ecs-action').length * 64;
+        var startX = 0, currentX = 0, dragging = false, open = false;
+
+        function setOpen(state) {
+            open = state;
+            card.style.transform = open ? 'translateX(-' + actionsWidth + 'px)' : 'translateX(0)';
+        }
+        function closeOthers() {
+            document.querySelectorAll('.ecs-swipe .ecs-student-card').forEach(function (c) {
+                if (c !== card) c.style.transform = 'translateX(0)';
+            });
+        }
+
+        card.addEventListener('touchstart', function (e) {
+            startX = e.touches[0].clientX;
+            dragging = true;
+            card.style.transition = 'none';
+            closeOthers();
+        }, { passive: true });
+
+        card.addEventListener('touchmove', function (e) {
+            if (!dragging) return;
+            currentX = e.touches[0].clientX - startX;
+            var base = open ? -actionsWidth : 0;
+            var next = Math.min(0, Math.max(-actionsWidth, base + currentX));
+            card.style.transform = 'translateX(' + next + 'px)';
+        }, { passive: true });
+
+        card.addEventListener('touchend', function () {
+            dragging = false;
+            card.style.transition = '';
+            var base = open ? -actionsWidth : 0;
+            var moved = base + currentX;
+            setOpen(moved < -(actionsWidth / 2));
+            currentX = 0;
+        });
+    });
+
+    function wirePickSheet(listId, searchId, hiddenInputId, formId) {
+        var list = document.getElementById(listId);
+        var search = document.getElementById(searchId);
+        var hidden = document.getElementById(hiddenInputId);
+        var form = document.getElementById(formId);
+        if (!list) return;
+        list.querySelectorAll('.ecs-pick-row').forEach(function (row) {
+            row.addEventListener('click', function () {
+                hidden.value = row.getAttribute('data-value');
+                form.submit();
+            });
+        });
+        if (search) {
+            search.addEventListener('input', function () {
+                var term = search.value.trim().toLowerCase();
+                list.querySelectorAll('.ecs-pick-row').forEach(function (row) {
+                    row.style.display = row.getAttribute('data-term').indexOf(term) !== -1 ? '' : 'none';
+                });
+            });
+        }
+    }
+    wirePickSheet('ecsTeacherList', 'ecsTeacherSearch', 'ecsTeacherMemberId', 'ecsTeacherForm');
+    wirePickSheet('ecsStudentList', 'ecsStudentSearch', 'ecsStudentMemberId', 'ecsStudentForm');
+})();
+
 document.querySelectorAll('.btn-remove-teacher').forEach(function (btn) {
     btn.addEventListener('click', function (e) {
         e.preventDefault();
@@ -411,7 +745,7 @@ document.querySelectorAll('.btn-remove-teacher').forEach(function (btn) {
             confirmButtonText: 'Sim, remover',
             cancelButtonText: 'Cancelar'
         }).then((result) => {
-            if (result.isConfirmed) window.location.href = href;
+            if (result.isConfirmed) window.location.replace(href);
         });
     });
 });
@@ -431,7 +765,7 @@ document.querySelectorAll('.btn-remove-student').forEach(function (btn) {
             confirmButtonText: 'Sim, remover',
             cancelButtonText: 'Cancelar'
         }).then((result) => {
-            if (result.isConfirmed) window.location.href = href;
+            if (result.isConfirmed) window.location.replace(href);
         });
     });
 });
@@ -451,7 +785,7 @@ document.querySelectorAll('.btn-delete-lesson').forEach(function (btn) {
             confirmButtonText: 'Sim, excluir',
             cancelButtonText: 'Cancelar'
         }).then((result) => {
-            if (result.isConfirmed) window.location.href = href;
+            if (result.isConfirmed) window.location.replace(href);
         });
     });
 });

@@ -258,7 +258,7 @@
                                 </select>
                             </td>
                             <td>
-                                <input type="text" class="form-control" name="people[<?= $peopleRowCount ?>][observation]" value="<?= htmlspecialchars($p['observation']) ?>">
+                                <input type="text" class="form-control" name="people[<?= $peopleRowCount ?>][observation]" value="<?= htmlspecialchars($p['observation'] ?? '') ?>">
                             </td>
                             <td class="text-center">
                                 <button type="button" class="btn btn-danger btn-sm" onclick="removeRow(this)"><i class="fas fa-trash"></i></button>
@@ -281,7 +281,7 @@
             </div>
         </div>
         <div class="member-form-card-body">
-            <textarea class="form-control" id="notes" name="notes" rows="3"><?= htmlspecialchars($report['notes']) ?></textarea>
+            <textarea class="form-control" id="notes" name="notes" rows="3"><?= htmlspecialchars($report['notes'] ?? '') ?></textarea>
         </div>
     </div>
 
