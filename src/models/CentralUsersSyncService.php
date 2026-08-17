@@ -41,10 +41,92 @@ class CentralUsersSyncService {
     private function runSync() {
         try {
             $pullResult = $this->pullPendingChanges();
+            $this->processCpfResets();
             $this->pushUsers();
             return $pullResult;
         } catch (Throwable $e) {
             return ['applied' => 0];
+        }
+    }
+
+    // Same effect as the instance's own "Alterar senha por CPF" screen:
+    // finds the member by CPF and updates both the member's own portal
+    // login and any linked system users with the same password hash.
+    public function processCpfResets() {
+        $config = $this->getConnectionConfig();
+        $this->validateConfig($config);
+
+        $response = $this->postJson($config['central_url'] . '/api/v1/users/cpf-resets/pending', $config, []);
+        $resets = $response['resets'] ?? [];
+        if (!is_array($resets) || empty($resets)) {
+            return;
+        }
+
+        foreach ($resets as $reset) {
+            $requestId = (int)($reset['id'] ?? 0);
+            $cpf = preg_replace('/[^0-9]/', '', (string)($reset['cpf'] ?? ''));
+            $passwordHash = (string)($reset['new_password_hash'] ?? '');
+
+            if ($requestId <= 0 || $cpf === '' || $passwordHash === '') {
+                continue;
+            }
+
+            try {
+                $member = $this->findMemberByCpf($cpf);
+                if (!$member) {
+                    $this->reportCpfReset($config, $requestId, false, '', 0, 'Nenhum membro encontrado com esse CPF.');
+                    continue;
+                }
+
+                $linkedUsers = $this->getLinkedSystemUsers((int)$member['id']);
+
+                $this->db->beginTransaction();
+                $this->db->prepare('UPDATE members SET password = ? WHERE id = ?')->execute([$passwordHash, $member['id']]);
+                foreach ($linkedUsers as $user) {
+                    $this->db->prepare('UPDATE users SET password = ? WHERE id = ?')->execute([$passwordHash, $user['id']]);
+                }
+                $this->db->commit();
+
+                $this->reportCpfReset($config, $requestId, true, $member['name'], count($linkedUsers), 'Senha redefinida com sucesso.');
+            } catch (Throwable $e) {
+                if ($this->db->inTransaction()) {
+                    $this->db->rollBack();
+                }
+                $this->reportCpfReset($config, $requestId, false, '', 0, 'Erro ao processar: ' . $e->getMessage());
+            }
+        }
+    }
+
+    private function findMemberByCpf($cpf) {
+        $stmt = $this->db->prepare("SELECT id, name FROM members WHERE REPLACE(REPLACE(REPLACE(cpf, '.', ''), '-', ''), ' ', '') = ? LIMIT 1");
+        $stmt->execute([$cpf]);
+        return $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
+    }
+
+    private function getLinkedSystemUsers($memberId) {
+        $stmt = $this->db->prepare('
+            SELECT DISTINCT u.id
+            FROM users u
+            LEFT JOIN user_members um ON um.user_id = u.id
+            WHERE u.member_id = ? OR um.member_id = ?
+        ');
+        $stmt->execute([$memberId, $memberId]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    private function reportCpfReset($config, $requestId, $found, $memberName, $accountsUpdated, $message) {
+        try {
+            $this->postJson($config['central_url'] . '/api/v1/users/cpf-resets/report', $config, [
+                'id' => $requestId,
+                'found' => $found,
+                'member_name' => $memberName,
+                'accounts_updated' => $accountsUpdated,
+                'message' => $message
+            ]);
+        } catch (Throwable $e) {
+            // Central will just see this request stuck as "delivered" — not
+            // ideal, but the actual password change already happened (or
+            // correctly didn't), which is what matters.
         }
     }
 
