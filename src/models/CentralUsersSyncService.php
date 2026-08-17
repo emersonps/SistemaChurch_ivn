@@ -43,7 +43,7 @@ class CentralUsersSyncService {
             $pullResult = $this->pullPendingChanges();
             $this->pushUsers();
             return $pullResult;
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             return ['applied' => 0];
         }
     }

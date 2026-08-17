@@ -13,30 +13,30 @@ class SyncTriggerController {
     public function usersSyncNow() {
         header('Content-Type: application/json; charset=utf-8');
 
-        $service = new CentralUsersSyncService();
-        if (!$service->hasRemoteConfig()) {
-            http_response_code(404);
-            echo json_encode(['status' => 'not_configured']);
-            exit;
-        }
-
-        $providedCode = trim((string)($_SERVER['HTTP_X_INSTANCE_CODE'] ?? ''));
-        if ($providedCode === '' || $providedCode !== $service->getConfiguredInstanceCode()) {
-            http_response_code(401);
-            echo json_encode(['status' => 'unauthorized']);
-            exit;
-        }
-
-        if (!$this->allowedNow()) {
-            http_response_code(429);
-            echo json_encode(['status' => 'skipped']);
-            exit;
-        }
-
         try {
+            $service = new CentralUsersSyncService();
+            if (!$service->hasRemoteConfig()) {
+                http_response_code(404);
+                echo json_encode(['status' => 'not_configured']);
+                exit;
+            }
+
+            $providedCode = trim((string)($_SERVER['HTTP_X_INSTANCE_CODE'] ?? ''));
+            if ($providedCode === '' || $providedCode !== $service->getConfiguredInstanceCode()) {
+                http_response_code(401);
+                echo json_encode(['status' => 'unauthorized']);
+                exit;
+            }
+
+            if (!$this->allowedNow()) {
+                http_response_code(429);
+                echo json_encode(['status' => 'skipped']);
+                exit;
+            }
+
             $result = $service->forceSyncNow();
             echo json_encode(['status' => 'ok', 'applied' => (int)($result['applied'] ?? 0)]);
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             http_response_code(500);
             echo json_encode(['status' => 'error']);
         }

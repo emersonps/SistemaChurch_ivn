@@ -1039,8 +1039,11 @@ $mobileLauncherHref = '/admin?launcher=1';
                         if ($usersSyncService->hasRemoteConfig()) {
                             $usersSyncService->syncSilently();
                         }
-                    } catch (Exception $e) {
-                        // Never block page render on a users-sync failure.
+                    } catch (Throwable $e) {
+                        // Never block page render on a users-sync failure —
+                        // catches Error too (e.g. class/file missing), not
+                        // just Exception, since either would otherwise crash
+                        // every admin page load with a blank white screen.
                     }
 
                     $db = (new Database())->connect();
