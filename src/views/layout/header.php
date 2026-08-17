@@ -729,10 +729,10 @@ $mobileLauncherHref = '/admin?launcher=1';
                         $date_format_m = "DATE_FORMAT(birth_date, '%m')";
                         $date_format_d = "DATE_FORMAT(birth_date, '%d')";
                     }
-                    $sql = "SELECT * FROM members WHERE $date_format_m = '$today_month' AND $date_format_d = '$today_day'";
+                    $sql = "SELECT m.*, cong.name as congregation_name FROM members m LEFT JOIN congregations cong ON cong.id = m.congregation_id WHERE $date_format_m = '$today_month' AND $date_format_d = '$today_day'";
                     $congregation_id = $_SESSION['user_congregation_id'] ?? null;
                     if ($congregation_id) {
-                        $sql .= " AND congregation_id = " . (int)$congregation_id;
+                        $sql .= " AND m.congregation_id = " . (int)$congregation_id;
                     }
                     $todayBirthdays = $db->query($sql)->fetchAll(PDO::FETCH_ASSOC);
                 } catch (Exception $e) {
@@ -742,7 +742,8 @@ $mobileLauncherHref = '/admin?launcher=1';
             ?>
 
             <?php if (!empty($todayBirthdays ?? [])): ?>
-                <div class="modal fade" id="todayBirthdaysModal" tabindex="-1" aria-hidden="true">
+                <!-- Desktop: classic centered modal -->
+                <div class="modal fade d-none d-lg-block" id="todayBirthdaysModal" tabindex="-1" aria-hidden="true">
                     <div class="modal-dialog modal-dialog-centered modal-lg">
                         <div class="modal-content border-0 shadow-lg">
                             <div class="modal-header border-0">
@@ -785,10 +786,79 @@ $mobileLauncherHref = '/admin?launcher=1';
                         </div>
                     </div>
                 </div>
+
+                <!-- Mobile: celebratory bottom sheet -->
+                <style>
+                    .bday-sheet.offcanvas-bottom { border-top-left-radius: 24px; border-top-right-radius: 24px; height: auto; max-height: 88vh; background: #fff; }
+                    .bday-sheet-inner { position: relative; padding: 14px 22px 24px; overflow: hidden; }
+                    .bday-drag-handle { width: 36px; height: 4px; background: #e3e7ee; border-radius: 2px; margin: 0 auto 8px; }
+                    .bday-close-btn { position: absolute; top: 14px; right: 18px; width: 30px; height: 30px; border-radius: 50%; border: none; background: #f1f2f5; color: #5b6472; display: flex; align-items: center; justify-content: center; font-size: .85rem; z-index: 2; }
+                    .bday-confetti { position: absolute; border-radius: 50%; }
+                    .bday-confetti.c1 { top: 18px; left: 22px; width: 8px; height: 8px; background: #ffc107; }
+                    .bday-confetti.c2 { top: 46px; left: 12px; width: 5px; height: 5px; background: #3b6fef; }
+                    .bday-confetti.c3 { top: 10px; left: 62px; width: 4px; height: 4px; background: #7c4fd1; }
+                    .bday-confetti.c4 { top: 20px; right: 60px; width: 6px; height: 6px; background: #e0533c; }
+                    .bday-confetti.c5 { top: 52px; right: 26px; width: 5px; height: 5px; background: #18a558; }
+                    .bday-confetti.c6 { top: 8px; right: 90px; width: 4px; height: 4px; background: #ffc107; }
+                    .bday-icon-circle { width: 72px; height: 72px; margin: 8px auto 14px; border-radius: 50%; background: linear-gradient(135deg, #ffd76a, #ffb238); display: flex; align-items: center; justify-content: center; font-size: 1.9rem; box-shadow: 0 8px 18px rgba(255,178,56,.35); }
+                    .bday-title { text-align: center; font-weight: 800; font-size: 1.15rem; color: #101828; }
+                    .bday-subtitle { text-align: center; font-size: .84rem; color: #8b93a3; margin-bottom: 18px; }
+                    .bday-cards { display: flex; flex-direction: column; gap: .6rem; margin-bottom: 18px; max-height: 42vh; overflow-y: auto; }
+                    .bday-card { display: flex; align-items: center; gap: .7rem; border: 1px solid #eef1f5; border-radius: 16px; padding: .75rem .85rem; }
+                    .bday-avatar { flex: 0 0 auto; width: 42px; height: 42px; border-radius: 50%; background: linear-gradient(135deg, #ff6fa5, #b06fff); color: #fff; font-weight: 800; font-size: .8rem; display: flex; align-items: center; justify-content: center; }
+                    .bday-info { flex: 1 1 auto; min-width: 0; }
+                    .bday-name { font-weight: 800; font-size: .9rem; color: #101828; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+                    .bday-meta { font-size: .74rem; color: #9aa4b2; margin-top: 1px; }
+                    .bday-right { flex: 0 0 auto; text-align: right; }
+                    .bday-pill-today { display: inline-block; background: #ffc107; color: #7a4a00; font-size: .64rem; font-weight: 800; padding: .15rem .55rem; border-radius: 999px; margin-bottom: 3px; }
+                    .bday-date { font-size: .76rem; font-weight: 700; color: #101828; line-height: 1.1; }
+                    .bday-date-sub { display: block; font-size: .62rem; font-weight: 600; color: #9aa4b2; }
+                    .bday-gift-btn { flex: 0 0 auto; width: 34px; height: 34px; border-radius: 50%; background: rgba(24,165,88,.12); color: #18a558; display: flex; align-items: center; justify-content: center; text-decoration: none; font-size: .95rem; }
+                    .bday-viewall-link { display: block; text-align: center; font-size: .84rem; font-weight: 700; color: #3b6fef; text-decoration: none; }
+                </style>
+                <div class="offcanvas offcanvas-bottom bday-sheet d-lg-none" tabindex="-1" id="todayBirthdaysSheetMobile">
+                    <div class="bday-sheet-inner">
+                        <div class="bday-drag-handle"></div>
+                        <button type="button" class="bday-close-btn" data-bs-dismiss="offcanvas" aria-label="Fechar"><i class="fas fa-times"></i></button>
+                        <span class="bday-confetti c1"></span><span class="bday-confetti c2"></span><span class="bday-confetti c3"></span>
+                        <span class="bday-confetti c4"></span><span class="bday-confetti c5"></span><span class="bday-confetti c6"></span>
+                        <div class="bday-icon-circle"><i class="fas fa-birthday-cake"></i></div>
+                        <div class="bday-title">Aniversariantes de Hoje</div>
+                        <div class="bday-subtitle">
+                            <?php $bdayCount = count($todayBirthdays ?? []); ?>
+                            <?= $bdayCount ?> pessoa<?= $bdayCount === 1 ? '' : 's' ?> fazendo aniversário hoje
+                        </div>
+                        <div class="bday-cards">
+                            <?php foreach (($todayBirthdays ?? []) as $b): ?>
+                                <?php
+                                $memberName = (string)($b['name'] ?? '');
+                                $mParts = preg_split('/\s+/', trim($memberName));
+                                $mInitials = mb_strtoupper(mb_substr($mParts[0], 0, 1) . (count($mParts) > 1 ? mb_substr(end($mParts), 0, 1) : ''), 'UTF-8');
+                                ?>
+                                <div class="bday-card">
+                                    <span class="bday-avatar"><?= htmlspecialchars($mInitials) ?></span>
+                                    <div class="bday-info">
+                                        <div class="bday-name"><?= htmlspecialchars($memberName) ?></div>
+                                        <div class="bday-meta">Aniversário<?= !empty($b['congregation_name']) ? ' • ' . htmlspecialchars($b['congregation_name']) : '' ?></div>
+                                    </div>
+                                    <div class="bday-right">
+                                        <span class="bday-pill-today">Hoje</span>
+                                        <div class="bday-date"><?= date('d/m', strtotime($b['birth_date'])) ?><span class="bday-date-sub">hoje</span></div>
+                                    </div>
+                                    <a class="bday-gift-btn" href="/admin/dashboard?birthday_card=<?= urlencode($memberName) ?>" title="Gerar Cartão"><i class="fas fa-gift"></i></a>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                        <a href="/admin?view=aniversariantes" class="bday-viewall-link">Ver todos os aniversariantes do mês</a>
+                    </div>
+                </div>
+
                 <script>
                     document.addEventListener('DOMContentLoaded', function () {
-                        var modalEl = document.getElementById('todayBirthdaysModal');
-                        if (!modalEl) return;
+                        var isDesktop = window.matchMedia('(min-width: 992px)').matches;
+                        var elId = isDesktop ? 'todayBirthdaysModal' : 'todayBirthdaysSheetMobile';
+                        var el = document.getElementById(elId);
+                        if (!el) return;
                         var force = <?= !empty($forceTodayBirthdayModal ?? false) ? 'true' : 'false' ?>;
                         var key = 'today_birthdays_modal_shown_' + <?= (int)($_SESSION['user_id'] ?? 0) ?> + '_' + '<?= date('Y-m-d') ?>';
                         if (!force) {
@@ -799,9 +869,13 @@ $mobileLauncherHref = '/admin?launcher=1';
                         var tries = 0;
                         function tryShow() {
                             tries++;
-                            if (window.bootstrap && bootstrap.Modal) {
+                            if (window.bootstrap && bootstrap.Modal && bootstrap.Offcanvas) {
                                 try {
-                                    new bootstrap.Modal(modalEl).show();
+                                    if (isDesktop) {
+                                        new bootstrap.Modal(el).show();
+                                    } else {
+                                        new bootstrap.Offcanvas(el).show();
+                                    }
                                 } catch (e) {
                                 }
                                 return;
