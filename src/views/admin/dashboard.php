@@ -520,8 +520,18 @@ $totalFinancialFormatted = 'R$ ' . number_format($total_financial, 2, ',', '.');
     function openBirthdayCard(name, id) {
         currentMemberName = name;
         currentMemberId = id || null;
+        var modalEl = document.getElementById('birthdayModal');
+        // #birthdayModal lives inside .app-page-content, which the mobile launcher
+        // hides via `body.mobile-launcher-page .app-page-content { display: none }`
+        // to swap in the launcher grid. A display:none ancestor hides the modal too,
+        // no matter what Bootstrap does to the modal's own display — the backdrop
+        // (appended straight to <body>) would show, but the card itself never would.
+        // Relocating it to be a direct child of <body> sidesteps that entirely.
+        if (modalEl.parentElement !== document.body) {
+            document.body.appendChild(modalEl);
+        }
         document.getElementById('cardMemberName').innerText = name;
-        new bootstrap.Modal(document.getElementById('birthdayModal')).show();
+        new bootstrap.Modal(modalEl).show();
     }
 
     document.addEventListener('DOMContentLoaded', function () {
