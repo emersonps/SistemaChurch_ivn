@@ -172,6 +172,21 @@ $systemVersion = $systemVersion !== '' ? $systemVersion : '1.0.0';
             }
         }
 
+        // A handful of query params change WHICH SCREEN a shared pathname renders
+        // (e.g. /admin vs /admin?launcher=1 — dashboard vs. the mobile app launcher,
+        // toggled by header.php's $isMobileLauncherPage). Those are distinct
+        // destinations, not a re-filtered view of the same screen, so a change in
+        // any of them must push a new history entry like a normal navigation —
+        // never replace, or the screen you left becomes unreachable via back/swipe.
+        var SCREEN_SWITCH_PARAMS = ['launcher'];
+        function isRealScreenSwitch(url) {
+            var current = new URLSearchParams(window.location.search);
+            var next = new URLSearchParams(url.search);
+            return SCREEN_SWITCH_PARAMS.some(function (p) {
+                return (current.get(p) || '') !== (next.get(p) || '');
+            });
+        }
+
         document.addEventListener('click', function (e) {
             var link = e.target.closest('a[href]');
             if (!link || e.defaultPrevented) return;
@@ -180,6 +195,7 @@ $systemVersion = $systemVersion !== '' ? $systemVersion : '1.0.0';
             var url = sameOriginUrl(link.href);
             if (!url || url.pathname !== window.location.pathname || url.hash !== '') return;
             if (url.href === window.location.href) return;
+            if (isRealScreenSwitch(url)) return;
             e.preventDefault();
             window.location.replace(url.href);
         });
@@ -190,8 +206,10 @@ $systemVersion = $systemVersion !== '' ? $systemVersion : '1.0.0';
             if ((form.getAttribute('method') || 'get').toLowerCase() !== 'get') return;
             var url = sameOriginUrl(form.getAttribute('action') || window.location.pathname);
             if (!url || url.pathname !== window.location.pathname) return;
-            e.preventDefault();
             var params = new URLSearchParams(new FormData(form));
+            var targetUrl = sameOriginUrl(url.pathname + (params.toString() ? '?' + params.toString() : ''));
+            if (targetUrl && isRealScreenSwitch(targetUrl)) return;
+            e.preventDefault();
             window.location.replace(url.pathname + (params.toString() ? '?' + params.toString() : ''));
         });
     })();
