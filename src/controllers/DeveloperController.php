@@ -172,8 +172,24 @@ class DeveloperController {
         view('developer/settings', [
             'siteProfile' => getChurchSiteProfileSettings(),
             'socialIconOptions' => getChurchSocialIconOptions(),
-            'globalSettingsSyncConfig' => $globalSyncConfig
+            'globalSettingsSyncConfig' => $globalSyncConfig,
+            'demoLandingConfig' => (new DemoLandingService())->getConfig()
         ]);
+    }
+
+    public function saveDemoLanding() {
+        $this->requireDeveloper();
+
+        (new DemoLandingService())->saveConfig([
+            'enabled' => isset($_POST['demo_landing_enabled']),
+            'public_url' => $_POST['demo_public_url'] ?? '',
+            'admin_username' => $_POST['demo_admin_username'] ?? '',
+            'secretary_username' => $_POST['demo_secretary_username'] ?? '',
+            'member_username' => $_POST['demo_member_username'] ?? '',
+        ]);
+
+        $_SESSION['success'] = 'Configuração da página de demonstração salva com sucesso.';
+        redirect('/developer/settings');
     }
 
     private function saveSystemSetting($db, $key, $value) {

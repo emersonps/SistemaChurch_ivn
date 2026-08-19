@@ -375,6 +375,9 @@ elseif ($uri == '/developer/payments/update-status') {
 elseif ($uri == '/developer/settings') {
     (new DeveloperController())->settings();
 }
+elseif ($uri == '/developer/settings/demo-landing' && $method == 'POST') {
+    (new DeveloperController())->saveDemoLanding();
+}
 elseif ($uri == '/developer/import') {
     (new DeveloperController())->import();
 }

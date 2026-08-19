@@ -3,6 +3,17 @@
 
 class HomeController {
     public function index() {
+        $requestPath = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH);
+        if (in_array($requestPath, ['/', '/home'], true)) {
+            $demoService = new DemoLandingService();
+            $demoConfig = $demoService->getConfig();
+            if ($demoConfig['enabled']) {
+                $demo = $demoService->getDisplayCredentials();
+                view('public/demo_landing', ['demo' => $demo, 'demoConfig' => $demoConfig]);
+                return;
+            }
+        }
+
         $db = (new Database())->connect();
         
         // Buscar Banners Ativos
