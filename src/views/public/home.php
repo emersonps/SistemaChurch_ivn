@@ -1969,7 +1969,7 @@ $firstAndLastName = function ($name) {
             <div class="row align-items-center g-4">
                 <div class="col-lg-7">
                     <h1 class="display-3 hero-title mb-3">Bem-vindo à<br><span class="hero-highlight"><?= htmlspecialchars($siteProfile['name'] ?? 'Nossa Igreja') ?></span></h1>
-                    <p class="lead mb-4 fs-4">Uma igreja comprometida com a Palavra de Deus e o amor ao próximo.</p>
+                    <p class="lead mb-4 fs-4"><?= htmlspecialchars($siteProfile['about_text'] ?? 'Uma igreja comprometida com a Palavra de Deus e o amor ao próximo.') ?></p>
                     <div class="hero-actions">
                         <a href="/portal/login" class="btn btn-cta"><i class="fas fa-user me-2"></i> Área do Membro</a>
                     </div>
