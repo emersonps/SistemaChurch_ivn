@@ -85,8 +85,9 @@
 
                     <div class="mb-4">
                         <label class="form-label fw-bold">Texto "Quem Somos"</label>
-                        <textarea name="church_about_text" class="form-control" rows="6" placeholder="Descreva a história, missão e identidade da igreja." <?= $globalSyncLocked ? 'disabled' : '' ?>><?= htmlspecialchars($siteProfile['about_text'] ?? '') ?></textarea>
-                        <div class="form-text">Este texto aparece na seção "Quem Somos" do site público.</div>
+                        <div id="aboutTextEditor" class="bg-white" style="min-height: 160px;"></div>
+                        <textarea name="church_about_text" id="aboutTextInput" class="d-none" <?= $globalSyncLocked ? 'disabled' : '' ?>><?= htmlspecialchars($siteProfile['about_text'] ?? '') ?></textarea>
+                        <div class="form-text">Este texto aparece na seção "Quem Somos" do site público. A formatação (negrito, cor, tamanho, quebra de linha) aparece igual no site.</div>
                     </div>
 
                     <?php
@@ -214,6 +215,47 @@ document.addEventListener('DOMContentLoaded', function () {
         bindRemoveButtons(wrapper);
     });
 });
+</script>
+
+<link href="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.snow.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var editorEl = document.getElementById('aboutTextEditor');
+        if (!editorEl || typeof Quill === 'undefined') return;
+
+        // Quill's default "size" format uses CSS classes (ql-size-large),
+        // which only mean anything where quill.snow.css is loaded — never
+        // true on the public site. Switch it to inline font-size styles so
+        // the size survives sanitization and renders the same everywhere.
+        var SizeStyle = Quill.import('attributors/style/size');
+        SizeStyle.whitelist = ['12px', '16px', '20px', '28px'];
+        Quill.register(SizeStyle, true);
+
+        var input = document.getElementById('aboutTextInput');
+        var quill = new Quill('#aboutTextEditor', {
+            theme: 'snow',
+            readOnly: input.disabled,
+            modules: {
+                toolbar: input.disabled ? false : [
+                    ['bold', 'italic', 'underline'],
+                    [{ color: [] }],
+                    [{ size: ['12px', '16px', '20px', '28px'] }],
+                    [{ align: [] }],
+                    ['clean']
+                ]
+            }
+        });
+
+        quill.root.innerHTML = input.value;
+
+        var form = editorEl.closest('form');
+        if (form) {
+            form.addEventListener('submit', function () {
+                input.value = quill.root.innerHTML;
+            });
+        }
+    });
 </script>
 
 <?php include __DIR__ . '/../layout/footer.php'; ?>

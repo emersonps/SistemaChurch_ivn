@@ -1182,3 +1182,102 @@ function calculateOverdueCharge($baseAmount, $dueDate, $today = null) {
         'total' => round($baseAmount + $lateFee + $interest, 2),
     ];
 }
+
+// Allowlist-based HTML sanitizer for basic rich text (bold/italic/underline,
+// color, size, alignment, line breaks) coming from the Quill editor. Strips
+// any tag not on the allowlist (unwrapping its content instead of dropping
+// it) and any attribute other than a filtered `style`, so a crafted POST
+// bypassing the editor can't inject scripts/handlers into a public page.
+function sanitizeBasicRichText($html) {
+    $html = trim((string)$html);
+    if ($html === '') {
+        return '';
+    }
+
+    $allowedTags = ['p', 'br', 'strong', 'b', 'em', 'i', 'u', 's', 'span', 'div', 'ul', 'ol', 'li'];
+    $allowedStyleProps = ['color', 'background-color', 'font-size', 'font-weight', 'font-style', 'text-decoration', 'text-align'];
+
+    libxml_use_internal_errors(true);
+    $dom = new DOMDocument('1.0', 'UTF-8');
+    $dom->loadHTML('<?xml encoding="UTF-8"><div id="__root__">' . $html . '</div>', LIBXML_NOERROR | LIBXML_NOWARNING);
+    libxml_clear_errors();
+
+    $root = $dom->getElementById('__root__');
+    if (!$root) {
+        return '';
+    }
+
+    $sanitizeNode = function ($node) use (&$sanitizeNode, $allowedTags, $allowedStyleProps) {
+        $children = [];
+        foreach ($node->childNodes as $child) {
+            $children[] = $child;
+        }
+
+        foreach ($children as $child) {
+            if ($child->nodeType === XML_TEXT_NODE) {
+                continue;
+            }
+
+            if ($child->nodeType !== XML_ELEMENT_NODE) {
+                $node->removeChild($child);
+                continue;
+            }
+
+            $tag = strtolower($child->nodeName);
+            if (!in_array($tag, $allowedTags, true)) {
+                while ($child->firstChild) {
+                    $node->insertBefore($child->firstChild, $child);
+                }
+                $node->removeChild($child);
+                continue;
+            }
+
+            if ($child->hasAttributes()) {
+                $styleValue = $child->getAttribute('style');
+                $attrNames = [];
+                foreach ($child->attributes as $attr) {
+                    $attrNames[] = $attr->name;
+                }
+                foreach ($attrNames as $attrName) {
+                    $child->removeAttribute($attrName);
+                }
+
+                if ($styleValue !== '') {
+                    $cleanDeclarations = [];
+                    foreach (explode(';', $styleValue) as $decl) {
+                        $parts = explode(':', $decl, 2);
+                        if (count($parts) !== 2) {
+                            continue;
+                        }
+                        $prop = strtolower(trim($parts[0]));
+                        $val = trim($parts[1]);
+                        if (!in_array($prop, $allowedStyleProps, true)) {
+                            continue;
+                        }
+                        if (preg_match('/url\s*\(|expression\s*\(|javascript:/i', $val)) {
+                            continue;
+                        }
+                        if (!preg_match('/^[a-zA-Z0-9#%,.()\s\-]+$/', $val)) {
+                            continue;
+                        }
+                        $cleanDeclarations[] = $prop . ': ' . $val;
+                    }
+                    if (!empty($cleanDeclarations)) {
+                        $child->setAttribute('style', implode('; ', $cleanDeclarations));
+                    }
+                }
+            }
+
+            $sanitizeNode($child);
+        }
+    };
+
+    $sanitizeNode($root);
+
+    $result = '';
+    foreach ($root->childNodes as $child) {
+        $result .= $dom->saveHTML($child);
+    }
+
+    return trim($result);
+}

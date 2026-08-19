@@ -108,7 +108,7 @@ class DeveloperController {
             $churchAlias = $_POST['church_alias'] ?? 'IVN';
             $churchPhone = trim($_POST['church_phone'] ?? '+55 (92) 99386-6290');
             $churchEmail = trim($_POST['church_email'] ?? 'contato@ivn.com.br');
-            $churchAboutText = trim($_POST['church_about_text'] ?? '');
+            $churchAboutText = sanitizeBasicRichText($_POST['church_about_text'] ?? '');
             $socialPlatforms = $_POST['social_platform'] ?? [];
             $socialUrls = $_POST['social_url'] ?? [];
             $logoUrl = getSystemSetting('church_logo_url', '/assets/img/logo.png');
