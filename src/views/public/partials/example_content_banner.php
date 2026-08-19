@@ -14,8 +14,27 @@ if (!empty($siteProfile['show_example_banner'])):
         var banner = document.getElementById('exampleContentBanner');
         if (!banner) return;
         var apply = function () {
+            var height = banner.offsetHeight;
+
+            // Push normal page content down.
             var current = parseFloat(getComputedStyle(document.body).paddingTop) || 0;
-            document.body.style.paddingTop = (current + banner.offsetHeight) + 'px';
+            document.body.style.paddingTop = (current + height) + 'px';
+
+            // Fixed/sticky headers (Bootstrap's .fixed-top navbar, or the
+            // harpa/prayer .topbar which is position:sticky) are anchored
+            // to the viewport at top:0 once pinned — body padding doesn't
+            // affect them — so without this they end up hidden behind the
+            // banner, immediately (fixed) or as soon as the page scrolls
+            // past them (sticky). Push any other top-pinned element down
+            // by the banner's height too.
+            Array.prototype.forEach.call(document.querySelectorAll('body *'), function (el) {
+                if (el === banner || banner.contains(el)) return;
+                var style = getComputedStyle(el);
+                if ((style.position === 'fixed' || style.position === 'sticky') && (parseFloat(style.top) || 0) === 0) {
+                    var elCurrentTop = parseFloat(el.style.top) || 0;
+                    el.style.top = (elCurrentTop + height) + 'px';
+                }
+            });
         };
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', apply);
