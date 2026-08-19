@@ -737,6 +737,7 @@ $totalPages = max(1, (int)($totalPages ?? 1));
     </style>
 </head>
 <body>
+<?php include __DIR__ . '/partials/example_content_banner.php'; ?>
     <header class="topbar">
         <div class="container topbar-inner">
             <a class="topbar-brand" href="/">

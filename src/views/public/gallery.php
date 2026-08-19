@@ -421,6 +421,7 @@ if (!empty($albums) && is_array($albums)) {
     </style>
 </head>
 <body>
+<?php include __DIR__ . '/partials/example_content_banner.php'; ?>
     <nav class="navbar navbar-expand-lg fixed-top navbar-light">
         <div class="container">
             <a class="navbar-brand" href="/">

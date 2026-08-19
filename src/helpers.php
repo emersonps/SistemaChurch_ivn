@@ -813,6 +813,7 @@ function getChurchSiteProfileSettings() {
             'É uma comunidade cristã comprometida com a centralidade das Escrituras, a proclamação do Evangelho e a edificação de famílias firmadas na fé. Somos apaixonados por Jesus e pelas pessoas. Cremos no poder transformador da Palavra de Deus e trabalhamos para levar o evangelho a toda criatura, vivendo em comunhão, promovendo discipulado e servindo ao próximo com amor, responsabilidade e propósito.'
         ),
         'social_links' => $normalizedSocials,
+        'show_example_banner' => getSystemSetting('show_example_banner', '0') === '1',
     ];
 }
 

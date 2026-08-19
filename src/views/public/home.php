@@ -1931,6 +1931,7 @@ $firstAndLastName = function ($name) {
     </style>
 </head>
 <body>
+<?php include __DIR__ . '/partials/example_content_banner.php'; ?>
 
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg fixed-top navbar-light">

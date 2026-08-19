@@ -455,6 +455,7 @@ $hymnsJson = json_encode($hymns, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES
     </style>
 </head>
 <body>
+<?php include __DIR__ . '/partials/example_content_banner.php'; ?>
     <header class="topbar">
         <div class="container topbar-inner">
             <div class="brand-pill">
