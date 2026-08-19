@@ -114,9 +114,6 @@ if ($uri == '/' || $uri == '/home') {
 elseif ($uri == '/devocional') {
     (new HomeController())->index();
 }
-elseif ($uri == '/contato') {
-    view('public/contact');
-}
 elseif ($uri == '/harpa' || $uri == '/harpa-crista') {
     view('public/harpa');
 }

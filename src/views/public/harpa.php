@@ -466,7 +466,6 @@ $hymnsJson = json_encode($hymns, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES
             </div>
             <div class="d-flex align-items-center gap-2 flex-wrap justify-content-end">
                 <a href="/" class="btn btn-outline-light btn-sm rounded-pill fw-bold"><i class="fas fa-house me-2"></i>Início</a>
-                <a href="/contato" class="btn btn-cta btn-sm"><i class="fas fa-circle-info me-2"></i>Contato</a>
             </div>
         </div>
     </header>

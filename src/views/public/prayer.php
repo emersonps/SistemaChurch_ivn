@@ -747,9 +747,6 @@ $totalPages = max(1, (int)($totalPages ?? 1));
                 <a href="/devocional" class="btn btn-outline-dark btn-sm px-3 text-nowrap d-none d-sm-inline-flex">
                     <i class="fas fa-book-bible"></i><span class="d-none d-md-inline">Devocional</span>
                 </a>
-                <a href="/contato" class="btn btn-outline-dark btn-sm px-3 text-nowrap d-none d-sm-inline-flex">
-                    <i class="fas fa-circle-info"></i><span class="d-none d-md-inline">Contato</span>
-                </a>
                 <button type="button" class="btn btn-outline-dark btn-sm px-3 text-nowrap" id="btnSharePrayerPage" aria-label="Compartilhar página">
                     <i class="fas fa-share-nodes"></i><span class="d-none d-md-inline">Compartilhar</span>
                 </button>
