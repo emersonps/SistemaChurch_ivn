@@ -117,6 +117,12 @@ elseif ($uri == '/devocional') {
 elseif ($uri == '/site') {
     (new HomeController())->siteHome();
 }
+elseif ($uri == '/demo-presence/ping' && $method == 'POST') {
+    (new DemoPresenceController())->ping();
+}
+elseif ($uri == '/demo-presence/leave' && $method == 'POST') {
+    (new DemoPresenceController())->leave();
+}
 elseif ($uri == '/harpa' || $uri == '/harpa-crista') {
     view('public/harpa');
 }

@@ -10,7 +10,7 @@ $siteProfile = getChurchSiteProfileSettings();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= htmlspecialchars($siteProfile['name'] ?? 'IgrejaBR') ?> — Ambiente Demonstrativo</title>
-    <link rel="icon" href="/assets/img/demo-landing-logo.png" type="image/png">
+    <link rel="icon" href="<?= htmlspecialchars(getChurchLogoUrl($siteProfile, true)) ?>" type="image/png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <style>
         * { box-sizing: border-box; }
@@ -167,12 +167,36 @@ $siteProfile = getChurchSiteProfileSettings();
             text-transform: uppercase;
             color: #98a2b3;
         }
+        .demo-online-counter {
+            margin-top: 2rem;
+            display: inline-flex;
+            align-items: center;
+            gap: .4rem;
+            font-size: .72rem;
+            color: #98a2b3;
+            opacity: 0;
+            transition: opacity .3s ease;
+        }
+        .demo-online-counter.is-visible { opacity: 1; }
+        .demo-online-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #22c55e;
+            box-shadow: 0 0 0 rgba(34, 197, 94, .5);
+            animation: demo-online-pulse 2s infinite;
+        }
+        @keyframes demo-online-pulse {
+            0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, .5); }
+            70% { box-shadow: 0 0 0 6px rgba(34, 197, 94, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+        }
     </style>
 </head>
 <body>
 <?php include __DIR__ . '/partials/example_content_banner.php'; ?>
     <div class="demo-card">
-        <img src="/assets/img/demo-landing-logo.png" alt="<?= htmlspecialchars($siteProfile['name'] ?? 'IgrejaBR') ?>" class="demo-logo">
+        <img src="<?= htmlspecialchars(getChurchLogoUrl($siteProfile, true)) ?>" alt="<?= htmlspecialchars($siteProfile['name'] ?? 'IgrejaBR') ?>" class="demo-logo" onerror="this.style.display='none'">
         <div class="demo-brand"><?= htmlspecialchars($siteProfile['name'] ?? 'IgrejaBR') ?></div>
         <div class="demo-tag">Ambiente Demonstrativo</div>
 
@@ -212,6 +236,63 @@ $siteProfile = getChurchSiteProfileSettings();
 
         <p class="demo-footer-text">Teste à vontade. Explore os recursos e conheça tudo o que o <?= htmlspecialchars($siteProfile['name'] ?? 'IgrejaBR') ?> pode oferecer à sua igreja.</p>
         <div class="demo-footer-tags">Gestão completa · Site integrado · Identidade própria</div>
+
+        <div class="demo-online-counter" id="demoOnlineCounter">
+            <span class="demo-online-dot"></span>
+            <span id="demoOnlineCount">—</span> online agora
+        </div>
     </div>
+    <script>
+        (function () {
+            var STORAGE_KEY = 'demo_presence_key';
+            var PING_INTERVAL_MS = 12000;
+
+            function getSessionKey() {
+                var key = sessionStorage.getItem(STORAGE_KEY);
+                if (!key) {
+                    key = (crypto.randomUUID ? crypto.randomUUID() : (Date.now().toString(36) + Math.random().toString(36).slice(2))).replace(/-/g, '');
+                    sessionStorage.setItem(STORAGE_KEY, key);
+                }
+                return key;
+            }
+
+            var sessionKey = getSessionKey();
+            var counterEl = document.getElementById('demoOnlineCounter');
+            var countEl = document.getElementById('demoOnlineCount');
+
+            function ping() {
+                fetch('/demo-presence/ping', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: 'key=' + encodeURIComponent(sessionKey)
+                })
+                    .then(function (r) { return r.json(); })
+                    .then(function (data) {
+                        if (typeof data.count === 'number') {
+                            countEl.textContent = data.count;
+                            counterEl.classList.add('is-visible');
+                        }
+                    })
+                    .catch(function () {});
+            }
+
+            function leave() {
+                var params = new URLSearchParams();
+                params.set('key', sessionKey);
+                if (navigator.sendBeacon) {
+                    navigator.sendBeacon('/demo-presence/leave', params);
+                }
+            }
+
+            // Keep pinging even while the tab is hidden (merely switching
+            // tabs isn't "leaving") — only an actual close/navigation
+            // triggers an explicit decrement. Anything that skips pagehide
+            // entirely (crash, killed process) still ages out via the
+            // server-side heartbeat timeout.
+            ping();
+            setInterval(ping, PING_INTERVAL_MS);
+            window.addEventListener('pagehide', leave);
+        })();
+    </script>
 </body>
 </html>
