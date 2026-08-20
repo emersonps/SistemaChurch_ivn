@@ -2299,7 +2299,7 @@ $firstAndLastName = function ($name) {
     <section id="mensagem-destaque" class="py-5">
         <div class="container py-4">
             <div class="text-center mb-4">
-                <h2 class="section-title">Mensagem em Destaque</h2>
+                <h2 class="section-title">Mural de Vídeos</h2>
             </div>
             <div class="row justify-content-center">
                 <div class="col-lg-9">

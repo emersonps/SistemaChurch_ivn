@@ -94,7 +94,7 @@
                     </li>
                     <li class="nav-item border-top mt-2 pt-2">
                         <a class="nav-link <?= strpos($_SERVER['REQUEST_URI'], '/developer/settings') !== false ? 'active' : '' ?>" href="/developer/settings">
-                            <i class="fas fa-paint-roller me-2"></i> Ajustes do Site (White Label)
+                            <i class="fas fa-flask me-2"></i> Página de Demonstração
                         </a>
                     </li>
                     <li class="nav-item">
@@ -169,7 +169,7 @@
                         </li>
                         <li class="nav-item border-top mt-2 pt-2">
                             <a class="nav-link <?= strpos($_SERVER['REQUEST_URI'], '/developer/settings') !== false ? 'active' : '' ?>" href="/developer/settings">
-                                <i class="fas fa-paint-roller me-2"></i> Ajustes do Site (White Label)
+                                <i class="fas fa-flask me-2"></i> Página de Demonstração
                             </a>
                         </li>
                         <li class="nav-item">

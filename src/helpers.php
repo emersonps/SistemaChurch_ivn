@@ -880,6 +880,12 @@ function getPermissionMenuDefinitions() {
             'children' => ['banners.manage']
         ],
         [
+            'section' => 'Secretaria',
+            'title' => 'Mural de Vídeos',
+            'parent' => 'video_wall.view',
+            'children' => ['video_wall.manage']
+        ],
+        [
             'section' => 'Financeiro',
             'title' => 'Financeiro',
             'parent' => 'financial.view',
