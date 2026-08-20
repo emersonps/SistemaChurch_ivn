@@ -22,6 +22,12 @@
     .live-badge-live::before {
         background: #fff;
     }
+    .live-badge-ended {
+        background: rgba(0, 0, 0, 0.55); color: #e9ecef;
+    }
+    .live-badge-ended::before {
+        background: #adb5bd;
+    }
     @keyframes liveBadgePulse {
         0%, 100% { transform: scale(1); opacity: 1; }
         50% { transform: scale(1.4); opacity: .5; }
@@ -35,7 +41,7 @@
 (function () {
     // How long after the scheduled start we keep showing "AO VIVO" before
     // treating the stream as over (we have no way to detect the real end
-    // without the YouTube Data API) and hiding the badge entirely.
+    // without the YouTube Data API) and switching the badge to "encerrada".
     var LIVE_WINDOW_MS = 4 * 60 * 60 * 1000;
 
     function pad(n) {
@@ -68,7 +74,9 @@
             el.textContent = 'AO VIVO';
             el.style.display = '';
         } else {
-            el.style.display = 'none';
+            el.className = 'live-badge live-badge-ended';
+            el.textContent = 'Transmissão encerrada';
+            el.style.display = '';
         }
     }
 
