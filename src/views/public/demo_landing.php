@@ -183,7 +183,7 @@ $siteProfile = getChurchSiteProfileSettings();
             <div class="demo-access-pill"><i class="fas fa-rocket"></i> Acesso liberado · portal demonstrativo</div>
             <p class="demo-access-text">Acesse o portal demonstrativo e explore todos os recursos da plataforma, e veja como o produto real será entregue para você/sua igreja.</p>
             <?php if (!empty($demoConfig['public_url'])): ?>
-                <a href="<?= htmlspecialchars($demoConfig['public_url']) ?>" target="_blank" rel="noopener noreferrer" class="demo-access-link">
+                <a href="/site" target="_blank" rel="noopener noreferrer" class="demo-access-link">
                     <i class="fas fa-globe"></i> <?= htmlspecialchars(preg_replace('#^https?://#', '', $demoConfig['public_url'])) ?>
                 </a>
             <?php endif; ?>

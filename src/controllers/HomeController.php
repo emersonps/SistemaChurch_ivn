@@ -14,6 +14,18 @@ class HomeController {
             }
         }
 
+        $this->renderPublicHomepage();
+    }
+
+    // Always shows the real church homepage, bypassing the demo-landing
+    // interception in index() — this is what the demo page's own "visit
+    // the real site" link points to, so it doesn't just loop back to
+    // itself.
+    public function siteHome() {
+        $this->renderPublicHomepage();
+    }
+
+    private function renderPublicHomepage() {
         $db = (new Database())->connect();
         
         // Buscar Banners Ativos

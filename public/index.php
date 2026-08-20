@@ -110,9 +110,12 @@ if ($method === 'POST' && strpos($uri, '/admin') === 0) {
 // Routes
 if ($uri == '/' || $uri == '/home') {
     (new HomeController())->index();
-} 
+}
 elseif ($uri == '/devocional') {
     (new HomeController())->index();
+}
+elseif ($uri == '/site') {
+    (new HomeController())->siteHome();
 }
 elseif ($uri == '/harpa' || $uri == '/harpa-crista') {
     view('public/harpa');
