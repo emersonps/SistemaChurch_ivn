@@ -264,9 +264,6 @@ class VideoWallController {
         if (!in_array($category, getVideoWallCategories(), true)) {
             $category = 'Mensagens';
         }
-        if ($videoDate === '' || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $videoDate)) {
-            $videoDate = date('Y-m-d');
-        }
 
         $videoId = extractYoutubeVideoId($youtubeUrl);
         if ($videoId === '') {
@@ -282,6 +279,11 @@ class VideoWallController {
                 redirect($id ? '/admin/video-wall/edit/' . $id : '/admin/video-wall/create');
             }
             $livestreamScheduledAt = date('Y-m-d H:i:s', $timestamp);
+            // The livestream's own date/time is authoritative for a live
+            // video — the (hidden, disabled) regular date field doesn't apply.
+            $videoDate = date('Y-m-d', $timestamp);
+        } elseif ($videoDate === '' || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $videoDate)) {
+            $videoDate = date('Y-m-d');
         }
 
         if ($id) {
