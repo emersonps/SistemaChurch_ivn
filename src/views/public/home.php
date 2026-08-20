@@ -1174,8 +1174,9 @@ $firstAndLastName = function ($name) {
         .floating-faith-popover {
             display: none;
             position: absolute;
-            top: 0;
-            right: 0;
+            top: 50%;
+            right: calc(100% + 10px);
+            transform: translateY(-50%);
             width: 224px;
             border-radius: 16px;
             color: #fff;
