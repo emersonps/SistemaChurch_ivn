@@ -79,6 +79,9 @@ class DemoLandingService {
     // Manual override for /developer/settings — rotates immediately instead
     // of waiting for the 2-day window, e.g. right after fixing a
     // misconfigured username so the fix doesn't sit unused for 2 days.
+    // Returns a per-slot report ([label => bool applied]) so the settings
+    // screen can say exactly which accounts were found, instead of the
+    // demo page silently showing a blank password with no explanation.
     public function forceRotateNow() {
         $config = $this->getConfig();
         $slots = [
@@ -87,11 +90,14 @@ class DemoLandingService {
             'member' => ['label' => 'Membro', 'username' => $config['member_username']],
         ];
 
-        $this->rotateAll($slots);
+        $report = $this->rotateAll($slots);
         $this->saveSetting('demo_credentials_rotated_at', date('Y-m-d H:i:s'));
+        return $report;
     }
 
     private function rotateAll(array $slots) {
+        $report = [];
+
         foreach ($slots as $key => $slot) {
             if ($slot['username'] === '') {
                 continue;
@@ -123,7 +129,11 @@ class DemoLandingService {
             if ($applied) {
                 $this->saveSetting('demo_' . $key . '_password_plain', $plainPassword);
             }
+
+            $report[] = ['label' => $slot['label'], 'username' => $slot['username'], 'applied' => $applied];
         }
+
+        return $report;
     }
 
     private function generatePassword() {

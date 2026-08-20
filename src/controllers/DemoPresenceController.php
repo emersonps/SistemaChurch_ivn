@@ -7,12 +7,23 @@
 
 class DemoPresenceController {
     public function ping() {
-        $this->json((new DemoPresenceService())->ping($_POST['key'] ?? ''));
+        try {
+            $this->json((new DemoPresenceService())->ping($_POST['key'] ?? ''));
+        } catch (Throwable $e) {
+            // Most likely cause: the demo_online_sessions migration hasn't
+            // run on this database yet. Surface it as a real error instead
+            // of the counter just silently never appearing.
+            $this->error($e);
+        }
     }
 
     public function leave() {
-        (new DemoPresenceService())->leave($_POST['key'] ?? '');
-        $this->json(0, false);
+        try {
+            (new DemoPresenceService())->leave($_POST['key'] ?? '');
+            $this->json(0, false);
+        } catch (Throwable $e) {
+            $this->error($e);
+        }
     }
 
     private function json($count, $includeCount = true) {
@@ -22,6 +33,13 @@ class DemoPresenceController {
             $payload['count'] = $count;
         }
         echo json_encode($payload);
+        exit;
+    }
+
+    private function error(Throwable $e) {
+        http_response_code(500);
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
         exit;
     }
 }

@@ -191,9 +191,28 @@ class DeveloperController {
 
         // Re-rotate immediately so a corrected username takes effect right
         // away instead of sitting unused until the next 2-day window.
-        $service->forceRotateNow();
+        $report = $service->forceRotateNow();
 
-        $_SESSION['success'] = 'Configuração da página de demonstração salva e senhas atualizadas com sucesso.';
+        $found = [];
+        $notFound = [];
+        foreach ($report as $row) {
+            if ($row['applied']) {
+                $found[] = $row['label'];
+            } else {
+                $notFound[] = $row['label'] . ' ("' . $row['username'] . '")';
+            }
+        }
+
+        if (empty($report)) {
+            $_SESSION['success'] = 'Configuração da página de demonstração salva. Nenhum usuário de demonstração foi preenchido ainda.';
+        } elseif (empty($notFound)) {
+            $_SESSION['success'] = 'Configuração salva e senha(s) atualizada(s): ' . implode(', ', $found) . '.';
+        } else {
+            $_SESSION['error'] = 'Configuração salva, mas não encontrei conta para: ' . implode(', ', $notFound)
+                . '. Confira se o usuário existe em Usuários do Sistema (ou se é o CPF exato de um membro cadastrado).'
+                . (!empty($found) ? ' Funcionou para: ' . implode(', ', $found) . '.' : '');
+        }
+
         redirect('/developer/settings');
     }
 
