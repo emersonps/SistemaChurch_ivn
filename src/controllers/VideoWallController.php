@@ -258,6 +258,8 @@ class VideoWallController {
         $speaker = trim((string)($_POST['speaker'] ?? ''));
         $description = trim((string)($_POST['description'] ?? ''));
         $videoDate = trim((string)($_POST['video_date'] ?? ''));
+        $isLivestream = isset($_POST['is_livestream']) ? 1 : 0;
+        $livestreamScheduledAtInput = trim((string)($_POST['livestream_scheduled_at'] ?? ''));
 
         if (!in_array($category, getVideoWallCategories(), true)) {
             $category = 'Mensagens';
@@ -272,12 +274,22 @@ class VideoWallController {
             redirect($id ? '/admin/video-wall/edit/' . $id : '/admin/video-wall/create');
         }
 
+        $livestreamScheduledAt = null;
+        if ($isLivestream) {
+            $timestamp = $livestreamScheduledAtInput !== '' ? strtotime($livestreamScheduledAtInput) : false;
+            if ($timestamp === false) {
+                $_SESSION['error'] = 'Informe a data e hora de início da transmissão ao vivo.';
+                redirect($id ? '/admin/video-wall/edit/' . $id : '/admin/video-wall/create');
+            }
+            $livestreamScheduledAt = date('Y-m-d H:i:s', $timestamp);
+        }
+
         if ($id) {
-            $stmt = $db->prepare('UPDATE video_wall SET title = ?, youtube_url = ?, youtube_video_id = ?, category = ?, speaker = ?, description = ?, video_date = ? WHERE id = ?');
-            $stmt->execute([$title, $youtubeUrl, $videoId, $category, $speaker, $description, $videoDate, $id]);
+            $stmt = $db->prepare('UPDATE video_wall SET title = ?, youtube_url = ?, youtube_video_id = ?, category = ?, speaker = ?, description = ?, video_date = ?, is_livestream = ?, livestream_scheduled_at = ? WHERE id = ?');
+            $stmt->execute([$title, $youtubeUrl, $videoId, $category, $speaker, $description, $videoDate, $isLivestream, $livestreamScheduledAt, $id]);
         } else {
-            $stmt = $db->prepare('INSERT INTO video_wall (title, youtube_url, youtube_video_id, category, speaker, description, video_date) VALUES (?, ?, ?, ?, ?, ?, ?)');
-            $stmt->execute([$title, $youtubeUrl, $videoId, $category, $speaker, $description, $videoDate]);
+            $stmt = $db->prepare('INSERT INTO video_wall (title, youtube_url, youtube_video_id, category, speaker, description, video_date, is_livestream, livestream_scheduled_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)');
+            $stmt->execute([$title, $youtubeUrl, $videoId, $category, $speaker, $description, $videoDate, $isLivestream, $livestreamScheduledAt]);
         }
     }
 }

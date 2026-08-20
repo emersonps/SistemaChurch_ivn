@@ -2312,6 +2312,9 @@ $firstAndLastName = function ($name) {
                         </div>
                         <div class="col-md-7">
                             <span class="badge bg-dark bg-opacity-75 mb-2"><?= htmlspecialchars($featuredVideo['category']) ?></span>
+                            <?php if (!empty($featuredVideo['is_livestream']) && !empty($featuredVideo['livestream_scheduled_at'])): ?>
+                                <span class="live-badge mb-2" data-scheduled-at="<?= htmlspecialchars(formatLivestreamScheduledAtIso($featuredVideo['livestream_scheduled_at'])) ?>"></span>
+                            <?php endif; ?>
                             <h3 class="h5 fw-bold mb-1"><?= htmlspecialchars($featuredVideo['title']) ?></h3>
                             <p class="text-muted small mb-2">
                                 <?= !empty($featuredVideo['video_date']) ? date('d \d\e F', strtotime($featuredVideo['video_date'])) : '' ?>
@@ -3578,5 +3581,6 @@ $firstAndLastName = function ($name) {
             })();
         });
     </script>
+    <?php include __DIR__ . '/../partials/livestream_badge.php'; ?>
 </body>
 </html>

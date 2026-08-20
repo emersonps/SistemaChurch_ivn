@@ -154,6 +154,9 @@
                     </div>
                     <div class="vw-tile-body">
                         <div class="vw-tile-title"><?= htmlspecialchars($video['title']) ?></div>
+                        <?php if (!empty($video['is_livestream']) && !empty($video['livestream_scheduled_at'])): ?>
+                            <span class="live-badge mb-2" data-scheduled-at="<?= htmlspecialchars(formatLivestreamScheduledAtIso($video['livestream_scheduled_at'])) ?>" style="align-self: flex-start;"></span>
+                        <?php endif; ?>
                         <div class="vw-tile-meta">
                             <?= !empty($video['video_date']) ? date('d/m/Y', strtotime($video['video_date'])) : '-' ?>
                             <?php if (!empty($video['speaker'])): ?> · <?= htmlspecialchars($video['speaker']) ?><?php endif; ?>
@@ -182,5 +185,7 @@
         <?php endforeach; ?>
     </div>
 <?php endif; ?>
+
+<?php include __DIR__ . '/../../partials/livestream_badge.php'; ?>
 
 <?php include __DIR__ . '/../../layout/footer.php'; ?>

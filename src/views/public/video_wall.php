@@ -77,6 +77,9 @@ $siteProfile = getChurchSiteProfileSettings();
                             <div class="vw-card-thumb">
                                 <img src="https://img.youtube.com/vi/<?= htmlspecialchars($video['youtube_video_id']) ?>/hqdefault.jpg" alt="">
                                 <span class="vw-card-category"><?= htmlspecialchars($video['category']) ?></span>
+                                <?php if (!empty($video['is_livestream']) && !empty($video['livestream_scheduled_at'])): ?>
+                                    <span class="live-badge" style="position: absolute; top: .6rem; right: .6rem;" data-scheduled-at="<?= htmlspecialchars(formatLivestreamScheduledAtIso($video['livestream_scheduled_at'])) ?>"></span>
+                                <?php endif; ?>
                                 <a href="/mural-de-videos/assistir/<?= (int)$video['id'] ?>" class="vw-card-play" target="_blank" rel="noopener">
                                     <i class="fas fa-circle-play"></i>
                                 </a>
@@ -102,5 +105,6 @@ $siteProfile = getChurchSiteProfileSettings();
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <?php include __DIR__ . '/../partials/livestream_badge.php'; ?>
 </body>
 </html>

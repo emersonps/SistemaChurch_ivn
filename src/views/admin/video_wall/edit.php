@@ -49,10 +49,31 @@
                 <label class="form-label">Descrição</label>
                 <textarea name="description" class="form-control" rows="3"><?= htmlspecialchars($video['description'] ?? '') ?></textarea>
             </div>
+            <div class="form-check form-switch mb-3">
+                <input type="checkbox" name="is_livestream" id="isLivestream" class="form-check-input" <?= !empty($video['is_livestream']) ? 'checked' : '' ?>>
+                <label class="form-check-label" for="isLivestream">É uma transmissão ao vivo</label>
+            </div>
+            <div class="mb-3 <?= empty($video['is_livestream']) ? 'd-none' : '' ?>" id="livestreamScheduleField">
+                <label class="form-label">Início da transmissão</label>
+                <input type="datetime-local" name="livestream_scheduled_at" class="form-control" value="<?= !empty($video['livestream_scheduled_at']) ? date('Y-m-d\TH:i', strtotime($video['livestream_scheduled_at'])) : '' ?>">
+                <div class="form-text">Antes desse horário o vídeo mostra uma contagem regressiva; a partir dele, o selo "AO VIVO".</div>
+            </div>
             <button type="submit" class="btn btn-primary"><i class="fas fa-save me-1"></i> Salvar</button>
         </form>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    var checkbox = document.getElementById('isLivestream');
+    var field = document.getElementById('livestreamScheduleField');
+    function sync() {
+        field.classList.toggle('d-none', !checkbox.checked);
+    }
+    checkbox.addEventListener('change', sync);
+    sync();
+});
+</script>
 
 <?php include __DIR__ . '/partials/category_modal.php'; ?>
 

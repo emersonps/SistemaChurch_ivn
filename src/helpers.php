@@ -1314,3 +1314,19 @@ function getVideoWallCategories() {
         return ['Cultos', 'Mensagens', 'Louvores', 'Jovens', 'Eventos'];
     }
 }
+
+// Formats a naive "Y-m-d H:i:s" datetime (stored in the app's own
+// timezone, America/Sao_Paulo) as an ISO 8601 string with an explicit UTC
+// offset, so `new Date(...)` on the client resolves the same instant in
+// time regardless of the visitor's own timezone.
+function formatLivestreamScheduledAtIso($datetime) {
+    $datetime = trim((string)$datetime);
+    if ($datetime === '') {
+        return '';
+    }
+    $timestamp = strtotime($datetime);
+    if ($timestamp === false) {
+        return '';
+    }
+    return date('Y-m-d\TH:i:sP', $timestamp);
+}
