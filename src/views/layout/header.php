@@ -365,6 +365,14 @@ $mobileLauncherHref = '/admin?launcher=1';
                         </li>
                         <?php endif; ?>
 
+                        <?php if (hasPermission('campaigns.view') || hasPermission('campaigns.manage')): ?>
+                        <li class="nav-item">
+                            <a class="nav-link <?= strpos($_SERVER['REQUEST_URI'], '/admin/campaigns') !== false ? 'active' : 'text-dark' ?>" href="/admin/campaigns">
+                                <i class="fas fa-bullseye me-2"></i> Campanhas
+                            </a>
+                        </li>
+                        <?php endif; ?>
+
                         <!-- Financeiro -->
                         <?php if (hasPermission('financial.view')): ?>
                         <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-3 mb-1 text-muted text-uppercase small">

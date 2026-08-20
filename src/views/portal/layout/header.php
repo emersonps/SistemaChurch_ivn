@@ -42,6 +42,7 @@ $portalNavGroups = [
     'Financeiro' => [
         ['label' => 'Meus Dízimos', 'subtitle' => 'Contribuições e ofertas', 'icon' => 'fa-hand-holding-dollar', 'href' => '/portal/financial', 'color' => 'green'],
         ['label' => 'Saúde Financeira', 'subtitle' => 'Como cuidamos da nossa casa', 'icon' => 'fa-heart-pulse', 'href' => '/portal/financial-health', 'color' => 'red'],
+        ['label' => 'Campanhas', 'subtitle' => 'Metas de arrecadação', 'icon' => 'fa-bullseye', 'href' => '/portal/campaigns', 'color' => 'purple'],
     ],
     'Ajuda' => [
         ['label' => 'Manual / Ajuda', 'subtitle' => 'Vídeos e suporte', 'icon' => 'fa-circle-question', 'href' => '/portal/manual', 'color' => 'cyan'],

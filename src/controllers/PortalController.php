@@ -369,6 +369,57 @@ class PortalController {
         ]);
     }
 
+    public function campaigns() {
+        $this->requireMemberLogin();
+        $memberId = $_SESSION['member_id'];
+        $db = (new Database())->connect();
+
+        $stmt = $db->prepare("
+            SELECT c.*, cp.id AS participant_id
+            FROM campaign_participants cp
+            JOIN campaigns c ON cp.campaign_id = c.id
+            WHERE cp.member_id = ? AND cp.status = 'active'
+            ORDER BY c.status = 'active' DESC, c.created_at DESC
+        ");
+        $stmt->execute([$memberId]);
+        $campaigns = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        foreach ($campaigns as &$campaign) {
+            $campaign['progress'] = getCampaignProgress($campaign['id']);
+        }
+        unset($campaign);
+
+        view('portal/campaigns', ['campaigns' => $campaigns]);
+    }
+
+    public function campaignShow($id) {
+        $this->requireMemberLogin();
+        $memberId = $_SESSION['member_id'];
+        $db = (new Database())->connect();
+
+        $stmt = $db->prepare("
+            SELECT cp.*, c.title, c.description, c.goal_amount, c.status AS campaign_status
+            FROM campaign_participants cp
+            JOIN campaigns c ON cp.campaign_id = c.id
+            WHERE cp.campaign_id = ? AND cp.member_id = ? AND cp.status = 'active'
+        ");
+        $stmt->execute([$id, $memberId]);
+        $participant = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$participant) {
+            redirect('/portal/campaigns');
+        }
+
+        $installmentsStmt = $db->prepare('SELECT * FROM campaign_installments WHERE participant_id = ? ORDER BY reference_month ASC');
+        $installmentsStmt->execute([$participant['id']]);
+
+        view('portal/campaign_show', [
+            'participant' => $participant,
+            'progress' => getCampaignProgress($id),
+            'installments' => $installmentsStmt->fetchAll(PDO::FETCH_ASSOC),
+        ]);
+    }
+
     public function card() {
         $this->requireMemberLogin();
         $member_id = $_SESSION['member_id'];

@@ -898,6 +898,12 @@ function getPermissionMenuDefinitions() {
             'children' => ['system_payments.manage']
         ],
         [
+            'section' => 'Financeiro',
+            'title' => 'Campanhas',
+            'parent' => 'campaigns.view',
+            'children' => ['campaigns.manage']
+        ],
+        [
             'section' => 'Ensino',
             'title' => 'Escola Bíblica',
             'parent' => 'ebd.view',
@@ -1329,4 +1335,41 @@ function formatLivestreamScheduledAtIso($datetime) {
         return '';
     }
     return date('Y-m-d\TH:i:sP', $timestamp);
+}
+
+// Formats a 'YYYY-MM' reference_month (campaign_installments,
+// system_payments) as "Mês/Ano" in Portuguese, e.g. '2026-09' -> 'Setembro/2026'.
+function formatReferenceMonth($yearMonth) {
+    $parts = explode('-', (string)$yearMonth);
+    if (count($parts) !== 2) {
+        return (string)$yearMonth;
+    }
+    $months = [1 => 'Janeiro', 2 => 'Fevereiro', 3 => 'Março', 4 => 'Abril', 5 => 'Maio', 6 => 'Junho', 7 => 'Julho', 8 => 'Agosto', 9 => 'Setembro', 10 => 'Outubro', 11 => 'Novembro', 12 => 'Dezembro'];
+    $month = (int)$parts[1];
+    return ($months[$month] ?? $parts[1]) . '/' . $parts[0];
+}
+
+// Progress of a fundraising campaign toward its goal, based on the sum of
+// paid installments. Percent is not capped here — callers that render a
+// progress bar should clamp it to 100 for the bar width while still
+// showing the real percent (a campaign can exceed its goal).
+function getCampaignProgress($campaignId) {
+    $db = (new Database())->connect();
+
+    $stmt = $db->prepare('SELECT goal_amount FROM campaigns WHERE id = ?');
+    $stmt->execute([$campaignId]);
+    $goal = (float)$stmt->fetchColumn();
+
+    $stmt = $db->prepare("SELECT COALESCE(SUM(paid_amount), 0) FROM campaign_installments WHERE campaign_id = ? AND status = 'paid'");
+    $stmt->execute([$campaignId]);
+    $raised = (float)$stmt->fetchColumn();
+
+    $percent = $goal > 0 ? ($raised / $goal) * 100 : 0;
+
+    return [
+        'goal' => $goal,
+        'raised' => $raised,
+        'percent' => $percent,
+        'percent_display' => min(100, round($percent)),
+    ];
 }

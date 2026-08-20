@@ -1115,6 +1115,49 @@ elseif (preg_match('#^/admin/donations/delete/(\d+)$#', $uri, $matches)) {
     (new DonationController())->delete($matches[1]);
 }
 
+// Rotas de Campanhas
+elseif ($uri == '/admin/campaigns') {
+    (new CampaignController())->index();
+}
+elseif ($uri == '/admin/campaigns/create') {
+    if ($method == 'POST') {
+        (new CampaignController())->store();
+    } else {
+        (new CampaignController())->create();
+    }
+}
+elseif (preg_match('#^/admin/campaigns/edit/(\d+)$#', $uri, $matches)) {
+    if ($method == 'POST') {
+        (new CampaignController())->update($matches[1]);
+    } else {
+        (new CampaignController())->edit($matches[1]);
+    }
+}
+elseif (preg_match('#^/admin/campaigns/delete/(\d+)$#', $uri, $matches) && $method == 'POST') {
+    (new CampaignController())->delete($matches[1]);
+}
+elseif (preg_match('#^/admin/campaigns/(\d+)/participants$#', $uri, $matches) && $method == 'POST') {
+    (new CampaignController())->addParticipant($matches[1]);
+}
+elseif (preg_match('#^/admin/campaigns/participants/(\d+)/remove$#', $uri, $matches) && $method == 'POST') {
+    (new CampaignController())->removeParticipant($matches[1]);
+}
+elseif (preg_match('#^/admin/campaigns/participants/(\d+)/installments$#', $uri, $matches) && $method == 'POST') {
+    (new CampaignController())->addInstallment($matches[1]);
+}
+elseif (preg_match('#^/admin/campaigns/installments/(\d+)/pay$#', $uri, $matches) && $method == 'POST') {
+    (new CampaignController())->payInstallment($matches[1]);
+}
+elseif (preg_match('#^/admin/campaigns/installments/(\d+)/unpay$#', $uri, $matches) && $method == 'POST') {
+    (new CampaignController())->unpayInstallment($matches[1]);
+}
+elseif (preg_match('#^/admin/campaigns/participants/(\d+)$#', $uri, $matches)) {
+    (new CampaignController())->showParticipant($matches[1]);
+}
+elseif (preg_match('#^/admin/campaigns/(\d+)$#', $uri, $matches)) {
+    (new CampaignController())->show($matches[1]);
+}
+
 // Portal Routes
 elseif ($uri == '/portal/login') {
     if ($method == 'POST') {
@@ -1157,6 +1200,12 @@ elseif ($uri == '/portal/financial') {
 }
 elseif ($uri == '/portal/financial-health') {
     (new PortalController())->financialHealth();
+}
+elseif ($uri == '/portal/campaigns') {
+    (new PortalController())->campaigns();
+}
+elseif (preg_match('#^/portal/campaigns/(\d+)$#', $uri, $matches)) {
+    (new PortalController())->campaignShow($matches[1]);
 }
 elseif ($uri == '/portal/card') {
     (new PortalController())->card();

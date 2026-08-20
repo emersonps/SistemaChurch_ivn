@@ -51,6 +51,8 @@ return array (
         39 => 'donations.manage',
         40 => 'video_wall.view',
         41 => 'video_wall.manage',
+        42 => 'campaigns.view',
+        43 => 'campaigns.manage',
       ),
     ),
     'secretary' =>
@@ -72,6 +74,8 @@ return array (
         11 => 'financial.manage',
         12 => 'donations.view',
         13 => 'donations.manage',
+        14 => 'campaigns.view',
+        15 => 'campaigns.manage',
       ),
     ),
     'developer' =>
