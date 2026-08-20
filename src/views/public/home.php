@@ -1142,8 +1142,12 @@ $firstAndLastName = function ($name) {
         }
         .floating-faith-card {
             position: relative;
+            z-index: 1;
             width: 46px;
             height: 46px;
+        }
+        .floating-faith-card.is-expanded {
+            z-index: 20;
         }
         .floating-faith-toggle {
             width: 46px;
@@ -1215,6 +1219,9 @@ $firstAndLastName = function ($name) {
             background: rgba(255,255,255,0.3);
         }
         @media (hover: hover) and (pointer: fine) {
+            .floating-faith-card:not(.is-suppressed):hover {
+                z-index: 20;
+            }
             .floating-faith-card:not(.is-suppressed):hover .floating-faith-popover {
                 display: block;
             }
