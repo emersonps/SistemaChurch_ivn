@@ -1116,75 +1116,47 @@ $firstAndLastName = function ($name) {
         .social-icon:hover {
             color: var(--primary-gold);
         }
+        /* Menu lateral flutuante — ícones discretos que se expandem ao passar o mouse/tocar. */
+        /* !important necessário: layout/footer.php define seu próprio .harpa-fab/.donate-fab
+           mais adiante no documento, com a mesma especificidade. */
+        .harpa-fab, .donate-fab {
+            display: none !important;
+        }
         .floating-faith-actions {
             position: fixed;
-            left: 0;
-            right: 0;
-            bottom: 0;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
             z-index: 1085;
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
+            display: flex;
+            flex-direction: column;
             gap: .6rem;
-            padding: .6rem .85rem calc(.6rem + env(safe-area-inset-bottom, 0px));
-            background: rgba(255, 255, 255, 0.78);
-            backdrop-filter: blur(18px);
-            box-shadow: 0 -16px 32px rgba(0,0,0,0.12);
-            border-top: 1px solid rgba(15,18,28,0.08);
-            transition: transform .22s ease, opacity .18s ease, visibility .18s ease;
+            transition: transform .22s ease;
         }
         .floating-faith-actions.is-suppressed {
-            opacity: 0;
-            visibility: hidden;
             pointer-events: none;
-            transform: translateY(110%);
-        }
-        .floating-faith-hover-zone {
-            display: none;
+            transform: translateY(-50%) translateX(140%);
         }
         .floating-faith-item {
-            display: flex;
-            min-width: 0;
+            display: block;
         }
         .floating-faith-card {
-            width: 100%;
-            min-width: 0;
-            border: none;
-            border-radius: 20px;
-            color: #fff;
-            box-shadow: 0 12px 24px rgba(0,0,0,0.14);
-            backdrop-filter: blur(10px);
-            overflow: hidden;
-            transition: box-shadow .18s ease, transform .18s ease;
-        }
-        .floating-faith-card.is-expanded {
-            transform: translateY(-1px);
-            box-shadow: 0 18px 34px rgba(0,0,0,0.22);
-        }
-        .floating-faith-card.is-collapsed {
-            width: 100%;
-        }
-        .floating-faith-card.is-expanded {
-            width: 100%;
+            position: relative;
+            width: 46px;
+            height: 46px;
         }
         .floating-faith-toggle {
-            width: 100%;
+            width: 46px;
+            height: 46px;
             border: none;
-            background: transparent;
-            min-height: 52px;
-            padding: .6rem .75rem;
+            border-radius: 14px;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: .65rem;
-            color: inherit;
-            text-align: center;
             cursor: pointer;
-            user-select: none;
+            color: #fff;
+            box-shadow: 0 10px 22px rgba(0,0,0,0.22);
             -webkit-tap-highlight-color: transparent;
-        }
-        .floating-faith-card:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 16px 28px rgba(0,0,0,0.2);
         }
         .floating-faith-toggle:focus-visible,
         .floating-faith-action:focus-visible {
@@ -1192,86 +1164,75 @@ $firstAndLastName = function ($name) {
             outline-offset: 2px;
         }
         .floating-faith-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 13px;
+            font-size: 1.1rem;
             display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            flex: 0 0 40px;
-            background: rgba(255,255,255,0.18);
-            font-size: 1rem;
         }
-        .floating-faith-content {
-            min-width: 0;
-            flex: 0 1 auto;
-            opacity: 1;
-            transition: opacity .16s ease;
-            text-align: center;
-        }
-        .floating-faith-card.is-collapsed .floating-faith-toggle {
-            justify-content: center;
-        }
-        .floating-faith-card.is-collapsed .floating-faith-icon {
-            margin: 0;
-        }
-        .floating-faith-card.is-collapsed .floating-faith-content span {
+        .floating-faith-popover {
             display: none;
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 224px;
+            border-radius: 16px;
+            color: #fff;
+            padding: .65rem .85rem .85rem;
+            box-shadow: 0 16px 30px rgba(0,0,0,0.3);
         }
-        .floating-faith-card.is-expanded .floating-faith-toggle {
-            padding-bottom: .55rem;
+        .floating-faith-card.is-expanded .floating-faith-popover {
+            display: block;
         }
         .floating-faith-content strong {
             display: block;
-            font-size: .9rem;
-            line-height: 1.2;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            font-size: .88rem;
+            margin-bottom: .2rem;
         }
         .floating-faith-content span {
             display: block;
-            font-size: .8rem;
-            opacity: .9;
-            line-height: 1.25;
-        }
-        .floating-faith-action-wrap {
-            padding: 0 .9rem .9rem;
-            max-height: 88px;
-            opacity: 1;
-            overflow: hidden;
-            transition: max-height .18s ease, opacity .18s ease, padding .18s ease;
-        }
-        .floating-faith-card.is-collapsed .floating-faith-action-wrap {
-            max-height: 0;
-            opacity: 0;
-            padding-bottom: 0;
-            pointer-events: none;
+            font-size: .76rem;
+            opacity: .92;
+            line-height: 1.3;
+            margin-bottom: .6rem;
         }
         .floating-faith-action {
             width: 100%;
             border: none;
-            border-radius: 14px;
-            padding: .72rem .9rem;
+            border-radius: 12px;
+            padding: .55rem .75rem;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: .55rem;
+            gap: .5rem;
             text-decoration: none;
             color: #fff;
-            background: rgba(255,255,255,0.16);
+            background: rgba(255,255,255,0.2);
             font-weight: 700;
+            font-size: .8rem;
+            white-space: nowrap;
             transition: background .16s ease;
         }
         .floating-faith-action:hover {
             color: #fff;
-            background: rgba(255,255,255,0.24);
+            background: rgba(255,255,255,0.3);
+        }
+        @media (hover: hover) and (pointer: fine) {
+            .floating-faith-card:not(.is-suppressed):hover .floating-faith-popover {
+                display: block;
+            }
+        }
+        .floating-faith-toggle, .floating-faith-popover {
+            background: var(--faith-gradient);
+        }
+        .floating-faith-card-donate {
+            --faith-gradient: linear-gradient(135deg, #ff8a00 0%, #b30000 100%);
         }
         .floating-faith-card-prayer {
-            background: linear-gradient(135deg, #8b1538 0%, #c62662 100%);
+            --faith-gradient: linear-gradient(135deg, #8b1538 0%, #c62662 100%);
         }
         .floating-faith-card-devotional {
-            background: linear-gradient(135deg, #3c1d25 0%, #6f3a54 100%);
+            --faith-gradient: linear-gradient(135deg, #3c1d25 0%, #6f3a54 100%);
+        }
+        .floating-faith-card-harpa {
+            --faith-gradient: linear-gradient(135deg, #ff2a7a 0%, #d4af37 100%);
         }
         .devotional-modal .modal-content {
             border: none;
@@ -1438,31 +1399,6 @@ $firstAndLastName = function ($name) {
         .devotional-modal .btn {
             border-radius: 999px;
             font-weight: 700;
-        }
-        @media (hover: hover) and (pointer: fine) and (min-width: 992px) {
-            .floating-faith-hover-zone {
-                position: fixed;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                height: 22px;
-                display: block;
-                z-index: 1084;
-            }
-            .floating-faith-actions {
-                transform: translateY(calc(100% + 8px));
-                opacity: 0;
-                pointer-events: none;
-                transition: transform .22s ease, opacity .18s ease, box-shadow .18s ease;
-            }
-            .floating-faith-hover-zone:hover + .floating-faith-actions,
-            .floating-faith-actions:hover,
-            .floating-faith-actions:focus-within,
-            .floating-faith-actions.is-visible {
-                transform: translateY(0);
-                opacity: 1;
-                pointer-events: auto;
-            }
         }
         @media (max-width: 991.98px) {
             .hero-section {
@@ -1867,39 +1803,35 @@ $firstAndLastName = function ($name) {
                 padding: .15rem .15rem 0;
             }
             .floating-faith-actions {
-                gap: .55rem;
-                padding: .55rem .65rem calc(.55rem + env(safe-area-inset-bottom, 0px));
+                right: 10px;
+                top: auto;
+                bottom: 90px;
+                transform: none;
+                gap: .5rem;
+            }
+            .floating-faith-actions.is-suppressed {
+                transform: translateX(120%);
             }
             .floating-faith-card {
-                border-radius: 16px;
+                width: 42px;
+                height: 42px;
             }
             .floating-faith-toggle {
-                min-height: 50px;
-                padding: .58rem .68rem;
-                gap: .7rem;
+                width: 42px;
+                height: 42px;
             }
-            .floating-faith-card.is-collapsed .floating-faith-toggle {
-                padding: .58rem .68rem;
-                gap: .6rem;
-            }
-            .floating-faith-icon {
-                width: 38px;
-                height: 38px;
-                border-radius: 12px;
-                flex-basis: 38px;
+            .floating-faith-popover {
+                width: 196px;
             }
             .floating-faith-content strong {
-                font-size: .84rem;
+                font-size: .82rem;
             }
             .floating-faith-content span {
-                font-size: .72rem;
-            }
-            .floating-faith-action-wrap {
-                padding: 0 .8rem .8rem;
+                font-size: .7rem;
             }
             .floating-faith-action {
-                padding: .68rem .7rem;
-                font-size: .8rem;
+                padding: .5rem .7rem;
+                font-size: .78rem;
             }
             .birthdays-modal-grid {
                 grid-template-columns: 1fr;
@@ -2954,18 +2886,33 @@ $firstAndLastName = function ($name) {
             }
         }
     ?>
-    <div class="floating-faith-hover-zone" aria-hidden="true"></div>
-    <div class="floating-faith-actions" aria-label="Ações rápidas de fé">
+    <div class="floating-faith-actions" aria-label="Ações rápidas">
+        <div class="floating-faith-item">
+            <div class="floating-faith-card floating-faith-card-donate is-collapsed" data-faith-card>
+                <button type="button" class="floating-faith-toggle" data-faith-toggle aria-expanded="false" aria-label="Abrir doação">
+                    <span class="floating-faith-icon"><i class="fas fa-hand-holding-heart"></i></span>
+                </button>
+                <div class="floating-faith-popover">
+                    <div class="floating-faith-content">
+                        <strong>Doação</strong>
+                        <span>Contribua com a obra via PIX.</span>
+                    </div>
+                    <a href="/doacao" class="floating-faith-action">
+                        <i class="fas fa-qrcode"></i> Fazer doação
+                    </a>
+                </div>
+            </div>
+        </div>
         <div class="floating-faith-item">
             <div class="floating-faith-card floating-faith-card-prayer is-collapsed" data-faith-card>
                 <button type="button" class="floating-faith-toggle" data-faith-toggle aria-expanded="false" aria-label="Abrir oração">
                     <span class="floating-faith-icon"><i class="fas fa-hands-praying"></i></span>
-                    <span class="floating-faith-content">
+                </button>
+                <div class="floating-faith-popover">
+                    <div class="floating-faith-content">
                         <strong>Oração</strong>
                         <span>Fale com a igreja e compartilhe seu pedido.</span>
-                    </span>
-                </button>
-                <div class="floating-faith-action-wrap">
+                    </div>
                     <a href="<?= htmlspecialchars($prayerLink) ?>" class="floating-faith-action" target="<?= htmlspecialchars($prayerTarget) ?>"<?= $prayerTarget === '_blank' ? ' rel="noopener noreferrer"' : '' ?>>
                         <i class="fas fa-paper-plane"></i> Fazer pedido
                     </a>
@@ -2976,15 +2923,31 @@ $firstAndLastName = function ($name) {
             <div class="floating-faith-card floating-faith-card-devotional is-collapsed" data-faith-card>
                 <button type="button" class="floating-faith-toggle" data-faith-toggle aria-expanded="false" aria-label="Abrir devocional">
                     <span class="floating-faith-icon"><i class="fas fa-book-bible"></i></span>
-                    <span class="floating-faith-content">
+                </button>
+                <div class="floating-faith-popover">
+                    <div class="floating-faith-content">
                         <strong>Devocional</strong>
                         <span>Abra um devocional e receba uma meditação.</span>
-                    </span>
-                </button>
-                <div class="floating-faith-action-wrap">
+                    </div>
                     <button type="button" class="floating-faith-action" data-bs-toggle="modal" data-bs-target="#devotionalModal">
                         <i class="fas fa-sparkles"></i> Abrir palavra
                     </button>
+                </div>
+            </div>
+        </div>
+        <div class="floating-faith-item">
+            <div class="floating-faith-card floating-faith-card-harpa is-collapsed" data-faith-card>
+                <button type="button" class="floating-faith-toggle" data-faith-toggle aria-expanded="false" aria-label="Abrir Harpa Cristã">
+                    <span class="floating-faith-icon"><i class="fas fa-music"></i></span>
+                </button>
+                <div class="floating-faith-popover">
+                    <div class="floating-faith-content">
+                        <strong>Harpa Cristã</strong>
+                        <span>Consulte hinos e letras.</span>
+                    </div>
+                    <a href="/harpa" class="floating-faith-action">
+                        <i class="fas fa-book-open"></i> Abrir Harpa
+                    </a>
                 </div>
             </div>
         </div>
@@ -3096,8 +3059,6 @@ $firstAndLastName = function ($name) {
             const faithCards = document.querySelectorAll('[data-faith-card]');
             const faithToggles = document.querySelectorAll('[data-faith-toggle]');
             const faithDock = document.querySelector('.floating-faith-actions');
-            const faithHoverZone = document.querySelector('.floating-faith-hover-zone');
-            const desktopFaithHoverMedia = window.matchMedia('(hover: hover) and (pointer: fine) and (min-width: 992px)');
             const homeModals = document.querySelectorAll('.modal');
             const devotionalPool = <?= json_encode($devotionalVerses, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;
             const devotionalModal = document.getElementById('devotionalModal');
@@ -3109,7 +3070,6 @@ $firstAndLastName = function ($name) {
             const devotionalShareButton = document.getElementById('devotionalShareButton');
             const devotionalShareFeedback = document.getElementById('devotionalShareFeedback');
             let devotionalShareFeedbackTimer = 0;
-            let isFaithDockVisible = false;
 
             function setDevotionalShareFeedback(message) {
                 if (!devotionalShareFeedback) return;
@@ -3133,25 +3093,6 @@ $firstAndLastName = function ($name) {
                 return verseText + (verseReference ? ' - ' + verseReference : '') + (verseTheme ? ' | Tema: ' + verseTheme : '') + (churchLabel ? ' | ' + churchLabel : '');
             }
 
-            function updateFaithDockInset() {
-                if (!faithDock || !document.body) return;
-                const hasExpandedCard = Array.from(faithCards).some(function(card) {
-                    return card.classList.contains('is-expanded');
-                });
-                const isSuppressed = faithDock.classList.contains('is-suppressed');
-                const useCompactInset = isSuppressed || (desktopFaithHoverMedia.matches && !isFaithDockVisible && !hasExpandedCard);
-                const baseInset = useCompactInset ? 14 : 116;
-                const measured = useCompactInset ? 14 : (faithDock.offsetHeight || 0) + 16;
-                document.body.style.paddingBottom = String(Math.max(baseInset, measured)) + 'px';
-            }
-
-            function setFaithDockVisibility(visible) {
-                if (!faithDock || !desktopFaithHoverMedia.matches) return;
-                isFaithDockVisible = visible;
-                faithDock.classList.toggle('is-visible', visible);
-                updateFaithDockInset();
-            }
-
             function setFaithCardState(card, expanded) {
                 if (!card) return;
                 card.classList.toggle('is-expanded', expanded);
@@ -3171,8 +3112,6 @@ $firstAndLastName = function ($name) {
                     faithCards.forEach(function(item) {
                         setFaithCardState(item, item === card ? shouldExpand : false);
                     });
-
-                    updateFaithDockInset();
                 });
             });
 
@@ -3181,29 +3120,7 @@ $firstAndLastName = function ($name) {
                 faithCards.forEach(function(card) {
                     setFaithCardState(card, false);
                 });
-                if (desktopFaithHoverMedia.matches) {
-                    setFaithDockVisibility(false);
-                    return;
-                }
-                updateFaithDockInset();
             });
-
-            if (faithHoverZone && faithDock) {
-                faithHoverZone.addEventListener('mouseenter', function() {
-                    setFaithDockVisibility(true);
-                });
-                faithDock.addEventListener('mouseenter', function() {
-                    setFaithDockVisibility(true);
-                });
-                faithDock.addEventListener('mouseleave', function() {
-                    const hasExpandedCard = Array.from(faithCards).some(function(card) {
-                        return card.classList.contains('is-expanded');
-                    });
-                    if (!hasExpandedCard) {
-                        setFaithDockVisibility(false);
-                    }
-                });
-            }
 
             homeModals.forEach(function(modalEl) {
                 modalEl.addEventListener('show.bs.modal', function() {
@@ -3213,23 +3130,14 @@ $firstAndLastName = function ($name) {
                     if (faithDock) {
                         faithDock.classList.add('is-suppressed');
                     }
-                    updateFaithDockInset();
                 });
 
                 modalEl.addEventListener('hidden.bs.modal', function() {
                     if (faithDock) {
                         faithDock.classList.remove('is-suppressed');
                     }
-                    if (desktopFaithHoverMedia.matches) {
-                        setFaithDockVisibility(false);
-                        return;
-                    }
-                    updateFaithDockInset();
                 });
             });
-
-            window.addEventListener('resize', updateFaithDockInset);
-            updateFaithDockInset();
 
             function renderDevotional(index) {
                 if (!Array.isArray(devotionalPool) || !devotionalPool.length || !devotionalVerseText || !devotionalVerseReference) return;
