@@ -1034,6 +1034,37 @@ elseif (preg_match('#^/admin/service_reports/update/(\d+)$#', $uri, $matches)) {
     (new ServiceReportController())->update($matches[1]);
 }
 
+// Rotas do Mural de Vídeos
+elseif ($uri == '/admin/video-wall') {
+    (new VideoWallController())->index();
+}
+elseif ($uri == '/admin/video-wall/create') {
+    if ($method == 'POST') {
+        (new VideoWallController())->store();
+    } else {
+        (new VideoWallController())->create();
+    }
+}
+elseif (preg_match('#^/admin/video-wall/edit/(\d+)$#', $uri, $matches)) {
+    if ($method == 'POST') {
+        (new VideoWallController())->update($matches[1]);
+    } else {
+        (new VideoWallController())->edit($matches[1]);
+    }
+}
+elseif (preg_match('#^/admin/video-wall/delete/(\d+)$#', $uri, $matches) && $method == 'POST') {
+    (new VideoWallController())->delete($matches[1]);
+}
+elseif (preg_match('#^/admin/video-wall/toggle-featured/(\d+)$#', $uri, $matches) && $method == 'POST') {
+    (new VideoWallController())->toggleFeatured($matches[1]);
+}
+elseif ($uri == '/mural-de-videos') {
+    (new VideoWallController())->publicIndex();
+}
+elseif (preg_match('#^/mural-de-videos/assistir/(\d+)$#', $uri, $matches)) {
+    (new VideoWallController())->watch($matches[1]);
+}
+
 // Rotas de Banners
 elseif ($uri == '/admin/banners') {
     (new BannerController())->index();

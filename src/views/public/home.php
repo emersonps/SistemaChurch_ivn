@@ -2287,6 +2287,55 @@ $firstAndLastName = function ($name) {
         </div>
     </section>
 
+    <!-- Mural de Vídeos: featured message -->
+    <?php
+    try {
+        $featuredVideo = (new Database())->connect()->query("SELECT * FROM video_wall WHERE is_featured = 1 LIMIT 1")->fetch(PDO::FETCH_ASSOC);
+    } catch (Throwable $e) {
+        $featuredVideo = false;
+    }
+    ?>
+    <?php if (!empty($featuredVideo)): ?>
+    <section id="mensagem-destaque" class="py-5">
+        <div class="container py-4">
+            <div class="text-center mb-4">
+                <h2 class="section-title">Mensagem em Destaque</h2>
+            </div>
+            <div class="row justify-content-center">
+                <div class="col-lg-9">
+                    <div class="row g-4 align-items-center bg-white rounded-4 shadow-sm p-3 p-md-4">
+                        <div class="col-md-5">
+                            <a href="/mural-de-videos/assistir/<?= (int)$featuredVideo['id'] ?>" target="_blank" rel="noopener" class="d-block position-relative rounded-3 overflow-hidden" style="aspect-ratio: 16/9;">
+                                <img src="https://img.youtube.com/vi/<?= htmlspecialchars($featuredVideo['youtube_video_id']) ?>/hqdefault.jpg" alt="" class="w-100 h-100" style="object-fit: cover;">
+                                <span class="position-absolute top-50 start-50 translate-middle text-white" style="font-size: 2.5rem;"><i class="fas fa-circle-play"></i></span>
+                            </a>
+                        </div>
+                        <div class="col-md-7">
+                            <span class="badge bg-dark bg-opacity-75 mb-2"><?= htmlspecialchars($featuredVideo['category']) ?></span>
+                            <h3 class="h5 fw-bold mb-1"><?= htmlspecialchars($featuredVideo['title']) ?></h3>
+                            <p class="text-muted small mb-2">
+                                <?= !empty($featuredVideo['video_date']) ? date('d \d\e F', strtotime($featuredVideo['video_date'])) : '' ?>
+                                <?php if (!empty($featuredVideo['speaker'])): ?> · <?= htmlspecialchars($featuredVideo['speaker']) ?><?php endif; ?>
+                            </p>
+                            <?php if (!empty($featuredVideo['description'])): ?>
+                                <p class="mb-3"><?= htmlspecialchars($featuredVideo['description']) ?></p>
+                            <?php endif; ?>
+                            <div class="d-flex flex-wrap gap-2">
+                                <a href="/mural-de-videos/assistir/<?= (int)$featuredVideo['id'] ?>" target="_blank" rel="noopener" class="btn btn-dark btn-sm rounded-pill px-3">
+                                    <i class="fas fa-play me-1"></i> Assistir Agora
+                                </a>
+                                <a href="/mural-de-videos" class="btn btn-outline-dark btn-sm rounded-pill px-3">
+                                    Ver Todos os Vídeos <i class="fas fa-arrow-right ms-1"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <?php endif; ?>
+
     <!-- Services (Cultos) Section -->
     <section id="cultos" class="py-5 bg-light">
         <div class="container py-5">

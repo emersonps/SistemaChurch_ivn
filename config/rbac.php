@@ -49,6 +49,8 @@ return array (
         37 => 'general_reports.view',
         38 => 'donations.view',
         39 => 'donations.manage',
+        40 => 'video_wall.view',
+        41 => 'video_wall.manage',
       ),
     ),
     'secretary' =>

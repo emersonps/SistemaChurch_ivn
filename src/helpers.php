@@ -1282,3 +1282,23 @@ function sanitizeBasicRichText($html) {
 
     return trim($result);
 }
+
+// Extracts the 11-char video id from any common YouTube URL shape
+// (watch?v=, youtu.be/, /embed/, /shorts/). Returns '' if it doesn't
+// recognize the URL at all.
+function extractYoutubeVideoId($url) {
+    $url = trim((string)$url);
+    if ($url === '') {
+        return '';
+    }
+
+    if (preg_match('#(?:youtube\.com/(?:watch\?v=|embed/|shorts/)|youtu\.be/)([A-Za-z0-9_-]{11})#', $url, $matches)) {
+        return $matches[1];
+    }
+
+    return '';
+}
+
+function getVideoWallCategories() {
+    return ['Cultos', 'Mensagens', 'Louvores', 'Jovens', 'Eventos'];
+}

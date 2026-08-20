@@ -341,6 +341,14 @@ $mobileLauncherHref = '/admin?launcher=1';
                         </li>
                         <?php endif; ?>
 
+                        <?php if (hasPermission('video_wall.view') || hasPermission('video_wall.manage')): ?>
+                        <li class="nav-item">
+                            <a class="nav-link <?= strpos($_SERVER['REQUEST_URI'], '/admin/video-wall') !== false ? 'active' : 'text-dark' ?>" href="/admin/video-wall">
+                                <i class="fas fa-clapperboard me-2"></i> Mural de Vídeos
+                            </a>
+                        </li>
+                        <?php endif; ?>
+
                         <?php if (hasPermission('banners.view') || hasPermission('banners.manage')): ?>
                         <li class="nav-item">
                             <a class="nav-link <?= strpos($_SERVER['REQUEST_URI'], '/admin/banners') !== false ? 'active' : 'text-dark' ?>" href="/admin/banners">
