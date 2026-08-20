@@ -1054,6 +1054,19 @@ $mobileLauncherHref = '/admin?launcher=1';
                         // every admin page load with a blank white screen.
                     }
 
+                    try {
+                        $globalSettingsSyncService = new CentralGlobalSettingsSyncService();
+                        if ($globalSettingsSyncService->isEnabled()) {
+                            $globalSettingsSyncService->syncSettings();
+                        }
+                    } catch (Throwable $e) {
+                        // Same reasoning as the users-sync block above: this
+                        // is what brings centrally-edited branding and demo
+                        // landing config down automatically, but must never
+                        // break an admin page load if the central is
+                        // unreachable or the payload is momentarily invalid.
+                    }
+
                     $db = (new Database())->connect();
                     $currentMonth = date('Y-m');
                     

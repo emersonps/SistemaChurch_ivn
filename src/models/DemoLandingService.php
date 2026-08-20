@@ -3,10 +3,14 @@
 //
 // Powers an optional "product demo" landing page shown at / instead of the
 // normal homepage. Off by default on every instance — only meant for a
-// dedicated demo/sales instance (e.g. IgrejaBR), turned on via
-// /developer/settings on that instance specifically. When on, it keeps a
-// small set of demo accounts' passwords rotating every 2 days so visitors
-// always get a fresh, short-lived credential to try the product with.
+// dedicated demo/sales instance (e.g. IgrejaBR). The enabled flag, public
+// URL and the three demo usernames are edited centrally in Central's
+// "Página de Demonstração" screen and reach this instance through the
+// existing global-settings sync (CentralGlobalSettingsSyncService), which
+// writes them into the same settings table read here. When on, this
+// service keeps the configured demo accounts' passwords rotating every 2
+// days so visitors always get a fresh, short-lived credential to try the
+// product with.
 
 class DemoLandingService {
     private $db;
@@ -24,16 +28,6 @@ class DemoLandingService {
             'secretary_username' => $this->getSetting('demo_secretary_username', ''),
             'member_username' => $this->getSetting('demo_member_username', ''),
         ];
-    }
-
-    public function saveConfig(array $data) {
-        $this->saveSetting('demo_landing_enabled', !empty($data['enabled']) ? '1' : '0');
-        $this->saveSetting('demo_public_url', trim((string)($data['public_url'] ?? '')));
-        $this->saveSetting('demo_admin_username', trim((string)($data['admin_username'] ?? '')));
-        $this->saveSetting('demo_secretary_username', trim((string)($data['secretary_username'] ?? '')));
-        $this->saveSetting('demo_member_username', trim((string)($data['member_username'] ?? '')));
-
-        return $this->getConfig();
     }
 
     // Rotates any configured demo account's password if the last rotation
@@ -76,12 +70,10 @@ class DemoLandingService {
         ];
     }
 
-    // Manual override for /developer/settings — rotates immediately instead
-    // of waiting for the 2-day window, e.g. right after fixing a
-    // misconfigured username so the fix doesn't sit unused for 2 days.
-    // Returns a per-slot report ([label => bool applied]) so the settings
-    // screen can say exactly which accounts were found, instead of the
-    // demo page silently showing a blank password with no explanation.
+    // Called by CentralGlobalSettingsSyncService right after a sync brings
+    // in new demo-landing config, so a corrected username takes effect
+    // immediately instead of sitting unused until the next 2-day window.
+    // Returns a per-slot report ([label => bool applied]) for logging.
     public function forceRotateNow() {
         $config = $this->getConfig();
         $slots = [

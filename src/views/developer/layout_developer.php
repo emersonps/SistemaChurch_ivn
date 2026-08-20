@@ -93,11 +93,6 @@
                         </a>
                     </li>
                     <li class="nav-item border-top mt-2 pt-2">
-                        <a class="nav-link <?= strpos($_SERVER['REQUEST_URI'], '/developer/settings') !== false ? 'active' : '' ?>" href="/developer/settings">
-                            <i class="fas fa-flask me-2"></i> Página de Demonstração
-                        </a>
-                    </li>
-                    <li class="nav-item">
                         <a class="nav-link text-danger" href="/admin/logout">
                             <i class="fas fa-sign-out-alt me-2"></i> Sair
                         </a>
@@ -168,11 +163,6 @@
                             </a>
                         </li>
                         <li class="nav-item border-top mt-2 pt-2">
-                            <a class="nav-link <?= strpos($_SERVER['REQUEST_URI'], '/developer/settings') !== false ? 'active' : '' ?>" href="/developer/settings">
-                                <i class="fas fa-flask me-2"></i> Página de Demonstração
-                            </a>
-                        </li>
-                        <li class="nav-item">
                             <a class="nav-link text-danger" href="/admin/logout">
                                 <i class="fas fa-sign-out-alt me-2"></i> Sair
                             </a>

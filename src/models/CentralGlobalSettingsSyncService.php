@@ -71,6 +71,11 @@ class CentralGlobalSettingsSyncService {
             $this->saveSetting($key, (string)$value);
         }
 
+        $demoLandingKeys = ['demo_landing_enabled', 'demo_public_url', 'demo_admin_username', 'demo_secretary_username', 'demo_member_username'];
+        if (array_intersect($demoLandingKeys, array_keys($payload))) {
+            (new DemoLandingService())->forceRotateNow();
+        }
+
         if ($newName !== '' && $newAlias !== '') {
             $whiteLabelService->saveBrandingSettings($this->db, $newAlias, $newName, $logoUrl !== '' ? $logoUrl : null);
             $whiteLabelService->applyBranding($newAlias, $newName);
