@@ -76,6 +76,21 @@ class DemoLandingService {
         ];
     }
 
+    // Manual override for /developer/settings — rotates immediately instead
+    // of waiting for the 2-day window, e.g. right after fixing a
+    // misconfigured username so the fix doesn't sit unused for 2 days.
+    public function forceRotateNow() {
+        $config = $this->getConfig();
+        $slots = [
+            'admin' => ['label' => 'Administrador', 'username' => $config['admin_username']],
+            'secretary' => ['label' => 'Secretaria', 'username' => $config['secretary_username']],
+            'member' => ['label' => 'Membro', 'username' => $config['member_username']],
+        ];
+
+        $this->rotateAll($slots);
+        $this->saveSetting('demo_credentials_rotated_at', date('Y-m-d H:i:s'));
+    }
+
     private function rotateAll(array $slots) {
         foreach ($slots as $key => $slot) {
             if ($slot['username'] === '') {
@@ -84,11 +99,28 @@ class DemoLandingService {
 
             $plainPassword = $this->generatePassword();
             $hash = password_hash($plainPassword, PASSWORD_DEFAULT);
+            $applied = false;
 
             $stmt = $this->db->prepare('UPDATE users SET password = ? WHERE username = ?');
             $stmt->execute([$hash, $slot['username']]);
-
             if ($stmt->rowCount() > 0) {
+                $applied = true;
+            }
+
+            // The "member" slot is usually a portal login identified by
+            // CPF, not a users.username row — try that too (same lookup
+            // as "Alterar senha por CPF"). Harmless no-op if the value
+            // isn't CPF-shaped or doesn't match anyone.
+            $cpf = preg_replace('/[^0-9]/', '', $slot['username']);
+            if ($cpf !== '') {
+                $memberStmt = $this->db->prepare("UPDATE members SET password = ? WHERE REPLACE(REPLACE(REPLACE(cpf, '.', ''), '-', ''), ' ', '') = ?");
+                $memberStmt->execute([$hash, $cpf]);
+                if ($memberStmt->rowCount() > 0) {
+                    $applied = true;
+                }
+            }
+
+            if ($applied) {
                 $this->saveSetting('demo_' . $key . '_password_plain', $plainPassword);
             }
         }

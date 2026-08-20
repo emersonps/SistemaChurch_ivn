@@ -180,7 +180,8 @@ class DeveloperController {
     public function saveDemoLanding() {
         $this->requireDeveloper();
 
-        (new DemoLandingService())->saveConfig([
+        $service = new DemoLandingService();
+        $service->saveConfig([
             'enabled' => isset($_POST['demo_landing_enabled']),
             'public_url' => $_POST['demo_public_url'] ?? '',
             'admin_username' => $_POST['demo_admin_username'] ?? '',
@@ -188,7 +189,11 @@ class DeveloperController {
             'member_username' => $_POST['demo_member_username'] ?? '',
         ]);
 
-        $_SESSION['success'] = 'Configuração da página de demonstração salva com sucesso.';
+        // Re-rotate immediately so a corrected username takes effect right
+        // away instead of sitting unused until the next 2-day window.
+        $service->forceRotateNow();
+
+        $_SESSION['success'] = 'Configuração da página de demonstração salva e senhas atualizadas com sucesso.';
         redirect('/developer/settings');
     }
 
