@@ -1306,5 +1306,11 @@ function extractYoutubeVideoId($url) {
 }
 
 function getVideoWallCategories() {
-    return ['Cultos', 'Mensagens', 'Louvores', 'Jovens', 'Eventos'];
+    try {
+        $db = (new Database())->connect();
+        $names = $db->query('SELECT name FROM video_wall_categories ORDER BY name ASC')->fetchAll(PDO::FETCH_COLUMN);
+        return $names ?: ['Mensagens'];
+    } catch (Throwable $e) {
+        return ['Cultos', 'Mensagens', 'Louvores', 'Jovens', 'Eventos'];
+    }
 }

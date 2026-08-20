@@ -1052,6 +1052,15 @@ elseif (preg_match('#^/admin/video-wall/delete/(\d+)$#', $uri, $matches) && $met
 elseif (preg_match('#^/admin/video-wall/toggle-featured/(\d+)$#', $uri, $matches) && $method == 'POST') {
     (new VideoWallController())->toggleFeatured($matches[1]);
 }
+elseif ($uri == '/admin/video-wall/categories' && $method == 'POST') {
+    (new VideoWallController())->categoryStore();
+}
+elseif (preg_match('#^/admin/video-wall/categories/rename/(\d+)$#', $uri, $matches) && $method == 'POST') {
+    (new VideoWallController())->categoryRename($matches[1]);
+}
+elseif (preg_match('#^/admin/video-wall/categories/delete/(\d+)$#', $uri, $matches) && $method == 'POST') {
+    (new VideoWallController())->categoryDelete($matches[1]);
+}
 elseif ($uri == '/mural-de-videos') {
     (new VideoWallController())->publicIndex();
 }

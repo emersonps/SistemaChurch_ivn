@@ -24,7 +24,12 @@
             </div>
             <div class="row g-3 mb-3">
                 <div class="col-md-6">
-                    <label class="form-label">Categoria</label>
+                    <label class="form-label d-flex justify-content-between align-items-center">
+                        <span>Categoria</span>
+                        <button type="button" class="btn btn-link btn-sm p-0" data-bs-toggle="modal" data-bs-target="#categoryModal">
+                            <i class="fas fa-gear me-1"></i>Gerenciar
+                        </button>
+                    </label>
                     <select name="category" class="form-select">
                         <?php foreach ($categories as $cat): ?>
                             <option value="<?= htmlspecialchars($cat) ?>" <?= $video['category'] === $cat ? 'selected' : '' ?>><?= htmlspecialchars($cat) ?></option>
@@ -48,5 +53,7 @@
         </form>
     </div>
 </div>
+
+<?php include __DIR__ . '/partials/category_modal.php'; ?>
 
 <?php include __DIR__ . '/../../layout/footer.php'; ?>
