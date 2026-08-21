@@ -156,21 +156,37 @@ class SiteSettingsController {
             }
         }
         
-        $stmt = $db->prepare("UPDATE site_settings SET 
-            theme_id = ?, 
-            primary_color = ?, 
-            secondary_color = ?, 
-            font_family = ?, 
-            hero_bg_image = ?
-        ");
-        
-        $stmt->execute([
-            $theme_id,
-            $selectedTheme['primary_color'],
-            $selectedTheme['secondary_color'],
-            $selectedTheme['font_family'],
-            $hero_bg_image
-        ]);
+        $existingId = $db->query("SELECT id FROM site_settings LIMIT 1")->fetchColumn();
+
+        if ($existingId) {
+            $stmt = $db->prepare("UPDATE site_settings SET
+                theme_id = ?,
+                primary_color = ?,
+                secondary_color = ?,
+                font_family = ?,
+                hero_bg_image = ?
+                WHERE id = ?
+            ");
+
+            $stmt->execute([
+                $theme_id,
+                $selectedTheme['primary_color'],
+                $selectedTheme['secondary_color'],
+                $selectedTheme['font_family'],
+                $hero_bg_image,
+                $existingId
+            ]);
+        } else {
+            $stmt = $db->prepare("INSERT INTO site_settings (theme_id, primary_color, secondary_color, font_family, hero_bg_image) VALUES (?, ?, ?, ?, ?)");
+
+            $stmt->execute([
+                $theme_id,
+                $selectedTheme['primary_color'],
+                $selectedTheme['secondary_color'],
+                $selectedTheme['font_family'],
+                $hero_bg_image
+            ]);
+        }
         
         $_SESSION['flash_success'] = "Layout do site atualizado com sucesso!";
         redirect('/admin/site-settings');
