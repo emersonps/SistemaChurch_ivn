@@ -693,9 +693,9 @@ $mobileLauncherHref = '/admin?launcher=1';
                 </style>
                 <div class="app-topbar d-none d-lg-flex align-items-center justify-content-between mb-3">
                     <div class="d-flex align-items-center gap-2">
-                        <div class="app-topbar-mark">SC</div>
+                        <div class="app-topbar-mark">IB</div>
                         <div>
-                            <div class="app-topbar-product">SistemaChurch</div>
+                            <div class="app-topbar-product">IgrejaBR Gestão de Igreja</div>
                             <div class="app-topbar-tagline">PAINEL DE GESTÃO ECLESIÁSTICA</div>
                         </div>
                     </div>
