@@ -1,12 +1,21 @@
 <?php include __DIR__ . '/../../layout/header.php'; ?>
 
-<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-    <h1 class="h2">Modelos de Escala</h1>
-    <div class="d-flex gap-2">
-        <a href="/admin/liturgy-schedules" class="btn btn-sm btn-outline-secondary rounded-pill px-3"><i class="fas fa-list me-1"></i> Ver Escalas</a>
-        <a href="/admin/liturgy-schedules/templates/create" class="btn btn-sm btn-primary rounded-pill px-3"><i class="fas fa-plus me-1"></i> Novo Modelo</a>
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-end pt-3 pb-2 mb-3 border-bottom">
+    <div>
+        <h1 class="h2 mb-2">Modelos de Escala</h1>
+        <ul class="nav nav-pills ls-section-nav">
+            <li class="nav-item"><a class="nav-link" href="/admin/liturgy-schedules"><i class="fas fa-calendar-check me-1"></i> Escalas</a></li>
+            <li class="nav-item"><a class="nav-link active" href="/admin/liturgy-schedules/templates"><i class="fas fa-sliders me-1"></i> Modelos</a></li>
+        </ul>
     </div>
+    <a href="/admin/liturgy-schedules/templates/create" class="btn btn-sm btn-primary rounded-pill px-3"><i class="fas fa-plus me-1"></i> Novo Modelo</a>
 </div>
+
+<style>
+    .ls-section-nav { --bs-nav-link-padding-y: .35rem; margin-bottom: 0; }
+    .ls-section-nav .nav-link { font-size: .85rem; font-weight: 600; color: #495057; padding: .35rem .9rem; }
+    .ls-section-nav .nav-link.active { background-color: #212529; color: #fff; }
+</style>
 
 <?php if (isset($_SESSION['success'])): ?>
     <div class="alert alert-success"><?= htmlspecialchars($_SESSION['success']) ?></div>

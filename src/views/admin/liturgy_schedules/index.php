@@ -1,11 +1,14 @@
 <?php include __DIR__ . '/../../layout/header.php'; ?>
 
-<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-    <h1 class="h2">Escalas Litúrgicas</h1>
-    <div class="d-flex gap-2">
-        <a href="/admin/liturgy-schedules/templates" class="btn btn-sm btn-outline-secondary rounded-pill px-3"><i class="fas fa-sliders me-1"></i> Modelos</a>
-        <a href="/admin/liturgy-schedules/create" class="btn btn-sm btn-primary rounded-pill px-3"><i class="fas fa-plus me-1"></i> Nova Escala</a>
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-end pt-3 pb-2 mb-3 border-bottom">
+    <div>
+        <h1 class="h2 mb-2">Escalas Litúrgicas</h1>
+        <ul class="nav nav-pills ls-section-nav">
+            <li class="nav-item"><a class="nav-link active" href="/admin/liturgy-schedules"><i class="fas fa-calendar-check me-1"></i> Escalas</a></li>
+            <li class="nav-item"><a class="nav-link" href="/admin/liturgy-schedules/templates"><i class="fas fa-sliders me-1"></i> Modelos</a></li>
+        </ul>
     </div>
+    <a href="/admin/liturgy-schedules/create" class="btn btn-sm btn-primary rounded-pill px-3"><i class="fas fa-plus me-1"></i> Nova Escala</a>
 </div>
 
 <?php if (isset($_SESSION['success'])): ?>
@@ -28,6 +31,9 @@
     .ls-stat-label { font-size: .72rem; text-transform: uppercase; letter-spacing: .04em; color: #868e96; font-weight: 700; }
     .ls-stat-value { font-size: 1.5rem; font-weight: 800; color: #212529; }
     .icon-btn { width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; padding: 0; }
+    .ls-section-nav { --bs-nav-link-padding-y: .35rem; margin-bottom: 0; }
+    .ls-section-nav .nav-link { font-size: .85rem; font-weight: 600; color: #495057; padding: .35rem .9rem; }
+    .ls-section-nav .nav-link.active { background-color: #212529; color: #fff; }
 </style>
 
 <div class="row g-3 mb-4">
