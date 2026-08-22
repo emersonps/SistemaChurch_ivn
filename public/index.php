@@ -1068,6 +1068,50 @@ elseif (preg_match('#^/mural-de-videos/assistir/(\d+)$#', $uri, $matches)) {
     (new VideoWallController())->watch($matches[1]);
 }
 
+// Rotas de Escalas Litúrgicas
+elseif ($uri == '/admin/liturgy-schedules/templates') {
+    (new LiturgyScheduleController())->templates();
+}
+elseif ($uri == '/admin/liturgy-schedules/templates/create') {
+    if ($method == 'POST') {
+        (new LiturgyScheduleController())->templateStore();
+    } else {
+        (new LiturgyScheduleController())->templateCreate();
+    }
+}
+elseif (preg_match('#^/admin/liturgy-schedules/templates/edit/(\d+)$#', $uri, $matches)) {
+    if ($method == 'POST') {
+        (new LiturgyScheduleController())->templateUpdate($matches[1]);
+    } else {
+        (new LiturgyScheduleController())->templateEdit($matches[1]);
+    }
+}
+elseif (preg_match('#^/admin/liturgy-schedules/templates/delete/(\d+)$#', $uri, $matches) && $method == 'POST') {
+    (new LiturgyScheduleController())->templateDelete($matches[1]);
+}
+elseif ($uri == '/admin/liturgy-schedules/create') {
+    if ($method == 'POST') {
+        (new LiturgyScheduleController())->store();
+    } else {
+        (new LiturgyScheduleController())->create();
+    }
+}
+elseif (preg_match('#^/admin/liturgy-schedules/edit/(\d+)$#', $uri, $matches)) {
+    (new LiturgyScheduleController())->edit($matches[1]);
+}
+elseif (preg_match('#^/admin/liturgy-schedules/update/(\d+)$#', $uri, $matches) && $method == 'POST') {
+    (new LiturgyScheduleController())->update($matches[1]);
+}
+elseif (preg_match('#^/admin/liturgy-schedules/delete/(\d+)$#', $uri, $matches) && $method == 'POST') {
+    (new LiturgyScheduleController())->delete($matches[1]);
+}
+elseif (preg_match('#^/admin/liturgy-schedules/(\d+)/print$#', $uri, $matches)) {
+    (new LiturgyScheduleController())->print($matches[1]);
+}
+elseif ($uri == '/admin/liturgy-schedules') {
+    (new LiturgyScheduleController())->index();
+}
+
 // Rotas de Banners
 elseif ($uri == '/admin/banners') {
     (new BannerController())->index();

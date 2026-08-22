@@ -886,6 +886,12 @@ function getPermissionMenuDefinitions() {
             'children' => ['video_wall.manage']
         ],
         [
+            'section' => 'Secretaria',
+            'title' => 'Escalas Litúrgicas',
+            'parent' => 'liturgy_schedules.view',
+            'children' => ['liturgy_schedules.manage']
+        ],
+        [
             'section' => 'Financeiro',
             'title' => 'Financeiro',
             'parent' => 'financial.view',
@@ -1372,4 +1378,29 @@ function getCampaignProgress($campaignId) {
         'percent' => $percent,
         'percent_display' => min(100, round($percent)),
     ];
+}
+
+// Lista curada de papéis litúrgicos que um modelo de escala pode ligar/desligar.
+// As chaves são fixas (usadas como chave em roles_config/values_json); os labels
+// são só o texto padrão sugerido — cada modelo pode reescrevê-los.
+function getLiturgyScheduleRoleCatalog() {
+    return [
+        'dirigente' => 'Dirigente',
+        'pregador' => 'Pregação',
+        'portaria' => 'Portaria',
+        'recepcao' => 'Recepção',
+        'louvor' => 'Louvor/Ministração',
+        'diacono' => 'Diácono de Plantão',
+        'regencia' => 'Regência',
+        'ebd' => 'EBD',
+    ];
+}
+
+function getLiturgyScheduleWeekdayPt($dateStr) {
+    $days = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
+    $ts = strtotime((string)$dateStr);
+    if ($ts === false) {
+        return '';
+    }
+    return $days[(int)date('w', $ts)];
 }

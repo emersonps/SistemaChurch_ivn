@@ -53,6 +53,8 @@ return array (
         41 => 'video_wall.manage',
         42 => 'campaigns.view',
         43 => 'campaigns.manage',
+        44 => 'liturgy_schedules.view',
+        45 => 'liturgy_schedules.manage',
       ),
     ),
     'secretary' =>
@@ -76,6 +78,8 @@ return array (
         13 => 'donations.manage',
         14 => 'campaigns.view',
         15 => 'campaigns.manage',
+        16 => 'liturgy_schedules.view',
+        17 => 'liturgy_schedules.manage',
       ),
     ),
     'developer' =>
