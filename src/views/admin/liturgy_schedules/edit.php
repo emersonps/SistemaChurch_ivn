@@ -5,22 +5,19 @@
 // conteúdo que a tela de impressão mostra) — editar e clicar em "Salvar"
 // atualiza o texto após o recarregamento da página.
 $waLines = [];
-$waLines[] = '📋 *' . $schedule['title'] . '*';
-if (!empty($schedule['congregation_name'])) {
-    $waLines[] = $schedule['congregation_name'];
-}
-$waLines[] = '';
+$waLines[] = '*' . $schedule['title'] . '*';
 foreach ($entries as $entry) {
-    $waLines[] = date('d/m', strtotime($entry['service_date'])) . ' (' . $entry['weekday'] . ')' . (!empty($entry['service_label']) ? ' - ' . $entry['service_label'] : '');
+    $dateLine = date('d/m', strtotime($entry['service_date'])) . ' (' . $entry['weekday'] . ')' . (!empty($entry['service_label']) ? ' - ' . $entry['service_label'] : '');
+    $waLines[] = '*' . $dateLine . '*';
     foreach ($rolesConfig as $role) {
         $val = trim((string)($entry['values'][$role['key']] ?? ''));
         if ($val !== '') {
-            $waLines[] = $role['label'] . ': ' . $val;
+            $waLines[] = '*' . $role['label'] . '*: ' . $val;
         }
     }
     $obs = trim((string)($entry['values']['observacoes'] ?? ''));
     if ($obs !== '') {
-        $waLines[] = 'Obs: ' . $obs;
+        $waLines[] = '*Observações*: ' . $obs;
     }
     $waLines[] = '';
 }

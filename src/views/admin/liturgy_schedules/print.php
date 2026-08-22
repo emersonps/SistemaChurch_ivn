@@ -24,6 +24,13 @@
             padding-bottom: 10px;
             border-bottom: 3px solid #C89A3D;
         }
+        .header-logo {
+            display: block;
+            margin: 0 auto 8px;
+            max-height: 70px;
+            max-width: 220px;
+            object-fit: contain;
+        }
         .header h1 {
             margin: 0;
             font-size: 20px;
@@ -92,12 +99,15 @@
 </head>
 <body>
 
+    <?php $siteProfile = getChurchSiteProfileSettings(); ?>
+
     <div class="no-print">
         <button onclick="window.print()">Imprimir</button>
         <button onclick="window.close()">Fechar</button>
     </div>
 
     <div class="header">
+        <img class="header-logo" src="<?= htmlspecialchars(getChurchLogoUrl($siteProfile, true)) ?>" alt="" onerror="this.style.display='none'">
         <h1><?= htmlspecialchars($schedule['title']) ?></h1>
         <h2><?= htmlspecialchars($schedule['congregation_name'] ?? 'Todas as congregações') ?></h2>
     </div>
