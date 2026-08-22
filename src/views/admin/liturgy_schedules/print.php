@@ -76,6 +76,15 @@
             color: #444;
             margin-top: 6px;
         }
+        .verse-box {
+            text-align: center;
+            font-style: italic;
+            font-size: 12px;
+            color: #C89A3D;
+            border-top: 1px solid #C89A3D;
+            padding-top: 10px;
+            margin-top: 18px;
+        }
         .footer {
             margin-top: 20px;
             text-align: center;
@@ -147,6 +156,8 @@
     <?php if (!empty($schedule['notes'])): ?>
         <div class="notes-box"><?= nl2br(htmlspecialchars($schedule['notes'])) ?></div>
     <?php endif; ?>
+
+    <div class="verse-box">&ldquo;Tudo seja feito com decência e ordem.&rdquo; &mdash; 1 Coríntios 14:40</div>
 
     <div class="footer">
         <p>Gerado em <?= date('d/m/Y H:i') ?></p>
