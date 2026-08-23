@@ -46,9 +46,6 @@ foreach ($congregacoes as $c) {
         .nav-link.active, .nav-link:hover { color: var(--primary-red) !important; }
 
         .cultos-page-wrap { padding: 2.5rem 0 4rem; }
-        .cultos-breadcrumb { font-size: .82rem; color: #9a8f92; margin-bottom: 1rem; }
-        .cultos-breadcrumb a { color: #9a8f92; text-decoration: none; }
-        .cultos-breadcrumb a:hover { color: var(--primary-red); }
         .cultos-page-head {
             display: flex;
             align-items: flex-end;
@@ -58,9 +55,8 @@ foreach ($congregacoes as $c) {
             margin-bottom: 1.75rem;
         }
         .cultos-page-head h1 {
-            font-family: Georgia, 'Times New Roman', serif;
             font-size: 2.4rem;
-            font-weight: 700;
+            font-weight: 800;
             margin-bottom: .5rem;
         }
         .cultos-page-head p { color: #6b7280; max-width: 560px; margin-bottom: 0; }
@@ -404,8 +400,6 @@ foreach ($congregacoes as $c) {
     </nav>
 
     <div class="container cultos-page-wrap">
-        <nav class="cultos-breadcrumb"><a href="/">Início</a> &nbsp;›&nbsp; <span>Cultos</span></nav>
-
         <div class="cultos-page-head">
             <div>
                 <h1>Programação Semanal</h1>
