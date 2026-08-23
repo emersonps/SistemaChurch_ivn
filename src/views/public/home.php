@@ -452,7 +452,7 @@ $firstAndLastName = function ($name) {
             background: rgba(255,255,255,0.88);
         }
 
-        .home-live-section {
+        .section-tint {
             background: #f6f3f5;
         }
         .birthdays-modal .modal-content {
@@ -2283,7 +2283,7 @@ $firstAndLastName = function ($name) {
     </header>
 
     <!-- Services (Cultos) Section -->
-    <section id="cultos" class="py-5 bg-light">
+    <section id="cultos" class="py-5 section-tint">
         <div class="container py-5">
             <?php $cultosSchedule = getCultosScheduleData($cultos); ?>
             <?php if (empty($cultosSchedule)): ?>
@@ -2529,7 +2529,7 @@ $firstAndLastName = function ($name) {
     }
     ?>
     <?php if (!empty($homeVideos)): ?>
-    <section id="mural-de-videos" class="py-5">
+    <section id="mural-de-videos" class="py-5 section-tint">
         <div class="container py-4">
             <div class="cultos-preview-head">
                 <span class="section-panel-kicker"><i class="fas fa-video"></i> Mural de vídeos</span>
@@ -2593,7 +2593,7 @@ $firstAndLastName = function ($name) {
     <?php endif; ?>
 
     <!-- Events Section -->
-    <section id="eventos" class="py-5">
+    <section id="eventos" class="py-5 section-tint">
         <div class="container py-5">
             <?php if (empty($eventos)): ?>
                 <div class="flat-strip-head">
@@ -2798,7 +2798,7 @@ $firstAndLastName = function ($name) {
     </section>
 
     <!-- Congregations Section -->
-    <section id="congregacoes" class="py-5">
+    <section id="congregacoes" class="py-5 section-tint">
         <div class="container py-5">
             <?php if (empty($congregacoes)): ?>
                 <div class="flat-strip-head">
