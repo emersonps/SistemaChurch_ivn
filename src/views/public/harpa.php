@@ -582,6 +582,8 @@ $hymnsJson = json_encode($hymns, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES
         </div>
     </div>
 
+    <?php include __DIR__ . '/partials/floating_faith_widget.php'; ?>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         const hymns = <?= $hymnsJson ?: '[]' ?>;

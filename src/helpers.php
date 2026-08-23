@@ -1404,3 +1404,148 @@ function getLiturgyScheduleWeekdayPt($dateStr) {
     }
     return $days[(int)date('w', $ts)];
 }
+
+function getDevotionalVerses() {
+        $devotionalVersesByTheme = [
+            'Ansiedade' => [
+                ['text' => 'Lançando sobre ele toda a vossa ansiedade, porque ele tem cuidado de vós.', 'reference' => '1 Pedro 5:7', 'testament' => 'Novo Testamento'],
+                ['text' => 'Não andeis ansiosos por coisa alguma; em tudo, porém, sejam conhecidas diante de Deus as vossas petições.', 'reference' => 'Filipenses 4:6', 'testament' => 'Novo Testamento'],
+                ['text' => 'No dia em que eu temer, hei de confiar em ti.', 'reference' => 'Salmo 56:3', 'testament' => 'Velho Testamento'],
+                ['text' => 'Deixo-vos a paz, a minha paz vos dou; não se turbe o vosso coração, nem se atemorize.', 'reference' => 'João 14:27', 'testament' => 'Novo Testamento'],
+                ['text' => 'Entregue o seu caminho ao Senhor; confie nele, e ele agirá.', 'reference' => 'Salmo 37:5', 'testament' => 'Velho Testamento'],
+                ['text' => 'Quando a ansiedade já me dominava no íntimo, o teu consolo trouxe alívio à minha alma.', 'reference' => 'Salmo 94:19', 'testament' => 'Velho Testamento'],
+                ['text' => 'O Senhor é bom, um refúgio em tempos de angústia. Ele protege os que nele confiam.', 'reference' => 'Naum 1:7', 'testament' => 'Velho Testamento'],
+                ['text' => 'Venham a mim todos os que estão cansados e sobrecarregados, e eu lhes darei descanso.', 'reference' => 'Mateus 11:28', 'testament' => 'Novo Testamento'],
+                ['text' => 'Tu conservarás em perfeita paz aquele cujo propósito é firme, porque em ti confia.', 'reference' => 'Isaías 26:3', 'testament' => 'Velho Testamento']
+            ],
+            'Fé' => [
+                ['text' => 'Ora, a fé é a certeza daquilo que esperamos e a prova das coisas que não vemos.', 'reference' => 'Hebreus 11:1', 'testament' => 'Novo Testamento'],
+                ['text' => 'Sem fé é impossível agradar a Deus.', 'reference' => 'Hebreus 11:6', 'testament' => 'Novo Testamento'],
+                ['text' => 'Porque vivemos por fé, e não pelo que vemos.', 'reference' => '2 Coríntios 5:7', 'testament' => 'Novo Testamento'],
+                ['text' => 'Se tiverdes fé do tamanho de um grão de mostarda, nada vos será impossível.', 'reference' => 'Mateus 17:20', 'testament' => 'Novo Testamento'],
+                ['text' => 'O justo viverá pela sua fé.', 'reference' => 'Habacuque 2:4', 'testament' => 'Velho Testamento'],
+                ['text' => 'Tudo é possível ao que crê.', 'reference' => 'Marcos 9:23', 'testament' => 'Novo Testamento'],
+                ['text' => 'Confia no Senhor de todo o teu coração e não te estribes no teu próprio entendimento.', 'reference' => 'Provérbios 3:5', 'testament' => 'Velho Testamento'],
+                ['text' => 'Peça-a, porém, com fé, em nada duvidando.', 'reference' => 'Tiago 1:6', 'testament' => 'Novo Testamento'],
+                ['text' => 'Esperei confiantemente pelo Senhor, e ele se inclinou para mim e me ouviu.', 'reference' => 'Salmo 40:1', 'testament' => 'Velho Testamento']
+            ],
+            'Promessas' => [
+                ['text' => 'Porque eu bem sei os planos que tenho para vós, diz o Senhor, planos de paz e não de mal.', 'reference' => 'Jeremias 29:11', 'testament' => 'Velho Testamento'],
+                ['text' => 'Das promessas do Senhor nenhuma falhou; todas se cumpriram.', 'reference' => 'Josué 21:45', 'testament' => 'Velho Testamento'],
+                ['text' => 'Fiel é o que vos chama, o qual também o fará.', 'reference' => '1 Tessalonicenses 5:24', 'testament' => 'Novo Testamento'],
+                ['text' => 'Todas as promessas de Deus encontram nele o sim.', 'reference' => '2 Coríntios 1:20', 'testament' => 'Novo Testamento'],
+                ['text' => 'Aquele que prometeu é fiel.', 'reference' => 'Hebreus 10:23', 'testament' => 'Novo Testamento'],
+                ['text' => 'O céu e a terra passarão, mas as minhas palavras jamais passarão.', 'reference' => 'Mateus 24:35', 'testament' => 'Novo Testamento'],
+                ['text' => 'A palavra do nosso Deus permanece eternamente.', 'reference' => 'Isaías 40:8', 'testament' => 'Velho Testamento'],
+                ['text' => 'Bendito seja o Senhor, que deu repouso ao seu povo, segundo tudo o que prometera.', 'reference' => '1 Reis 8:56', 'testament' => 'Velho Testamento'],
+                ['text' => 'Guardemos firme a confissão da esperança, sem vacilar.', 'reference' => 'Hebreus 10:23', 'testament' => 'Novo Testamento']
+            ],
+            'Força' => [
+                ['text' => 'Posso todas as coisas naquele que me fortalece.', 'reference' => 'Filipenses 4:13', 'testament' => 'Novo Testamento'],
+                ['text' => 'O Senhor é a minha força e o meu cântico.', 'reference' => 'Salmo 118:14', 'testament' => 'Velho Testamento'],
+                ['text' => 'Os que esperam no Senhor renovarão as suas forças.', 'reference' => 'Isaías 40:31', 'testament' => 'Velho Testamento'],
+                ['text' => 'Diga o fraco: Eu sou forte.', 'reference' => 'Joel 3:10', 'testament' => 'Velho Testamento'],
+                ['text' => 'A minha graça te basta, porque o poder se aperfeiçoa na fraqueza.', 'reference' => '2 Coríntios 12:9', 'testament' => 'Novo Testamento'],
+                ['text' => 'Sede fortes e revigore-se o vosso coração, vós todos que esperais no Senhor.', 'reference' => 'Salmo 31:24', 'testament' => 'Velho Testamento'],
+                ['text' => 'Fortalecei-vos no Senhor e na força do seu poder.', 'reference' => 'Efésios 6:10', 'testament' => 'Novo Testamento'],
+                ['text' => 'Deus é o que me cinge de força e aperfeiçoa o meu caminho.', 'reference' => 'Salmo 18:32', 'testament' => 'Velho Testamento'],
+                ['text' => 'Não temas, porque eu sou contigo; eu te fortaleço e te ajudo.', 'reference' => 'Isaías 41:10', 'testament' => 'Velho Testamento']
+            ],
+            'Esperança' => [
+                ['text' => 'Porque eu sei em quem tenho crido.', 'reference' => '2 Timóteo 1:12', 'testament' => 'Novo Testamento'],
+                ['text' => 'Bendito o homem que confia no Senhor e cuja esperança é o Senhor.', 'reference' => 'Jeremias 17:7', 'testament' => 'Velho Testamento'],
+                ['text' => 'Quero trazer à memória o que me pode dar esperança.', 'reference' => 'Lamentações 3:21', 'testament' => 'Velho Testamento'],
+                ['text' => 'Alegrai-vos na esperança, sede pacientes na tribulação, perseverai na oração.', 'reference' => 'Romanos 12:12', 'testament' => 'Novo Testamento'],
+                ['text' => 'Ora, o Deus de esperança vos encha de todo o gozo e paz no vosso crer.', 'reference' => 'Romanos 15:13', 'testament' => 'Novo Testamento'],
+                ['text' => 'A esperança que se retarda deixa o coração doente, mas o desejo cumprido é árvore de vida.', 'reference' => 'Provérbios 13:12', 'testament' => 'Velho Testamento'],
+                ['text' => 'Bom é aguardar a salvação do Senhor, e isso, em silêncio.', 'reference' => 'Lamentações 3:26', 'testament' => 'Velho Testamento'],
+                ['text' => 'Temos esta esperança como âncora da alma, firme e segura.', 'reference' => 'Hebreus 6:19', 'testament' => 'Novo Testamento'],
+                ['text' => 'Mas eu esperarei continuamente e te louvarei cada vez mais.', 'reference' => 'Salmo 71:14', 'testament' => 'Velho Testamento']
+            ],
+            'Paz' => [
+                ['text' => 'Tu conservarás em perfeita paz aquele cujo propósito é firme, porque em ti confia.', 'reference' => 'Isaías 26:3', 'testament' => 'Velho Testamento'],
+                ['text' => 'Deixo-vos a paz, a minha paz vos dou.', 'reference' => 'João 14:27', 'testament' => 'Novo Testamento'],
+                ['text' => 'O Senhor dará força ao seu povo; o Senhor abençoará o seu povo com paz.', 'reference' => 'Salmo 29:11', 'testament' => 'Velho Testamento'],
+                ['text' => 'Que a paz de Cristo seja o árbitro em vosso coração.', 'reference' => 'Colossenses 3:15', 'testament' => 'Novo Testamento'],
+                ['text' => 'Grande paz têm os que amam a tua lei.', 'reference' => 'Salmo 119:165', 'testament' => 'Velho Testamento'],
+                ['text' => 'Em paz me deito e logo pego no sono, porque, Senhor, só tu me fazes repousar seguro.', 'reference' => 'Salmo 4:8', 'testament' => 'Velho Testamento'],
+                ['text' => 'A paz de Deus, que excede todo entendimento, guardará o vosso coração.', 'reference' => 'Filipenses 4:7', 'testament' => 'Novo Testamento'],
+                ['text' => 'Bem-aventurados os pacificadores, porque serão chamados filhos de Deus.', 'reference' => 'Mateus 5:9', 'testament' => 'Novo Testamento'],
+                ['text' => 'O fruto da justiça semeia-se em paz.', 'reference' => 'Tiago 3:18', 'testament' => 'Novo Testamento']
+            ],
+            'Salvação' => [
+                ['text' => 'Porque Deus amou o mundo de tal maneira que deu o seu Filho unigênito.', 'reference' => 'João 3:16', 'testament' => 'Novo Testamento'],
+                ['text' => 'Crê no Senhor Jesus e serás salvo, tu e tua casa.', 'reference' => 'Atos 16:31', 'testament' => 'Novo Testamento'],
+                ['text' => 'O Senhor é a minha luz e a minha salvação; de quem terei medo?', 'reference' => 'Salmo 27:1', 'testament' => 'Velho Testamento'],
+                ['text' => 'Todo aquele que invocar o nome do Senhor será salvo.', 'reference' => 'Romanos 10:13', 'testament' => 'Novo Testamento'],
+                ['text' => 'Em nenhum outro há salvação.', 'reference' => 'Atos 4:12', 'testament' => 'Novo Testamento'],
+                ['text' => 'Com alegria tirareis água das fontes da salvação.', 'reference' => 'Isaías 12:3', 'testament' => 'Velho Testamento'],
+                ['text' => 'Pela graça sois salvos, mediante a fé.', 'reference' => 'Efésios 2:8', 'testament' => 'Novo Testamento'],
+                ['text' => 'O Senhor desnudou o seu santo braço perante todas as nações; e todos verão a salvação do nosso Deus.', 'reference' => 'Isaías 52:10', 'testament' => 'Velho Testamento'],
+                ['text' => 'Eu sou o caminho, e a verdade, e a vida; ninguém vem ao Pai senão por mim.', 'reference' => 'João 14:6', 'testament' => 'Novo Testamento']
+            ],
+            'Oração' => [
+                ['text' => 'Orai sem cessar.', 'reference' => '1 Tessalonicenses 5:17', 'testament' => 'Novo Testamento'],
+                ['text' => 'A oração de um justo é poderosa e eficaz.', 'reference' => 'Tiago 5:16', 'testament' => 'Novo Testamento'],
+                ['text' => 'Buscai o Senhor enquanto se pode achar; invocai-o enquanto está perto.', 'reference' => 'Isaías 55:6', 'testament' => 'Velho Testamento'],
+                ['text' => 'Clama a mim, e responder-te-ei.', 'reference' => 'Jeremias 33:3', 'testament' => 'Velho Testamento'],
+                ['text' => 'Se permanecerdes em mim, e as minhas palavras permanecerem em vós, pedireis o que quiserdes.', 'reference' => 'João 15:7', 'testament' => 'Novo Testamento'],
+                ['text' => 'Invoca-me no dia da angústia; eu te livrarei, e tu me glorificarás.', 'reference' => 'Salmo 50:15', 'testament' => 'Velho Testamento'],
+                ['text' => 'Tudo quanto pedirdes em oração, crendo, recebereis.', 'reference' => 'Mateus 21:22', 'testament' => 'Novo Testamento'],
+                ['text' => 'Eu amo o Senhor, porque ele ouve a minha voz e as minhas súplicas.', 'reference' => 'Salmo 116:1', 'testament' => 'Velho Testamento'],
+                ['text' => 'Antes de clamarem, eu responderei.', 'reference' => 'Isaías 65:24', 'testament' => 'Velho Testamento']
+            ],
+            'Sabedoria' => [
+                ['text' => 'Se, porém, algum de vós necessita de sabedoria, peça-a a Deus.', 'reference' => 'Tiago 1:5', 'testament' => 'Novo Testamento'],
+                ['text' => 'O temor do Senhor é o princípio da sabedoria.', 'reference' => 'Provérbios 9:10', 'testament' => 'Velho Testamento'],
+                ['text' => 'Entrega o teu caminho ao Senhor; confia nele, e o mais ele fará.', 'reference' => 'Salmo 37:5', 'testament' => 'Velho Testamento'],
+                ['text' => 'A sabedoria do alto é primeiramente pura, depois pacífica, indulgente.', 'reference' => 'Tiago 3:17', 'testament' => 'Novo Testamento'],
+                ['text' => 'Ensina-nos a contar os nossos dias, para que alcancemos coração sábio.', 'reference' => 'Salmo 90:12', 'testament' => 'Velho Testamento'],
+                ['text' => 'Reconhece-o em todos os teus caminhos, e ele endireitará as tuas veredas.', 'reference' => 'Provérbios 3:6', 'testament' => 'Velho Testamento'],
+                ['text' => 'A tua palavra é lâmpada para os meus pés e luz para o meu caminho.', 'reference' => 'Salmo 119:105', 'testament' => 'Velho Testamento'],
+                ['text' => 'Quem ouve estas minhas palavras e as pratica será comparado a um homem prudente.', 'reference' => 'Mateus 7:24', 'testament' => 'Novo Testamento'],
+                ['text' => 'Cristo Jesus se nos tornou da parte de Deus sabedoria.', 'reference' => '1 Coríntios 1:30', 'testament' => 'Novo Testamento']
+            ],
+            'Gratidão' => [
+                ['text' => 'Em tudo dai graças, porque esta é a vontade de Deus.', 'reference' => '1 Tessalonicenses 5:18', 'testament' => 'Novo Testamento'],
+                ['text' => 'Rendei graças ao Senhor, porque ele é bom; porque a sua misericórdia dura para sempre.', 'reference' => 'Salmo 136:1', 'testament' => 'Velho Testamento'],
+                ['text' => 'Bendize, ó minha alma, ao Senhor, e não te esqueças de nenhum de seus benefícios.', 'reference' => 'Salmo 103:2', 'testament' => 'Velho Testamento'],
+                ['text' => 'Graças a Deus por seu dom indescritível.', 'reference' => '2 Coríntios 9:15', 'testament' => 'Novo Testamento'],
+                ['text' => 'Celebrai com júbilo ao Senhor, todos os moradores da terra.', 'reference' => 'Salmo 100:1', 'testament' => 'Velho Testamento'],
+                ['text' => 'Cantarei ao Senhor por tudo o que me tem feito.', 'reference' => 'Salmo 13:6', 'testament' => 'Velho Testamento'],
+                ['text' => 'Louvando a Deus e contando com a simpatia de todo o povo.', 'reference' => 'Atos 2:47', 'testament' => 'Novo Testamento'],
+                ['text' => 'Ofereçamos sempre, por meio de Jesus, a Deus sacrifício de louvor.', 'reference' => 'Hebreus 13:15', 'testament' => 'Novo Testamento'],
+                ['text' => 'Entrai por suas portas com ações de graças.', 'reference' => 'Salmo 100:4', 'testament' => 'Velho Testamento']
+            ],
+            'Amor' => [
+                ['text' => 'Acima de tudo, porém, revistam-se do amor, que é o elo perfeito.', 'reference' => 'Colossenses 3:14', 'testament' => 'Novo Testamento'],
+                ['text' => 'Nós amamos porque ele nos amou primeiro.', 'reference' => '1 João 4:19', 'testament' => 'Novo Testamento'],
+                ['text' => 'O amor é paciente, o amor é bondoso.', 'reference' => '1 Coríntios 13:4', 'testament' => 'Novo Testamento'],
+                ['text' => 'Muitas águas não poderiam apagar o amor.', 'reference' => 'Cânticos 8:7', 'testament' => 'Velho Testamento'],
+                ['text' => 'Amarás o teu próximo como a ti mesmo.', 'reference' => 'Mateus 22:39', 'testament' => 'Novo Testamento'],
+                ['text' => 'O Senhor teu Deus está no meio de ti, poderoso para salvar; ele se deleitará em ti com alegria.', 'reference' => 'Sofonias 3:17', 'testament' => 'Velho Testamento'],
+                ['text' => 'Nisto conhecerão todos que sois meus discípulos: se tiverdes amor uns aos outros.', 'reference' => 'João 13:35', 'testament' => 'Novo Testamento'],
+                ['text' => 'O ódio excita contendas, mas o amor cobre todas as transgressões.', 'reference' => 'Provérbios 10:12', 'testament' => 'Velho Testamento'],
+                ['text' => 'Acima de tudo, tende amor intenso uns para com os outros.', 'reference' => '1 Pedro 4:8', 'testament' => 'Novo Testamento']
+            ],
+            'Direção' => [
+                ['text' => 'Eu o instruirei e o ensinarei no caminho que você deve seguir.', 'reference' => 'Salmo 32:8', 'testament' => 'Velho Testamento'],
+                ['text' => 'O coração do homem pode fazer planos, mas a resposta certa vem do Senhor.', 'reference' => 'Provérbios 16:1', 'testament' => 'Velho Testamento'],
+                ['text' => 'Mostra-me, Senhor, os teus caminhos, ensina-me as tuas veredas.', 'reference' => 'Salmo 25:4', 'testament' => 'Velho Testamento'],
+                ['text' => 'Se alguém quer fazer a vontade dele, conhecerá a respeito da doutrina.', 'reference' => 'João 7:17', 'testament' => 'Novo Testamento'],
+                ['text' => 'O homem faz planos, mas o Senhor dirige os seus passos.', 'reference' => 'Provérbios 16:9', 'testament' => 'Velho Testamento'],
+                ['text' => 'As tuas ovelhas ouvem a minha voz; eu as conheço, e elas me seguem.', 'reference' => 'João 10:27', 'testament' => 'Novo Testamento'],
+                ['text' => 'Guia-me pela vereda da justiça por amor do seu nome.', 'reference' => 'Salmo 23:3', 'testament' => 'Velho Testamento'],
+                ['text' => 'Quando vier, porém, o Espírito da verdade, ele vos guiará a toda a verdade.', 'reference' => 'João 16:13', 'testament' => 'Novo Testamento'],
+                ['text' => 'Confia no Senhor de todo o teu coração... e ele endireitará as tuas veredas.', 'reference' => 'Provérbios 3:5-6', 'testament' => 'Velho Testamento']
+            ]
+        ];
+    $devotionalVerses = [];
+    foreach ($devotionalVersesByTheme as $theme => $themeVerses) {
+        foreach ($themeVerses as $verse) {
+            $verse['theme'] = $theme;
+            $devotionalVerses[] = $verse;
+        }
+    }
+    return $devotionalVerses;
+}
