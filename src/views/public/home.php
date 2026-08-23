@@ -471,6 +471,13 @@ $firstAndLastName = function ($name) {
         .panel-soft-head.panel-scrollable {
             padding-right: 6.75rem;
         }
+        .panel-soft-head-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
         .panel-soft-body {
             padding: 1.35rem;
         }
@@ -670,10 +677,6 @@ $firstAndLastName = function ($name) {
             padding: 0;
             height: 100%;
         }
-        .cultos-card-head,
-        .section-panel-head {
-            padding-right: 6.75rem;
-        }
         .upcoming-list {
             display: grid;
             gap: .9rem;
@@ -822,7 +825,7 @@ $firstAndLastName = function ($name) {
             text-transform: uppercase;
             letter-spacing: .04em;
         }
-        .cultos-card-nav {
+        .carousel-mini-nav {
             display: flex;
             align-items: center;
             gap: .6rem;
@@ -848,7 +851,7 @@ $firstAndLastName = function ($name) {
             color: #6b7280;
             white-space: nowrap;
         }
-        .cultos-mini-btn {
+        .carousel-mini-btn {
             width: 30px;
             height: 30px;
             border-radius: 50%;
@@ -862,11 +865,11 @@ $firstAndLastName = function ($name) {
             font-size: .78rem;
             transition: transform .15s ease, box-shadow .15s ease, opacity .15s ease;
         }
-        .cultos-mini-btn:hover {
+        .carousel-mini-btn:hover {
             transform: scale(1.06);
             box-shadow: 0 10px 18px rgba(0,0,0,0.16);
         }
-        .cultos-mini-btn:disabled {
+        .carousel-mini-btn:disabled {
             opacity: .35;
             box-shadow: none;
         }
@@ -978,7 +981,6 @@ $firstAndLastName = function ($name) {
             border-top: 1px solid rgba(0,0,0,0.06);
             display: flex;
             align-items: center;
-            justify-content: space-between;
             gap: .6rem;
         }
         .culto-item-cta-text {
@@ -990,26 +992,14 @@ $firstAndLastName = function ($name) {
             font-size: .78rem;
             margin-left: .2rem;
         }
-        .culto-item-cta-btn {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            flex-shrink: 0;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(179,0,0,0.09);
-            color: var(--primary-red);
-            font-size: .78rem;
-        }
-        .cultos-dots {
+        .carousel-dots {
             display: flex;
             align-items: center;
             justify-content: center;
             gap: .5rem;
             margin-top: 1.25rem;
         }
-        .cultos-dot {
+        .carousel-dot {
             width: 8px;
             height: 8px;
             border-radius: 999px;
@@ -1018,7 +1008,7 @@ $firstAndLastName = function ($name) {
             padding: 0;
             transition: width .2s ease, background-color .2s ease;
         }
-        .cultos-dot.is-active {
+        .carousel-dot.is-active {
             width: 22px;
             background: var(--primary-red);
         }
@@ -1089,6 +1079,13 @@ $firstAndLastName = function ($name) {
             padding: 1.15rem 1.35rem;
             background: linear-gradient(135deg, rgba(255,42,122,0.08), rgba(179,0,0,0.06));
             border-bottom: 1px solid rgba(0,0,0,0.06);
+        }
+        .section-panel-head-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            flex-wrap: wrap;
         }
         .section-panel-kicker {
             display: inline-flex;
@@ -2167,16 +2164,19 @@ $firstAndLastName = function ($name) {
             ?>
             <div class="row g-4 align-items-start">
                 <div class="col-lg-7">
-                    <div class="live-board scrollable-panel">
-                        <div class="panel-soft-head panel-scrollable">
-                            <h2 class="live-board-title"><i class="fas fa-newspaper"></i> Atualizações Recentes</h2>
+                    <div class="live-board" data-carousel-group>
+                        <div class="panel-soft-head">
+                            <div class="panel-soft-head-top">
+                                <h2 class="live-board-title"><i class="fas fa-newspaper"></i> Atualizações Recentes</h2>
+                                <div class="carousel-mini-nav">
+                                    <button type="button" class="section-carousel-btn prev carousel-mini-btn" aria-label="Quadro anterior das atualizações"><i class="fas fa-chevron-left"></i></button>
+                                    <button type="button" class="section-carousel-btn next carousel-mini-btn" aria-label="Próximo quadro das atualizações"><i class="fas fa-chevron-right"></i></button>
+                                </div>
+                            </div>
                             <p class="text-muted small mb-0 mt-2">Role para o lado para ver mais informações.</p>
                         </div>
                         <div class="panel-soft-body">
                         <div class="section-carousel js-section-carousel section-carousel-inline">
-                            <button type="button" class="section-carousel-btn prev" aria-label="Quadro anterior das atualizações">
-                                <i class="fas fa-chevron-left"></i>
-                            </button>
                             <div class="section-carousel-track">
                                 <div class="section-carousel-slide">
                                     <div class="live-card">
@@ -2263,9 +2263,11 @@ $firstAndLastName = function ($name) {
                                     </div>
                                 </div>
                             </div>
-                            <button type="button" class="section-carousel-btn next" aria-label="Próximo quadro das atualizações">
-                                <i class="fas fa-chevron-right"></i>
-                            </button>
+                        </div>
+                        <div class="carousel-dots">
+                            <button type="button" class="carousel-dot is-active" data-section-dot="0" aria-label="Ir para Aniversariantes"></button>
+                            <button type="button" class="carousel-dot" data-section-dot="1" aria-label="Ir para Novos Membros"></button>
+                            <button type="button" class="carousel-dot" data-section-dot="2" aria-label="Ir para Batismos"></button>
                         </div>
                         </div>
                     </div>
@@ -2424,11 +2426,11 @@ $firstAndLastName = function ($name) {
                                             <div class="cultos-card-head-top">
                                                 <span class="cultos-card-kicker"><i class="fas fa-house-chimney"></i> Congregação</span>
                                                 <?php if ($cultosTotalSlides > 1): ?>
-                                                    <div class="cultos-card-nav">
+                                                    <div class="carousel-mini-nav">
                                                         <span class="cultos-mini-progress"><span class="cultos-mini-progress-bar" style="width: <?= round((($slideIndex + 1) / $cultosTotalSlides) * 100) ?>%"></span></span>
                                                         <span class="cultos-counter"><?= $slideIndex + 1 ?> / <?= $cultosTotalSlides ?></span>
-                                                        <button type="button" class="cultos-mini-btn" data-cultos-scroll="prev" aria-label="Congregação anterior"><i class="fas fa-chevron-left"></i></button>
-                                                        <button type="button" class="cultos-mini-btn" data-cultos-scroll="next" aria-label="Próxima congregação"><i class="fas fa-chevron-right"></i></button>
+                                                        <button type="button" class="carousel-mini-btn" data-cultos-scroll="prev" aria-label="Congregação anterior"><i class="fas fa-chevron-left"></i></button>
+                                                        <button type="button" class="carousel-mini-btn" data-cultos-scroll="next" aria-label="Próxima congregação"><i class="fas fa-chevron-right"></i></button>
                                                     </div>
                                                 <?php endif; ?>
                                             </div>
@@ -2482,7 +2484,6 @@ $firstAndLastName = function ($name) {
                                                         <?php endif; ?>
                                                         <div class="culto-item-footer">
                                                             <span class="culto-item-cta-text">Esperamos por você! <i class="fas fa-arrow-right"></i></span>
-                                                            <span class="culto-item-cta-btn" aria-hidden="true"><i class="fas fa-arrow-right"></i></span>
                                                         </div>
                                                     </article>
                                                 <?php endforeach; ?>
@@ -2495,9 +2496,9 @@ $firstAndLastName = function ($name) {
                         </div>
                     </div>
                     <?php if ($cultosTotalSlides > 1): ?>
-                        <div class="cultos-dots" id="cultosDots">
+                        <div class="carousel-dots" id="cultosDots">
                             <?php for ($d = 0; $d < $cultosTotalSlides; $d++): ?>
-                                <button type="button" class="cultos-dot<?= $d === 0 ? ' is-active' : '' ?>" data-cultos-dot="<?= $d ?>" aria-label="Ir para congregação <?= $d + 1 ?>"></button>
+                                <button type="button" class="carousel-dot<?= $d === 0 ? ' is-active' : '' ?>" data-cultos-dot="<?= $d ?>" aria-label="Ir para congregação <?= $d + 1 ?>"></button>
                             <?php endfor; ?>
                         </div>
                     <?php endif; ?>
@@ -2540,17 +2541,23 @@ $firstAndLastName = function ($name) {
                     <p class="text-muted">Nenhum evento próximo agendado.</p>
                 </div>
             <?php else: ?>
-                <div class="section-carousel-shell">
+                <?php $eventosTotalSlides = count($eventosPorCongregacao); ?>
+                <div class="section-carousel-shell" data-carousel-group>
                     <div class="section-carousel js-section-carousel">
-                        <button type="button" class="section-carousel-btn prev" aria-label="Congregação anterior">
-                            <i class="fas fa-chevron-left"></i>
-                        </button>
                         <div class="section-carousel-track">
                             <?php foreach ($eventosPorCongregacao as $congregacao => $items): ?>
                                 <div class="section-carousel-slide">
-                                    <div class="section-panel-card scrollable-panel">
+                                    <div class="section-panel-card">
                                         <div class="section-panel-head">
-                                            <span class="section-panel-kicker"><i class="fas fa-calendar-days"></i> Eventos</span>
+                                            <div class="section-panel-head-top">
+                                                <span class="section-panel-kicker"><i class="fas fa-calendar-days"></i> Eventos</span>
+                                                <?php if ($eventosTotalSlides > 1): ?>
+                                                    <div class="carousel-mini-nav">
+                                                        <button type="button" class="section-carousel-btn prev carousel-mini-btn" aria-label="Congregação anterior"><i class="fas fa-chevron-left"></i></button>
+                                                        <button type="button" class="section-carousel-btn next carousel-mini-btn" aria-label="Próxima congregação"><i class="fas fa-chevron-right"></i></button>
+                                                    </div>
+                                                <?php endif; ?>
+                                            </div>
                                             <h3><?= htmlspecialchars($congregacao) ?></h3>
                                             <p>Role para ver eventos de outras congregações.</p>
                                         </div>
@@ -2643,10 +2650,14 @@ $firstAndLastName = function ($name) {
                                 </div>
                             <?php endforeach; ?>
                         </div>
-                        <button type="button" class="section-carousel-btn next" aria-label="Próxima congregação">
-                            <i class="fas fa-chevron-right"></i>
-                        </button>
                     </div>
+                    <?php if ($eventosTotalSlides > 1): ?>
+                        <div class="carousel-dots">
+                            <?php for ($d = 0; $d < $eventosTotalSlides; $d++): ?>
+                                <button type="button" class="carousel-dot<?= $d === 0 ? ' is-active' : '' ?>" data-section-dot="<?= $d ?>" aria-label="Ir para congregação <?= $d + 1 ?>"></button>
+                            <?php endfor; ?>
+                        </div>
+                    <?php endif; ?>
                 </div>
             <?php endif; ?>
         </div>
@@ -2683,17 +2694,23 @@ $firstAndLastName = function ($name) {
                     <p class="text-muted">Nenhum convite especial no momento.</p>
                 </div>
             <?php else: ?>
-                <div class="section-carousel-shell">
+                <?php $convitesTotalSlides = count($convitesPorCongregacao); ?>
+                <div class="section-carousel-shell" data-carousel-group>
                     <div class="section-carousel js-section-carousel">
-                        <button type="button" class="section-carousel-btn prev" aria-label="Convite anterior">
-                            <i class="fas fa-chevron-left"></i>
-                        </button>
                         <div class="section-carousel-track">
                             <?php foreach ($convitesPorCongregacao as $congregacao => $items): ?>
                                 <div class="section-carousel-slide">
-                                    <div class="section-panel-card scrollable-panel">
+                                    <div class="section-panel-card">
                                         <div class="section-panel-head">
-                                            <span class="section-panel-kicker"><i class="fas fa-envelope-open-text"></i> Convites</span>
+                                            <div class="section-panel-head-top">
+                                                <span class="section-panel-kicker"><i class="fas fa-envelope-open-text"></i> Convites</span>
+                                                <?php if ($convitesTotalSlides > 1): ?>
+                                                    <div class="carousel-mini-nav">
+                                                        <button type="button" class="section-carousel-btn prev carousel-mini-btn" aria-label="Convite anterior"><i class="fas fa-chevron-left"></i></button>
+                                                        <button type="button" class="section-carousel-btn next carousel-mini-btn" aria-label="Próximo convite"><i class="fas fa-chevron-right"></i></button>
+                                                    </div>
+                                                <?php endif; ?>
+                                            </div>
                                             <h3><?= htmlspecialchars($congregacao) ?></h3>
                                             <p>Role para ver convites de outras congregações.</p>
                                         </div>
@@ -2776,10 +2793,14 @@ $firstAndLastName = function ($name) {
                                 </div>
                             <?php endforeach; ?>
                         </div>
-                        <button type="button" class="section-carousel-btn next" aria-label="Próximo convite">
-                            <i class="fas fa-chevron-right"></i>
-                        </button>
                     </div>
+                    <?php if ($convitesTotalSlides > 1): ?>
+                        <div class="carousel-dots">
+                            <?php for ($d = 0; $d < $convitesTotalSlides; $d++): ?>
+                                <button type="button" class="carousel-dot<?= $d === 0 ? ' is-active' : '' ?>" data-section-dot="<?= $d ?>" aria-label="Ir para convite <?= $d + 1 ?>"></button>
+                            <?php endfor; ?>
+                        </div>
+                    <?php endif; ?>
                 </div>
             <?php endif; ?>
         </div>
@@ -2798,15 +2819,21 @@ $firstAndLastName = function ($name) {
                     <p class="text-muted">Nenhuma congregação cadastrada.</p>
                 </div>
             <?php else: ?>
-                <div class="section-carousel-shell">
+                <?php $congregacoesTotalSlides = count($congregacoes); ?>
+                <div class="section-carousel-shell" data-carousel-group>
+                    <?php if ($congregacoesTotalSlides > 1): ?>
+                        <div class="d-flex justify-content-end mb-2">
+                            <div class="carousel-mini-nav">
+                                <button type="button" class="section-carousel-btn prev carousel-mini-btn" aria-label="Congregação anterior"><i class="fas fa-chevron-left"></i></button>
+                                <button type="button" class="section-carousel-btn next carousel-mini-btn" aria-label="Próxima congregação"><i class="fas fa-chevron-right"></i></button>
+                            </div>
+                        </div>
+                    <?php endif; ?>
                     <div class="section-carousel js-section-carousel">
-                        <button type="button" class="section-carousel-btn prev" aria-label="Congregação anterior">
-                            <i class="fas fa-chevron-left"></i>
-                        </button>
                         <div class="section-carousel-track">
                             <?php foreach ($congregacoes as $congregacao): ?>
                                 <div class="section-carousel-slide">
-                                    <div class="congregacao-card scrollable-panel">
+                                    <div class="congregacao-card">
                                         <div class="congregacao-card-media">
                                             <?php if (!empty($congregacao['photo'])): ?>
                                                 <img src="/uploads/congregations/<?= htmlspecialchars($congregacao['photo']) ?>" alt="<?= htmlspecialchars($congregacao['name']) ?>">
@@ -2858,10 +2885,14 @@ $firstAndLastName = function ($name) {
                                 </div>
                             <?php endforeach; ?>
                         </div>
-                        <button type="button" class="section-carousel-btn next" aria-label="Próxima congregação">
-                            <i class="fas fa-chevron-right"></i>
-                        </button>
                     </div>
+                    <?php if ($congregacoesTotalSlides > 1): ?>
+                        <div class="carousel-dots">
+                            <?php for ($d = 0; $d < $congregacoesTotalSlides; $d++): ?>
+                                <button type="button" class="carousel-dot<?= $d === 0 ? ' is-active' : '' ?>" data-section-dot="<?= $d ?>" aria-label="Ir para congregação <?= $d + 1 ?>"></button>
+                            <?php endfor; ?>
+                        </div>
+                    <?php endif; ?>
                 </div>
             <?php endif; ?>
         </div>
@@ -3473,9 +3504,12 @@ $firstAndLastName = function ($name) {
 
             sectionCarousels.forEach(function(carousel) {
                 const track = carousel.querySelector('.section-carousel-track');
-                const prev = carousel.querySelector('.section-carousel-btn.prev');
-                const next = carousel.querySelector('.section-carousel-btn.next');
                 if (!track) return;
+
+                const scope = carousel.closest('[data-carousel-group]') || carousel;
+                const prevBtns = scope.querySelectorAll('.section-carousel-btn.prev');
+                const nextBtns = scope.querySelectorAll('.section-carousel-btn.next');
+                const dots = scope.querySelectorAll('[data-section-dot]');
 
                 function getIndex() {
                     const w = track.clientWidth || 1;
@@ -3485,8 +3519,11 @@ $firstAndLastName = function ($name) {
                 function updateUI() {
                     const total = track.children.length || 0;
                     const idx = getIndex();
-                    if (prev) prev.disabled = idx <= 0;
-                    if (next) next.disabled = total ? idx >= total - 1 : true;
+                    prevBtns.forEach(function(btn) { btn.disabled = idx <= 0; });
+                    nextBtns.forEach(function(btn) { btn.disabled = total ? idx >= total - 1 : true; });
+                    dots.forEach(function(dot) {
+                        dot.classList.toggle('is-active', parseInt(dot.getAttribute('data-section-dot'), 10) === idx);
+                    });
                 }
 
                 let rafId = 0;
@@ -3498,14 +3535,25 @@ $firstAndLastName = function ($name) {
                     });
                 }, { passive: true });
 
-                [prev, next].forEach(function(button) {
-                    if (!button) return;
-                    button.addEventListener('click', function() {
-                        const amount = track.clientWidth;
-                        track.scrollBy({
-                            left: button.classList.contains('next') ? amount : -amount,
-                            behavior: 'smooth'
-                        });
+                function goTo(direction) {
+                    const amount = track.clientWidth;
+                    track.scrollBy({
+                        left: direction === 'next' ? amount : -amount,
+                        behavior: 'smooth'
+                    });
+                    window.setTimeout(updateUI, 250);
+                }
+
+                prevBtns.forEach(function(button) {
+                    button.addEventListener('click', function() { goTo('prev'); });
+                });
+                nextBtns.forEach(function(button) {
+                    button.addEventListener('click', function() { goTo('next'); });
+                });
+                dots.forEach(function(dot) {
+                    dot.addEventListener('click', function() {
+                        const index = parseInt(dot.getAttribute('data-section-dot'), 10) || 0;
+                        track.scrollTo({ left: index * track.clientWidth, behavior: 'smooth' });
                         window.setTimeout(updateUI, 250);
                     });
                 });
