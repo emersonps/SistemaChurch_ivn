@@ -7,7 +7,7 @@ $activeLabels = array_column($activeRoles, 'label', 'key');
 $customValues = [];
 foreach ($activeRoles as $r) {
     if (strpos($r['key'], 'custom_') === 0) {
-        $customValues[$r['key']] = $r['label'];
+        $customValues[] = $r['label'];
     }
 }
 ?>
@@ -62,12 +62,15 @@ foreach ($activeRoles as $r) {
 
                 <hr>
                 <div class="small text-muted mb-2">Colunas personalizadas (opcional)</div>
-                <div class="mb-2">
-                    <input type="text" name="custom_1_label" class="form-control form-control-sm" value="<?= htmlspecialchars($customValues['custom_1'] ?? '') ?>" placeholder="Ex: Regente do Coral">
+                <div id="customFieldsList">
+                    <?php foreach ($customValues as $customLabel): ?>
+                        <div class="input-group input-group-sm mb-2 custom-field-row">
+                            <input type="text" name="custom_labels[]" class="form-control" value="<?= htmlspecialchars($customLabel) ?>" placeholder="Ex: Regente do Coral">
+                            <button type="button" class="btn btn-outline-danger btn-remove-custom" title="Remover campo"><i class="fas fa-trash"></i></button>
+                        </div>
+                    <?php endforeach; ?>
                 </div>
-                <div>
-                    <input type="text" name="custom_2_label" class="form-control form-control-sm" value="<?= htmlspecialchars($customValues['custom_2'] ?? '') ?>" placeholder="Ex: Multimídia">
-                </div>
+                <button type="button" class="btn btn-sm btn-outline-primary" id="btnAddCustomField"><i class="fas fa-plus me-1"></i> Adicionar campo personalizado</button>
             </div>
 
             <div class="form-text mb-3">"Observações" é incluída automaticamente em toda escala.</div>
@@ -76,5 +79,36 @@ foreach ($activeRoles as $r) {
         </form>
     </div>
 </div>
+
+<template id="customFieldTemplate">
+    <div class="input-group input-group-sm mb-2 custom-field-row">
+        <input type="text" name="custom_labels[]" class="form-control" placeholder="Ex: Regente do Coral">
+        <button type="button" class="btn btn-outline-danger btn-remove-custom" title="Remover campo"><i class="fas fa-trash"></i></button>
+    </div>
+</template>
+
+<script>
+(function () {
+    var list = document.getElementById('customFieldsList');
+    var tpl = document.getElementById('customFieldTemplate');
+
+    function wireRemove(row) {
+        row.querySelector('.btn-remove-custom').addEventListener('click', function () {
+            row.remove();
+        });
+    }
+
+    list.querySelectorAll('.custom-field-row').forEach(wireRemove);
+
+    document.getElementById('btnAddCustomField').addEventListener('click', function () {
+        var wrapper = document.createElement('div');
+        wrapper.innerHTML = tpl.innerHTML.trim();
+        var row = wrapper.firstElementChild;
+        list.appendChild(row);
+        wireRemove(row);
+        row.querySelector('input').focus();
+    });
+})();
+</script>
 
 <?php include __DIR__ . '/../../layout/footer.php'; ?>

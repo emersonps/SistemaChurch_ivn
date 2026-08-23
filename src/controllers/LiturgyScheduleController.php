@@ -80,11 +80,15 @@ class LiturgyScheduleController {
             $rolesConfig[] = ['key' => $key, 'label' => $label !== '' ? $label : $defaultLabel];
         }
 
-        foreach (['custom_1', 'custom_2'] as $customKey) {
-            $customLabel = trim((string)($_POST[$customKey . '_label'] ?? ''));
-            if ($customLabel !== '') {
-                $rolesConfig[] = ['key' => $customKey, 'label' => $customLabel];
+        $customLabels = is_array($_POST['custom_labels'] ?? null) ? $_POST['custom_labels'] : [];
+        $customIndex = 1;
+        foreach ($customLabels as $customLabel) {
+            $customLabel = trim((string)$customLabel);
+            if ($customLabel === '') {
+                continue;
             }
+            $rolesConfig[] = ['key' => 'custom_' . $customIndex, 'label' => $customLabel];
+            $customIndex++;
         }
 
         return $rolesConfig;
