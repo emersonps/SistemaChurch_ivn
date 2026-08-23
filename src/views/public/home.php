@@ -986,6 +986,64 @@ $firstAndLastName = function ($name) {
                 grid-template-columns: 1fr;
             }
         }
+        .video-preview-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 1.25rem;
+        }
+        @media (max-width: 767.98px) {
+            .video-preview-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        .video-preview-card {
+            display: block;
+            background: #fff;
+            border: 1px solid rgba(0,0,0,0.08);
+            border-radius: 16px;
+            overflow: hidden;
+            text-decoration: none;
+            color: inherit;
+            transition: transform .15s ease, box-shadow .15s ease;
+        }
+        .video-preview-card:hover {
+            color: inherit;
+            transform: translateY(-2px);
+            box-shadow: 0 14px 30px rgba(0,0,0,0.1);
+        }
+        .video-preview-thumb {
+            position: relative;
+            aspect-ratio: 16/9;
+        }
+        .video-preview-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .video-preview-category {
+            position: absolute;
+            top: .6rem;
+            left: .6rem;
+            background: rgba(255,255,255,0.92);
+            color: #2d1a21;
+            font-size: .68rem;
+            font-weight: 800;
+            letter-spacing: .04em;
+            padding: .3rem .6rem;
+            border-radius: 999px;
+        }
+        .video-preview-body {
+            padding: 1rem 1.1rem 1.2rem;
+        }
+        .video-preview-title {
+            font-weight: 800;
+            margin-bottom: .3rem;
+            line-height: 1.35;
+        }
+        .video-preview-meta {
+            color: #6b7280;
+            font-size: .84rem;
+        }
         .flat-strip-shell {
             position: relative;
         }
@@ -2166,53 +2224,43 @@ $firstAndLastName = function ($name) {
         </div>
     </section>
 
-    <!-- Mural de Vídeos: featured message -->
+    <!-- Mural de Vídeos: preview -->
     <?php
     try {
-        $featuredVideo = (new Database())->connect()->query("SELECT * FROM video_wall WHERE is_featured = 1 LIMIT 1")->fetch(PDO::FETCH_ASSOC);
+        $homeVideos = (new Database())->connect()->query("SELECT * FROM video_wall ORDER BY video_date DESC, created_at DESC LIMIT 3")->fetchAll(PDO::FETCH_ASSOC);
     } catch (Throwable $e) {
-        $featuredVideo = false;
+        $homeVideos = [];
     }
     ?>
-    <?php if (!empty($featuredVideo)): ?>
-    <section id="mensagem-destaque" class="py-5">
+    <?php if (!empty($homeVideos)): ?>
+    <section id="mural-de-videos" class="py-5">
         <div class="container py-4">
-            <div class="text-center mb-4">
-                <h2 class="section-title">Mural de Vídeos</h2>
+            <div class="cultos-preview-head">
+                <span class="section-panel-kicker"><i class="fas fa-video"></i> Mural de vídeos</span>
+                <a href="/mural-de-videos" class="btn btn-outline-secondary rounded-pill btn-sm px-3">Ver tudo</a>
             </div>
-            <div class="row justify-content-center">
-                <div class="col-lg-9">
-                    <div class="row g-4 align-items-center bg-white rounded-4 shadow-sm p-3 p-md-4">
-                        <div class="col-md-5">
-                            <a href="/mural-de-videos/assistir/<?= (int)$featuredVideo['id'] ?>" target="_blank" rel="noopener" class="d-block position-relative rounded-3 overflow-hidden" style="aspect-ratio: 16/9;">
-                                <img src="https://img.youtube.com/vi/<?= htmlspecialchars($featuredVideo['youtube_video_id']) ?>/hqdefault.jpg" alt="" class="w-100 h-100" style="object-fit: cover;">
-                                <span class="position-absolute top-50 start-50 translate-middle text-white" style="font-size: 2.5rem;"><i class="fas fa-circle-play"></i></span>
-                            </a>
+            <div class="video-preview-grid">
+                <?php foreach ($homeVideos as $video): ?>
+                    <a href="/mural-de-videos/assistir/<?= (int)$video['id'] ?>" target="_blank" rel="noopener" class="video-preview-card">
+                        <div class="video-preview-thumb">
+                            <img src="https://img.youtube.com/vi/<?= htmlspecialchars($video['youtube_video_id']) ?>/hqdefault.jpg" alt="">
+                            <span class="video-preview-category"><?= htmlspecialchars(mb_strtoupper($video['category'])) ?></span>
+                            <?php if (!empty($video['is_livestream']) && !empty($video['livestream_scheduled_at'])): ?>
+                                <span class="live-badge" style="position: absolute; top: .6rem; right: .6rem;" data-scheduled-at="<?= htmlspecialchars(formatLivestreamScheduledAtIso($video['livestream_scheduled_at'])) ?>"></span>
+                            <?php endif; ?>
                         </div>
-                        <div class="col-md-7">
-                            <span class="badge bg-dark bg-opacity-75 mb-2"><?= htmlspecialchars($featuredVideo['category']) ?></span>
-                            <?php if (!empty($featuredVideo['is_livestream']) && !empty($featuredVideo['livestream_scheduled_at'])): ?>
-                                <span class="live-badge mb-2" data-scheduled-at="<?= htmlspecialchars(formatLivestreamScheduledAtIso($featuredVideo['livestream_scheduled_at'])) ?>"></span>
-                            <?php endif; ?>
-                            <h3 class="h5 fw-bold mb-1"><?= htmlspecialchars($featuredVideo['title']) ?></h3>
-                            <p class="text-muted small mb-2">
-                                <?= !empty($featuredVideo['video_date']) ? date('d \d\e F', strtotime($featuredVideo['video_date'])) : '' ?>
-                                <?php if (!empty($featuredVideo['speaker'])): ?> · <?= htmlspecialchars($featuredVideo['speaker']) ?><?php endif; ?>
-                            </p>
-                            <?php if (!empty($featuredVideo['description'])): ?>
-                                <p class="mb-3"><?= htmlspecialchars($featuredVideo['description']) ?></p>
-                            <?php endif; ?>
-                            <div class="d-flex flex-wrap gap-2">
-                                <a href="/mural-de-videos/assistir/<?= (int)$featuredVideo['id'] ?>" target="_blank" rel="noopener" class="btn btn-dark btn-sm rounded-pill px-3">
-                                    <i class="fas fa-play me-1"></i> Assistir Agora
-                                </a>
-                                <a href="/mural-de-videos" class="btn btn-outline-dark btn-sm rounded-pill px-3">
-                                    Ver Todos os Vídeos <i class="fas fa-arrow-right ms-1"></i>
-                                </a>
+                        <div class="video-preview-body">
+                            <div class="video-preview-title"><?= htmlspecialchars($video['title']) ?></div>
+                            <div class="video-preview-meta">
+                                <?php if (!empty($video['speaker'])): ?>
+                                    <?= htmlspecialchars($video['speaker']) ?>
+                                <?php elseif (!empty($video['video_date'])): ?>
+                                    <?= date('d/m/Y', strtotime($video['video_date'])) ?>
+                                <?php endif; ?>
                             </div>
                         </div>
-                    </div>
-                </div>
+                    </a>
+                <?php endforeach; ?>
             </div>
         </div>
     </section>
