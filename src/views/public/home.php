@@ -1044,6 +1044,37 @@ $firstAndLastName = function ($name) {
             color: #6b7280;
             font-size: .84rem;
         }
+        #ultimas-fotos .video-preview-grid {
+            grid-template-columns: repeat(6, minmax(0, 1fr));
+            gap: .75rem;
+        }
+        #ultimas-fotos .video-preview-thumb {
+            aspect-ratio: 1;
+        }
+        #ultimas-fotos .video-preview-category {
+            font-size: .58rem;
+            padding: .22rem .45rem;
+        }
+        #ultimas-fotos .video-preview-body {
+            padding: .6rem .7rem .75rem;
+        }
+        #ultimas-fotos .video-preview-title {
+            font-size: .82rem;
+            margin-bottom: .15rem;
+        }
+        #ultimas-fotos .video-preview-meta {
+            font-size: .72rem;
+        }
+        @media (max-width: 991.98px) {
+            #ultimas-fotos .video-preview-grid {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
+        }
+        @media (max-width: 767.98px) {
+            #ultimas-fotos .video-preview-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
         .flat-strip-shell {
             position: relative;
         }
