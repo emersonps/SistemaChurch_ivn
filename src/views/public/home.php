@@ -909,57 +909,6 @@ $firstAndLastName = function ($name) {
         .live-card-photos {
             margin-top: 1rem;
         }
-        .congregacao-card {
-            background: #fff;
-            border-radius: 22px;
-            border: 1px solid rgba(0,0,0,0.07);
-            box-shadow: 0 16px 42px rgba(0,0,0,0.08);
-            overflow: hidden;
-            height: 100%;
-        }
-        .congregacao-card-media {
-            height: 220px;
-            background: #e9ecef;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .congregacao-card-media img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        .congregacao-card-body {
-            padding: 1.25rem 1.35rem 1.35rem;
-        }
-        .congregacao-card-title {
-            font-size: 1.3rem;
-            font-weight: 800;
-            color: #2d1a21;
-            margin-bottom: .45rem;
-        }
-        .congregacao-card-meta {
-            color: #6b7280;
-            margin-bottom: 1rem;
-        }
-        .congregacao-card-info {
-            display: grid;
-            gap: .75rem;
-        }
-        .congregacao-card-info p,
-        .congregacao-card-info li {
-            margin: 0;
-            color: #4b5563;
-        }
-        .congregacao-card-info i {
-            color: var(--primary-red);
-        }
-        .congregacao-schedules {
-            margin-top: 1rem;
-            padding-top: 1rem;
-            border-top: 1px solid rgba(0,0,0,0.08);
-        }
-
         .flat-strip-head {
             display: flex;
             align-items: center;
@@ -1350,6 +1299,209 @@ $firstAndLastName = function ($name) {
         .convite-card-btn-outline:hover {
             background: rgba(179,0,0,0.06);
             color: var(--primary-red);
+        }
+
+        .congregacoes-nav {
+            display: flex;
+            align-items: center;
+            gap: .6rem;
+        }
+        .congregacoes-counter {
+            background: #fff;
+            border: 1px solid rgba(0,0,0,0.1);
+            border-radius: 999px;
+            padding: .45rem .9rem;
+            font-size: .82rem;
+            font-weight: 700;
+            color: #2d1a21;
+            white-space: nowrap;
+        }
+        .congregacao-flat-card {
+            flex: 0 0 calc(33.33% - .75rem);
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+        }
+        @media (max-width: 991.98px) {
+            .congregacao-flat-card { flex: 0 0 calc(50% - .5rem); }
+        }
+        @media (max-width: 575.98px) {
+            .congregacao-flat-card { flex: 0 0 86%; }
+        }
+        .congregacao-flat-media {
+            position: relative;
+            aspect-ratio: 16/9;
+            background: linear-gradient(135deg, rgba(15,18,28,0.75), rgba(90,16,38,0.7));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .congregacao-flat-media img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .congregacao-flat-media-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: .4rem;
+            color: rgba(255,255,255,0.85);
+        }
+        .congregacao-flat-media-placeholder i {
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.16);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+        }
+        .congregacao-flat-media-placeholder span {
+            font-size: .64rem;
+            font-weight: 800;
+            letter-spacing: .06em;
+        }
+        .congregacao-status-badge {
+            position: absolute;
+            top: .6rem;
+            right: .6rem;
+            font-size: .64rem;
+            font-weight: 800;
+            letter-spacing: .04em;
+            padding: .28rem .6rem;
+            border-radius: 999px;
+            color: #fff;
+            background: #198754;
+        }
+        .congregacao-status-badge.is-inactive {
+            background: rgba(0,0,0,0.55);
+        }
+        .congregacao-flat-overlay {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            padding: 1.6rem .9rem .7rem;
+            background: linear-gradient(180deg, transparent, rgba(0,0,0,0.72));
+            color: #fff;
+        }
+        .congregacao-flat-overlay h3 {
+            font-size: 1.05rem;
+            font-weight: 800;
+            margin-bottom: .2rem;
+        }
+        .congregacao-flat-overlay span {
+            font-size: .78rem;
+            opacity: .9;
+        }
+        .congregacao-flat-body {
+            background: #fff;
+            border: 1px solid rgba(0,0,0,0.08);
+            border-top: none;
+            border-radius: 0 0 16px 16px;
+            padding: 1rem 1.1rem 1.2rem;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        .congregacao-flat-leader {
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+            margin-bottom: .8rem;
+            flex-wrap: wrap;
+        }
+        .congregacao-leader-pill {
+            background: rgba(179,0,0,0.08);
+            color: var(--primary-red);
+            font-size: .78rem;
+            font-weight: 700;
+            padding: .3rem .7rem;
+            border-radius: 999px;
+        }
+        .congregacao-leader-role {
+            color: #9a8f92;
+            font-size: .76rem;
+        }
+        .congregacao-flat-info {
+            display: grid;
+            gap: .4rem;
+            margin-bottom: .9rem;
+        }
+        .congregacao-flat-info div {
+            display: flex;
+            align-items: flex-start;
+            gap: .5rem;
+            color: #6b7280;
+            font-size: .82rem;
+        }
+        .congregacao-flat-info i {
+            color: var(--primary-red);
+            margin-top: .15rem;
+            width: 14px;
+        }
+        .congregacao-flat-schedule {
+            background: #f8f7f5;
+            border-radius: 12px;
+            padding: .8rem .9rem;
+            margin-bottom: 1rem;
+        }
+        .congregacao-flat-schedule-title {
+            font-size: .68rem;
+            font-weight: 800;
+            letter-spacing: .05em;
+            color: #9a8f92;
+            margin-bottom: .5rem;
+        }
+        .congregacao-flat-schedule-row {
+            display: flex;
+            align-items: baseline;
+            gap: .5rem;
+            font-size: .8rem;
+            margin-bottom: .3rem;
+        }
+        .congregacao-flat-schedule-row:last-child {
+            margin-bottom: 0;
+        }
+        .congregacao-flat-schedule-day {
+            font-weight: 800;
+            color: #2d1a21;
+            width: 32px;
+            flex-shrink: 0;
+        }
+        .congregacao-flat-schedule-time {
+            color: #2d1a21;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+        .congregacao-flat-schedule-name {
+            color: #9a8f92;
+            margin-left: auto;
+            text-align: right;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .congregacao-flat-cta {
+            margin-top: auto;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: .5rem;
+            background: #212529;
+            color: #fff;
+            border: none;
+            border-radius: 999px;
+            padding: .6rem 1rem;
+            font-weight: 700;
+            font-size: .86rem;
+            text-decoration: none;
+        }
+        .congregacao-flat-cta:hover {
+            color: #fff;
+            filter: brightness(1.1);
         }
 
         /* Footer */
@@ -1834,9 +1986,6 @@ $firstAndLastName = function ($name) {
                 grid-template-columns: 1fr;
                 gap: .85rem;
             }
-            .congregacao-card-body {
-                padding: 1rem 1.1rem 1.1rem;
-            }
             .section-carousel-inline {
                 padding: .25rem 3rem .35rem;
             }
@@ -1957,8 +2106,7 @@ $firstAndLastName = function ($name) {
             .section-carousel-slide {
                 padding: 0;
             }
-            .section-panel-card,
-            .congregacao-card {
+            .section-panel-card {
                 border-radius: 16px;
             }
             .section-panel-head {
@@ -1968,15 +2116,8 @@ $firstAndLastName = function ($name) {
             .section-panel-head h3 {
                 font-size: 1.12rem;
             }
-            .section-panel-body,
-            .congregacao-card-body {
+            .section-panel-body {
                 padding: .95rem;
-            }
-            .congregacao-card-media {
-                height: 190px;
-            }
-            .congregacao-card-title {
-                font-size: 1.15rem;
             }
             .section-carousel-inline {
                 padding: .15rem .15rem 0;
@@ -2665,93 +2806,104 @@ $firstAndLastName = function ($name) {
     </section>
 
     <!-- Congregations Section -->
-    <section id="congregacoes" class="py-5 bg-light">
+    <section id="congregacoes" class="py-5">
         <div class="container py-5">
-            <div class="text-center mb-5">
-                <h2 class="section-title">Nossas Congregações</h2>
-                <p class="text-muted">Encontre uma de nossas igrejas</p>
-            </div>
             <?php if (empty($congregacoes)): ?>
+                <div class="flat-strip-head">
+                    <span class="section-panel-kicker"><i class="fas fa-church"></i> Nossas Congregações</span>
+                </div>
                 <div class="text-center">
                     <p class="text-muted">Nenhuma congregação cadastrada.</p>
                 </div>
             <?php else: ?>
+                <?php $congDayAbbrev = ['Domingo' => 'DOM', 'Segunda' => 'SEG', 'Terça' => 'TER', 'Terca' => 'TER', 'Quarta' => 'QUA', 'Quinta' => 'QUI', 'Sexta' => 'SEX', 'Sábado' => 'SAB', 'Sabado' => 'SAB']; ?>
                 <?php $congregacoesTotalSlides = count($congregacoes); ?>
-                <div class="section-carousel-shell" data-carousel-group>
-                    <?php if ($congregacoesTotalSlides > 1): ?>
-                        <div class="d-flex justify-content-end mb-2">
-                            <div class="carousel-mini-nav">
-                                <span class="carousel-mini-progress"><span class="carousel-mini-progress-bar" data-carousel-progress style="width: <?= round((1 / $congregacoesTotalSlides) * 100) ?>%"></span></span>
-                                <span class="carousel-counter"><span data-carousel-counter-current>1</span> / <span data-carousel-counter-total><?= $congregacoesTotalSlides ?></span></span>
-                                <button type="button" class="section-carousel-btn prev carousel-mini-btn" aria-label="Congregação anterior"><i class="fas fa-chevron-left"></i></button>
-                                <button type="button" class="section-carousel-btn next carousel-mini-btn" aria-label="Próxima congregação"><i class="fas fa-chevron-right"></i></button>
-                            </div>
-                        </div>
-                    <?php endif; ?>
-                    <div class="section-carousel js-section-carousel">
-                        <div class="section-carousel-track">
-                            <?php foreach ($congregacoes as $congregacao): ?>
-                                <div class="section-carousel-slide">
-                                    <div class="congregacao-card">
-                                        <div class="congregacao-card-media">
-                                            <?php if (!empty($congregacao['photo'])): ?>
-                                                <img src="/uploads/congregations/<?= htmlspecialchars($congregacao['photo']) ?>" alt="<?= htmlspecialchars($congregacao['name']) ?>">
-                                            <?php else: ?>
-                                                <i class="fas fa-church fa-4x text-white opacity-50"></i>
-                                            <?php endif; ?>
-                                        </div>
-                                        <div class="congregacao-card-body">
-                                            <h3 class="congregacao-card-title"><?= htmlspecialchars($congregacao['name']) ?></h3>
-                                            <p class="congregacao-card-meta">Dirigente: <strong><?= htmlspecialchars($congregacao['leader_name'] ?? 'Não informado') ?></strong></p>
-                                            <div class="congregacao-card-info">
-                                                <?php if (!empty($congregacao['address'])): ?>
-                                                    <p><i class="fas fa-map-marker-alt me-2"></i><?= htmlspecialchars($congregacao['address']) ?></p>
-                                                <?php endif; ?>
-                                                <?php if (!empty($congregacao['city'])): ?>
-                                                    <p><i class="fas fa-city me-2"></i><?= htmlspecialchars($congregacao['city']) ?><?= !empty($congregacao['state']) ? ' - ' . htmlspecialchars($congregacao['state']) : '' ?></p>
-                                                <?php endif; ?>
-                                                <?php if (!empty($congregacao['phone'])): ?>
-                                                    <p><i class="fas fa-phone me-2"></i><?= htmlspecialchars($congregacao['phone']) ?></p>
-                                                <?php endif; ?>
-                                                <?php if (!empty($congregacao['email'])): ?>
-                                                    <p><i class="fas fa-envelope me-2"></i><?= htmlspecialchars($congregacao['email']) ?></p>
-                                                <?php endif; ?>
-                                                <?php if (!empty($congregacao['opening_date'])): ?>
-                                                    <p><i class="fas fa-birthday-cake me-2"></i>Desde <?= date('d/m/Y', strtotime($congregacao['opening_date'])) ?></p>
-                                                <?php endif; ?>
-                                            </div>
-                                            <?php
-                                                $schedules = !empty($congregacao['service_schedule']) ? json_decode($congregacao['service_schedule'], true) : [];
-                                                if (!empty($schedules)):
-                                            ?>
-                                                <div class="congregacao-schedules">
-                                                    <h6 class="small fw-bold mb-3"><i class="far fa-clock text-gold me-1"></i> Horários de Culto</h6>
-                                                    <ul class="list-unstyled small mb-0 congregacao-card-info">
-                                                        <?php foreach ($schedules as $schedule): ?>
-                                                            <li>
-                                                                <strong><?= htmlspecialchars($schedule['day'] ?? '') ?></strong>
-                                                                <span class="ms-2"><?= htmlspecialchars($schedule['start_time'] ?? '') ?><?= !empty($schedule['end_time']) ? ' às ' . htmlspecialchars($schedule['end_time']) : '' ?></span>
-                                                                <?php if (!empty($schedule['name'])): ?>
-                                                                    <div class="text-muted fst-italic mt-1">- <?= htmlspecialchars($schedule['name']) ?></div>
-                                                                <?php endif; ?>
-                                                            </li>
-                                                        <?php endforeach; ?>
-                                                    </ul>
-                                                </div>
-                                            <?php endif; ?>
-                                        </div>
-                                    </div>
-                                </div>
-                            <?php endforeach; ?>
+                <div data-flat-strip-group>
+                <div class="flat-strip-head">
+                    <span class="section-panel-kicker"><i class="fas fa-church"></i> Nossas Congregações</span>
+                    <div class="congregacoes-nav">
+                        <?php if ($congregacoesTotalSlides > 1): ?>
+                            <span class="congregacoes-counter"><span data-flat-strip-current>1</span> / <span data-flat-strip-total><?= $congregacoesTotalSlides ?></span></span>
+                        <?php endif; ?>
+                        <div class="carousel-mini-nav">
+                            <button type="button" class="carousel-mini-btn" data-flat-strip-scroll="prev" aria-label="Congregação anterior"><i class="fas fa-chevron-left"></i></button>
+                            <button type="button" class="carousel-mini-btn" data-flat-strip-scroll="next" aria-label="Próxima congregação"><i class="fas fa-chevron-right"></i></button>
                         </div>
                     </div>
-                    <?php if ($congregacoesTotalSlides > 1): ?>
-                        <div class="carousel-dots">
-                            <?php for ($d = 0; $d < $congregacoesTotalSlides; $d++): ?>
-                                <button type="button" class="carousel-dot<?= $d === 0 ? ' is-active' : '' ?>" data-section-dot="<?= $d ?>" aria-label="Ir para congregação <?= $d + 1 ?>"></button>
-                            <?php endfor; ?>
-                        </div>
-                    <?php endif; ?>
+                </div>
+                <div class="flat-strip-shell">
+                    <div class="flat-strip-track">
+                        <?php foreach ($congregacoes as $congregacao): ?>
+                            <?php
+                                $congIsActive = ($congregacao['status'] ?? 'active') === 'active';
+                                $congSchedules = !empty($congregacao['service_schedule']) ? json_decode($congregacao['service_schedule'], true) : [];
+                                $congAddressParts = array_filter([
+                                    $congregacao['address'] ?? '',
+                                    trim(($congregacao['city'] ?? '') . (!empty($congregacao['state']) ? ' - ' . $congregacao['state'] : '')),
+                                ]);
+                                $congMapsUrl = !empty($congregacao['address']) ? 'https://www.google.com/maps/dir/?api=1&destination=' . rawurlencode($congregacao['address'] . ' ' . ($congregacao['city'] ?? '')) : '';
+                            ?>
+                            <div class="flat-strip-card congregacao-flat-card">
+                                <div class="congregacao-flat-media">
+                                    <?php if (!empty($congregacao['photo'])): ?>
+                                        <img src="/uploads/congregations/<?= htmlspecialchars($congregacao['photo']) ?>" alt="<?= htmlspecialchars($congregacao['name']) ?>">
+                                    <?php else: ?>
+                                        <div class="congregacao-flat-media-placeholder">
+                                            <i class="fas fa-church"></i>
+                                            <span>SEM FOTO</span>
+                                        </div>
+                                    <?php endif; ?>
+                                    <span class="congregacao-status-badge<?= $congIsActive ? '' : ' is-inactive' ?>"><?= $congIsActive ? 'ATIVA' : 'INATIVA' ?></span>
+                                    <div class="congregacao-flat-overlay">
+                                        <h3><?= htmlspecialchars($congregacao['name']) ?></h3>
+                                        <?php if (!empty($congAddressParts)): ?>
+                                            <span><?= htmlspecialchars(implode(' • ', $congAddressParts)) ?></span>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+                                <div class="congregacao-flat-body">
+                                    <?php if (!empty($congregacao['leader_name'])): ?>
+                                        <div class="congregacao-flat-leader">
+                                            <span class="congregacao-leader-pill"><?= htmlspecialchars($congregacao['leader_name']) ?></span>
+                                            <span class="congregacao-leader-role">Dirigente</span>
+                                        </div>
+                                    <?php endif; ?>
+                                    <div class="congregacao-flat-info">
+                                        <?php if (!empty($congregacao['address'])): ?>
+                                            <div><i class="fas fa-location-dot"></i> <?= htmlspecialchars($congregacao['address']) ?></div>
+                                        <?php endif; ?>
+                                        <?php if (!empty($congregacao['phone'])): ?>
+                                            <div><i class="fas fa-phone"></i> <?= htmlspecialchars($congregacao['phone']) ?></div>
+                                        <?php endif; ?>
+                                        <?php if (!empty($congregacao['opening_date'])): ?>
+                                            <div><i class="far fa-calendar"></i> Desde <?= date('d/m/Y', strtotime($congregacao['opening_date'])) ?></div>
+                                        <?php endif; ?>
+                                    </div>
+                                    <?php if (!empty($congSchedules)): ?>
+                                        <div class="congregacao-flat-schedule">
+                                            <div class="congregacao-flat-schedule-title">Horários de Culto</div>
+                                            <?php foreach ($congSchedules as $schedule): ?>
+                                                <?php $dayFull = $schedule['day'] ?? ''; ?>
+                                                <div class="congregacao-flat-schedule-row">
+                                                    <span class="congregacao-flat-schedule-day"><?= htmlspecialchars($congDayAbbrev[$dayFull] ?? mb_strtoupper(mb_substr($dayFull, 0, 3))) ?></span>
+                                                    <span class="congregacao-flat-schedule-time"><?= htmlspecialchars($schedule['start_time'] ?? '') ?><?= !empty($schedule['end_time']) ? ' - ' . htmlspecialchars($schedule['end_time']) : '' ?></span>
+                                                    <?php if (!empty($schedule['name'])): ?>
+                                                        <span class="congregacao-flat-schedule-name"><?= htmlspecialchars($schedule['name']) ?></span>
+                                                    <?php endif; ?>
+                                                </div>
+                                            <?php endforeach; ?>
+                                        </div>
+                                    <?php endif; ?>
+                                    <?php if ($congMapsUrl !== ''): ?>
+                                        <a href="<?= htmlspecialchars($congMapsUrl) ?>" target="_blank" rel="noopener" class="congregacao-flat-cta">
+                                            <i class="fas fa-location-arrow"></i> Como chegar
+                                        </a>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
                 </div>
             <?php endif; ?>
         </div>
@@ -3373,6 +3525,8 @@ $firstAndLastName = function ($name) {
 
                 const prevBtn = group.querySelector('[data-flat-strip-scroll="prev"]');
                 const nextBtn = group.querySelector('[data-flat-strip-scroll="next"]');
+                const counterCurrent = group.querySelector('[data-flat-strip-current]');
+                const counterTotal = group.querySelector('[data-flat-strip-total]');
 
                 function scrollAmount() {
                     const card = track.querySelector('.flat-strip-card');
@@ -3383,6 +3537,13 @@ $firstAndLastName = function ($name) {
                     const maxScroll = track.scrollWidth - track.clientWidth - 1;
                     if (prevBtn) prevBtn.disabled = track.scrollLeft <= 0;
                     if (nextBtn) nextBtn.disabled = track.scrollLeft >= maxScroll;
+                    if (counterCurrent) {
+                        const amount = scrollAmount();
+                        const total = track.children.length;
+                        const idx = amount ? Math.round(track.scrollLeft / amount) : 0;
+                        counterCurrent.textContent = String(Math.max(0, Math.min(total - 1, idx)) + 1);
+                        if (counterTotal) counterTotal.textContent = String(total);
+                    }
                 }
 
                 let rafId = 0;
