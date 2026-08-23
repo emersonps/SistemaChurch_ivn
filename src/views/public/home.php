@@ -1196,6 +1196,159 @@ $firstAndLastName = function ($name) {
             }
         }
 
+        .convite-card {
+            flex: 0 0 calc(28% - 1rem);
+            padding: 0;
+        }
+        @media (max-width: 991.98px) {
+            .convite-card { flex: 0 0 calc(50% - .5rem); }
+        }
+        @media (max-width: 575.98px) {
+            .convite-card { flex: 0 0 82%; }
+        }
+        .convite-card-thumb {
+            position: relative;
+            aspect-ratio: 16/9;
+            background: linear-gradient(135deg, rgba(255,42,122,0.12), rgba(212,175,55,0.2));
+        }
+        .convite-card-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .convite-card-thumb-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .convite-card-thumb-placeholder i {
+            font-size: 1.3rem;
+            color: var(--primary-gold);
+            background: #fff;
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        }
+        .convite-card-congregation {
+            position: absolute;
+            top: .6rem;
+            left: .6rem;
+            right: 4.5rem;
+            background: rgba(0,0,0,0.72);
+            color: #fff;
+            font-size: .68rem;
+            font-weight: 700;
+            padding: .3rem .6rem;
+            border-radius: 999px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .convite-card-special {
+            position: absolute;
+            top: .6rem;
+            right: .6rem;
+            background: var(--primary-gold);
+            color: #3c1d25;
+            font-size: .68rem;
+            font-weight: 800;
+            padding: .3rem .65rem;
+            border-radius: 999px;
+            white-space: nowrap;
+        }
+        .convite-card-body {
+            padding: 1rem 1.1rem 1.2rem;
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+        .convite-card-title {
+            font-weight: 800;
+            margin-bottom: .4rem;
+            font-size: 1rem;
+        }
+        .convite-card-datetime {
+            display: flex;
+            align-items: center;
+            gap: .4rem;
+            color: var(--primary-red);
+            font-weight: 700;
+            font-size: .84rem;
+            margin-bottom: .6rem;
+        }
+        .convite-card-desc {
+            color: #6b7280;
+            font-size: .86rem;
+            margin-bottom: .9rem;
+            flex: 1;
+        }
+        .convite-card-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: .5rem;
+            padding-top: .8rem;
+            border-top: 1px solid rgba(0,0,0,0.06);
+            margin-bottom: .9rem;
+            flex-wrap: wrap;
+        }
+        .convite-card-location {
+            display: flex;
+            align-items: center;
+            gap: .35rem;
+            color: #6b7280;
+            font-size: .8rem;
+        }
+        .convite-card-location i {
+            color: var(--primary-red);
+        }
+        .convite-card-waiting {
+            color: var(--primary-red);
+            font-weight: 700;
+            font-size: .8rem;
+            white-space: nowrap;
+        }
+        .convite-card-actions {
+            display: grid;
+            gap: .5rem;
+        }
+        .convite-card-btn-primary {
+            background: #212529;
+            color: #fff;
+            border: none;
+            border-radius: 999px;
+            padding: .55rem 1rem;
+            font-weight: 700;
+            font-size: .86rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: .5rem;
+        }
+        .convite-card-btn-primary:hover {
+            color: #fff;
+            filter: brightness(1.1);
+        }
+        .convite-card-btn-outline {
+            background: transparent;
+            color: var(--primary-red);
+            border: 1px solid var(--primary-red);
+            border-radius: 999px;
+            padding: .55rem 1rem;
+            font-weight: 700;
+            font-size: .86rem;
+        }
+        .convite-card-btn-outline:hover {
+            background: rgba(179,0,0,0.06);
+            color: var(--primary-red);
+        }
+
         /* Footer */
         .footer { 
             background: #1a1a1a; 
@@ -2384,145 +2537,122 @@ $firstAndLastName = function ($name) {
     </section>
 
     <!-- Convites Section -->
-    <section id="convites" class="py-5 bg-white">
+    <section id="convites" class="py-5">
         <div class="container py-5">
-            <div class="text-center mb-5">
-                <h2 class="section-title">Convites</h2>
-                <p class="text-muted">Você é nosso convidado de honra</p>
-            </div>
-
-            <?php
-            $convitesPorCongregacao = [];
-            foreach ($convites as $conviteItem) {
-                $loc = !empty($conviteItem['location']) ? $conviteItem['location'] : 'Geral';
-                if (!isset($convitesPorCongregacao[$loc])) {
-                    $convitesPorCongregacao[$loc] = [];
-                }
-                $convitesPorCongregacao[$loc][] = $conviteItem;
-            }
-            ksort($convitesPorCongregacao);
-            if (isset($convitesPorCongregacao['Sede'])) {
-                $sede = $convitesPorCongregacao['Sede'];
-                unset($convitesPorCongregacao['Sede']);
-                $convitesPorCongregacao = array_merge(['Sede' => $sede], $convitesPorCongregacao);
-            }
-            ?>
-
-            <?php if (empty($convitesPorCongregacao)): ?>
+            <?php if (empty($convites)): ?>
+                <div class="flat-strip-head">
+                    <span class="section-panel-kicker"><i class="fas fa-envelope-open-text"></i> Convites</span>
+                </div>
                 <div class="text-center">
                     <p class="text-muted">Nenhum convite especial no momento.</p>
                 </div>
             <?php else: ?>
-                <?php $convitesTotalSlides = count($convitesPorCongregacao); $convitesSlideIndex = 0; ?>
-                <div class="section-carousel-shell" data-carousel-group>
-                    <div class="section-carousel js-section-carousel">
-                        <div class="section-carousel-track">
-                            <?php foreach ($convitesPorCongregacao as $congregacao => $items): ?>
-                                <div class="section-carousel-slide">
-                                    <div class="section-panel-card">
-                                        <div class="section-panel-head">
-                                            <div class="section-panel-head-top">
-                                                <span class="section-panel-kicker"><i class="fas fa-envelope-open-text"></i> Convites</span>
-                                                <?php if ($convitesTotalSlides > 1): ?>
-                                                    <div class="carousel-mini-nav">
-                                                        <span class="carousel-mini-progress"><span class="carousel-mini-progress-bar" style="width: <?= round((($convitesSlideIndex + 1) / $convitesTotalSlides) * 100) ?>%"></span></span>
-                                                        <span class="carousel-counter"><?= $convitesSlideIndex + 1 ?> / <?= $convitesTotalSlides ?></span>
-                                                        <button type="button" class="section-carousel-btn prev carousel-mini-btn" aria-label="Convite anterior"><i class="fas fa-chevron-left"></i></button>
-                                                        <button type="button" class="section-carousel-btn next carousel-mini-btn" aria-label="Próximo convite"><i class="fas fa-chevron-right"></i></button>
-                                                    </div>
-                                                <?php endif; ?>
-                                            </div>
-                                            <h3><?= htmlspecialchars($congregacao) ?></h3>
-                                            <p>Role para ver convites de outras congregações.</p>
+                <div data-flat-strip-group>
+                <div class="flat-strip-head">
+                    <span class="section-panel-kicker"><i class="fas fa-envelope-open-text"></i> Convites</span>
+                    <div class="carousel-mini-nav">
+                        <button type="button" class="carousel-mini-btn" data-flat-strip-scroll="prev" aria-label="Convite anterior"><i class="fas fa-chevron-left"></i></button>
+                        <button type="button" class="carousel-mini-btn" data-flat-strip-scroll="next" aria-label="Próximo convite"><i class="fas fa-chevron-right"></i></button>
+                    </div>
+                </div>
+                <div class="flat-strip-shell">
+                    <div class="flat-strip-track">
+                        <?php foreach ($convites as $convite): ?>
+                            <?php
+                                $dateBadges = eventGetDateBadges($convite);
+                                $firstBadge = $dateBadges[0] ?? null;
+                                $congName = trim((string)($convite['congregation_name'] ?? ''));
+                                $conviteId = (int)$convite['id'];
+                            ?>
+                            <div class="flat-strip-card convite-card">
+                                <div class="convite-card-thumb">
+                                    <?php if (!empty($convite['banner_path'])): ?>
+                                        <img src="<?= htmlspecialchars($convite['banner_path']) ?>" alt="<?= htmlspecialchars($convite['title']) ?>">
+                                    <?php else: ?>
+                                        <div class="convite-card-thumb-placeholder"><i class="fas fa-envelope-open-text"></i></div>
+                                    <?php endif; ?>
+                                    <?php if ($congName !== ''): ?>
+                                        <span class="convite-card-congregation"><?= htmlspecialchars($congName) ?></span>
+                                    <?php endif; ?>
+                                    <?php if (!empty($convite['banner_path'])): ?>
+                                        <span class="convite-card-special">Especial</span>
+                                    <?php endif; ?>
+                                </div>
+                                <div class="convite-card-body">
+                                    <h4 class="convite-card-title"><?= htmlspecialchars($convite['title']) ?></h4>
+                                    <?php if ($firstBadge): ?>
+                                        <div class="convite-card-datetime">
+                                            <i class="far fa-calendar"></i>
+                                            <?= htmlspecialchars($firstBadge['date']) ?><?= $firstBadge['time'] !== '' ? ' &nbsp;•&nbsp; ' . htmlspecialchars($firstBadge['time']) : '' ?>
                                         </div>
-                                        <div class="section-panel-body">
-                                            <div class="section-panel-grid">
-                                                <?php foreach ($items as $convite): ?>
-                                                    <div class="card h-100 border-0 shadow-sm" style="background: #fff; border-top: 4px solid var(--primary-gold) !important;">
-                                                        <?php if (!empty($convite['banner_path'])): ?>
-                                                            <div class="position-relative">
-                                                                <img src="<?= $convite['banner_path'] ?>" class="card-img-top" alt="<?= htmlspecialchars($convite['title']) ?>" style="height: 250px; object-fit: cover;">
-                                                                <div class="position-absolute top-0 end-0 m-2">
-                                                                    <span class="badge bg-gold text-dark shadow-sm">Especial</span>
-                                                                </div>
-                                                            </div>
-                                                        <?php else: ?>
-                                                            <div class="card-img-top bg-light d-flex align-items-center justify-content-center text-gold" style="height: 250px;">
-                                                                <i class="fas fa-envelope-open-text fa-4x"></i>
-                                                            </div>
-                                                        <?php endif; ?>
+                                    <?php endif; ?>
+                                    <?php if (!empty($convite['description'])): ?>
+                                        <p class="convite-card-desc"><?= htmlspecialchars($convite['description']) ?></p>
+                                    <?php endif; ?>
+                                    <div class="convite-card-footer">
+                                        <?php if (!empty($convite['location'])): ?>
+                                            <span class="convite-card-location"><i class="fas fa-location-dot"></i> <?= htmlspecialchars($convite['location']) ?></span>
+                                        <?php else: ?>
+                                            <span></span>
+                                        <?php endif; ?>
+                                        <span class="convite-card-waiting">Esperamos por você!</span>
+                                    </div>
+                                    <div class="convite-card-actions">
+                                        <?php if (!empty($convite['banner_path'])): ?>
+                                            <button type="button" class="convite-card-btn-primary" data-bs-toggle="modal" data-bs-target="#conviteBannerModal<?= $conviteId ?>">
+                                                <i class="fas fa-image"></i> Ver Convite
+                                            </button>
+                                        <?php endif; ?>
+                                        <button type="button" class="convite-card-btn-outline" data-bs-toggle="modal" data-bs-target="#conviteDetailModal<?= $conviteId ?>">
+                                            Ver Detalhes
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
 
-                                                        <div class="card-body text-center p-4">
-                                                            <h5 class="card-title fw-bold text-dark mb-3"><?= htmlspecialchars($convite['title']) ?></h5>
-
-                                                            <div class="mb-3">
-                                                                <?php $dateBadges = eventGetDateBadges($convite); ?>
-                                                                <?php if (empty($dateBadges)): ?>
-                                                                    <p class="mb-0 text-gold fw-bold">Data a confirmar</p>
-                                                                <?php else: ?>
-                                                                    <?php foreach ($dateBadges as $idx => $b): ?>
-                                                                        <?php if ($idx === 0): ?>
-                                                                            <p class="mb-1 text-gold fw-bold fs-5">
-                                                                                <i class="far fa-calendar-alt me-2"></i> <?= htmlspecialchars($b['date']) ?>
-                                                                                <span class="ms-2 text-muted fw-normal fs-6"><i class="far fa-clock me-2"></i><?= htmlspecialchars($b['time']) ?></span>
-                                                                            </p>
-                                                                        <?php else: ?>
-                                                                            <p class="mb-1 text-muted small">
-                                                                                <?= htmlspecialchars($b['weekday']) ?> • <?= htmlspecialchars($b['date']) ?> <?= htmlspecialchars($b['time']) ?>
-                                                                            </p>
-                                                                        <?php endif; ?>
-                                                                    <?php endforeach; ?>
-                                                                <?php endif; ?>
-                                                            </div>
-
-                                                            <p class="card-text text-muted small mb-4"><?= htmlspecialchars($convite['description']) ?></p>
-                                                            <div class="small fw-bold text-gold mt-2">Esperamos por você!</div>
-
-                                                            <?php if (!empty($convite['location'])): ?>
-                                                                <div class="d-inline-block border rounded-pill px-3 py-1 bg-light text-muted small">
-                                                                    <i class="fas fa-map-marker-alt text-danger me-1"></i> <?= htmlspecialchars($convite['location']) ?>
-                                                                </div>
-                                                            <?php endif; ?>
-
-                                                            <?php if (!empty($convite['banner_path'])): ?>
-                                                                <div class="mt-4">
-                                                                    <button type="button" class="btn btn-outline-gold btn-sm rounded-pill" data-bs-toggle="modal" data-bs-target="#conviteModal<?= $convite['id'] ?>">
-                                                                        <i class="fas fa-expand me-1"></i> Ver Detalhes
-                                                                    </button>
-                                                                </div>
-
-                                                                <div class="modal fade" id="conviteModal<?= $convite['id'] ?>" tabindex="-1" aria-hidden="true">
-                                                                    <div class="modal-dialog modal-lg modal-dialog-centered">
-                                                                        <div class="modal-content bg-transparent border-0">
-                                                                            <div class="modal-body p-0 position-relative text-center">
-                                                                                <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-3" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                                                <img src="<?= $convite['banner_path'] ?>" class="img-fluid rounded shadow-lg" alt="<?= htmlspecialchars($convite['title']) ?>">
-                                                                                <div class="mt-2">
-                                                                                    <a href="<?= $convite['banner_path'] ?>" download class="btn btn-light btn-sm"><i class="fas fa-download me-2"></i> Baixar Convite</a>
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                        </div>
-                                                            <?php endif; ?>
-                                                        </div>
-                                                    </div>
-                                                <?php endforeach; ?>
+                            <?php if (!empty($convite['banner_path'])): ?>
+                                <div class="modal fade" id="conviteBannerModal<?= $conviteId ?>" tabindex="-1" aria-hidden="true">
+                                    <div class="modal-dialog modal-lg modal-dialog-centered">
+                                        <div class="modal-content bg-transparent border-0">
+                                            <div class="modal-body p-0 position-relative text-center">
+                                                <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-3" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                <img src="<?= htmlspecialchars($convite['banner_path']) ?>" class="img-fluid rounded shadow-lg" alt="<?= htmlspecialchars($convite['title']) ?>">
+                                                <div class="mt-2">
+                                                    <a href="<?= htmlspecialchars($convite['banner_path']) ?>" download class="btn btn-light btn-sm"><i class="fas fa-download me-2"></i> Baixar Convite</a>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                                <?php $convitesSlideIndex++; ?>
-                            <?php endforeach; ?>
-                        </div>
+                            <?php endif; ?>
+
+                            <div class="modal fade" id="conviteDetailModal<?= $conviteId ?>" tabindex="-1" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title"><?= htmlspecialchars($convite['title']) ?></h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <?php if ($firstBadge): ?>
+                                                <p class="mb-2"><i class="far fa-calendar me-2 text-danger"></i><?= htmlspecialchars($firstBadge['date']) ?><?= $firstBadge['time'] !== '' ? ' às ' . htmlspecialchars($firstBadge['time']) : '' ?></p>
+                                            <?php endif; ?>
+                                            <?php if (!empty($convite['location'])): ?>
+                                                <p class="mb-2"><i class="fas fa-location-dot me-2 text-danger"></i><?= htmlspecialchars($convite['location']) ?></p>
+                                            <?php endif; ?>
+                                            <?php if ($congName !== ''): ?>
+                                                <p class="mb-2"><i class="fas fa-church me-2 text-danger"></i><?= htmlspecialchars($congName) ?></p>
+                                            <?php endif; ?>
+                                            <?php if (!empty($convite['description'])): ?>
+                                                <p class="mb-0 mt-3"><?= nl2br(htmlspecialchars($convite['description'])) ?></p>
+                                            <?php endif; ?>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
                     </div>
-                    <?php if ($convitesTotalSlides > 1): ?>
-                        <div class="carousel-dots">
-                            <?php for ($d = 0; $d < $convitesTotalSlides; $d++): ?>
-                                <button type="button" class="carousel-dot<?= $d === 0 ? ' is-active' : '' ?>" data-section-dot="<?= $d ?>" aria-label="Ir para convite <?= $d + 1 ?>"></button>
-                            <?php endfor; ?>
-                        </div>
-                    <?php endif; ?>
+                </div>
                 </div>
             <?php endif; ?>
         </div>

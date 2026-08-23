@@ -39,10 +39,12 @@ class HomeController {
         
         // Buscar Convites Especiais (type = 'convite')
         $convites = $db->query("
-            SELECT * FROM events 
-            WHERE type = 'convite' 
-            AND (status = 'active' OR status IS NULL) 
-            ORDER BY event_date ASC
+            SELECT e.*, c.name AS congregation_name
+            FROM events e
+            LEFT JOIN congregations c ON c.id = e.congregation_id
+            WHERE e.type = 'convite'
+            AND (e.status = 'active' OR e.status IS NULL)
+            ORDER BY e.event_date ASC
         ")->fetchAll();
 
         // Buscar Eventos por Congregação (EXCETO culto, convite e interno)
