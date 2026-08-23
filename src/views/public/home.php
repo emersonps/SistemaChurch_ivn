@@ -1250,6 +1250,9 @@ $firstAndLastName = function ($name) {
             text-overflow: ellipsis;
             white-space: nowrap;
         }
+        .convite-card-congregation-external {
+            background: rgba(179,0,0,0.82);
+        }
         .convite-card-special {
             position: absolute;
             top: .6rem;
@@ -2573,6 +2576,8 @@ $firstAndLastName = function ($name) {
                                     <?php endif; ?>
                                     <?php if ($congName !== ''): ?>
                                         <span class="convite-card-congregation"><?= htmlspecialchars($congName) ?></span>
+                                    <?php else: ?>
+                                        <span class="convite-card-congregation convite-card-congregation-external"><i class="fas fa-arrow-up-right-from-square me-1"></i>Evento Externo</span>
                                     <?php endif; ?>
                                     <?php if (!empty($convite['banner_path'])): ?>
                                         <span class="convite-card-special">Especial</span>
@@ -2642,6 +2647,8 @@ $firstAndLastName = function ($name) {
                                             <?php endif; ?>
                                             <?php if ($congName !== ''): ?>
                                                 <p class="mb-2"><i class="fas fa-church me-2 text-danger"></i><?= htmlspecialchars($congName) ?></p>
+                                            <?php else: ?>
+                                                <p class="mb-2"><i class="fas fa-arrow-up-right-from-square me-2 text-danger"></i>Evento Externo</p>
                                             <?php endif; ?>
                                             <?php if (!empty($convite['description'])): ?>
                                                 <p class="mb-0 mt-3"><?= nl2br(htmlspecialchars($convite['description'])) ?></p>
