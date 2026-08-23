@@ -45,7 +45,7 @@ foreach ($congregacoes as $c) {
         .nav-link { color: rgba(45,26,33,0.72) !important; font-weight: 600; }
         .nav-link.active, .nav-link:hover { color: var(--primary-red) !important; }
 
-        .cultos-page-wrap { padding: 2.5rem 0 4rem; }
+        .cultos-page-wrap { padding-top: 2.5rem; padding-bottom: 4rem; }
         .cultos-page-head {
             display: flex;
             align-items: flex-end;
