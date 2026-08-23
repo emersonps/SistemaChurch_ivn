@@ -1549,3 +1549,58 @@ function getDevotionalVerses() {
     }
     return $devotionalVerses;
 }
+
+// Enriquece uma lista de eventos type='culto' com dia da semana e horário,
+// ordenados pela próxima ocorrência. Cultos recorrentes guardam o dia em
+// recurring_days e a hora em event_date com data fictícia (1970-01-01),
+// então eventGetDateBadges() (pensada para eventos com data real) não serve
+// aqui — por isso os dois casos (recorrente vs. data única) são tratados
+// separadamente antes de devolver um formato normalizado para as views.
+function getCultosScheduleData(array $cultos) {
+    $dayAbbrev = ['Domingo' => 'DOM', 'Segunda' => 'SEG', 'Terça' => 'TER', 'Terca' => 'TER', 'Quarta' => 'QUA', 'Quinta' => 'QUI', 'Sexta' => 'SEX', 'Sábado' => 'SAB', 'Sabado' => 'SAB'];
+    $now = new DateTimeImmutable('now');
+
+    $cultos = array_values(array_filter($cultos, function ($c) use ($now) {
+        return eventHasFutureOccurrence($c, $now);
+    }));
+
+    $enriched = [];
+    foreach ($cultos as $culto) {
+        $recurringDays = !empty($culto['recurring_days']) ? json_decode($culto['recurring_days'], true) : [];
+        if (!is_array($recurringDays)) {
+            $recurringDays = [];
+        }
+
+        if (!empty($recurringDays)) {
+            $weekdayFull = $recurringDays[0];
+            $timeStart = !empty($culto['event_date']) ? date('H:i', strtotime($culto['event_date'])) : '';
+            if ($timeStart === '00:00') {
+                $timeStart = '';
+            }
+        } else {
+            $dateBadges = eventGetDateBadges($culto);
+            $firstBadge = $dateBadges[0] ?? null;
+            $weekdayFull = $firstBadge['weekday'] ?? '';
+            $timeStart = $firstBadge['time'] ?? '';
+        }
+
+        $timeEnd = !empty($culto['end_time']) ? substr($culto['end_time'], 0, 5) : '';
+        $timeRange = $timeStart !== '' ? ($timeStart . ($timeEnd !== '' ? ' - ' . $timeEnd : '')) : '';
+
+        $culto['weekday_full'] = $weekdayFull !== '' ? $weekdayFull : '—';
+        $culto['weekday_abbrev'] = $weekdayFull !== '' ? ($dayAbbrev[$weekdayFull] ?? mb_strtoupper(mb_substr($weekdayFull, 0, 3))) : '—';
+        $culto['time_start'] = $timeStart;
+        $culto['time_range'] = $timeRange;
+        $culto['next_occurrence'] = eventNextOccurrence($culto, $now);
+
+        $enriched[] = $culto;
+    }
+
+    usort($enriched, function ($a, $b) {
+        $ta = $a['next_occurrence'] ? $a['next_occurrence']->getTimestamp() : PHP_INT_MAX;
+        $tb = $b['next_occurrence'] ? $b['next_occurrence']->getTimestamp() : PHP_INT_MAX;
+        return $ta <=> $tb;
+    });
+
+    return $enriched;
+}

@@ -123,6 +123,9 @@ elseif ($uri == '/demo-presence/ping' && $method == 'POST') {
 elseif ($uri == '/demo-presence/leave' && $method == 'POST') {
     (new DemoPresenceController())->leave();
 }
+elseif ($uri == '/cultos') {
+    (new EventController())->publicCultosPage();
+}
 elseif ($uri == '/harpa' || $uri == '/harpa-crista') {
     view('public/harpa');
 }

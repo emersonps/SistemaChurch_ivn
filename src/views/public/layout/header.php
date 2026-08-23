@@ -293,7 +293,7 @@
                 <ul class="navbar-nav ms-auto align-items-center">
                     <li class="nav-item"><a class="nav-link active" href="/">Início</a></li>
                     <li class="nav-item"><a class="nav-link" href="/#sobre">Sobre</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/#cultos">Cultos</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/cultos">Cultos</a></li>
                     <li class="nav-item"><a class="nav-link" href="/#eventos">Eventos</a></li>
                     <li class="nav-item"><a class="nav-link" href="/#convites">Convites</a></li>
                     <li class="nav-item"><a class="nav-link" href="/#congregacoes">Congregações</a></li>

@@ -754,4 +754,33 @@ class EventController {
             echo json_encode(['success' => false, 'message' => 'Erro ao registrar: ' . $e->getMessage()]);
         }
     }
+
+    // Página pública /cultos: programação semanal completa, com filtros por
+    // dia/congregação e o mapa ilustrativo das congregações.
+    public function publicCultosPage() {
+        $db = (new Database())->connect();
+
+        $cultosRaw = $db->query("SELECT * FROM events WHERE type = 'culto' AND (status = 'active' OR status IS NULL) ORDER BY event_date ASC")->fetchAll(PDO::FETCH_ASSOC);
+        $cultos = getCultosScheduleData($cultosRaw);
+
+        $weekOrder = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
+        $cultosByWeekday = array_fill_keys($weekOrder, []);
+        foreach ($cultos as $culto) {
+            $day = in_array($culto['weekday_full'], $weekOrder, true) ? $culto['weekday_full'] : null;
+            if ($day === null) {
+                continue;
+            }
+            $cultosByWeekday[$day][] = $culto;
+        }
+
+        $congregacoes = $db->query("SELECT * FROM congregations ORDER BY name ASC")->fetchAll(PDO::FETCH_ASSOC);
+
+        view('public/cultos', [
+            'cultos' => $cultos,
+            'cultosByWeekday' => $cultosByWeekday,
+            'weekOrder' => $weekOrder,
+            'congregacoes' => $congregacoes,
+            'siteProfile' => getChurchSiteProfileSettings(),
+        ]);
+    }
 }

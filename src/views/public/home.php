@@ -1022,6 +1022,24 @@ $firstAndLastName = function ($name) {
             flex-wrap: wrap;
             margin-bottom: 1.75rem;
         }
+        .cultos-preview-head {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-bottom: 1.75rem;
+        }
+        .cultos-preview-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 1rem;
+        }
+        @media (max-width: 767.98px) {
+            .cultos-preview-grid {
+                grid-template-columns: 1fr;
+            }
+        }
         .flat-strip-shell {
             position: relative;
         }
@@ -1872,7 +1890,7 @@ $firstAndLastName = function ($name) {
                 <ul class="navbar-nav ms-auto align-items-center">
                     <li class="nav-item"><a class="nav-link active" href="#inicio">Início</a></li>
                     <li class="nav-item"><a class="btn btn-cta btn-sm px-3 text-nowrap" href="/oracao"><i class="fas fa-hands-praying me-2"></i>Oração</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#cultos">Cultos</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/cultos">Cultos</a></li>
                     <li class="nav-item"><a class="nav-link" href="#eventos">Eventos</a></li>
                     <li class="nav-item"><a class="nav-link" href="#convites">Convites</a></li>
                     <li class="nav-item"><a class="nav-link" href="#congregacoes">Congregações</a></li>
@@ -1978,21 +1996,8 @@ $firstAndLastName = function ($name) {
     <!-- Services (Cultos) Section -->
     <section id="cultos" class="py-5 bg-light">
         <div class="container py-5">
-            <?php
-                $cultosSorted = $cultos;
-                $nowForCultos = new DateTimeImmutable('now');
-                $cultosSorted = array_values(array_filter($cultosSorted, function ($c) use ($nowForCultos) {
-                    return eventHasFutureOccurrence($c, $nowForCultos);
-                }));
-                usort($cultosSorted, function ($a, $b) use ($nowForCultos) {
-                    $na = eventNextOccurrence($a, $nowForCultos);
-                    $nb = eventNextOccurrence($b, $nowForCultos);
-                    $ta = $na ? $na->getTimestamp() : PHP_INT_MAX;
-                    $tb = $nb ? $nb->getTimestamp() : PHP_INT_MAX;
-                    return $ta <=> $tb;
-                });
-            ?>
-            <?php if (empty($cultosSorted)): ?>
+            <?php $cultosSchedule = getCultosScheduleData($cultos); ?>
+            <?php if (empty($cultosSchedule)): ?>
                 <div class="flat-strip-head">
                     <h2 class="section-title mb-0">Nossos Cultos</h2>
                 </div>
@@ -2000,76 +2005,31 @@ $firstAndLastName = function ($name) {
                     <p class="text-muted">Nenhum culto cadastrado no momento.</p>
                 </div>
             <?php else: ?>
-                <?php $cultosDayAbbrev = ['Domingo' => 'DOM', 'Segunda' => 'SEG', 'Terça' => 'TER', 'Terca' => 'TER', 'Quarta' => 'QUA', 'Quinta' => 'QUI', 'Sexta' => 'SEX', 'Sábado' => 'SAB', 'Sabado' => 'SAB']; ?>
-                <div data-flat-strip-group>
-                <div class="flat-strip-head">
-                    <h2 class="section-title mb-0">Nossos Cultos</h2>
-                    <div class="carousel-mini-nav">
-                        <button type="button" class="carousel-mini-btn" data-flat-strip-scroll="prev" aria-label="Cultos anteriores"><i class="fas fa-chevron-left"></i></button>
-                        <button type="button" class="carousel-mini-btn" data-flat-strip-scroll="next" aria-label="Próximos cultos"><i class="fas fa-chevron-right"></i></button>
+                <div class="cultos-preview-head">
+                    <div>
+                        <span class="section-panel-kicker"><i class="fas fa-church"></i> Congregações</span>
+                        <h2 class="section-title mb-0 mt-2">Nossos cultos na semana</h2>
                     </div>
+                    <a href="/cultos" class="btn btn-outline-secondary rounded-pill btn-sm px-3">Ver todos</a>
                 </div>
-                <div class="flat-strip-shell">
-                    <div class="flat-strip-track">
-                        <?php foreach ($cultosSorted as $culto): ?>
-                            <?php
-                                // Cultos recorrentes guardam o dia em recurring_days e a hora
-                                // em event_date com data fictícia (1970-01-01), então
-                                // eventGetDateBadges() (pensada para eventos com data real)
-                                // não serve aqui — tratamos os dois casos separadamente.
-                                $recurringDays = !empty($culto['recurring_days']) ? json_decode($culto['recurring_days'], true) : [];
-                                if (!is_array($recurringDays)) {
-                                    $recurringDays = [];
-                                }
-                                if (!empty($recurringDays)) {
-                                    $dayLabel = $cultosDayAbbrev[$recurringDays[0]] ?? mb_strtoupper(mb_substr($recurringDays[0], 0, 3));
-                                    $timeLabel = !empty($culto['event_date']) ? date('H:i', strtotime($culto['event_date'])) : '';
-                                    if ($timeLabel === '00:00') {
-                                        $timeLabel = '';
-                                    }
-                                } else {
-                                    $dateBadges = eventGetDateBadges($culto);
-                                    $firstBadge = $dateBadges[0] ?? null;
-                                    $dayLabel = $firstBadge ? ($cultosDayAbbrev[$firstBadge['weekday']] ?? mb_strtoupper(mb_substr($firstBadge['weekday'], 0, 3))) : '—';
-                                    $timeLabel = $firstBadge['time'] ?? '';
-                                }
-                            ?>
-                            <div class="flat-strip-card">
-                                <div class="flat-strip-card-top">
-                                    <span class="flat-strip-day-badge"><?= htmlspecialchars($dayLabel) ?></span>
-                                    <?php if ($timeLabel !== ''): ?>
-                                        <span class="flat-strip-time-pill"><i class="far fa-clock"></i> <?= htmlspecialchars($timeLabel) ?></span>
-                                    <?php endif; ?>
-                                </div>
-                                <h4><?= htmlspecialchars($culto['title']) ?></h4>
-                                <?php if (!empty($culto['location'])): ?>
-                                    <div class="flat-strip-card-location">
-                                        <i class="fas fa-location-dot"></i>
-                                        <span><?= htmlspecialchars($culto['location']) ?></span>
-                                    </div>
-                                <?php endif; ?>
-                                <?php if (!empty($culto['banner_path'])): ?>
-                                    <button type="button" class="flat-strip-card-cta" data-bs-toggle="modal" data-bs-target="#bannerModalCulto<?= $culto['id'] ?>">
-                                        <i class="fas fa-image"></i> Ver convite
-                                    </button>
-                                    <div class="modal fade" id="bannerModalCulto<?= $culto['id'] ?>" tabindex="-1" aria-hidden="true">
-                                        <div class="modal-dialog modal-lg modal-dialog-centered">
-                                            <div class="modal-content bg-transparent border-0">
-                                                <div class="modal-body p-0 position-relative text-center">
-                                                    <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-3" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                    <img src="<?= $culto['banner_path'] ?>" class="img-fluid rounded shadow-lg" alt="<?= htmlspecialchars($culto['title']) ?>">
-                                                    <div class="mt-2">
-                                                        <a href="<?= $culto['banner_path'] ?>" download class="btn btn-light btn-sm"><i class="fas fa-download me-2"></i> Baixar Convite</a>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
+                <div class="cultos-preview-grid">
+                    <?php foreach (array_slice($cultosSchedule, 0, 3) as $culto): ?>
+                        <div class="flat-strip-card">
+                            <div class="flat-strip-card-top">
+                                <span class="flat-strip-day-badge"><?= htmlspecialchars($culto['weekday_abbrev']) ?></span>
+                                <?php if ($culto['time_start'] !== ''): ?>
+                                    <span class="flat-strip-time-pill"><i class="far fa-clock"></i> <?= htmlspecialchars($culto['time_start']) ?></span>
                                 <?php endif; ?>
                             </div>
-                        <?php endforeach; ?>
-                    </div>
-                </div>
+                            <h4><?= htmlspecialchars($culto['title']) ?></h4>
+                            <?php if (!empty($culto['location'])): ?>
+                                <div class="flat-strip-card-location">
+                                    <i class="fas fa-location-dot"></i>
+                                    <span><?= htmlspecialchars($culto['location']) ?></span>
+                                </div>
+                            <?php endif; ?>
+                        </div>
+                    <?php endforeach; ?>
                 </div>
             <?php endif; ?>
         </div>
