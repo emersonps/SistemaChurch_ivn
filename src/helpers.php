@@ -1119,7 +1119,7 @@ function eventNextOccurrence(array $event, $now = null) {
     }
 
     $recurring = trim((string)($event['recurring_days'] ?? ''));
-    if ($recurring !== '') {
+    if (empty($items) && $recurring !== '') {
         $days = json_decode($recurring, true);
         if (is_array($days) && !empty($days)) {
             $map = [

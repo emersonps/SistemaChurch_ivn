@@ -2358,10 +2358,15 @@ $firstAndLastName = function ($name) {
                 </div>
                 <div class="flat-strip-shell">
                     <div class="flat-strip-track">
+                        <?php $eventosNow = new DateTimeImmutable('today'); ?>
                         <?php foreach ($eventos as $evento): ?>
                             <?php
                                 $dateBadges = eventGetDateBadges($evento);
-                                $firstBadge = $dateBadges[0] ?? null;
+                                $futureBadges = array_values(array_filter($dateBadges, function ($b) use ($eventosNow) {
+                                    $ts = strtotime($b['raw']);
+                                    return $ts !== false && $ts >= $eventosNow->getTimestamp();
+                                }));
+                                $firstBadge = $futureBadges[0] ?? ($dateBadges[0] ?? null);
                                 $dayLabel = $firstBadge ? ($eventosDayAbbrev[$firstBadge['weekday']] ?? mb_strtoupper(mb_substr($firstBadge['weekday'], 0, 3))) : '—';
                                 $timeLabel = $firstBadge['time'] ?? '';
                                 $dateLabel = $firstBadge['date'] ?? '';
