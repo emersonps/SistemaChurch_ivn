@@ -30,6 +30,7 @@ $prayerTarget = $prayerTarget ?? '_self';
             background: rgba(255,255,255,0.24);
             transform: rotate(25deg) translateX(-140%);
             animation: ctaShimmer 3.2s ease-in-out infinite;
+        }
         .floating-faith-actions {
             position: fixed;
             right: 14px;

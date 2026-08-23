@@ -7,6 +7,12 @@ $whatsappDigits = preg_replace('/\D/', '', (string)($siteProfile['phone'] ?? '')
 if ($whatsappDigits !== '' && strlen($whatsappDigits) <= 11) {
     $whatsappDigits = '55' . $whatsappDigits;
 }
+$congregationAddressByName = [];
+foreach ($congregacoes as $c) {
+    if (!empty($c['name']) && !empty($c['address'])) {
+        $congregationAddressByName[$c['name']] = $c['address'];
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -221,6 +227,8 @@ if ($whatsappDigits !== '' && strlen($whatsappDigits) <= 11) {
         .cultos-full-card h4 { font-size: 1.02rem; font-weight: 800; margin-bottom: .35rem; }
         .cultos-full-card .flat-strip-card-location { display: flex; align-items: flex-start; gap: .4rem; color: #6b7280; font-size: .84rem; margin-bottom: .4rem; }
         .cultos-full-card .flat-strip-card-location i { color: var(--primary-red); margin-top: .15rem; }
+        .cultos-full-card-address { display: flex; align-items: flex-start; gap: .4rem; color: #9a8f92; font-size: .78rem; margin-bottom: .4rem; }
+        .cultos-full-card-address i { color: #9a8f92; margin-top: .15rem; }
         .cultos-full-card-time { display: flex; align-items: center; gap: .4rem; color: #6b7280; font-size: .84rem; margin-bottom: .6rem; }
         .cultos-full-card-time i { color: var(--primary-red); }
         .cultos-full-card-desc { color: #6b7280; font-size: .86rem; margin-bottom: .8rem; }
@@ -431,6 +439,13 @@ if ($whatsappDigits !== '' && strlen($whatsappDigits) <= 11) {
                                             <div class="flat-strip-card-location">
                                                 <i class="fas fa-location-dot"></i>
                                                 <span><?= htmlspecialchars($culto['location']) ?></span>
+                                            </div>
+                                        <?php endif; ?>
+                                        <?php $cultoAddress = $culto['address'] ?? ($congregationAddressByName[$culto['location']] ?? ''); ?>
+                                        <?php if (!empty($cultoAddress)): ?>
+                                            <div class="cultos-full-card-address">
+                                                <i class="fas fa-signs-post"></i>
+                                                <span><?= htmlspecialchars($cultoAddress) ?></span>
                                             </div>
                                         <?php endif; ?>
                                         <?php if ($culto['time_range'] !== ''): ?>
