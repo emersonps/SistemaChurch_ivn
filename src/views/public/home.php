@@ -1024,7 +1024,7 @@ $firstAndLastName = function ($name) {
         }
         .cultos-preview-head {
             display: flex;
-            align-items: flex-end;
+            align-items: center;
             justify-content: space-between;
             gap: 1rem;
             flex-wrap: wrap;
@@ -2006,10 +2006,7 @@ $firstAndLastName = function ($name) {
                 </div>
             <?php else: ?>
                 <div class="cultos-preview-head">
-                    <div>
-                        <span class="section-panel-kicker"><i class="fas fa-church"></i> Congregações</span>
-                        <h2 class="section-title mb-0 mt-2">Nossos cultos na semana</h2>
-                    </div>
+                    <span class="section-panel-kicker"><i class="fas fa-church"></i> Nossos cultos na semana</span>
                     <a href="/cultos" class="btn btn-outline-secondary rounded-pill btn-sm px-3">Ver todos</a>
                 </div>
                 <div class="cultos-preview-grid">
