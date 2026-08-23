@@ -2833,10 +2833,19 @@ $firstAndLastName = function ($name) {
                 </div>
                 <div class="flat-strip-shell">
                     <div class="flat-strip-track">
+                        <?php $congTodayName = eventDateWeekdayName('now'); $congNowTime = date('H:i'); ?>
                         <?php foreach ($congregacoes as $congregacao): ?>
                             <?php
-                                $congIsActive = ($congregacao['status'] ?? 'active') === 'active';
                                 $congSchedules = !empty($congregacao['service_schedule']) ? json_decode($congregacao['service_schedule'], true) : [];
+                                $congIsOpenNow = false;
+                                foreach ($congSchedules as $congSchedule) {
+                                    $schedStart = $congSchedule['start_time'] ?? '';
+                                    $schedEnd = $congSchedule['end_time'] ?? '';
+                                    if (($congSchedule['day'] ?? '') === $congTodayName && $schedStart !== '' && $schedEnd !== '' && $congNowTime >= $schedStart && $congNowTime <= $schedEnd) {
+                                        $congIsOpenNow = true;
+                                        break;
+                                    }
+                                }
                                 $congAddressParts = array_filter([
                                     $congregacao['address'] ?? '',
                                     trim(($congregacao['city'] ?? '') . (!empty($congregacao['state']) ? ' - ' . $congregacao['state'] : '')),
@@ -2853,7 +2862,7 @@ $firstAndLastName = function ($name) {
                                             <span>SEM FOTO</span>
                                         </div>
                                     <?php endif; ?>
-                                    <span class="congregacao-status-badge<?= $congIsActive ? '' : ' is-inactive' ?>"><?= $congIsActive ? 'ATIVA' : 'INATIVA' ?></span>
+                                    <span class="congregacao-status-badge<?= $congIsOpenNow ? '' : ' is-inactive' ?>"><?= $congIsOpenNow ? 'Aberta' : 'Fechada' ?></span>
                                     <div class="congregacao-flat-overlay">
                                         <h3><?= htmlspecialchars($congregacao['name']) ?></h3>
                                         <?php if (!empty($congAddressParts)): ?>
