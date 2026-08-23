@@ -173,7 +173,7 @@ $galleryInitialLimit = 12;
         .vw-card-desc { font-size: .85rem; color: #495057; margin-bottom: 1rem; flex: 1; }
 
         /* Header card */
-        .gallery-page-wrap { padding: 1.6rem 0 4rem; }
+        .gallery-page-wrap { padding-top: 1.6rem; padding-bottom: 4rem; }
         .gallery-header-card {
             background: #fff;
             border: 1px solid rgba(15,18,28,0.07);
@@ -467,18 +467,27 @@ $galleryInitialLimit = 12;
                 videos: document.getElementById('galleryPanelVideos')
             };
 
+            function activateTab(target) {
+                tabs.forEach(function (t) {
+                    t.classList.toggle('is-active', t.getAttribute('data-gallery-tab') === target);
+                });
+                Object.keys(panels).forEach(function (key) {
+                    if (panels[key]) {
+                        panels[key].classList.toggle('d-none', key !== target);
+                    }
+                });
+            }
+
             tabs.forEach(function (tab) {
                 tab.addEventListener('click', function () {
-                    var target = tab.getAttribute('data-gallery-tab');
-                    tabs.forEach(function (t) { t.classList.remove('is-active'); });
-                    tab.classList.add('is-active');
-                    Object.keys(panels).forEach(function (key) {
-                        if (panels[key]) {
-                            panels[key].classList.toggle('d-none', key !== target);
-                        }
-                    });
+                    activateTab(tab.getAttribute('data-gallery-tab'));
                 });
             });
+
+            var requestedTab = new URLSearchParams(window.location.search).get('tab');
+            if (requestedTab && panels[requestedTab]) {
+                activateTab(requestedTab);
+            }
         })();
 
         (function () {

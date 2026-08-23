@@ -351,7 +351,7 @@ $firstAndLastName = function ($name) {
             white-space: nowrap;
         }
 
-        .countdown-carousel { position: relative; padding: .85rem 3.25rem 1.05rem; overflow: hidden; }
+        .countdown-carousel { position: relative; padding: .85rem 1.05rem 1.05rem; overflow: hidden; }
         .countdown-carousel-track {
             display: flex;
             gap: 0;
@@ -396,23 +396,21 @@ $firstAndLastName = function ($name) {
         .countdown-box span { display: block; font-size: .72rem; color: #777; text-transform: uppercase; letter-spacing: .06em; }
 
         .countdown-carousel-btn {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 42px;
-            height: 42px;
+            width: 30px;
+            height: 30px;
             border-radius: 50%;
             border: none;
             background: #fff;
             color: var(--primary-red);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.12);
-            z-index: 2;
+            box-shadow: 0 6px 14px rgba(0,0,0,0.12);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: .78rem;
             transition: transform .15s ease, box-shadow .15s ease, opacity .15s ease;
         }
-        .countdown-carousel-btn:hover { transform: translateY(-50%) scale(1.04); box-shadow: 0 16px 30px rgba(0,0,0,0.18); }
-        .countdown-carousel-btn:disabled { opacity: .45; box-shadow: none; }
-        .countdown-carousel-btn.prev { left: .9rem; }
-        .countdown-carousel-btn.next { right: .9rem; }
+        .countdown-carousel-btn:hover { transform: scale(1.06); box-shadow: 0 10px 20px rgba(0,0,0,0.16); }
+        .countdown-carousel-btn:disabled { opacity: .4; box-shadow: none; }
 
         .hero-countdown-cta { padding: 0 1.05rem 1.05rem; }
         .hero-countdown-cta .btn { width: 100%; border-radius: 999px; font-weight: 800; padding: 12px 18px; }
@@ -786,17 +784,8 @@ $firstAndLastName = function ($name) {
                 grid-template-columns: 1fr;
             }
         }
-        .video-preview-grid {
-            display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: 1.25rem;
-        }
-        @media (max-width: 767.98px) {
-            .video-preview-grid {
-                grid-template-columns: 1fr;
-            }
-        }
         .video-preview-card {
+            flex: 0 0 calc(33.33% - .667rem);
             display: block;
             background: #fff;
             border: 1px solid rgba(0,0,0,0.08);
@@ -810,6 +799,12 @@ $firstAndLastName = function ($name) {
             color: inherit;
             transform: translateY(-2px);
             box-shadow: 0 14px 30px rgba(0,0,0,0.1);
+        }
+        @media (max-width: 991.98px) {
+            .video-preview-card { flex: 0 0 calc(50% - .5rem); }
+        }
+        @media (max-width: 575.98px) {
+            .video-preview-card { flex: 0 0 82%; }
         }
         .video-preview-thumb {
             position: relative;
@@ -844,9 +839,8 @@ $firstAndLastName = function ($name) {
             color: #6b7280;
             font-size: .84rem;
         }
-        #ultimas-fotos .video-preview-grid {
-            grid-template-columns: repeat(6, minmax(0, 1fr));
-            gap: .75rem;
+        #ultimas-fotos .video-preview-card {
+            flex: 0 0 calc(16.666% - .625rem);
         }
         #ultimas-fotos .video-preview-thumb {
             aspect-ratio: 1;
@@ -866,14 +860,10 @@ $firstAndLastName = function ($name) {
             font-size: .72rem;
         }
         @media (max-width: 991.98px) {
-            #ultimas-fotos .video-preview-grid {
-                grid-template-columns: repeat(3, minmax(0, 1fr));
-            }
+            #ultimas-fotos .video-preview-card { flex: 0 0 calc(33.33% - .5rem); }
         }
         @media (max-width: 767.98px) {
-            #ultimas-fotos .video-preview-grid {
-                grid-template-columns: repeat(2, minmax(0, 1fr));
-            }
+            #ultimas-fotos .video-preview-card { flex: 0 0 calc(50% - .375rem); }
         }
         .flat-strip-shell {
             position: relative;
@@ -1363,28 +1353,15 @@ $firstAndLastName = function ($name) {
             padding: .4rem .85rem;
             border-radius: 999px;
         }
-        .atualizacoes-grid {
-            display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-            background: #fff;
-            border: 1px solid rgba(0,0,0,0.07);
-            border-radius: 20px;
-            overflow: hidden;
-            box-shadow: 0 16px 40px rgba(0,0,0,0.05);
-        }
         .atualizacoes-col {
+            flex: 0 0 calc(33.33% - .75rem);
             padding: 1.5rem 1.4rem;
-            border-right: 1px solid rgba(0,0,0,0.06);
-            display: flex;
-            flex-direction: column;
         }
-        .atualizacoes-col:last-child {
-            border-right: none;
+        @media (max-width: 991.98px) {
+            .atualizacoes-col { flex: 0 0 calc(50% - .5rem); }
         }
-        @media (max-width: 767.98px) {
-            .atualizacoes-grid { grid-template-columns: 1fr; }
-            .atualizacoes-col { border-right: none; border-bottom: 1px solid rgba(0,0,0,0.06); }
-            .atualizacoes-col:last-child { border-bottom: none; }
+        @media (max-width: 575.98px) {
+            .atualizacoes-col { flex: 0 0 86%; }
         }
         .atualizacoes-col-head {
             display: flex;
@@ -1928,9 +1905,6 @@ $firstAndLastName = function ($name) {
             .countdown-carousel {
                 padding: .9rem .9rem 1rem;
             }
-            .countdown-carousel-btn {
-                display: none;
-            }
             .countdown-slide {
                 padding: .9rem;
                 border-radius: 14px;
@@ -2192,18 +2166,27 @@ $firstAndLastName = function ($name) {
                                 <div class="hero-countdown-head">
                                     <div class="hero-countdown-head-top">
                                         <h3>Contagem regressiva</h3>
-                                        <div class="hero-countdown-status">
-                                            <span id="heroCountdownIndex">1</span>
-                                            <span>/</span>
-                                            <span id="heroCountdownTotal"><?= (int)count($countdownCultos) ?></span>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <div class="hero-countdown-status">
+                                                <span id="heroCountdownIndex">1</span>
+                                                <span>/</span>
+                                                <span id="heroCountdownTotal"><?= (int)count($countdownCultos) ?></span>
+                                            </div>
+                                            <?php if (count($countdownCultos) > 1): ?>
+                                                <div class="carousel-mini-nav">
+                                                    <button type="button" class="countdown-carousel-btn prev" data-countdown-scroll="prev" aria-label="Anterior">
+                                                        <i class="fas fa-chevron-left"></i>
+                                                    </button>
+                                                    <button type="button" class="countdown-carousel-btn next" data-countdown-scroll="next" aria-label="Próximo">
+                                                        <i class="fas fa-chevron-right"></i>
+                                                    </button>
+                                                </div>
+                                            <?php endif; ?>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                             <div class="countdown-carousel">
-                                <button type="button" class="countdown-carousel-btn prev" data-countdown-scroll="prev" aria-label="Anterior">
-                                    <i class="fas fa-chevron-left"></i>
-                                </button>
                                 <div class="countdown-carousel-track" id="heroCountdownTrack">
                                     <?php foreach ($countdownCultos as $countdownCulto): ?>
                                         <div class="countdown-card" data-countdown="<?= htmlspecialchars($countdownCulto['starts_at']) ?>">
@@ -2242,9 +2225,6 @@ $firstAndLastName = function ($name) {
                                         </div>
                                     <?php endforeach; ?>
                                 </div>
-                                <button type="button" class="countdown-carousel-btn next" data-countdown-scroll="next" aria-label="Próximo">
-                                    <i class="fas fa-chevron-right"></i>
-                                </button>
                             </div>
                             <?php /* CTA oculto temporariamente
                             <div class="hero-countdown-cta">
@@ -2370,12 +2350,20 @@ $firstAndLastName = function ($name) {
                 $ptMonths = ['', 'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
                 $currentMonthName = $ptMonths[(int)date('n')];
             ?>
+            <div data-flat-strip-group>
             <div class="flat-strip-head">
                 <span class="section-panel-kicker"><i class="fas fa-newspaper"></i> Atualizações Recentes</span>
-                <span class="atualizacoes-month-pill"><?= htmlspecialchars($currentMonthName) ?> <?= date('Y') ?></span>
+                <div class="d-flex align-items-center gap-2">
+                    <span class="atualizacoes-month-pill"><?= htmlspecialchars($currentMonthName) ?> <?= date('Y') ?></span>
+                    <div class="carousel-mini-nav">
+                        <button type="button" class="carousel-mini-btn" data-flat-strip-scroll="prev" aria-label="Anterior"><i class="fas fa-chevron-left"></i></button>
+                        <button type="button" class="carousel-mini-btn" data-flat-strip-scroll="next" aria-label="Próximo"><i class="fas fa-chevron-right"></i></button>
+                    </div>
+                </div>
             </div>
-            <div class="atualizacoes-grid">
-                <div class="atualizacoes-col">
+            <div class="flat-strip-shell">
+            <div class="flat-strip-track">
+                <div class="atualizacoes-col flat-strip-card">
                     <div class="atualizacoes-col-head">
                         <div class="atualizacoes-col-icon icon-birthday"><i class="fas fa-cake-candles"></i></div>
                         <?php if (!empty($birthdays)): ?>
@@ -2418,7 +2406,7 @@ $firstAndLastName = function ($name) {
                     </div>
                 </div>
 
-                <div class="atualizacoes-col">
+                <div class="atualizacoes-col flat-strip-card">
                     <div class="atualizacoes-col-head">
                         <div class="atualizacoes-col-icon icon-members"><i class="fas fa-user-plus"></i></div>
                         <?php if (!empty($newMembers)): ?>
@@ -2453,7 +2441,7 @@ $firstAndLastName = function ($name) {
                     </div>
                 </div>
 
-                <div class="atualizacoes-col">
+                <div class="atualizacoes-col flat-strip-card">
                     <div class="atualizacoes-col-head">
                         <div class="atualizacoes-col-icon icon-baptism"><i class="fas fa-droplet"></i></div>
                         <?php if (!empty($baptisms)): ?>
@@ -2493,6 +2481,8 @@ $firstAndLastName = function ($name) {
                     </div>
                 </div>
             </div>
+            </div>
+            </div>
         </div>
     </section>
 
@@ -2507,11 +2497,19 @@ $firstAndLastName = function ($name) {
     <?php if (!empty($homeVideos)): ?>
     <section id="mural-de-videos" class="py-5 section-tint">
         <div class="container py-4">
+            <div data-flat-strip-group>
             <div class="cultos-preview-head">
                 <span class="section-panel-kicker"><i class="fas fa-video"></i> Mural de vídeos</span>
-                <a href="/mural-de-videos" class="btn btn-outline-secondary rounded-pill btn-sm px-3">Ver tudo</a>
+                <div class="d-flex align-items-center gap-2">
+                    <div class="carousel-mini-nav">
+                        <button type="button" class="carousel-mini-btn" data-flat-strip-scroll="prev" aria-label="Vídeo anterior"><i class="fas fa-chevron-left"></i></button>
+                        <button type="button" class="carousel-mini-btn" data-flat-strip-scroll="next" aria-label="Próximo vídeo"><i class="fas fa-chevron-right"></i></button>
+                    </div>
+                    <a href="/galeria?tab=videos" class="btn btn-outline-secondary rounded-pill btn-sm px-3">Ver tudo</a>
+                </div>
             </div>
-            <div class="video-preview-grid">
+            <div class="flat-strip-shell">
+            <div class="flat-strip-track">
                 <?php foreach ($homeVideos as $video): ?>
                     <a href="/mural-de-videos/assistir/<?= (int)$video['id'] ?>" target="_blank" rel="noopener" class="video-preview-card">
                         <div class="video-preview-thumb">
@@ -2534,6 +2532,8 @@ $firstAndLastName = function ($name) {
                     </a>
                 <?php endforeach; ?>
             </div>
+            </div>
+            </div>
         </div>
     </section>
     <?php endif; ?>
@@ -2542,11 +2542,19 @@ $firstAndLastName = function ($name) {
     <?php if (!empty($latestPhotos)): ?>
     <section id="ultimas-fotos" class="py-5">
         <div class="container py-4">
+            <div data-flat-strip-group>
             <div class="cultos-preview-head">
                 <span class="section-panel-kicker"><i class="fas fa-images"></i> Últimas fotos</span>
-                <a href="/galeria" class="btn btn-outline-secondary rounded-pill btn-sm px-3">Ver mais</a>
+                <div class="d-flex align-items-center gap-2">
+                    <div class="carousel-mini-nav">
+                        <button type="button" class="carousel-mini-btn" data-flat-strip-scroll="prev" aria-label="Foto anterior"><i class="fas fa-chevron-left"></i></button>
+                        <button type="button" class="carousel-mini-btn" data-flat-strip-scroll="next" aria-label="Próxima foto"><i class="fas fa-chevron-right"></i></button>
+                    </div>
+                    <a href="/galeria" class="btn btn-outline-secondary rounded-pill btn-sm px-3">Ver mais</a>
+                </div>
             </div>
-            <div class="video-preview-grid">
+            <div class="flat-strip-shell">
+            <div class="flat-strip-track">
                 <?php foreach ($latestPhotos as $photo): ?>
                     <a href="/galeria" class="video-preview-card">
                         <div class="video-preview-thumb">
@@ -2563,6 +2571,8 @@ $firstAndLastName = function ($name) {
                         </div>
                     </a>
                 <?php endforeach; ?>
+            </div>
+            </div>
             </div>
         </div>
     </section>
