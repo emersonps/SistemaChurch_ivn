@@ -165,11 +165,18 @@ $footerNavItems = [
         align-items: center;
         justify-content: center;
         color: rgba(255,255,255,0.85);
+        text-decoration: none;
+        line-height: 1;
+        flex-shrink: 0;
         transition: background .15s ease, color .15s ease;
+    }
+    .footer-social-icon i {
+        font-size: 1rem;
     }
     .footer-social-icon:hover {
         background: rgba(255,255,255,0.14);
         color: var(--primary-gold);
+        text-decoration: none;
     }
     .footer-divider {
         border: none;
