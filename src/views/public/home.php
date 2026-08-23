@@ -764,67 +764,6 @@ $firstAndLastName = function ($name) {
             background-color: var(--primary-gold) !important;
             color: #000;
         }
-        .cultos-carousel-shell {
-            position: relative;
-            max-width: 1080px;
-            margin: 0 auto;
-        }
-        .cultos-carousel {
-            position: relative;
-            padding: .5rem 0;
-        }
-        .cultos-carousel-track {
-            display: flex;
-            gap: 0;
-            overflow-x: auto;
-            scroll-snap-type: x mandatory;
-            scroll-behavior: smooth;
-            scrollbar-width: none;
-        }
-        .cultos-carousel-track::-webkit-scrollbar {
-            display: none;
-        }
-        .cultos-slide {
-            flex: 0 0 100%;
-            min-width: 100%;
-            scroll-snap-align: center;
-            padding: .35rem;
-        }
-        .cultos-card {
-            background: #fff;
-            border-radius: 22px;
-            border: 1px solid rgba(0,0,0,0.07);
-            box-shadow: 0 16px 42px rgba(0,0,0,0.08);
-            overflow: hidden;
-        }
-        .cultos-card-head {
-            display: flex;
-            flex-direction: column;
-            gap: .35rem;
-            padding: 1.2rem 1.35rem;
-            background: linear-gradient(135deg, rgba(255,42,122,0.08), rgba(179,0,0,0.06));
-            border-bottom: 1px solid rgba(0,0,0,0.06);
-        }
-        .cultos-card-head-top {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 1rem;
-            flex-wrap: wrap;
-        }
-        .cultos-card-kicker {
-            display: inline-flex;
-            align-items: center;
-            gap: .45rem;
-            padding: .42rem .72rem;
-            border-radius: 999px;
-            background: rgba(179,0,0,0.09);
-            color: var(--primary-red);
-            font-size: .78rem;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: .04em;
-        }
         .carousel-mini-nav {
             display: flex;
             align-items: center;
@@ -872,125 +811,6 @@ $firstAndLastName = function ($name) {
         .carousel-mini-btn:disabled {
             opacity: .35;
             box-shadow: none;
-        }
-        .cultos-card-head h3 {
-            margin: .5rem 0 0;
-            font-size: 1.55rem;
-            font-weight: 800;
-            color: #2d1a21;
-        }
-        .cultos-card-head p {
-            margin: 0;
-            color: #6b7280;
-        }
-        .cultos-card-body {
-            padding: 1.25rem 1.35rem 1.35rem;
-        }
-        .cultos-card-grid {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 1rem;
-        }
-        .culto-item {
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            border: 1px solid rgba(0,0,0,0.06);
-            border-radius: 18px;
-            padding: 1rem;
-            background: #fff;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.04);
-        }
-        .culto-item-top {
-            display: flex;
-            align-items: flex-start;
-            justify-content: space-between;
-            gap: .6rem;
-            margin-bottom: .9rem;
-        }
-        .culto-item-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 14px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            background: linear-gradient(135deg, rgba(255,42,122,0.14), rgba(179,0,0,0.10));
-            color: var(--primary-red);
-            flex-shrink: 0;
-        }
-        .culto-item-days {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: flex-end;
-            gap: .35rem;
-        }
-        .culto-item-day-badge {
-            display: inline-block;
-            background: rgba(212,175,55,0.18);
-            color: #5b4300;
-            font-weight: 700;
-            font-size: .76rem;
-            border-radius: 999px;
-            padding: .35rem .65rem;
-            white-space: nowrap;
-        }
-        .culto-item h4 {
-            font-size: 1.12rem;
-            font-weight: 800;
-            color: #2d1a21;
-            margin-bottom: .7rem;
-        }
-        .culto-item-schedule {
-            display: grid;
-            gap: .45rem;
-            color: #6b7280;
-            margin-bottom: .8rem;
-        }
-        .culto-item-schedule span,
-        .culto-item-location-pill {
-            display: flex;
-            align-items: flex-start;
-            gap: .5rem;
-        }
-        .culto-item-schedule i,
-        .culto-item-location-pill i {
-            color: var(--primary-red);
-            margin-top: .12rem;
-        }
-        .culto-item-description {
-            color: #6b7280;
-            margin: 0 0 .8rem;
-            line-height: 1.55;
-        }
-        .culto-item-location-pill {
-            display: inline-flex;
-            align-self: flex-start;
-            align-items: center;
-            gap: .4rem;
-            border: 1px solid rgba(0,0,0,0.1);
-            border-radius: 999px;
-            padding: .35rem .75rem;
-            font-size: .8rem;
-            color: #4b5563;
-            margin-bottom: .9rem;
-        }
-        .culto-item-footer {
-            margin-top: auto;
-            padding-top: .8rem;
-            border-top: 1px solid rgba(0,0,0,0.06);
-            display: flex;
-            align-items: center;
-            gap: .6rem;
-        }
-        .culto-item-cta-text {
-            font-weight: 700;
-            font-size: .88rem;
-            color: var(--primary-red);
-        }
-        .culto-item-cta-text i {
-            font-size: .78rem;
-            margin-left: .2rem;
         }
         .carousel-dots {
             display: flex;
@@ -1194,7 +1014,7 @@ $firstAndLastName = function ($name) {
             border-top: 1px solid rgba(0,0,0,0.08);
         }
 
-        .eventos-strip-head {
+        .flat-strip-head {
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -1202,10 +1022,10 @@ $firstAndLastName = function ($name) {
             flex-wrap: wrap;
             margin-bottom: 1.75rem;
         }
-        .eventos-strip-shell {
+        .flat-strip-shell {
             position: relative;
         }
-        .eventos-track {
+        .flat-strip-track {
             display: flex;
             gap: 1rem;
             overflow-x: auto;
@@ -1214,10 +1034,10 @@ $firstAndLastName = function ($name) {
             scrollbar-width: none;
             padding-bottom: .25rem;
         }
-        .eventos-track::-webkit-scrollbar {
+        .flat-strip-track::-webkit-scrollbar {
             display: none;
         }
-        .eventos-card {
+        .flat-strip-card {
             flex: 0 0 calc(25% - .75rem);
             scroll-snap-align: start;
             background: #fff;
@@ -1228,14 +1048,14 @@ $firstAndLastName = function ($name) {
             display: flex;
             flex-direction: column;
         }
-        .eventos-card-top {
+        .flat-strip-card-top {
             display: flex;
             align-items: flex-start;
             justify-content: space-between;
             gap: .6rem;
             margin-bottom: .9rem;
         }
-        .eventos-day-badge {
+        .flat-strip-day-badge {
             display: inline-flex;
             align-items: center;
             justify-content: center;
@@ -1249,7 +1069,7 @@ $firstAndLastName = function ($name) {
             font-size: .82rem;
             letter-spacing: .02em;
         }
-        .eventos-time-pill {
+        .flat-strip-time-pill {
             display: inline-flex;
             align-items: center;
             gap: .35rem;
@@ -1261,13 +1081,13 @@ $firstAndLastName = function ($name) {
             font-weight: 700;
             white-space: nowrap;
         }
-        .eventos-card h4 {
+        .flat-strip-card h4 {
             font-size: 1rem;
             font-weight: 800;
             color: #2d1a21;
             margin-bottom: .5rem;
         }
-        .eventos-card-location {
+        .flat-strip-card-location {
             display: flex;
             align-items: flex-start;
             gap: .4rem;
@@ -1275,11 +1095,11 @@ $firstAndLastName = function ($name) {
             font-size: .84rem;
             margin-bottom: .9rem;
         }
-        .eventos-card-location i {
+        .flat-strip-card-location i {
             color: var(--primary-red);
             margin-top: .15rem;
         }
-        .eventos-card-cta {
+        .flat-strip-card-cta {
             margin-top: auto;
             display: inline-flex;
             align-items: center;
@@ -1296,18 +1116,18 @@ $firstAndLastName = function ($name) {
             text-decoration: none;
             transition: background .16s ease, border-color .16s ease;
         }
-        .eventos-card-cta:hover {
+        .flat-strip-card-cta:hover {
             background: #f8f9fa;
             border-color: rgba(0,0,0,0.2);
             color: #2d1a21;
         }
         @media (max-width: 991.98px) {
-            .eventos-card {
+            .flat-strip-card {
                 flex: 0 0 calc(50% - .5rem);
             }
         }
         @media (max-width: 575.98px) {
-            .eventos-card {
+            .flat-strip-card {
                 flex: 0 0 82%;
             }
         }
@@ -1798,23 +1618,6 @@ $firstAndLastName = function ($name) {
             .upcoming-panel .btn {
                 width: 100%;
             }
-            .cultos-carousel {
-                padding: .35rem 3.5rem;
-            }
-            .cultos-card-head {
-                padding: 1rem 1.1rem;
-                padding-right: 6rem;
-            }
-            .cultos-card-head h3 {
-                font-size: 1.28rem;
-            }
-            .cultos-card-body {
-                padding: 1rem 1.1rem 1.1rem;
-            }
-            .cultos-card-grid {
-                grid-template-columns: 1fr;
-                gap: .85rem;
-            }
             .section-carousel {
                 padding: .35rem 3.5rem;
             }
@@ -1956,41 +1759,6 @@ $firstAndLastName = function ($name) {
             .upcoming-thumb {
                 width: 42px;
                 height: 42px;
-            }
-            .cultos-carousel {
-                padding: .25rem .25rem .1rem;
-            }
-            .cultos-carousel-btn {
-                display: none;
-            }
-            .cultos-slide {
-                padding: 0;
-            }
-            .cultos-card {
-                border-radius: 16px;
-            }
-            .cultos-card-head {
-                padding: .95rem;
-                flex-direction: column;
-                align-items: flex-start;
-                padding-right: 5.6rem;
-            }
-            .cultos-card-head h3 {
-                font-size: 1.15rem;
-                margin-top: .55rem;
-            }
-            .cultos-card-body {
-                padding: .95rem;
-            }
-            .culto-item {
-                border-radius: 14px;
-                padding: .9rem;
-            }
-            .culto-item h4 {
-                font-size: 1rem;
-            }
-            .culto-item-description {
-                font-size: .92rem;
             }
             .section-carousel {
                 padding: .25rem .25rem .1rem;
@@ -2206,6 +1974,106 @@ $firstAndLastName = function ($name) {
             </div>
         </div>
     </header>
+
+    <!-- Services (Cultos) Section -->
+    <section id="cultos" class="py-5 bg-light">
+        <div class="container py-5">
+            <?php
+                $cultosSorted = $cultos;
+                $nowForCultos = new DateTimeImmutable('now');
+                $cultosSorted = array_values(array_filter($cultosSorted, function ($c) use ($nowForCultos) {
+                    return eventHasFutureOccurrence($c, $nowForCultos);
+                }));
+                usort($cultosSorted, function ($a, $b) use ($nowForCultos) {
+                    $na = eventNextOccurrence($a, $nowForCultos);
+                    $nb = eventNextOccurrence($b, $nowForCultos);
+                    $ta = $na ? $na->getTimestamp() : PHP_INT_MAX;
+                    $tb = $nb ? $nb->getTimestamp() : PHP_INT_MAX;
+                    return $ta <=> $tb;
+                });
+            ?>
+            <?php if (empty($cultosSorted)): ?>
+                <div class="flat-strip-head">
+                    <h2 class="section-title mb-0">Nossos Cultos</h2>
+                </div>
+                <div class="text-center">
+                    <p class="text-muted">Nenhum culto cadastrado no momento.</p>
+                </div>
+            <?php else: ?>
+                <?php $cultosDayAbbrev = ['Domingo' => 'DOM', 'Segunda' => 'SEG', 'Terça' => 'TER', 'Terca' => 'TER', 'Quarta' => 'QUA', 'Quinta' => 'QUI', 'Sexta' => 'SEX', 'Sábado' => 'SAB', 'Sabado' => 'SAB']; ?>
+                <div data-flat-strip-group>
+                <div class="flat-strip-head">
+                    <h2 class="section-title mb-0">Nossos Cultos</h2>
+                    <div class="carousel-mini-nav">
+                        <button type="button" class="carousel-mini-btn" data-flat-strip-scroll="prev" aria-label="Cultos anteriores"><i class="fas fa-chevron-left"></i></button>
+                        <button type="button" class="carousel-mini-btn" data-flat-strip-scroll="next" aria-label="Próximos cultos"><i class="fas fa-chevron-right"></i></button>
+                    </div>
+                </div>
+                <div class="flat-strip-shell">
+                    <div class="flat-strip-track">
+                        <?php foreach ($cultosSorted as $culto): ?>
+                            <?php
+                                // Cultos recorrentes guardam o dia em recurring_days e a hora
+                                // em event_date com data fictícia (1970-01-01), então
+                                // eventGetDateBadges() (pensada para eventos com data real)
+                                // não serve aqui — tratamos os dois casos separadamente.
+                                $recurringDays = !empty($culto['recurring_days']) ? json_decode($culto['recurring_days'], true) : [];
+                                if (!is_array($recurringDays)) {
+                                    $recurringDays = [];
+                                }
+                                if (!empty($recurringDays)) {
+                                    $dayLabel = $cultosDayAbbrev[$recurringDays[0]] ?? mb_strtoupper(mb_substr($recurringDays[0], 0, 3));
+                                    $timeLabel = !empty($culto['event_date']) ? date('H:i', strtotime($culto['event_date'])) : '';
+                                    if ($timeLabel === '00:00') {
+                                        $timeLabel = '';
+                                    }
+                                } else {
+                                    $dateBadges = eventGetDateBadges($culto);
+                                    $firstBadge = $dateBadges[0] ?? null;
+                                    $dayLabel = $firstBadge ? ($cultosDayAbbrev[$firstBadge['weekday']] ?? mb_strtoupper(mb_substr($firstBadge['weekday'], 0, 3))) : '—';
+                                    $timeLabel = $firstBadge['time'] ?? '';
+                                }
+                            ?>
+                            <div class="flat-strip-card">
+                                <div class="flat-strip-card-top">
+                                    <span class="flat-strip-day-badge"><?= htmlspecialchars($dayLabel) ?></span>
+                                    <?php if ($timeLabel !== ''): ?>
+                                        <span class="flat-strip-time-pill"><i class="far fa-clock"></i> <?= htmlspecialchars($timeLabel) ?></span>
+                                    <?php endif; ?>
+                                </div>
+                                <h4><?= htmlspecialchars($culto['title']) ?></h4>
+                                <?php if (!empty($culto['location'])): ?>
+                                    <div class="flat-strip-card-location">
+                                        <i class="fas fa-location-dot"></i>
+                                        <span><?= htmlspecialchars($culto['location']) ?></span>
+                                    </div>
+                                <?php endif; ?>
+                                <?php if (!empty($culto['banner_path'])): ?>
+                                    <button type="button" class="flat-strip-card-cta" data-bs-toggle="modal" data-bs-target="#bannerModalCulto<?= $culto['id'] ?>">
+                                        <i class="fas fa-image"></i> Ver convite
+                                    </button>
+                                    <div class="modal fade" id="bannerModalCulto<?= $culto['id'] ?>" tabindex="-1" aria-hidden="true">
+                                        <div class="modal-dialog modal-lg modal-dialog-centered">
+                                            <div class="modal-content bg-transparent border-0">
+                                                <div class="modal-body p-0 position-relative text-center">
+                                                    <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-3" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    <img src="<?= $culto['banner_path'] ?>" class="img-fluid rounded shadow-lg" alt="<?= htmlspecialchars($culto['title']) ?>">
+                                                    <div class="mt-2">
+                                                        <a href="<?= $culto['banner_path'] ?>" download class="btn btn-light btn-sm"><i class="fas fa-download me-2"></i> Baixar Convite</a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                <?php endif; ?>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+                </div>
+            <?php endif; ?>
+        </div>
+    </section>
 
     <!-- Banner Modal -->
     <?php if (!empty($banners)): ?>
@@ -2500,136 +2368,11 @@ $firstAndLastName = function ($name) {
     </section>
     <?php endif; ?>
 
-    <!-- Services (Cultos) Section -->
-    <section id="cultos" class="py-5 bg-light">
-        <div class="container py-5">
-            <div class="text-center mb-5">
-                <h2 class="section-title">Nossos Cultos</h2>
-                <p class="text-muted">Participe das nossas celebrações semanais</p>
-            </div>
-
-            <?php
-            // Agrupar cultos por congregação
-            $cultosPorCongregacao = [];
-            foreach ($cultos as $c) {
-                $loc = !empty($c['location']) ? $c['location'] : 'Geral';
-                if (!isset($cultosPorCongregacao[$loc])) {
-                    $cultosPorCongregacao[$loc] = [];
-                }
-                $cultosPorCongregacao[$loc][] = $c;
-            }
-            ksort($cultosPorCongregacao); // Ordenar por nome da congregação
-            
-            // Garantir que Sede apareça primeiro se existir
-            if (isset($cultosPorCongregacao['Sede'])) {
-                $sede = $cultosPorCongregacao['Sede'];
-                unset($cultosPorCongregacao['Sede']);
-                $cultosPorCongregacao = array_merge(['Sede' => $sede], $cultosPorCongregacao);
-            }
-            ?>
-
-            <?php if (empty($cultosPorCongregacao)): ?>
-                <div class="text-center">
-                    <p class="text-muted">Nenhum culto cadastrado no momento.</p>
-                </div>
-            <?php else: ?>
-                <?php $cultosTotalSlides = count($cultosPorCongregacao); $slideIndex = 0; ?>
-                <div class="cultos-carousel-shell">
-                    <div class="cultos-carousel">
-                        <div class="cultos-carousel-track" id="cultosCarouselTrack">
-                            <?php foreach ($cultosPorCongregacao as $congregacao => $items): ?>
-                                <div class="cultos-slide">
-                                    <div class="cultos-card">
-                                        <div class="cultos-card-head">
-                                            <div class="cultos-card-head-top">
-                                                <span class="cultos-card-kicker"><i class="fas fa-house-chimney"></i> Congregação</span>
-                                                <?php if ($cultosTotalSlides > 1): ?>
-                                                    <div class="carousel-mini-nav">
-                                                        <span class="carousel-mini-progress"><span class="carousel-mini-progress-bar" style="width: <?= round((($slideIndex + 1) / $cultosTotalSlides) * 100) ?>%"></span></span>
-                                                        <span class="carousel-counter"><?= $slideIndex + 1 ?> / <?= $cultosTotalSlides ?></span>
-                                                        <button type="button" class="carousel-mini-btn" data-cultos-scroll="prev" aria-label="Congregação anterior"><i class="fas fa-chevron-left"></i></button>
-                                                        <button type="button" class="carousel-mini-btn" data-cultos-scroll="next" aria-label="Próxima congregação"><i class="fas fa-chevron-right"></i></button>
-                                                    </div>
-                                                <?php endif; ?>
-                                            </div>
-                                            <h3><?= htmlspecialchars($congregacao) ?></h3>
-                                            <p>Role para ver cultos de outras congregações</p>
-                                        </div>
-                                        <div class="cultos-card-body">
-                                            <div class="cultos-card-grid">
-                                                <?php foreach ($items as $culto): ?>
-                                                    <?php
-                                                        $is_valid_date = !empty($culto['event_date']) && strpos($culto['event_date'], '1970-01-01') === false;
-                                                        $time_only = !empty($culto['event_date']) ? date('H:i', strtotime($culto['event_date'])) : '';
-                                                        $end_time = !empty($culto['end_time']) ? $culto['end_time'] : '';
-                                                        $days = !empty($culto['recurring_days']) ? json_decode($culto['recurring_days'], true) : [];
-                                                        if (!is_array($days)) $days = [];
-                                                    ?>
-                                                    <article class="culto-item">
-                                                        <div class="culto-item-top">
-                                                            <div class="culto-item-icon">
-                                                                <i class="fas fa-book-bible fa-lg"></i>
-                                                            </div>
-                                                            <?php if (!empty($days)): ?>
-                                                                <div class="culto-item-days">
-                                                                    <?php foreach ($days as $day): ?>
-                                                                        <span class="culto-item-day-badge"><?= htmlspecialchars($day) ?></span>
-                                                                    <?php endforeach; ?>
-                                                                </div>
-                                                            <?php endif; ?>
-                                                        </div>
-                                                        <h4><?= htmlspecialchars($culto['title']) ?></h4>
-                                                        <?php if (!empty($days)): ?>
-                                                            <div class="culto-item-schedule">
-                                                                <span><i class="far fa-clock"></i> <?= $time_only ? $time_only : 'Horário a confirmar' ?><?= $end_time ? ' - ' . htmlspecialchars($end_time) : '' ?></span>
-                                                            </div>
-                                                        <?php elseif ($is_valid_date): ?>
-                                                            <div class="culto-item-schedule">
-                                                                <span><i class="far fa-calendar-alt"></i> <?= date('d/m/Y', strtotime($culto['event_date'])) ?></span>
-                                                                <span><i class="far fa-clock"></i> <?= $time_only ?: 'Horário a confirmar' ?></span>
-                                                            </div>
-                                                        <?php else: ?>
-                                                            <div class="culto-item-schedule">
-                                                                <span><i class="far fa-clock"></i> Horário a confirmar</span>
-                                                            </div>
-                                                        <?php endif; ?>
-                                                        <p class="culto-item-description"><?= htmlspecialchars($culto['description'] ?: 'Participe conosco e acompanhe a programação desta congregação.') ?></p>
-                                                        <?php if (!empty($culto['location']) && $culto['location'] !== $congregacao): ?>
-                                                            <div class="culto-item-location-pill">
-                                                                <i class="fas fa-location-dot"></i>
-                                                                <span><?= htmlspecialchars($culto['location']) ?></span>
-                                                            </div>
-                                                        <?php endif; ?>
-                                                        <div class="culto-item-footer">
-                                                            <span class="culto-item-cta-text">Esperamos por você! <i class="fas fa-arrow-right"></i></span>
-                                                        </div>
-                                                    </article>
-                                                <?php endforeach; ?>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <?php $slideIndex++; ?>
-                            <?php endforeach; ?>
-                        </div>
-                    </div>
-                    <?php if ($cultosTotalSlides > 1): ?>
-                        <div class="carousel-dots" id="cultosDots">
-                            <?php for ($d = 0; $d < $cultosTotalSlides; $d++): ?>
-                                <button type="button" class="carousel-dot<?= $d === 0 ? ' is-active' : '' ?>" data-cultos-dot="<?= $d ?>" aria-label="Ir para congregação <?= $d + 1 ?>"></button>
-                            <?php endfor; ?>
-                        </div>
-                    <?php endif; ?>
-                </div>
-            <?php endif; ?>
-        </div>
-    </section>
-
     <!-- Events Section -->
     <section id="eventos" class="py-5">
         <div class="container py-5">
             <?php if (empty($eventos)): ?>
-                <div class="eventos-strip-head">
+                <div class="flat-strip-head">
                     <h2 class="section-title mb-0">Próximos eventos</h2>
                 </div>
                 <div class="text-center">
@@ -2637,15 +2380,16 @@ $firstAndLastName = function ($name) {
                 </div>
             <?php else: ?>
                 <?php $eventosDayAbbrev = ['Domingo' => 'DOM', 'Segunda' => 'SEG', 'Terça' => 'TER', 'Terca' => 'TER', 'Quarta' => 'QUA', 'Quinta' => 'QUI', 'Sexta' => 'SEX', 'Sábado' => 'SAB', 'Sabado' => 'SAB']; ?>
-                <div class="eventos-strip-head">
+                <div data-flat-strip-group>
+                <div class="flat-strip-head">
                     <h2 class="section-title mb-0">Próximos eventos</h2>
-                    <div class="carousel-mini-nav" data-eventos-nav>
-                        <button type="button" class="carousel-mini-btn" data-eventos-scroll="prev" aria-label="Eventos anteriores"><i class="fas fa-chevron-left"></i></button>
-                        <button type="button" class="carousel-mini-btn" data-eventos-scroll="next" aria-label="Próximos eventos"><i class="fas fa-chevron-right"></i></button>
+                    <div class="carousel-mini-nav">
+                        <button type="button" class="carousel-mini-btn" data-flat-strip-scroll="prev" aria-label="Eventos anteriores"><i class="fas fa-chevron-left"></i></button>
+                        <button type="button" class="carousel-mini-btn" data-flat-strip-scroll="next" aria-label="Próximos eventos"><i class="fas fa-chevron-right"></i></button>
                     </div>
                 </div>
-                <div class="eventos-strip-shell">
-                    <div class="eventos-track" id="eventosTrack">
+                <div class="flat-strip-shell">
+                    <div class="flat-strip-track">
                         <?php foreach ($eventos as $evento): ?>
                             <?php
                                 $dateBadges = eventGetDateBadges($evento);
@@ -2653,22 +2397,22 @@ $firstAndLastName = function ($name) {
                                 $dayLabel = $firstBadge ? ($eventosDayAbbrev[$firstBadge['weekday']] ?? mb_strtoupper(mb_substr($firstBadge['weekday'], 0, 3))) : '—';
                                 $timeLabel = $firstBadge['time'] ?? '';
                             ?>
-                            <div class="eventos-card">
-                                <div class="eventos-card-top">
-                                    <span class="eventos-day-badge"><?= htmlspecialchars($dayLabel) ?></span>
+                            <div class="flat-strip-card">
+                                <div class="flat-strip-card-top">
+                                    <span class="flat-strip-day-badge"><?= htmlspecialchars($dayLabel) ?></span>
                                     <?php if ($timeLabel !== ''): ?>
-                                        <span class="eventos-time-pill"><i class="far fa-clock"></i> <?= htmlspecialchars($timeLabel) ?></span>
+                                        <span class="flat-strip-time-pill"><i class="far fa-clock"></i> <?= htmlspecialchars($timeLabel) ?></span>
                                     <?php endif; ?>
                                 </div>
                                 <h4><?= htmlspecialchars($evento['title']) ?></h4>
                                 <?php if (!empty($evento['location'])): ?>
-                                    <div class="eventos-card-location">
+                                    <div class="flat-strip-card-location">
                                         <i class="fas fa-location-dot"></i>
                                         <span><?= htmlspecialchars($evento['location']) ?></span>
                                     </div>
                                 <?php endif; ?>
                                 <?php if (!empty($evento['banner_path'])): ?>
-                                    <button type="button" class="eventos-card-cta" data-bs-toggle="modal" data-bs-target="#bannerModal<?= $evento['id'] ?>">
+                                    <button type="button" class="flat-strip-card-cta" data-bs-toggle="modal" data-bs-target="#bannerModal<?= $evento['id'] ?>">
                                         <i class="fas fa-image"></i> Ver convite
                                     </button>
                                     <div class="modal fade" id="bannerModal<?= $evento['id'] ?>" tabindex="-1" aria-hidden="true">
@@ -2688,6 +2432,7 @@ $firstAndLastName = function ($name) {
                             </div>
                         <?php endforeach; ?>
                     </div>
+                </div>
                 </div>
             <?php endif; ?>
         </div>
@@ -3241,11 +2986,6 @@ $firstAndLastName = function ($name) {
             const countdownTotalEl = document.getElementById('heroCountdownTotal');
             const prevBtn = document.querySelector('.countdown-carousel-btn.prev');
             const nextBtn = document.querySelector('.countdown-carousel-btn.next');
-            const cultosTrack = document.getElementById('cultosCarouselTrack');
-            const cultosButtons = document.querySelectorAll('[data-cultos-scroll]');
-            const cultosPrevBtns = document.querySelectorAll('[data-cultos-scroll="prev"]');
-            const cultosNextBtns = document.querySelectorAll('[data-cultos-scroll="next"]');
-            const cultosDots = document.querySelectorAll('#cultosDots [data-cultos-dot]');
             const sectionCarousels = document.querySelectorAll('.js-section-carousel');
             const faithCards = document.querySelectorAll('[data-faith-card]');
             const faithToggles = document.querySelectorAll('[data-faith-toggle]');
@@ -3479,62 +3219,6 @@ $firstAndLastName = function ($name) {
                 });
             }
 
-            function getCultosIndex() {
-                if (!cultosTrack) return 0;
-                const w = cultosTrack.clientWidth || 1;
-                return Math.max(0, Math.min((cultosTrack.children.length || 1) - 1, Math.round(cultosTrack.scrollLeft / w)));
-            }
-
-            function updateCultosUI() {
-                if (!cultosTrack) return;
-                const total = cultosTrack.children.length || 0;
-                const idx = getCultosIndex();
-                cultosPrevBtns.forEach(function(btn) { btn.disabled = idx <= 0; });
-                cultosNextBtns.forEach(function(btn) { btn.disabled = total ? idx >= total - 1 : true; });
-                cultosDots.forEach(function(dot) {
-                    dot.classList.toggle('is-active', parseInt(dot.getAttribute('data-cultos-dot'), 10) === idx);
-                });
-            }
-
-            if (cultosTrack) {
-                let cultosRafId = 0;
-                cultosTrack.addEventListener('scroll', function() {
-                    if (cultosRafId) return;
-                    cultosRafId = window.requestAnimationFrame(function() {
-                        cultosRafId = 0;
-                        updateCultosUI();
-                    });
-                }, { passive: true });
-                updateCultosUI();
-            }
-
-            if (cultosTrack && cultosButtons.length) {
-                cultosButtons.forEach(function(button) {
-                    button.addEventListener('click', function() {
-                        const direction = button.getAttribute('data-cultos-scroll');
-                        const amount = cultosTrack.clientWidth;
-                        cultosTrack.scrollBy({
-                            left: direction === 'next' ? amount : -amount,
-                            behavior: 'smooth'
-                        });
-                        window.setTimeout(updateCultosUI, 250);
-                    });
-                });
-            }
-
-            if (cultosTrack && cultosDots.length) {
-                cultosDots.forEach(function(dot) {
-                    dot.addEventListener('click', function() {
-                        const index = parseInt(dot.getAttribute('data-cultos-dot'), 10) || 0;
-                        cultosTrack.scrollTo({
-                            left: index * cultosTrack.clientWidth,
-                            behavior: 'smooth'
-                        });
-                        window.setTimeout(updateCultosUI, 250);
-                    });
-                });
-            }
-
             sectionCarousels.forEach(function(carousel) {
                 const track = carousel.querySelector('.section-carousel-track');
                 if (!track) return;
@@ -3602,16 +3286,15 @@ $firstAndLastName = function ($name) {
                 updateUI();
             });
 
-            (function () {
-                const track = document.getElementById('eventosTrack');
-                const nav = document.querySelector('[data-eventos-nav]');
-                if (!track || !nav) return;
+            document.querySelectorAll('[data-flat-strip-group]').forEach(function (group) {
+                const track = group.querySelector('.flat-strip-track');
+                if (!track) return;
 
-                const prevBtn = nav.querySelector('[data-eventos-scroll="prev"]');
-                const nextBtn = nav.querySelector('[data-eventos-scroll="next"]');
+                const prevBtn = group.querySelector('[data-flat-strip-scroll="prev"]');
+                const nextBtn = group.querySelector('[data-flat-strip-scroll="next"]');
 
                 function scrollAmount() {
-                    const card = track.querySelector('.eventos-card');
+                    const card = track.querySelector('.flat-strip-card');
                     return card ? card.getBoundingClientRect().width + 16 : track.clientWidth * 0.8;
                 }
 
@@ -3644,7 +3327,7 @@ $firstAndLastName = function ($name) {
                 }
 
                 updateButtons();
-            })();
+            });
 
             if (bsCollapse) {
                 navLinks.forEach((l) => {
