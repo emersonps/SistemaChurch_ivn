@@ -814,6 +814,7 @@ function getChurchSiteProfileSettings() {
         ),
         'social_links' => $normalizedSocials,
         'show_example_banner' => getSystemSetting('show_example_banner', '0') === '1',
+        'founded_year' => getSystemSetting('church_founded_year', ''),
     ];
 }
 

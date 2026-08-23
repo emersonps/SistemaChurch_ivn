@@ -23,7 +23,7 @@ class SettingsController {
             'whatsapp_api_url', 'whatsapp_api_instance', 'whatsapp_api_token',
             'church_name', 'church_alias', 'church_address',
             'church_phone', 'church_email', 'church_logo_url',
-            'system_version'
+            'church_founded_year', 'system_version'
         ];
         
         $stmt = $db->prepare("INSERT INTO settings (setting_key, setting_value) VALUES (?, ?) ON DUPLICATE KEY UPDATE setting_value = VALUES(setting_value)");

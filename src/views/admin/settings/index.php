@@ -51,6 +51,11 @@
                         <input type="text" class="form-control" name="church_logo_url" value="<?= htmlspecialchars($settings['church_logo_url'] ?? '') ?>" placeholder="Ex: /assets/img/logo.png">
                     </div>
                     <div class="mb-3">
+                        <label class="form-label">Ano de Fundação</label>
+                        <input type="text" class="form-control" name="church_founded_year" value="<?= htmlspecialchars($settings['church_founded_year'] ?? '') ?>" placeholder="Ex: 2020" style="max-width: 200px;">
+                        <div class="form-text">Exibida como "Desde {ano}" no rodapé do site.</div>
+                    </div>
+                    <div class="mb-3">
                         <label class="form-label">Versão do Sistema</label>
                         <input type="text" class="form-control" name="system_version" value="<?= htmlspecialchars($settings['system_version'] ?? '') ?>" placeholder="Ex: 1.8.0" style="max-width: 200px;">
                         <div class="form-text">Exibida no rodapé dos painéis administrativo e do membro.</div>

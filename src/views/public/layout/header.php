@@ -229,26 +229,6 @@
             color: #000;
         }
 
-        /* Footer */
-        .footer { 
-            background: #1a1a1a; 
-            color: white; 
-            padding: 60px 0 30px; 
-            border-top: 5px solid var(--primary-gold);
-        }
-        .footer h5 {
-            color: var(--primary-gold);
-            font-weight: 600;
-            margin-bottom: 20px;
-        }
-        .social-icon {
-            color: white;
-            transition: color 0.3s;
-        }
-        .social-icon:hover {
-            color: var(--primary-gold);
-        }
-
         /* Custom Pills for Tabs (Cultos, etc) - Highly Specific */
         #pills-tab .nav-link, #pills-tab-eventos .nav-link {
             color: #b30000 !important; /* Red text for inactive */

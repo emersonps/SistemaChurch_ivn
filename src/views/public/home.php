@@ -1558,31 +1558,7 @@ $firstAndLastName = function ($name) {
             font-size: .8rem;
         }
 
-        /* Footer */
-        .footer { 
-            background: #1a1a1a; 
-            color: white; 
-            padding: 60px 0 30px; 
-            border-top: 5px solid var(--primary-gold);
-        }
-        .footer h5 {
-            color: var(--primary-gold);
-            font-weight: 600;
-            margin-bottom: 20px;
-        }
-        .social-icon {
-            color: white;
-            transition: color 0.3s;
-        }
-        .social-icon:hover {
-            color: var(--primary-gold);
-        }
         /* Menu lateral flutuante — ícones discretos que se expandem ao passar o mouse/tocar. */
-        /* !important necessário: layout/footer.php define seu próprio .harpa-fab/.donate-fab
-           mais adiante no documento, com a mesma especificidade. */
-        .harpa-fab, .donate-fab {
-            display: none !important;
-        }
         .floating-faith-actions {
             position: fixed;
             right: 14px;
