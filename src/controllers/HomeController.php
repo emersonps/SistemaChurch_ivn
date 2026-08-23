@@ -117,14 +117,14 @@ class HomeController {
         $birthdays = $this->extractMonthlyBirthdays($members);
         $newMembers = $this->extractNewMembers($members);
         $baptisms = $this->extractRecentBaptisms($members);
-        $latestAlbum = $this->fetchLatestAlbum($db);
+        $latestPhotos = $this->fetchLatestPhotos($db);
         $upcomingItems = $this->buildUpcomingItems($eventos, $convites, $baptisms);
 
         return [
             'birthdays' => $birthdays,
             'new_members' => $newMembers,
             'baptisms' => $baptisms,
-            'latest_album' => $latestAlbum,
+            'latest_photos' => $latestPhotos,
             'upcoming_items' => $upcomingItems
         ];
     }
@@ -206,20 +206,19 @@ class HomeController {
         return date('Y-m', $timestamp) === date('Y-m');
     }
 
-    private function fetchLatestAlbum(PDO $db) {
+    private function fetchLatestPhotos(PDO $db, $limit = 6) {
         try {
-            $album = $db->query("SELECT * FROM photo_albums ORDER BY event_date DESC, id DESC LIMIT 1")->fetch(PDO::FETCH_ASSOC);
-            if (!$album) {
-                return null;
-            }
-
-            $stmtPhotos = $db->prepare("SELECT * FROM photos WHERE album_id = ? LIMIT 4");
-            $stmtPhotos->execute([$album['id']]);
-            $album['photos'] = $stmtPhotos->fetchAll(PDO::FETCH_ASSOC);
-
-            return $album;
+            $stmt = $db->prepare("
+                SELECT p.filename, pa.category, pa.event_date, pa.title AS album_title
+                FROM photos p
+                JOIN photo_albums pa ON pa.id = p.album_id
+                ORDER BY pa.event_date DESC, p.id DESC
+                LIMIT " . (int)$limit
+            );
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (Exception $e) {
-            return null;
+            return [];
         }
     }
 

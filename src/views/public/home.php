@@ -2084,8 +2084,7 @@ $firstAndLastName = function ($name) {
                 $birthdays = $highlights['birthdays'] ?? [];
                 $newMembers = $highlights['new_members'] ?? [];
                 $baptisms = $highlights['baptisms'] ?? [];
-                $latestAlbum = $highlights['latest_album'] ?? null;
-                $latestAlbumPhotos = $latestAlbum['photos'] ?? [];
+                $latestPhotos = $highlights['latest_photos'] ?? [];
             ?>
             <div class="row g-4 align-items-start justify-content-center">
                 <div class="col-lg-8">
@@ -2197,28 +2196,6 @@ $firstAndLastName = function ($name) {
                         </div>
                         </div>
                     </div>
-                    <div class="live-board mt-4">
-                        <div class="panel-soft-head">
-                            <h2 class="live-board-title"><i class="fas fa-images"></i> Últimas Fotos</h2>
-                        </div>
-                        <div class="panel-soft-body">
-                        <div class="live-card live-card-photos mt-0">
-                            <div class="live-card-head">
-                                <div class="live-card-icon"><i class="fas fa-camera-retro"></i></div>
-                                <h3 class="live-card-title h5">Mural de Fotos</h3>
-                            </div>
-                            <p><?= !empty($latestAlbum['title']) ? htmlspecialchars($latestAlbum['title']) : 'Publique fotos na galeria para destacar aqui.' ?></p>
-                            <?php if (!empty($latestAlbumPhotos)): ?>
-                                <div class="photo-strip">
-                                    <?php foreach (array_slice($latestAlbumPhotos, 0, 3) as $photo): ?>
-                                        <img src="/uploads/gallery/<?= htmlspecialchars($photo['filename']) ?>" alt="Foto da igreja">
-                                    <?php endforeach; ?>
-                                </div>
-                            <?php endif; ?>
-                            <a href="/galeria" class="btn btn-outline-secondary btn-sm rounded-pill mt-3 px-3">Ir para o mural de fotos</a>
-                        </div>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
@@ -2257,6 +2234,36 @@ $firstAndLastName = function ($name) {
                                 <?php elseif (!empty($video['video_date'])): ?>
                                     <?= date('d/m/Y', strtotime($video['video_date'])) ?>
                                 <?php endif; ?>
+                            </div>
+                        </div>
+                    </a>
+                <?php endforeach; ?>
+            </div>
+        </div>
+    </section>
+    <?php endif; ?>
+
+    <!-- Últimas Fotos: preview -->
+    <?php if (!empty($latestPhotos)): ?>
+    <section id="ultimas-fotos" class="py-5">
+        <div class="container py-4">
+            <div class="cultos-preview-head">
+                <span class="section-panel-kicker"><i class="fas fa-images"></i> Últimas fotos</span>
+                <a href="/galeria" class="btn btn-outline-secondary rounded-pill btn-sm px-3">Ver mais</a>
+            </div>
+            <div class="video-preview-grid">
+                <?php foreach ($latestPhotos as $photo): ?>
+                    <a href="/galeria" class="video-preview-card">
+                        <div class="video-preview-thumb">
+                            <img src="/uploads/gallery/<?= htmlspecialchars($photo['filename']) ?>" alt="Foto da igreja">
+                            <?php if (!empty($photo['category'])): ?>
+                                <span class="video-preview-category"><?= htmlspecialchars(mb_strtoupper($photo['category'])) ?></span>
+                            <?php endif; ?>
+                        </div>
+                        <div class="video-preview-body">
+                            <div class="video-preview-title"><?= htmlspecialchars($photo['album_title'] ?: 'Foto da galeria') ?></div>
+                            <div class="video-preview-meta">
+                                <?= !empty($photo['event_date']) ? date('d/m/Y', strtotime($photo['event_date'])) : '' ?>
                             </div>
                         </div>
                     </a>
