@@ -155,7 +155,7 @@ if (!empty($event['recurring_days'])) {
                     <label class="form-label">Título <span class="required-mark">*</span></label>
                     <input type="text" class="form-control" name="title" value="<?= htmlspecialchars($event['title']) ?>" required>
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-6" id="bannerFieldBox">
                     <label class="form-label">Banner (Atualizar)</label>
                     <?php if (!empty($event['banner_path'])): ?>
                         <div class="mb-2">
@@ -512,6 +512,7 @@ if (!isset($typeLabelsPhp[$currentTypeKey])) { $currentTypeKey = 'evento'; }
     const internalBox = document.getElementById('internalOptions');
     const recurringDaysBox = document.getElementById('recurringDaysBox');
     const eventDatesBox = document.getElementById('eventDatesBox');
+    const bannerFieldBox = document.getElementById('bannerFieldBox');
     function toggleInternal() {
         if (String(typeSelect.value).toLowerCase() === 'interno') {
             internalBox.style.display = '';
@@ -524,6 +525,9 @@ if (!isset($typeLabelsPhp[$currentTypeKey])) { $currentTypeKey = 'evento'; }
         }
         if (eventDatesBox) {
             eventDatesBox.style.display = isCulto ? 'none' : '';
+        }
+        if (bannerFieldBox) {
+            bannerFieldBox.style.display = isCulto ? 'none' : '';
         }
         const map = {
             'culto': 'Culto: para eventos recorrentes, diários, como cultos semanais.',

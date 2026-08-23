@@ -768,7 +768,7 @@ $firstAndLastName = function ($name) {
         }
         .cultos-carousel {
             position: relative;
-            padding: .5rem 4.5rem;
+            padding: .5rem 0;
         }
         .cultos-carousel-track {
             display: flex;
@@ -796,12 +796,18 @@ $firstAndLastName = function ($name) {
         }
         .cultos-card-head {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 1rem;
+            flex-direction: column;
+            gap: .35rem;
             padding: 1.2rem 1.35rem;
             background: linear-gradient(135deg, rgba(255,42,122,0.08), rgba(179,0,0,0.06));
             border-bottom: 1px solid rgba(0,0,0,0.06);
+        }
+        .cultos-card-head-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            flex-wrap: wrap;
         }
         .cultos-card-kicker {
             display: inline-flex;
@@ -816,8 +822,56 @@ $firstAndLastName = function ($name) {
             text-transform: uppercase;
             letter-spacing: .04em;
         }
+        .cultos-card-nav {
+            display: flex;
+            align-items: center;
+            gap: .6rem;
+        }
+        .cultos-mini-progress {
+            display: inline-block;
+            width: 34px;
+            height: 6px;
+            border-radius: 999px;
+            background: rgba(179,0,0,0.14);
+            overflow: hidden;
+        }
+        .cultos-mini-progress-bar {
+            display: block;
+            height: 100%;
+            background: var(--primary-red);
+            border-radius: 999px;
+            transition: width .25s ease;
+        }
+        .cultos-counter {
+            font-size: .78rem;
+            font-weight: 700;
+            color: #6b7280;
+            white-space: nowrap;
+        }
+        .cultos-mini-btn {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: none;
+            background: #fff;
+            color: var(--primary-red);
+            box-shadow: 0 6px 14px rgba(0,0,0,0.12);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: .78rem;
+            transition: transform .15s ease, box-shadow .15s ease, opacity .15s ease;
+        }
+        .cultos-mini-btn:hover {
+            transform: scale(1.06);
+            box-shadow: 0 10px 18px rgba(0,0,0,0.16);
+        }
+        .cultos-mini-btn:disabled {
+            opacity: .35;
+            box-shadow: none;
+        }
         .cultos-card-head h3 {
-            margin: .7rem 0 .2rem;
+            margin: .5rem 0 0;
             font-size: 1.55rem;
             font-weight: 800;
             color: #2d1a21;
@@ -836,11 +890,20 @@ $firstAndLastName = function ($name) {
         }
         .culto-item {
             height: 100%;
+            display: flex;
+            flex-direction: column;
             border: 1px solid rgba(0,0,0,0.06);
             border-radius: 18px;
             padding: 1rem;
             background: #fff;
             box-shadow: 0 8px 20px rgba(0,0,0,0.04);
+        }
+        .culto-item-top {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: .6rem;
+            margin-bottom: .9rem;
         }
         .culto-item-icon {
             width: 48px;
@@ -851,7 +914,23 @@ $firstAndLastName = function ($name) {
             justify-content: center;
             background: linear-gradient(135deg, rgba(255,42,122,0.14), rgba(179,0,0,0.10));
             color: var(--primary-red);
-            margin-bottom: .9rem;
+            flex-shrink: 0;
+        }
+        .culto-item-days {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+            gap: .35rem;
+        }
+        .culto-item-day-badge {
+            display: inline-block;
+            background: rgba(212,175,55,0.18);
+            color: #5b4300;
+            font-weight: 700;
+            font-size: .76rem;
+            border-radius: 999px;
+            padding: .35rem .65rem;
+            white-space: nowrap;
         }
         .culto-item h4 {
             font-size: 1.12rem;
@@ -866,61 +945,82 @@ $firstAndLastName = function ($name) {
             margin-bottom: .8rem;
         }
         .culto-item-schedule span,
-        .culto-item-location {
+        .culto-item-location-pill {
             display: flex;
             align-items: flex-start;
             gap: .5rem;
         }
         .culto-item-schedule i,
-        .culto-item-location i {
+        .culto-item-location-pill i {
             color: var(--primary-red);
             margin-top: .12rem;
         }
-        .culto-item-days {
-            display: flex;
-            flex-wrap: wrap;
-            gap: .45rem;
-            margin-bottom: .8rem;
-        }
-        .culto-item-days .badge {
-            background: rgba(212,175,55,0.18) !important;
-            color: #5b4300;
-            font-weight: 700;
-            border-radius: 999px;
-            padding: .42rem .7rem;
-        }
         .culto-item-description {
             color: #6b7280;
-            margin: 0;
+            margin: 0 0 .8rem;
             line-height: 1.55;
         }
-        .cultos-carousel-btn {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            border: none;
-            background: #fff;
+        .culto-item-location-pill {
+            display: inline-flex;
+            align-self: flex-start;
+            align-items: center;
+            gap: .4rem;
+            border: 1px solid rgba(0,0,0,0.1);
+            border-radius: 999px;
+            padding: .35rem .75rem;
+            font-size: .8rem;
+            color: #4b5563;
+            margin-bottom: .9rem;
+        }
+        .culto-item-footer {
+            margin-top: auto;
+            padding-top: .8rem;
+            border-top: 1px solid rgba(0,0,0,0.06);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: .6rem;
+        }
+        .culto-item-cta-text {
+            font-weight: 700;
+            font-size: .88rem;
             color: var(--primary-red);
-            box-shadow: 0 14px 26px rgba(0,0,0,0.14);
-            z-index: 2;
-            transition: transform .15s ease, box-shadow .15s ease, opacity .15s ease;
         }
-        .cultos-carousel-btn:hover {
-            transform: translateY(-50%) scale(1.04);
-            box-shadow: 0 18px 30px rgba(0,0,0,0.18);
+        .culto-item-cta-text i {
+            font-size: .78rem;
+            margin-left: .2rem;
         }
-        .cultos-carousel-btn:disabled {
-            opacity: .4;
-            box-shadow: none;
+        .culto-item-cta-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(179,0,0,0.09);
+            color: var(--primary-red);
+            font-size: .78rem;
         }
-        .cultos-carousel-btn.prev {
-            left: .2rem;
+        .cultos-dots {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: .5rem;
+            margin-top: 1.25rem;
         }
-        .cultos-carousel-btn.next {
-            right: .2rem;
+        .cultos-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 999px;
+            border: none;
+            background: rgba(0,0,0,0.15);
+            padding: 0;
+            transition: width .2s ease, background-color .2s ease;
+        }
+        .cultos-dot.is-active {
+            width: 22px;
+            background: var(--primary-red);
         }
         .section-carousel-shell {
             position: relative;
@@ -2313,21 +2413,27 @@ $firstAndLastName = function ($name) {
                     <p class="text-muted">Nenhum culto cadastrado no momento.</p>
                 </div>
             <?php else: ?>
+                <?php $cultosTotalSlides = count($cultosPorCongregacao); $slideIndex = 0; ?>
                 <div class="cultos-carousel-shell">
                     <div class="cultos-carousel">
-                        <button type="button" class="cultos-carousel-btn prev" data-cultos-scroll="prev" aria-label="Congregação anterior">
-                            <i class="fas fa-chevron-left"></i>
-                        </button>
                         <div class="cultos-carousel-track" id="cultosCarouselTrack">
                             <?php foreach ($cultosPorCongregacao as $congregacao => $items): ?>
                                 <div class="cultos-slide">
                                     <div class="cultos-card scrollable-panel">
                                         <div class="cultos-card-head">
-                                            <div>
-                                                <span class="cultos-card-kicker"><i class="fas fa-church"></i> Congregação</span>
-                                                <h3><?= htmlspecialchars($congregacao) ?></h3>
-                                                <p>Role para ver cultos de outras congregações.</p>
+                                            <div class="cultos-card-head-top">
+                                                <span class="cultos-card-kicker"><i class="fas fa-house-chimney"></i> Congregação</span>
+                                                <?php if ($cultosTotalSlides > 1): ?>
+                                                    <div class="cultos-card-nav">
+                                                        <span class="cultos-mini-progress"><span class="cultos-mini-progress-bar" style="width: <?= round((($slideIndex + 1) / $cultosTotalSlides) * 100) ?>%"></span></span>
+                                                        <span class="cultos-counter"><?= $slideIndex + 1 ?> / <?= $cultosTotalSlides ?></span>
+                                                        <button type="button" class="cultos-mini-btn" data-cultos-scroll="prev" aria-label="Congregação anterior"><i class="fas fa-chevron-left"></i></button>
+                                                        <button type="button" class="cultos-mini-btn" data-cultos-scroll="next" aria-label="Próxima congregação"><i class="fas fa-chevron-right"></i></button>
+                                                    </div>
+                                                <?php endif; ?>
                                             </div>
+                                            <h3><?= htmlspecialchars($congregacao) ?></h3>
+                                            <p>Role para ver cultos de outras congregações</p>
                                         </div>
                                         <div class="cultos-card-body">
                                             <div class="cultos-card-grid">
@@ -2340,18 +2446,22 @@ $firstAndLastName = function ($name) {
                                                         if (!is_array($days)) $days = [];
                                                     ?>
                                                     <article class="culto-item">
-                                                        <div class="culto-item-icon">
-                                                            <i class="fas fa-book-bible fa-lg"></i>
+                                                        <div class="culto-item-top">
+                                                            <div class="culto-item-icon">
+                                                                <i class="fas fa-book-bible fa-lg"></i>
+                                                            </div>
+                                                            <?php if (!empty($days)): ?>
+                                                                <div class="culto-item-days">
+                                                                    <?php foreach ($days as $day): ?>
+                                                                        <span class="culto-item-day-badge"><?= htmlspecialchars($day) ?></span>
+                                                                    <?php endforeach; ?>
+                                                                </div>
+                                                            <?php endif; ?>
                                                         </div>
                                                         <h4><?= htmlspecialchars($culto['title']) ?></h4>
                                                         <?php if (!empty($days)): ?>
-                                                            <div class="culto-item-days">
-                                                                <?php foreach ($days as $day): ?>
-                                                                    <span class="badge"><?= htmlspecialchars($day) ?></span>
-                                                                <?php endforeach; ?>
-                                                            </div>
                                                             <div class="culto-item-schedule">
-                                                                <span><i class="far fa-clock"></i> <?= $time_only ? $time_only : 'Horário a confirmar' ?><?= $end_time ? ' às ' . htmlspecialchars($end_time) : '' ?></span>
+                                                                <span><i class="far fa-clock"></i> <?= $time_only ? $time_only : 'Horário a confirmar' ?><?= $end_time ? ' - ' . htmlspecialchars($end_time) : '' ?></span>
                                                             </div>
                                                         <?php elseif ($is_valid_date): ?>
                                                             <div class="culto-item-schedule">
@@ -2364,25 +2474,33 @@ $firstAndLastName = function ($name) {
                                                             </div>
                                                         <?php endif; ?>
                                                         <p class="culto-item-description"><?= htmlspecialchars($culto['description'] ?: 'Participe conosco e acompanhe a programação desta congregação.') ?></p>
-                                                        <div class="small fw-bold text-gold mt-2">Esperamos por você!</div>
                                                         <?php if (!empty($culto['location']) && $culto['location'] !== $congregacao): ?>
-                                                            <div class="culto-item-location mt-3">
+                                                            <div class="culto-item-location-pill">
                                                                 <i class="fas fa-location-dot"></i>
                                                                 <span><?= htmlspecialchars($culto['location']) ?></span>
                                                             </div>
                                                         <?php endif; ?>
+                                                        <div class="culto-item-footer">
+                                                            <span class="culto-item-cta-text">Esperamos por você! <i class="fas fa-arrow-right"></i></span>
+                                                            <span class="culto-item-cta-btn" aria-hidden="true"><i class="fas fa-arrow-right"></i></span>
+                                                        </div>
                                                     </article>
                                                 <?php endforeach; ?>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
+                                <?php $slideIndex++; ?>
                             <?php endforeach; ?>
                         </div>
-                        <button type="button" class="cultos-carousel-btn next" data-cultos-scroll="next" aria-label="Próxima congregação">
-                            <i class="fas fa-chevron-right"></i>
-                        </button>
                     </div>
+                    <?php if ($cultosTotalSlides > 1): ?>
+                        <div class="cultos-dots" id="cultosDots">
+                            <?php for ($d = 0; $d < $cultosTotalSlides; $d++): ?>
+                                <button type="button" class="cultos-dot<?= $d === 0 ? ' is-active' : '' ?>" data-cultos-dot="<?= $d ?>" aria-label="Ir para congregação <?= $d + 1 ?>"></button>
+                            <?php endfor; ?>
+                        </div>
+                    <?php endif; ?>
                 </div>
             <?php endif; ?>
         </div>
@@ -3061,8 +3179,9 @@ $firstAndLastName = function ($name) {
             const nextBtn = document.querySelector('.countdown-carousel-btn.next');
             const cultosTrack = document.getElementById('cultosCarouselTrack');
             const cultosButtons = document.querySelectorAll('[data-cultos-scroll]');
-            const cultosPrevBtn = document.querySelector('.cultos-carousel-btn.prev');
-            const cultosNextBtn = document.querySelector('.cultos-carousel-btn.next');
+            const cultosPrevBtns = document.querySelectorAll('[data-cultos-scroll="prev"]');
+            const cultosNextBtns = document.querySelectorAll('[data-cultos-scroll="next"]');
+            const cultosDots = document.querySelectorAll('#cultosDots [data-cultos-dot]');
             const sectionCarousels = document.querySelectorAll('.js-section-carousel');
             const faithCards = document.querySelectorAll('[data-faith-card]');
             const faithToggles = document.querySelectorAll('[data-faith-toggle]');
@@ -3306,8 +3425,11 @@ $firstAndLastName = function ($name) {
                 if (!cultosTrack) return;
                 const total = cultosTrack.children.length || 0;
                 const idx = getCultosIndex();
-                if (cultosPrevBtn) cultosPrevBtn.disabled = idx <= 0;
-                if (cultosNextBtn) cultosNextBtn.disabled = total ? idx >= total - 1 : true;
+                cultosPrevBtns.forEach(function(btn) { btn.disabled = idx <= 0; });
+                cultosNextBtns.forEach(function(btn) { btn.disabled = total ? idx >= total - 1 : true; });
+                cultosDots.forEach(function(dot) {
+                    dot.classList.toggle('is-active', parseInt(dot.getAttribute('data-cultos-dot'), 10) === idx);
+                });
             }
 
             if (cultosTrack) {
@@ -3329,6 +3451,19 @@ $firstAndLastName = function ($name) {
                         const amount = cultosTrack.clientWidth;
                         cultosTrack.scrollBy({
                             left: direction === 'next' ? amount : -amount,
+                            behavior: 'smooth'
+                        });
+                        window.setTimeout(updateCultosUI, 250);
+                    });
+                });
+            }
+
+            if (cultosTrack && cultosDots.length) {
+                cultosDots.forEach(function(dot) {
+                    dot.addEventListener('click', function() {
+                        const index = parseInt(dot.getAttribute('data-cultos-dot'), 10) || 0;
+                        cultosTrack.scrollTo({
+                            left: index * cultosTrack.clientWidth,
                             behavior: 'smooth'
                         });
                         window.setTimeout(updateCultosUI, 250);
