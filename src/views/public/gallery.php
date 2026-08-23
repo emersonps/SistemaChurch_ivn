@@ -166,8 +166,44 @@ $galleryInitialLimit = 12;
             font-size: .86rem;
             color: var(--gallery-ink);
             text-decoration: none;
+            border: none;
+            background: transparent;
         }
         .gallery-tab.is-active { background: #212529; color: #fff; }
+        .gallery-tab-panel.d-none { display: none; }
+
+        .vw-filters { display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: 2rem; }
+        .vw-filter-pill {
+            padding: .45rem 1.1rem; border-radius: 999px; border: 1px solid #dee2e6;
+            background: #fff; color: #343a40; font-weight: 600; font-size: .85rem; text-decoration: none;
+        }
+        .vw-filter-pill.is-active { background: #212529; color: #fff; border-color: #212529; }
+        .vw-filter-divider { width: 1px; align-self: stretch; background: #dee2e6; margin: 0 .25rem; }
+        .vw-filter-pill.vw-filter-live { display: inline-flex; align-items: center; gap: .4rem; }
+        .vw-filter-pill.vw-filter-live::before {
+            content: ''; width: 7px; height: 7px; border-radius: 50%; background: #dc3545;
+        }
+        .vw-filter-pill.vw-filter-ended::before {
+            content: ''; width: 7px; height: 7px; border-radius: 50%; background: #adb5bd; display: inline-block; margin-right: .4rem;
+        }
+        .vw-card {
+            background: #fff; border-radius: 16px; overflow: hidden; height: 100%;
+            box-shadow: 0 .5rem 1.5rem rgba(0,0,0,0.06); display: flex; flex-direction: column;
+        }
+        .vw-card-thumb { position: relative; padding-top: 56.25%; background: #000; }
+        .vw-card-thumb img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+        .vw-card-play {
+            position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+            color: #fff; font-size: 2.5rem; background: rgba(0,0,0,0.15); text-decoration: none;
+        }
+        .vw-card-category {
+            position: absolute; top: .6rem; left: .6rem; background: rgba(0,0,0,0.7); color: #fff;
+            font-size: .68rem; font-weight: 700; padding: .25rem .6rem; border-radius: 999px;
+        }
+        .vw-card-body { padding: 1rem 1.1rem; flex: 1; display: flex; flex-direction: column; }
+        .vw-card-title { font-weight: 700; margin-bottom: .3rem; }
+        .vw-card-meta { font-size: .8rem; color: #868e96; margin-bottom: .6rem; }
+        .vw-card-desc { font-size: .85rem; color: #495057; margin-bottom: 1rem; flex: 1; }
 
         /* Header card */
         .gallery-page-wrap { padding: 1.6rem 0 4rem; }
@@ -295,69 +331,100 @@ $galleryInitialLimit = 12;
 
     <div class="gallery-tabs-wrap">
         <div class="gallery-tabs">
-            <a href="/galeria" class="gallery-tab is-active"><i class="fas fa-images"></i> Galeria de Fotos</a>
-            <a href="/mural-de-videos" class="gallery-tab"><i class="fas fa-clapperboard"></i> Mural de Vídeos</a>
+            <button type="button" class="gallery-tab is-active" data-gallery-tab="photos"><i class="fas fa-images"></i> Galeria de Fotos</button>
+            <button type="button" class="gallery-tab" data-gallery-tab="videos"><i class="fas fa-clapperboard"></i> Mural de Vídeos</button>
         </div>
     </div>
 
     <div class="container gallery-page-wrap">
-        <div class="gallery-header-card">
-            <nav class="gallery-breadcrumb"><a href="/">Início</a> › <strong>Galeria</strong></nav>
-            <div class="gallery-header-row">
-                <div>
-                    <h1>Galeria de Fotos</h1>
-                    <p>Reviva os melhores momentos da nossa igreja. Cada imagem conta uma história de fé, comunhão e celebração.</p>
-                </div>
-                <div class="gallery-header-meta">
-                    <span class="gallery-meta-text"><i class="far fa-calendar me-1"></i> <?= (int)$albumCount ?> <?= $albumCount === 1 ? 'álbum' : 'álbuns' ?><?= $yearRange !== '' ? ' • ' . htmlspecialchars($yearRange) : '' ?></span>
-                    <span class="gallery-meta-badge"><i class="fas fa-arrows-rotate"></i> Atualizado semanalmente</span>
+        <div id="galleryPanelPhotos" class="gallery-tab-panel">
+            <div class="gallery-header-card">
+                <nav class="gallery-breadcrumb"><a href="/">Início</a> › <strong>Galeria</strong></nav>
+                <div class="gallery-header-row">
+                    <div>
+                        <h1>Galeria de Fotos</h1>
+                        <p>Reviva os melhores momentos da nossa igreja. Cada imagem conta uma história de fé, comunhão e celebração.</p>
+                    </div>
+                    <div class="gallery-header-meta">
+                        <span class="gallery-meta-text"><i class="far fa-calendar me-1"></i> <?= (int)$albumCount ?> <?= $albumCount === 1 ? 'álbum' : 'álbuns' ?><?= $yearRange !== '' ? ' • ' . htmlspecialchars($yearRange) : '' ?></span>
+                        <span class="gallery-meta-badge"><i class="fas fa-arrows-rotate"></i> Atualizado semanalmente</span>
+                    </div>
                 </div>
             </div>
+
+            <?php if (empty($photosByYear)): ?>
+                <div class="empty-state">
+                    <i class="fas fa-images fa-3x mb-3" style="color: rgba(15,18,28,0.26);"></i>
+                    <h3 class="h4 mb-2">Nenhum álbum publicado ainda.</h3>
+                    <p class="mb-0">Assim que os álbuns forem publicados, as fotos vão aparecer aqui.</p>
+                </div>
+            <?php else: ?>
+                <div class="gallery-filters">
+                    <button type="button" class="gallery-filter-pill is-active" data-gallery-filter="all">Todos <span class="count"><?= (int)$albumCount ?></span></button>
+                    <?php foreach ($categories as $cat): ?>
+                        <?php if (($categoryCounts[$cat] ?? 0) === 0) continue; ?>
+                        <button type="button" class="gallery-filter-pill" data-gallery-filter="<?= htmlspecialchars($cat) ?>"><?= htmlspecialchars($cat) ?> <span class="count"><?= (int)$categoryCounts[$cat] ?></span></button>
+                    <?php endforeach; ?>
+                </div>
+
+                <?php foreach ($photosByYear as $year => $yearPhotos): ?>
+                    <div class="gallery-year-section" data-year-section>
+                        <div class="gallery-year-head">
+                            <span class="gallery-year-title"><?= (int)$year ?></span>
+                            <span class="gallery-year-line"></span>
+                            <span class="gallery-year-count" data-year-count><?= count($yearPhotos) ?> foto<?= count($yearPhotos) === 1 ? '' : 's' ?></span>
+                        </div>
+                        <div class="gallery-photo-grid">
+                            <?php foreach ($yearPhotos as $photo): ?>
+                                <div class="gallery-photo-item" data-gallery-photo data-category="<?= htmlspecialchars($photo['category']) ?>">
+                                    <a href="<?= htmlspecialchars($photo['url']) ?>" data-lightbox="gallery-<?= (int)$year ?>" data-title="<?= htmlspecialchars($photo['album_title']) ?>">
+                                        <img src="<?= htmlspecialchars($photo['url']) ?>" alt="<?= htmlspecialchars($photo['album_title'] ?: 'Foto da galeria') ?>" loading="lazy">
+                                        <?php if ($photo['is_first_of_album'] && $photo['album_title'] !== ''): ?>
+                                            <span class="gallery-photo-caption"><?= htmlspecialchars($photo['album_title']) ?></span>
+                                        <?php endif; ?>
+                                    </a>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+
+                <?php if ($totalPhotoCount > $galleryInitialLimit): ?>
+                    <div class="text-center mt-2 mb-4">
+                        <button type="button" class="btn btn-outline-dark rounded-pill px-4" id="galleryLoadMoreBtn">Ver mais fotos</button>
+                    </div>
+                <?php endif; ?>
+            <?php endif; ?>
         </div>
 
-        <?php if (empty($photosByYear)): ?>
-            <div class="empty-state">
-                <i class="fas fa-images fa-3x mb-3" style="color: rgba(15,18,28,0.26);"></i>
-                <h3 class="h4 mb-2">Nenhum álbum publicado ainda.</h3>
-                <p class="mb-0">Assim que os álbuns forem publicados, as fotos vão aparecer aqui.</p>
-            </div>
-        <?php else: ?>
-            <div class="gallery-filters">
-                <button type="button" class="gallery-filter-pill is-active" data-gallery-filter="all">Todos <span class="count"><?= (int)$albumCount ?></span></button>
-                <?php foreach ($categories as $cat): ?>
-                    <?php if (($categoryCounts[$cat] ?? 0) === 0) continue; ?>
-                    <button type="button" class="gallery-filter-pill" data-gallery-filter="<?= htmlspecialchars($cat) ?>"><?= htmlspecialchars($cat) ?> <span class="count"><?= (int)$categoryCounts[$cat] ?></span></button>
-                <?php endforeach; ?>
-            </div>
-
-            <?php foreach ($photosByYear as $year => $yearPhotos): ?>
-                <div class="gallery-year-section" data-year-section>
-                    <div class="gallery-year-head">
-                        <span class="gallery-year-title"><?= (int)$year ?></span>
-                        <span class="gallery-year-line"></span>
-                        <span class="gallery-year-count" data-year-count><?= count($yearPhotos) ?> foto<?= count($yearPhotos) === 1 ? '' : 's' ?></span>
+        <div id="galleryPanelVideos" class="gallery-tab-panel d-none">
+            <div class="gallery-header-card">
+                <nav class="gallery-breadcrumb"><a href="/">Início</a> › <strong>Mural de Vídeos</strong></nav>
+                <div class="gallery-header-row">
+                    <div>
+                        <h1>Mural de Vídeos</h1>
+                        <p>Cultos, mensagens e momentos especiais da nossa igreja.</p>
                     </div>
-                    <div class="gallery-photo-grid">
-                        <?php foreach ($yearPhotos as $photo): ?>
-                            <div class="gallery-photo-item" data-gallery-photo data-category="<?= htmlspecialchars($photo['category']) ?>">
-                                <a href="<?= htmlspecialchars($photo['url']) ?>" data-lightbox="gallery-<?= (int)$year ?>" data-title="<?= htmlspecialchars($photo['album_title']) ?>">
-                                    <img src="<?= htmlspecialchars($photo['url']) ?>" alt="<?= htmlspecialchars($photo['album_title'] ?: 'Foto da galeria') ?>" loading="lazy">
-                                    <?php if ($photo['is_first_of_album'] && $photo['album_title'] !== ''): ?>
-                                        <span class="gallery-photo-caption"><?= htmlspecialchars($photo['album_title']) ?></span>
-                                    <?php endif; ?>
-                                </a>
-                            </div>
-                        <?php endforeach; ?>
+                    <div class="gallery-header-meta">
+                        <span class="gallery-meta-text"><i class="fas fa-video me-1"></i> <?= count($videos ?? []) ?> vídeo<?= count($videos ?? []) === 1 ? '' : 's' ?></span>
                     </div>
                 </div>
-            <?php endforeach; ?>
+            </div>
 
-            <?php if ($totalPhotoCount > $galleryInitialLimit): ?>
-                <div class="text-center mt-2 mb-4">
-                    <button type="button" class="btn btn-outline-dark rounded-pill px-4" id="galleryLoadMoreBtn">Ver mais fotos</button>
+            <?php if (!empty($videos)): ?>
+                <div class="vw-filters">
+                    <button type="button" class="vw-filter-pill is-active" data-video-filter="all">Todos</button>
+                    <?php foreach (getVideoWallCategories() as $vcat): ?>
+                        <button type="button" class="vw-filter-pill" data-video-filter="<?= htmlspecialchars($vcat) ?>"><?= htmlspecialchars($vcat) ?></button>
+                    <?php endforeach; ?>
+                    <span class="vw-filter-divider"></span>
+                    <button type="button" class="vw-filter-pill vw-filter-live" data-video-status-filter="ao_vivo">Ao Vivo</button>
+                    <button type="button" class="vw-filter-pill vw-filter-ended" data-video-status-filter="encerrado">Encerrados</button>
                 </div>
             <?php endif; ?>
-        <?php endif; ?>
+
+            <?php include __DIR__ . '/partials/video_wall_cards.php'; ?>
+        </div>
     </div>
 
     <?php include __DIR__ . '/partials/floating_faith_widget.php'; ?>
@@ -420,6 +487,71 @@ $galleryInitialLimit = 12;
 
             applyFilters();
         })();
+
+        (function () {
+            var tabs = document.querySelectorAll('[data-gallery-tab]');
+            var panels = {
+                photos: document.getElementById('galleryPanelPhotos'),
+                videos: document.getElementById('galleryPanelVideos')
+            };
+
+            tabs.forEach(function (tab) {
+                tab.addEventListener('click', function () {
+                    var target = tab.getAttribute('data-gallery-tab');
+                    tabs.forEach(function (t) { t.classList.remove('is-active'); });
+                    tab.classList.add('is-active');
+                    Object.keys(panels).forEach(function (key) {
+                        if (panels[key]) {
+                            panels[key].classList.toggle('d-none', key !== target);
+                        }
+                    });
+                });
+            });
+        })();
+
+        (function () {
+            var videoState = { category: 'all', status: '' };
+            var categoryPills = document.querySelectorAll('[data-video-filter]');
+            var statusPills = document.querySelectorAll('[data-video-status-filter]');
+            var videoCards = document.querySelectorAll('[data-video-card]');
+
+            function applyVideoFilters() {
+                videoCards.forEach(function (card) {
+                    var show;
+                    if (videoState.status !== '') {
+                        show = card.getAttribute('data-live-status') === videoState.status;
+                    } else if (videoState.category !== 'all') {
+                        show = card.getAttribute('data-category') === videoState.category;
+                    } else {
+                        show = true;
+                    }
+                    card.classList.toggle('d-none', !show);
+                });
+            }
+
+            categoryPills.forEach(function (pill) {
+                pill.addEventListener('click', function () {
+                    videoState.category = pill.getAttribute('data-video-filter');
+                    videoState.status = '';
+                    categoryPills.forEach(function (p) { p.classList.remove('is-active'); });
+                    statusPills.forEach(function (p) { p.classList.remove('is-active'); });
+                    pill.classList.add('is-active');
+                    applyVideoFilters();
+                });
+            });
+
+            statusPills.forEach(function (pill) {
+                pill.addEventListener('click', function () {
+                    videoState.status = pill.getAttribute('data-video-status-filter');
+                    videoState.category = 'all';
+                    categoryPills.forEach(function (p) { p.classList.remove('is-active'); });
+                    statusPills.forEach(function (p) { p.classList.remove('is-active'); });
+                    pill.classList.add('is-active');
+                    applyVideoFilters();
+                });
+            });
+        })();
     </script>
+    <?php include __DIR__ . '/../partials/livestream_badge.php'; ?>
 </body>
 </html>

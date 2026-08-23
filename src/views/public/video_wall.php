@@ -79,41 +79,7 @@ $siteProfile = getChurchSiteProfileSettings();
             <a href="/mural-de-videos?status=encerrado" class="vw-filter-pill vw-filter-ended <?= $selectedStatus === 'encerrado' ? 'is-active' : '' ?>">Encerrados</a>
         </div>
 
-        <?php if (empty($videos)): ?>
-            <div class="text-center text-muted py-5">Nenhum vídeo disponível ainda.</div>
-        <?php else: ?>
-            <div class="row g-4 pb-5">
-                <?php foreach ($videos as $video): ?>
-                    <div class="col-md-4 col-sm-6">
-                        <div class="vw-card">
-                            <div class="vw-card-thumb">
-                                <img src="https://img.youtube.com/vi/<?= htmlspecialchars($video['youtube_video_id']) ?>/hqdefault.jpg" alt="">
-                                <span class="vw-card-category"><?= htmlspecialchars($video['category']) ?></span>
-                                <?php if (!empty($video['is_livestream']) && !empty($video['livestream_scheduled_at'])): ?>
-                                    <span class="live-badge" style="position: absolute; top: .6rem; right: .6rem;" data-scheduled-at="<?= htmlspecialchars(formatLivestreamScheduledAtIso($video['livestream_scheduled_at'])) ?>"></span>
-                                <?php endif; ?>
-                                <a href="/mural-de-videos/assistir/<?= (int)$video['id'] ?>" class="vw-card-play" target="_blank" rel="noopener">
-                                    <i class="fas fa-circle-play"></i>
-                                </a>
-                            </div>
-                            <div class="vw-card-body">
-                                <div class="vw-card-title"><?= htmlspecialchars($video['title']) ?></div>
-                                <div class="vw-card-meta">
-                                    <?= !empty($video['video_date']) ? date('d/m/Y', strtotime($video['video_date'])) : '' ?>
-                                    <?php if (!empty($video['speaker'])): ?> · <?= htmlspecialchars($video['speaker']) ?><?php endif; ?>
-                                </div>
-                                <?php if (!empty($video['description'])): ?>
-                                    <div class="vw-card-desc"><?= htmlspecialchars($video['description']) ?></div>
-                                <?php endif; ?>
-                                <a href="/mural-de-videos/assistir/<?= (int)$video['id'] ?>" class="btn btn-dark btn-sm mt-auto" target="_blank" rel="noopener">
-                                    <i class="fas fa-play me-1"></i> Assistir Agora
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                <?php endforeach; ?>
-            </div>
-        <?php endif; ?>
+        <?php include __DIR__ . '/partials/video_wall_cards.php'; ?>
     </div>
 
     <?php include __DIR__ . '/partials/floating_faith_widget.php'; ?>

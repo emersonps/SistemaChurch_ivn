@@ -305,6 +305,8 @@ class GalleryController {
 
         $yearRange = !empty($years) ? (min($years) === max($years) ? (string)min($years) : min($years) . '-' . max($years)) : '';
 
+        $videos = $db->query("SELECT * FROM video_wall ORDER BY video_date DESC, created_at DESC")->fetchAll(PDO::FETCH_ASSOC);
+
         view('public/gallery', [
             'albums' => $albums,
             'categories' => $categories,
@@ -313,6 +315,7 @@ class GalleryController {
             'totalPhotoCount' => count($flatPhotos),
             'albumCount' => count($albums),
             'yearRange' => $yearRange,
+            'videos' => $videos,
         ]);
     }
 }
