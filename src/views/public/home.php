@@ -669,60 +669,6 @@ $firstAndLastName = function ($name) {
             object-fit: cover;
             border-radius: 12px;
         }
-        .upcoming-panel {
-            background: #fff;
-            border-radius: 20px;
-            border: 1px solid rgba(0,0,0,0.08);
-            box-shadow: 0 18px 40px rgba(0,0,0,0.08);
-            padding: 0;
-            height: 100%;
-        }
-        .upcoming-list {
-            display: grid;
-            gap: .9rem;
-        }
-        .upcoming-item {
-            display: grid;
-            grid-template-columns: 54px 1fr;
-            gap: .8rem;
-            align-items: start;
-            padding-bottom: .9rem;
-            border-bottom: 1px solid rgba(0,0,0,0.08);
-        }
-        .upcoming-item:last-child {
-            border-bottom: none;
-            padding-bottom: 0;
-        }
-        .upcoming-thumb {
-            width: 54px;
-            height: 54px;
-            border-radius: 12px;
-            background: linear-gradient(135deg, rgba(255,42,122,0.12), rgba(179,0,0,0.10));
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            color: #d11f68;
-        }
-        .upcoming-thumb img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        .upcoming-item-title {
-            font-weight: 800;
-            color: #2d1a21;
-            margin-bottom: .18rem;
-        }
-        .upcoming-item-subtitle {
-            color: #6b7280;
-            font-size: .92rem;
-            line-height: 1.4;
-        }
-        .upcoming-panel .btn {
-            border-radius: 999px;
-        }
-
         /* Section Headers */
         .section-title {
             color: var(--primary-red);
@@ -1504,8 +1450,7 @@ $firstAndLastName = function ($name) {
             .live-grid {
                 grid-template-columns: 1fr;
             }
-            .live-board,
-            .upcoming-panel {
+            .live-board {
                 padding: 1.2rem;
             }
         }
@@ -1597,8 +1542,7 @@ $firstAndLastName = function ($name) {
                 padding-top: 2rem !important;
                 padding-bottom: 2rem !important;
             }
-            .live-board,
-            .upcoming-panel {
+            .live-board {
                 border-radius: 16px;
             }
             .panel-soft-head {
@@ -1627,25 +1571,6 @@ $firstAndLastName = function ($name) {
             }
             .mini-avatar-item {
                 min-width: 68px;
-            }
-            .upcoming-item {
-                grid-template-columns: 48px 1fr;
-                gap: .7rem;
-                padding-bottom: .8rem;
-            }
-            .upcoming-thumb {
-                width: 48px;
-                height: 48px;
-                border-radius: 10px;
-            }
-            .upcoming-item-title {
-                font-size: .97rem;
-            }
-            .upcoming-item-subtitle {
-                font-size: .87rem;
-            }
-            .upcoming-panel .btn {
-                width: 100%;
             }
             .section-carousel {
                 padding: .35rem 3.5rem;
@@ -1745,9 +1670,6 @@ $firstAndLastName = function ($name) {
             .photo-strip img {
                 height: 84px;
             }
-            .live-board,
-            .upcoming-panel {
-            }
             .panel-soft-head {
                 padding: .95rem .95rem .85rem;
             }
@@ -1780,14 +1702,6 @@ $firstAndLastName = function ($name) {
                 font-size: .75rem;
                 white-space: normal;
                 line-height: 1.15;
-            }
-            .upcoming-item {
-                grid-template-columns: 42px 1fr;
-                gap: .65rem;
-            }
-            .upcoming-thumb {
-                width: 42px;
-                height: 42px;
             }
             .section-carousel {
                 padding: .25rem .25rem .1rem;
@@ -2114,10 +2028,9 @@ $firstAndLastName = function ($name) {
                 $baptisms = $highlights['baptisms'] ?? [];
                 $latestAlbum = $highlights['latest_album'] ?? null;
                 $latestAlbumPhotos = $latestAlbum['photos'] ?? [];
-                $upcomingItems = $highlights['upcoming_items'] ?? [];
             ?>
-            <div class="row g-4 align-items-start">
-                <div class="col-lg-7">
+            <div class="row g-4 align-items-start justify-content-center">
+                <div class="col-lg-8">
                     <div class="live-board" data-carousel-group>
                         <div class="panel-soft-head">
                             <div class="panel-soft-head-top">
@@ -2246,37 +2159,6 @@ $firstAndLastName = function ($name) {
                             <?php endif; ?>
                             <a href="/galeria" class="btn btn-outline-secondary btn-sm rounded-pill mt-3 px-3">Ir para o mural de fotos</a>
                         </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-5">
-                    <div class="upcoming-panel h-100">
-                        <div class="panel-soft-head">
-                            <h2 class="live-board-title"><i class="fas fa-calendar-days"></i> Próximo Evento</h2>
-                        </div>
-                        <div class="panel-soft-body">
-                        <div class="upcoming-list">
-                            <?php if (!empty($upcomingItems)): ?>
-                                <?php foreach ($upcomingItems as $item): ?>
-                                    <div class="upcoming-item">
-                                        <div class="upcoming-thumb">
-                                            <?php if (!empty($item['icon'])): ?>
-                                                <img src="<?= htmlspecialchars($item['icon']) ?>" alt="<?= htmlspecialchars($item['title']) ?>">
-                                            <?php else: ?>
-                                                <i class="fas fa-calendar-heart"></i>
-                                            <?php endif; ?>
-                                        </div>
-                                        <div>
-                                            <div class="upcoming-item-title"><?= htmlspecialchars($item['title']) ?></div>
-                                            <div class="upcoming-item-subtitle"><?= htmlspecialchars($item['subtitle']) ?></div>
-                                        </div>
-                                    </div>
-                                <?php endforeach; ?>
-                            <?php else: ?>
-                                <div class="text-muted">Nenhum evento em destaque no momento.</div>
-                            <?php endif; ?>
-                        </div>
-                        <a href="#eventos" class="btn btn-outline-secondary mt-4 px-4">Ver tudo</a>
                         </div>
                     </div>
                 </div>
