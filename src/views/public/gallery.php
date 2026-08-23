@@ -32,6 +32,8 @@ $galleryInitialLimit = 12;
             --gallery-wine-dark: #5a1026;
             --gallery-ink: rgba(15,18,28,0.92);
             --gallery-muted: rgba(15,18,28,0.62);
+            --primary-red: #b30000;
+            --primary-gold: #d4af37;
         }
         body {
             font-family: 'Poppins', sans-serif;
@@ -40,59 +42,24 @@ $galleryInitialLimit = 12;
                 radial-gradient(circle at 14% 18%, rgba(255, 42, 122, 0.10), transparent 38%),
                 radial-gradient(circle at 84% 22%, rgba(212, 175, 55, 0.14), transparent 40%),
                 linear-gradient(180deg, #fffdfd 0%, #fff7f9 100%);
-            padding-top: 86px;
+            padding-top: 76px;
         }
 
-        .navbar {
-            background-color: rgba(255, 255, 255, 0.92) !important;
-            box-shadow: 0 2px 14px rgba(0,0,0,0.08);
-            border-bottom: 1px solid rgba(0,0,0,0.06);
-            backdrop-filter: blur(12px);
-        }
-
+        .navbar { background-color: rgba(255,255,255,0.96) !important; box-shadow: 0 2px 14px rgba(0,0,0,0.08); }
         .navbar-brand {
             font-weight: 900;
-            color: rgba(15,18,28,0.92) !important;
+            color: #2d1a21 !important;
             display: inline-flex;
             align-items: center;
             gap: .65rem;
         }
-
         .navbar-brand img {
             width: 42px;
             height: 42px;
             object-fit: contain;
         }
-
-        .nav-link {
-            color: rgba(15,18,28,0.70) !important;
-            font-weight: 600;
-            text-transform: uppercase;
-            font-size: 0.9rem;
-            letter-spacing: 1px;
-            transition: color 0.2s ease;
-            position: relative;
-        }
-
-        .nav-link:hover,
-        .nav-link.active {
-            color: var(--gallery-gold) !important;
-        }
-
-        .nav-link.active {
-            font-weight: 800;
-        }
-
-        .nav-link.active::after {
-            content: "";
-            position: absolute;
-            left: 14%;
-            right: 14%;
-            bottom: -10px;
-            height: 2px;
-            border-radius: 999px;
-            background: var(--gallery-gold);
-        }
+        .nav-link { color: rgba(45,26,33,0.72) !important; font-weight: 600; }
+        .nav-link.active, .nav-link:hover { color: var(--primary-red) !important; }
 
         .btn-cta {
             position: relative;
