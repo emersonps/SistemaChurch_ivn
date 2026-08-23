@@ -2390,7 +2390,7 @@ $firstAndLastName = function ($name) {
                                 <?php endif; ?>
                                 <?php if (!empty($evento['banner_path'])): ?>
                                     <button type="button" class="flat-strip-card-cta" data-bs-toggle="modal" data-bs-target="#bannerModal<?= $evento['id'] ?>">
-                                        <i class="fas fa-image"></i> Ver convite
+                                        <i class="fas fa-image"></i> Ver banner
                                     </button>
                                     <div class="modal fade" id="bannerModal<?= $evento['id'] ?>" tabindex="-1" aria-hidden="true">
                                         <div class="modal-dialog modal-lg modal-dialog-centered">
