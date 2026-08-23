@@ -455,143 +455,6 @@ $firstAndLastName = function ($name) {
         .home-live-section {
             background: #f6f3f5;
         }
-        .live-board {
-            background: #fff;
-            border-radius: 20px;
-            border: 1px solid rgba(0,0,0,0.08);
-            box-shadow: 0 18px 40px rgba(0,0,0,0.08);
-            padding: 0;
-        }
-        .panel-soft-head {
-            padding: 1.15rem 1.35rem 1rem;
-            background: linear-gradient(135deg, rgba(255,42,122,0.08), rgba(179,0,0,0.06));
-            border-bottom: 1px solid rgba(0,0,0,0.06);
-            position: relative;
-        }
-        .panel-soft-head.panel-scrollable {
-            padding-right: 6.75rem;
-        }
-        .panel-soft-head-top {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 1rem;
-            flex-wrap: wrap;
-        }
-        .panel-soft-body {
-            padding: 1.35rem;
-        }
-        .live-board-title {
-            display: flex;
-            align-items: center;
-            gap: .65rem;
-            font-weight: 800;
-            color: #3c1d25;
-            margin-bottom: 0;
-        }
-        .live-board-title i {
-            color: #8b1538;
-        }
-        .live-grid {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 1rem;
-        }
-        .live-card {
-            border-radius: 16px;
-            background: #fff;
-            border: 1px solid rgba(0,0,0,0.06);
-            padding: 1rem;
-        }
-        .live-card-head {
-            display: flex;
-            align-items: center;
-            gap: .7rem;
-            margin-bottom: .5rem;
-        }
-        .live-card-icon {
-            width: 42px;
-            height: 42px;
-            border-radius: 12px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            background: linear-gradient(135deg, rgba(255,42,122,0.12), rgba(179,0,0,0.10));
-            color: #d11f68;
-            font-size: 1.1rem;
-        }
-        .live-card-title {
-            font-weight: 800;
-            color: #3c1d25;
-            margin: 0;
-        }
-        .live-card p {
-            margin: 0;
-            color: #6b7280;
-            line-height: 1.45;
-        }
-        .mini-avatars {
-            display: flex;
-            align-items: flex-start;
-            gap: .9rem;
-            margin-top: .75rem;
-            flex-wrap: wrap;
-        }
-        .mini-avatar-item {
-            min-width: 74px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: .5rem;
-            text-align: center;
-        }
-        .mini-avatar-name {
-            display: block;
-            color: #6b7280;
-            font-size: .8rem;
-            font-weight: 700;
-            line-height: 1.1;
-            width: 100%;
-            white-space: nowrap;
-        }
-        .mini-avatar {
-            width: 34px;
-            height: 34px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #ffd1e3, #f2b3cd);
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            font-size: .76rem;
-            font-weight: 800;
-            color: #8b1538;
-            overflow: hidden;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.10);
-        }
-        .mini-avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        .live-card-link {
-            margin-top: .95rem;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: .45rem;
-            border: none;
-            border-radius: 999px;
-            padding: .72rem 1rem;
-            background: rgba(179,0,0,0.08);
-            color: var(--primary-red);
-            font-weight: 800;
-            transition: background .16s ease, transform .16s ease;
-        }
-        .live-card-link:hover {
-            background: rgba(179,0,0,0.12);
-            color: var(--primary-red);
-            transform: translateY(-1px);
-        }
         .birthdays-modal .modal-content {
             border: none;
             border-radius: 26px;
@@ -896,18 +759,6 @@ $firstAndLastName = function ($name) {
         }
         .section-panel-card .photo-strip {
             margin-bottom: 0;
-        }
-        .section-carousel-inline {
-            padding: .25rem 3.5rem .35rem;
-        }
-        .section-carousel-inline .section-carousel-slide {
-            padding: 0;
-        }
-        .section-carousel-inline .live-card {
-            height: auto;
-        }
-        .live-card-photos {
-            margin-top: 1rem;
         }
         .flat-strip-head {
             display: flex;
@@ -1504,6 +1355,209 @@ $firstAndLastName = function ($name) {
             filter: brightness(1.1);
         }
 
+        .atualizacoes-month-pill {
+            background: #f1f1f1;
+            color: #6b7280;
+            font-size: .78rem;
+            font-weight: 700;
+            padding: .4rem .85rem;
+            border-radius: 999px;
+        }
+        .atualizacoes-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            background: #fff;
+            border: 1px solid rgba(0,0,0,0.07);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 16px 40px rgba(0,0,0,0.05);
+        }
+        .atualizacoes-col {
+            padding: 1.5rem 1.4rem;
+            border-right: 1px solid rgba(0,0,0,0.06);
+            display: flex;
+            flex-direction: column;
+        }
+        .atualizacoes-col:last-child {
+            border-right: none;
+        }
+        @media (max-width: 767.98px) {
+            .atualizacoes-grid { grid-template-columns: 1fr; }
+            .atualizacoes-col { border-right: none; border-bottom: 1px solid rgba(0,0,0,0.06); }
+            .atualizacoes-col:last-child { border-bottom: none; }
+        }
+        .atualizacoes-col-head {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: .6rem;
+            margin-bottom: 1rem;
+        }
+        .atualizacoes-col-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+        .atualizacoes-col-icon.icon-birthday { background: rgba(214,51,108,0.12); color: #d6336c; }
+        .atualizacoes-col-icon.icon-members { background: rgba(79,70,229,0.12); color: #4f46e5; }
+        .atualizacoes-col-icon.icon-baptism { background: rgba(14,165,233,0.14); color: #0ea5e9; }
+        .atualizacoes-count-badge {
+            background: rgba(212,175,55,0.18);
+            color: #8a6100;
+            font-size: .72rem;
+            font-weight: 800;
+            padding: .3rem .6rem;
+            border-radius: 999px;
+            white-space: nowrap;
+        }
+        .atualizacoes-dot-badge {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            background: #22c55e;
+            margin-top: .4rem;
+            flex-shrink: 0;
+        }
+        .atualizacoes-col-title {
+            font-weight: 800;
+            font-size: 1.05rem;
+            margin-bottom: .25rem;
+        }
+        .atualizacoes-col-subtitle {
+            color: #9a8f92;
+            font-size: .82rem;
+            margin-bottom: 1.1rem;
+        }
+        .atualizacoes-col-body {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        .atualizacoes-avatars {
+            display: flex;
+            gap: .5rem;
+            margin-bottom: .7rem;
+            flex-wrap: wrap;
+        }
+        .atualizacoes-avatar {
+            position: relative;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(179,0,0,0.1);
+            color: var(--primary-red);
+            font-weight: 800;
+            font-size: .9rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        .atualizacoes-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .atualizacoes-avatar-more {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #f1f1f1;
+            color: #6b7280;
+            font-weight: 700;
+            font-size: .8rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .atualizacoes-names {
+            color: #6b7280;
+            font-size: .82rem;
+        }
+        .atualizacoes-member-row {
+            display: flex;
+            align-items: center;
+            gap: .6rem;
+            margin-bottom: .55rem;
+        }
+        .atualizacoes-member-row:last-child {
+            margin-bottom: 0;
+        }
+        .atualizacoes-member-row .atualizacoes-avatar {
+            width: 34px;
+            height: 34px;
+            font-size: .78rem;
+            flex-shrink: 0;
+        }
+        .atualizacoes-member-name {
+            font-weight: 600;
+            font-size: .86rem;
+            color: #2d1a21;
+        }
+        .atualizacoes-tag-new {
+            background: rgba(34,197,94,0.14);
+            color: #15803d;
+            font-size: .68rem;
+            font-weight: 700;
+            padding: .18rem .55rem;
+            border-radius: 999px;
+            margin-left: .4rem;
+        }
+        .atualizacoes-empty {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: .5rem;
+            padding: 1rem 0;
+            flex: 1;
+            justify-content: center;
+        }
+        .atualizacoes-empty-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: #f4f4f4;
+            color: #c4c4c4;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+        }
+        .atualizacoes-empty strong {
+            font-size: .92rem;
+            color: #2d1a21;
+        }
+        .atualizacoes-empty span {
+            font-size: .8rem;
+            color: #9a8f92;
+        }
+        .atualizacoes-col-footer {
+            margin-top: 1rem;
+            padding-top: .9rem;
+            border-top: 1px solid rgba(0,0,0,0.06);
+        }
+        .atualizacoes-footer-link {
+            color: var(--primary-red);
+            font-weight: 700;
+            font-size: .84rem;
+            background: none;
+            border: none;
+            padding: 0;
+            display: inline-flex;
+            align-items: center;
+            gap: .4rem;
+        }
+        .atualizacoes-footer-muted {
+            color: #9a8f92;
+            font-size: .8rem;
+        }
+
         /* Footer */
         .footer { 
             background: #1a1a1a; 
@@ -1844,12 +1898,6 @@ $firstAndLastName = function ($name) {
             .countdown-slide {
                 padding: .95rem;
             }
-            .live-grid {
-                grid-template-columns: 1fr;
-            }
-            .live-board {
-                padding: 1.2rem;
-            }
         }
         @media (max-width: 767.98px) {
             .hero-section {
@@ -1939,36 +1987,6 @@ $firstAndLastName = function ($name) {
                 padding-top: 2rem !important;
                 padding-bottom: 2rem !important;
             }
-            .live-board {
-                border-radius: 16px;
-            }
-            .panel-soft-head {
-                padding: 1rem 1rem .9rem;
-            }
-            .panel-soft-head.panel-scrollable {
-                padding-right: 6rem;
-            }
-            .panel-soft-body {
-                padding: 1rem;
-            }
-            .live-grid {
-                gap: .8rem;
-            }
-            .live-board-title {
-                margin-bottom: 1rem;
-                font-size: 1.2rem;
-            }
-            .live-card {
-                padding: .95rem;
-                border-radius: 14px;
-            }
-            .mini-avatars {
-                gap: .75rem;
-                justify-content: center;
-            }
-            .mini-avatar-item {
-                min-width: 68px;
-            }
             .section-carousel {
                 padding: .35rem 3.5rem;
             }
@@ -1985,9 +2003,6 @@ $firstAndLastName = function ($name) {
             .section-panel-grid {
                 grid-template-columns: 1fr;
                 gap: .85rem;
-            }
-            .section-carousel-inline {
-                padding: .25rem 3rem .35rem;
             }
         }
         @media (max-width: 575.98px) {
@@ -2064,39 +2079,6 @@ $firstAndLastName = function ($name) {
             .photo-strip img {
                 height: 84px;
             }
-            .panel-soft-head {
-                padding: .95rem .95rem .85rem;
-            }
-            .panel-soft-head.panel-scrollable {
-                padding-right: 5.6rem;
-            }
-            .panel-soft-body {
-                padding: .95rem;
-            }
-            .live-card-head {
-                gap: .6rem;
-            }
-            .live-card-icon {
-                width: 38px;
-                height: 38px;
-                border-radius: 10px;
-            }
-            .live-card-title {
-                font-size: 1rem;
-            }
-            .mini-avatars {
-                justify-content: flex-start;
-                gap: .7rem;
-            }
-            .mini-avatar-item {
-                min-width: 58px;
-                flex: 0 0 calc(33.333% - .5rem);
-            }
-            .mini-avatar-name {
-                font-size: .75rem;
-                white-space: normal;
-                line-height: 1.15;
-            }
             .section-carousel {
                 padding: .25rem .25rem .1rem;
             }
@@ -2118,9 +2100,6 @@ $firstAndLastName = function ($name) {
             }
             .section-panel-body {
                 padding: .95rem;
-            }
-            .section-carousel-inline {
-                padding: .15rem .15rem 0;
             }
             .floating-faith-actions {
                 right: 10px;
@@ -2412,116 +2391,129 @@ $firstAndLastName = function ($name) {
                 $newMembers = $highlights['new_members'] ?? [];
                 $baptisms = $highlights['baptisms'] ?? [];
                 $latestPhotos = $highlights['latest_photos'] ?? [];
+                $ptMonths = ['', 'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+                $currentMonthName = $ptMonths[(int)date('n')];
             ?>
-            <div class="row g-4 align-items-start justify-content-center">
-                <div class="col-lg-8">
-                    <div class="live-board" data-carousel-group>
-                        <div class="panel-soft-head">
-                            <div class="panel-soft-head-top">
-                                <h2 class="live-board-title"><i class="fas fa-newspaper"></i> Atualizações Recentes</h2>
-                                <div class="carousel-mini-nav">
-                                    <span class="carousel-mini-progress"><span class="carousel-mini-progress-bar" data-carousel-progress style="width: 33%"></span></span>
-                                    <span class="carousel-counter"><span data-carousel-counter-current>1</span> / <span data-carousel-counter-total>3</span></span>
-                                    <button type="button" class="section-carousel-btn prev carousel-mini-btn" aria-label="Quadro anterior das atualizações"><i class="fas fa-chevron-left"></i></button>
-                                    <button type="button" class="section-carousel-btn next carousel-mini-btn" aria-label="Próximo quadro das atualizações"><i class="fas fa-chevron-right"></i></button>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="panel-soft-body">
-                        <div class="section-carousel js-section-carousel section-carousel-inline">
-                            <div class="section-carousel-track">
-                                <div class="section-carousel-slide">
-                                    <div class="live-card">
-                                        <div class="live-card-head">
-                                            <div class="live-card-icon"><i class="fas fa-cake-candles"></i></div>
-                                            <h3 class="live-card-title h5">Aniversariantes</h3>
-                                        </div>
-                                        <p><?= !empty($birthdays) ? 'Mostrando os primeiros aniversariantes do mês.' : 'Nenhum aniversariante cadastrado para este mês.' ?></p>
-                                        <?php if (!empty($birthdays)): ?>
-                                            <div class="mini-avatars">
-                                                <?php foreach (array_slice($birthdays, 0, 3) as $birthday): ?>
-                                                    <div class="mini-avatar-item">
-                                                        <div class="mini-avatar" title="<?= htmlspecialchars($birthday['name']) ?>">
-                                                            <?php if (!empty($birthday['photo'])): ?>
-                                                                <img src="/uploads/members/<?= htmlspecialchars($birthday['photo']) ?>" alt="<?= htmlspecialchars($birthday['name']) ?>">
-                                                            <?php else: ?>
-                                                                <?= htmlspecialchars(substr((string)$birthday['name'], 0, 1)) ?>
-                                                            <?php endif; ?>
-                                                        </div>
-                                                        <span class="mini-avatar-name"><?= htmlspecialchars(trim((string)($birthday['first_name'] ?? $birthday['name'] ?? ''))) ?></span>
-                                                    </div>
-                                                <?php endforeach; ?>
-                                            </div>
-                                            <?php if (count($birthdays) > 3): ?>
-                                                <button type="button" class="live-card-link" data-bs-toggle="modal" data-bs-target="#birthdaysModal">
-                                                    <i class="fas fa-cake-candles"></i> Ver mais
-                                                </button>
-                                            <?php endif; ?>
-                                        <?php endif; ?>
-                                    </div>
-                                </div>
-                                <div class="section-carousel-slide">
-                                    <div class="live-card">
-                                        <div class="live-card-head">
-                                            <div class="live-card-icon"><i class="fas fa-user-plus"></i></div>
-                                            <h3 class="live-card-title h5">Novos Membros</h3>
-                                        </div>
-                                        <?php if (!empty($newMembers)): ?>
-                                            <p>Todos os novos membros registrados no mês corrente.</p>
-                                            <div class="mini-avatars">
-                                                <?php foreach ($newMembers as $member): ?>
-                                                    <div class="mini-avatar-item">
-                                                        <div class="mini-avatar" title="<?= htmlspecialchars($member['name']) ?>">
-                                                            <?php if (!empty($member['photo'])): ?>
-                                                                <img src="/uploads/members/<?= htmlspecialchars($member['photo']) ?>" alt="<?= htmlspecialchars($member['name']) ?>">
-                                                            <?php else: ?>
-                                                                <?= htmlspecialchars(substr((string)$member['name'], 0, 1)) ?>
-                                                            <?php endif; ?>
-                                                        </div>
-                                                        <span class="mini-avatar-name"><?= htmlspecialchars(trim((string)($member['first_name'] ?? $member['name'] ?? ''))) ?></span>
-                                                    </div>
-                                                <?php endforeach; ?>
-                                            </div>
+            <div class="flat-strip-head">
+                <span class="section-panel-kicker"><i class="fas fa-newspaper"></i> Atualizações Recentes</span>
+                <span class="atualizacoes-month-pill"><?= htmlspecialchars($currentMonthName) ?> <?= date('Y') ?></span>
+            </div>
+            <div class="atualizacoes-grid">
+                <div class="atualizacoes-col">
+                    <div class="atualizacoes-col-head">
+                        <div class="atualizacoes-col-icon icon-birthday"><i class="fas fa-cake-candles"></i></div>
+                        <?php if (!empty($birthdays)): ?>
+                            <span class="atualizacoes-count-badge"><?= count($birthdays) ?> neste mês</span>
+                        <?php endif; ?>
+                    </div>
+                    <div class="atualizacoes-col-title">Aniversariantes</div>
+                    <div class="atualizacoes-col-subtitle"><?= !empty($birthdays) ? 'Mostrando os primeiros do mês' : 'Nenhum aniversariante este mês' ?></div>
+                    <div class="atualizacoes-col-body">
+                        <?php if (!empty($birthdays)): ?>
+                            <div class="atualizacoes-avatars">
+                                <?php foreach (array_slice($birthdays, 0, 3) as $birthday): ?>
+                                    <div class="atualizacoes-avatar" title="<?= htmlspecialchars($birthday['name']) ?>">
+                                        <?php if (!empty($birthday['photo'])): ?>
+                                            <img src="/uploads/members/<?= htmlspecialchars($birthday['photo']) ?>" alt="<?= htmlspecialchars($birthday['name']) ?>">
                                         <?php else: ?>
-                                            <p>Nenhum novo membro registrado neste mês.</p>
+                                            <?= htmlspecialchars(mb_substr((string)$birthday['name'], 0, 1)) ?>
                                         <?php endif; ?>
                                     </div>
-                                </div>
-                                <div class="section-carousel-slide">
-                                    <div class="live-card">
-                                        <div class="live-card-head">
-                                            <div class="live-card-icon"><i class="fas fa-droplet"></i></div>
-                                            <h3 class="live-card-title h5">Batismos</h3>
-                                        </div>
-                                        <?php if (!empty($baptisms)): ?>
-                                            <p>Todos os batismos registrados no mês corrente.</p>
-                                            <div class="mini-avatars">
-                                                <?php foreach ($baptisms as $baptism): ?>
-                                                    <div class="mini-avatar-item">
-                                                        <div class="mini-avatar" title="<?= htmlspecialchars($baptism['name']) ?>">
-                                                            <?php if (!empty($baptism['photo'])): ?>
-                                                                <img src="/uploads/members/<?= htmlspecialchars($baptism['photo']) ?>" alt="<?= htmlspecialchars($baptism['name']) ?>">
-                                                            <?php else: ?>
-                                                                <?= htmlspecialchars(substr((string)$baptism['name'], 0, 1)) ?>
-                                                            <?php endif; ?>
-                                                        </div>
-                                                        <span class="mini-avatar-name"><?= htmlspecialchars(trim((string)($baptism['first_name'] ?? $baptism['name'] ?? ''))) ?></span>
-                                                    </div>
-                                                <?php endforeach; ?>
-                                            </div>
-                                        <?php else: ?>
-                                            <p>Sem batismos registrados neste mês.</p>
-                                        <?php endif; ?>
-                                    </div>
-                                </div>
+                                <?php endforeach; ?>
+                                <?php if (count($birthdays) > 3): ?>
+                                    <div class="atualizacoes-avatar-more">+<?= count($birthdays) - 3 ?></div>
+                                <?php endif; ?>
                             </div>
-                        </div>
-                        <div class="carousel-dots">
-                            <button type="button" class="carousel-dot is-active" data-section-dot="0" aria-label="Ir para Aniversariantes"></button>
-                            <button type="button" class="carousel-dot" data-section-dot="1" aria-label="Ir para Novos Membros"></button>
-                            <button type="button" class="carousel-dot" data-section-dot="2" aria-label="Ir para Batismos"></button>
-                        </div>
-                        </div>
+                            <div class="atualizacoes-names">
+                                <?= htmlspecialchars(implode('  ', array_map(function ($b) {
+                                    return trim((string)($b['first_name'] ?? $b['name'] ?? ''));
+                                }, array_slice($birthdays, 0, 3)))) ?>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                    <div class="atualizacoes-col-footer">
+                        <?php if (count($birthdays) > 3): ?>
+                            <button type="button" class="atualizacoes-footer-link" data-bs-toggle="modal" data-bs-target="#birthdaysModal">
+                                Ver mais <i class="fas fa-cake-candles"></i>
+                            </button>
+                        <?php else: ?>
+                            <span class="atualizacoes-footer-muted">Nenhum registro adicional</span>
+                        <?php endif; ?>
+                    </div>
+                </div>
+
+                <div class="atualizacoes-col">
+                    <div class="atualizacoes-col-head">
+                        <div class="atualizacoes-col-icon icon-members"><i class="fas fa-user-plus"></i></div>
+                        <?php if (!empty($newMembers)): ?>
+                            <span class="atualizacoes-dot-badge"></span>
+                        <?php endif; ?>
+                    </div>
+                    <div class="atualizacoes-col-title">Novos Membros</div>
+                    <div class="atualizacoes-col-subtitle">Todos os novos do mês corrente</div>
+                    <div class="atualizacoes-col-body">
+                        <?php if (!empty($newMembers)): ?>
+                            <?php foreach (array_slice($newMembers, 0, 4) as $member): ?>
+                                <div class="atualizacoes-member-row">
+                                    <div class="atualizacoes-avatar" title="<?= htmlspecialchars($member['name']) ?>">
+                                        <?php if (!empty($member['photo'])): ?>
+                                            <img src="/uploads/members/<?= htmlspecialchars($member['photo']) ?>" alt="<?= htmlspecialchars($member['name']) ?>">
+                                        <?php else: ?>
+                                            <?= htmlspecialchars(mb_substr((string)$member['name'], 0, 1)) ?>
+                                        <?php endif; ?>
+                                    </div>
+                                    <span class="atualizacoes-member-name"><?= htmlspecialchars(trim((string)($member['first_name'] ?? $member['name'] ?? ''))) ?></span>
+                                    <span class="atualizacoes-tag-new">Novo</span>
+                                </div>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </div>
+                    <div class="atualizacoes-col-footer">
+                        <?php if (!empty($newMembers)): ?>
+                            <span class="atualizacoes-footer-muted"><?= count($newMembers) ?> novo<?= count($newMembers) === 1 ? '' : 's' ?> este mês</span>
+                        <?php else: ?>
+                            <span class="atualizacoes-footer-muted">Nenhum registro • <?= htmlspecialchars($currentMonthName) ?></span>
+                        <?php endif; ?>
+                    </div>
+                </div>
+
+                <div class="atualizacoes-col">
+                    <div class="atualizacoes-col-head">
+                        <div class="atualizacoes-col-icon icon-baptism"><i class="fas fa-droplet"></i></div>
+                        <?php if (!empty($baptisms)): ?>
+                            <span class="atualizacoes-count-badge"><?= count($baptisms) ?> neste mês</span>
+                        <?php endif; ?>
+                    </div>
+                    <div class="atualizacoes-col-title">Batismos</div>
+                    <div class="atualizacoes-col-subtitle">Celebrações deste mês</div>
+                    <div class="atualizacoes-col-body">
+                        <?php if (!empty($baptisms)): ?>
+                            <?php foreach (array_slice($baptisms, 0, 4) as $baptism): ?>
+                                <div class="atualizacoes-member-row">
+                                    <div class="atualizacoes-avatar" title="<?= htmlspecialchars($baptism['name']) ?>">
+                                        <?php if (!empty($baptism['photo'])): ?>
+                                            <img src="/uploads/members/<?= htmlspecialchars($baptism['photo']) ?>" alt="<?= htmlspecialchars($baptism['name']) ?>">
+                                        <?php else: ?>
+                                            <?= htmlspecialchars(mb_substr((string)$baptism['name'], 0, 1)) ?>
+                                        <?php endif; ?>
+                                    </div>
+                                    <span class="atualizacoes-member-name"><?= htmlspecialchars(trim((string)($baptism['first_name'] ?? $baptism['name'] ?? ''))) ?></span>
+                                </div>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <div class="atualizacoes-empty">
+                                <div class="atualizacoes-empty-icon"><i class="fas fa-droplet"></i></div>
+                                <strong>Sem batismos neste mês</strong>
+                                <span>Em breve celebraremos novas vidas em Cristo</span>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                    <div class="atualizacoes-col-footer">
+                        <?php if (!empty($baptisms)): ?>
+                            <span class="atualizacoes-footer-muted"><?= count($baptisms) ?> batismo<?= count($baptisms) === 1 ? '' : 's' ?> este mês</span>
+                        <?php else: ?>
+                            <span class="atualizacoes-footer-muted">Nenhum registro • <?= htmlspecialchars($currentMonthName) ?></span>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>
