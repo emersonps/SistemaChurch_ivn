@@ -24,6 +24,20 @@ if ($whatsappDigits !== '' && strlen($whatsappDigits) <= 11) {
         }
         body { padding-top: 76px; background: #fdfaf7; color: #2d1a21; }
         .navbar { background-color: rgba(255,255,255,0.96) !important; box-shadow: 0 2px 14px rgba(0,0,0,0.08); }
+        .navbar-brand {
+            font-weight: 900;
+            color: #2d1a21 !important;
+            display: inline-flex;
+            align-items: center;
+            gap: .65rem;
+        }
+        .navbar-brand img {
+            width: 42px;
+            height: 42px;
+            object-fit: contain;
+        }
+        .nav-link { color: rgba(45,26,33,0.72) !important; font-weight: 600; }
+        .nav-link.active, .nav-link:hover { color: var(--primary-red) !important; }
 
         .cultos-page-wrap { padding: 2.5rem 0 4rem; }
         .cultos-breadcrumb { font-size: .82rem; color: #9a8f92; margin-bottom: 1rem; }
