@@ -244,14 +244,12 @@ foreach ($congregacoes as $c) {
             display: inline-flex; align-items: center; justify-content: center;
         }
 
-        html { scroll-behavior: smooth; }
         .cultos-map-section {
             margin-top: 3rem;
             background: #fff;
             border: 1px solid rgba(0,0,0,0.07);
             border-radius: 20px;
             padding: 1.75rem;
-            scroll-margin-top: 90px;
         }
         .cultos-map-section h3 { font-weight: 800; margin-bottom: .3rem; }
         .cultos-congregation-pills { display: flex; flex-wrap: wrap; gap: .5rem; margin: 1.2rem 0 1.5rem; }
@@ -340,38 +338,6 @@ foreach ($congregacoes as $c) {
             .cultos-page-head h1 { font-size: 1.9rem; }
         }
 
-        .cultos-map-fab {
-            display: none;
-        }
-        @media (max-width: 991.98px) {
-            .cultos-map-fab {
-                display: inline-flex;
-                align-items: center;
-                gap: .5rem;
-                position: fixed;
-                left: 50%;
-                bottom: 18px;
-                transform: translateX(-50%);
-                z-index: 1080;
-                background: #212529;
-                color: #fff;
-                font-weight: 800;
-                font-size: .84rem;
-                padding: .75rem 1.1rem;
-                border-radius: 999px;
-                box-shadow: 0 14px 28px rgba(0,0,0,0.28);
-                text-decoration: none;
-                white-space: nowrap;
-            }
-            .cultos-map-fab:hover { color: #fff; }
-            .cultos-map-fab i { color: var(--primary-red); }
-            .cultos-map-fab-count {
-                background: rgba(255,255,255,0.18);
-                border-radius: 999px;
-                padding: .1rem .5rem;
-                font-size: .74rem;
-            }
-        }
     </style>
 </head>
 <body>
@@ -506,7 +472,7 @@ foreach ($congregacoes as $c) {
             </div>
 
             <?php if (!empty($congregacoes)): ?>
-                <div class="cultos-map-section" id="ondeEstamos">
+                <div class="cultos-map-section">
                     <h3>Onde estamos</h3>
                     <p class="text-muted">Veja as congregações com programação ativa nos filtros atuais.</p>
                     <div class="cultos-congregation-pills">
@@ -558,11 +524,6 @@ foreach ($congregacoes as $c) {
                         </div>
                     </div>
                 </div>
-
-                <a href="#ondeEstamos" class="cultos-map-fab" data-map-fab>
-                    <i class="fas fa-location-dot"></i> Ver no mapa
-                    <span class="cultos-map-fab-count"><?= count($congregacoes) ?></span>
-                </a>
             <?php endif; ?>
 
             <?php if ($whatsappDigits !== ''): ?>
