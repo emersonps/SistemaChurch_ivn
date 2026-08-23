@@ -80,16 +80,19 @@ class EventController {
         $sql = "SELECT * FROM events WHERE 1=1";
         $params = [];
         
-        // Se não for admin, filtra pela congregação do usuário
-        // Assumindo que o nome da congregação está salvo em events.location
+        // Se não for admin, filtra pela congregação do usuário.
+        // Assumindo que o nome da congregação está salvo em events.location — exceto
+        // para convites, cujo location aponta livremente para fora da igreja, então
+        // essa comparação não serve para "dono do evento" nesse tipo (senão o convite
+        // que o próprio usuário criou some da lista dele por não bater o location).
         if ($_SESSION['user_role'] !== 'admin' && !empty($_SESSION['user_congregation_id'])) {
             // Primeiro, pegamos o nome da congregação do usuário
             $stmt = $db->prepare("SELECT name FROM congregations WHERE id = ?");
             $stmt->execute([$_SESSION['user_congregation_id']]);
             $userCongregation = $stmt->fetchColumn();
-            
+
             if ($userCongregation) {
-                $sql .= " AND location = ?";
+                $sql .= " AND (location = ? OR type = 'convite')";
                 $params[] = $userCongregation;
             }
         }
@@ -259,12 +262,14 @@ class EventController {
             redirect('/admin/events');
         }
         
-        // Verificar permissão de edição (se não for admin, só pode editar da sua congregação)
-        if ($_SESSION['user_role'] !== 'admin' && !empty($_SESSION['user_congregation_id'])) {
+        // Verificar permissão de edição (se não for admin, só pode editar da sua congregação).
+        // Convites ficam de fora: location é explicitamente livre para apontar
+        // para fora da igreja, então não serve como identificador de dono.
+        if ($_SESSION['user_role'] !== 'admin' && !empty($_SESSION['user_congregation_id']) && ($event['type'] ?? '') !== 'convite') {
             $stmt = $db->prepare("SELECT name FROM congregations WHERE id = ?");
             $stmt->execute([$_SESSION['user_congregation_id']]);
             $userCongregationName = $stmt->fetchColumn();
-            
+
             if ($event['location'] !== $userCongregationName) {
                 redirect('/admin/events'); // Redireciona silenciosamente ou poderia mostrar erro
             }
@@ -480,19 +485,22 @@ class EventController {
         requirePermission('events.manage');
         $db = (new Database())->connect();
         
-        // Verificar permissão antes de deletar
+        // Verificar permissão antes de deletar (convites ficam de fora, mesmo motivo do update()/edit())
         if ($_SESSION['user_role'] !== 'admin' && !empty($_SESSION['user_congregation_id'])) {
-            $stmtCheck = $db->prepare("SELECT location FROM events WHERE id = ?");
+            $stmtCheck = $db->prepare("SELECT location, type FROM events WHERE id = ?");
             $stmtCheck->execute([$id]);
-            $currentLocation = $stmtCheck->fetchColumn();
-            
-            $stmtCong = $db->prepare("SELECT name FROM congregations WHERE id = ?");
-            $stmtCong->execute([$_SESSION['user_congregation_id']]);
-            $userCongregationName = $stmtCong->fetchColumn();
-            
-            if ($currentLocation !== $userCongregationName) {
-                redirect('/admin/events');
-                return;
+            $currentEvent = $stmtCheck->fetch(PDO::FETCH_ASSOC);
+            $currentLocation = $currentEvent['location'] ?? null;
+
+            if (($currentEvent['type'] ?? '') !== 'convite') {
+                $stmtCong = $db->prepare("SELECT name FROM congregations WHERE id = ?");
+                $stmtCong->execute([$_SESSION['user_congregation_id']]);
+                $userCongregationName = $stmtCong->fetchColumn();
+
+                if ($currentLocation !== $userCongregationName) {
+                    redirect('/admin/events');
+                    return;
+                }
             }
         }
         
