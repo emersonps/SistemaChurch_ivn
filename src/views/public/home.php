@@ -2263,8 +2263,8 @@ $firstAndLastName = function ($name) {
         <div class="container py-5">
             <?php $cultosSchedule = getCultosScheduleData($cultos); ?>
             <?php if (empty($cultosSchedule)): ?>
-                <div class="flat-strip-head">
-                    <h2 class="section-title mb-0">Nossos Cultos</h2>
+                <div class="cultos-preview-head">
+                    <span class="section-panel-kicker"><i class="fas fa-church"></i> Nossos cultos na semana</span>
                 </div>
                 <div class="text-center">
                     <p class="text-muted">Nenhum culto cadastrado no momento.</p>
