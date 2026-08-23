@@ -398,8 +398,6 @@ if (!empty($albums) && is_array($albums)) {
             <div class="collapse navbar-collapse" id="navbarGallery">
                 <ul class="navbar-nav ms-auto align-items-center">
                     <li class="nav-item"><a class="nav-link" href="/">Início</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/oracao">Oração</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/devocional">Devocional</a></li>
                     <li class="nav-item"><a class="nav-link active" href="/galeria" aria-current="page">Galeria</a></li>
                 </ul>
             </div>

@@ -357,8 +357,6 @@ foreach ($congregacoes as $c) {
             <div class="collapse navbar-collapse" id="navbarCultos">
                 <ul class="navbar-nav ms-auto align-items-center">
                     <li class="nav-item"><a class="nav-link" href="/">Início</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/oracao">Oração</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/devocional">Devocional</a></li>
                     <li class="nav-item"><a class="nav-link active" href="/cultos" aria-current="page">Cultos</a></li>
                     <li class="nav-item"><a class="nav-link" href="/galeria">Galeria</a></li>
                     <li class="nav-item d-flex flex-column flex-lg-row gap-2 ms-lg-3">
