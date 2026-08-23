@@ -1890,7 +1890,7 @@ $firstAndLastName = function ($name) {
                 <ul class="navbar-nav ms-auto align-items-center">
                     <li class="nav-item"><a class="nav-link active" href="#inicio">Início</a></li>
                     <li class="nav-item"><a class="btn btn-cta btn-sm px-3 text-nowrap" href="/oracao"><i class="fas fa-hands-praying me-2"></i>Oração</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/cultos">Cultos</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#cultos">Cultos</a></li>
                     <li class="nav-item"><a class="nav-link" href="#eventos">Eventos</a></li>
                     <li class="nav-item"><a class="nav-link" href="#convites">Convites</a></li>
                     <li class="nav-item"><a class="nav-link" href="#congregacoes">Congregações</a></li>
