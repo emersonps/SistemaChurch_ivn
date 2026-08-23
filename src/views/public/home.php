@@ -2419,7 +2419,7 @@ $firstAndLastName = function ($name) {
                         <div class="cultos-carousel-track" id="cultosCarouselTrack">
                             <?php foreach ($cultosPorCongregacao as $congregacao => $items): ?>
                                 <div class="cultos-slide">
-                                    <div class="cultos-card scrollable-panel">
+                                    <div class="cultos-card">
                                         <div class="cultos-card-head">
                                             <div class="cultos-card-head-top">
                                                 <span class="cultos-card-kicker"><i class="fas fa-house-chimney"></i> Congregação</span>
