@@ -99,16 +99,41 @@ if ($whatsappDigits !== '' && strlen($whatsappDigits) <= 11) {
             border-color: #212529;
             color: #fff;
         }
-        .cultos-filters-right { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
-        .cultos-today-toggle {
+        .cultos-filters-right { display: flex; align-items: center; gap: .6rem; flex-wrap: wrap; }
+        .cultos-filters-right .form-select {
+            border-radius: 999px;
+            border-color: rgba(0,0,0,0.1);
+            font-size: .84rem;
+            font-weight: 700;
+            color: #2d1a21;
+            padding: .5rem 2.1rem .5rem 1rem;
+            height: auto;
+        }
+        .cultos-toggle-pill {
             display: inline-flex;
             align-items: center;
             gap: .5rem;
+            border: 1px solid rgba(0,0,0,0.1);
+            background: #fff;
+            border-radius: 999px;
+            padding: .5rem 1rem;
             font-size: .84rem;
-            color: #6b7280;
-            cursor: pointer;
-            margin-bottom: 0;
+            font-weight: 700;
+            color: #2d1a21;
+            transition: background .15s ease, color .15s ease, border-color .15s ease;
         }
+        .cultos-toggle-pill .dot {
+            width: 8px; height: 8px; border-radius: 50%;
+            background: rgba(0,0,0,0.25);
+            flex-shrink: 0;
+            transition: background .15s ease;
+        }
+        .cultos-toggle-pill.is-active {
+            background: #212529;
+            border-color: #212529;
+            color: #fff;
+        }
+        .cultos-toggle-pill.is-active .dot { background: #2ecc71; }
 
         .cultos-layout {
             display: grid;
@@ -366,9 +391,9 @@ if ($whatsappDigits !== '' && strlen($whatsappDigits) <= 11) {
                             <option value="<?= htmlspecialchars($c['name']) ?>"><?= htmlspecialchars($c['name']) ?></option>
                         <?php endforeach; ?>
                     </select>
-                    <label class="cultos-today-toggle">
-                        <input type="checkbox" id="filterToday"> Apenas hoje
-                    </label>
+                    <button type="button" class="cultos-toggle-pill" id="filterToday" aria-pressed="false">
+                        <span class="dot"></span> Apenas hoje
+                    </button>
                 </div>
             </div>
 
@@ -568,8 +593,9 @@ if ($whatsappDigits !== '' && strlen($whatsappDigits) <= 11) {
             }
 
             if (todayToggle) {
-                todayToggle.addEventListener('change', function () {
-                    state.today = todayToggle.checked;
+                todayToggle.addEventListener('click', function () {
+                    state.today = todayToggle.classList.toggle('is-active');
+                    todayToggle.setAttribute('aria-pressed', state.today ? 'true' : 'false');
                     applyFilters();
                 });
             }
