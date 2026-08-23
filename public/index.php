@@ -960,6 +960,15 @@ elseif (preg_match('#^/admin/gallery/delete_photo/(\d+)$#', $uri, $matches)) {
 elseif (preg_match('#^/admin/gallery/delete/(\d+)$#', $uri, $matches)) {
     (new GalleryController())->deleteAlbum($matches[1]);
 }
+elseif ($uri == '/admin/gallery/categories' && $method == 'POST') {
+    (new GalleryController())->categoryStore();
+}
+elseif (preg_match('#^/admin/gallery/categories/rename/(\d+)$#', $uri, $matches) && $method == 'POST') {
+    (new GalleryController())->categoryRename($matches[1]);
+}
+elseif (preg_match('#^/admin/gallery/categories/delete/(\d+)$#', $uri, $matches) && $method == 'POST') {
+    (new GalleryController())->categoryDelete($matches[1]);
+}
 
 // Rotas de Usuários
 elseif ($uri == '/admin/users') {

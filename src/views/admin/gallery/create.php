@@ -105,7 +105,21 @@
                     <label class="form-label">Local</label>
                     <input type="text" class="form-control" name="location">
                 </div>
-                <div class="col-md-12">
+                <div class="col-md-3">
+                    <label class="form-label d-flex justify-content-between align-items-center">
+                        <span>Categoria</span>
+                        <button type="button" class="btn btn-link btn-sm p-0" data-bs-toggle="modal" data-bs-target="#categoryModal">
+                            <i class="fas fa-gear me-1"></i>Gerenciar
+                        </button>
+                    </label>
+                    <select name="category" class="form-select">
+                        <option value="">Sem categoria</option>
+                        <?php foreach ($categories as $cat): ?>
+                            <option value="<?= htmlspecialchars($cat) ?>"><?= htmlspecialchars($cat) ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="col-md-9">
                     <label class="form-label">Descrição</label>
                     <textarea class="form-control" name="description" rows="3"></textarea>
                 </div>
@@ -118,5 +132,7 @@
         <button type="submit" class="btn btn-primary px-4">Salvar</button>
     </div>
 </form>
+
+<?php include __DIR__ . '/partials/category_modal.php'; ?>
 
 <?php include __DIR__ . '/../../layout/footer.php'; ?>

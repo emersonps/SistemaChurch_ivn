@@ -1,12 +1,12 @@
 <?php
 $siteProfile = getChurchSiteProfileSettings();
-$albumCount = isset($albums) && is_array($albums) ? count($albums) : 0;
-$highlightPhotosCount = 0;
-if (!empty($albums) && is_array($albums)) {
-    foreach ($albums as $album) {
-        $highlightPhotosCount += isset($album['photos']) && is_array($album['photos']) ? count($album['photos']) : 0;
-    }
-}
+$albumCount = $albumCount ?? 0;
+$yearRange = $yearRange ?? '';
+$categories = $categories ?? [];
+$categoryCounts = $categoryCounts ?? [];
+$photosByYear = $photosByYear ?? [];
+$totalPhotoCount = $totalPhotoCount ?? 0;
+$galleryInitialLimit = 12;
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -132,236 +132,6 @@ if (!empty($albums) && is_array($albums)) {
             100% { transform: rotate(25deg) translateX(260%); opacity: 0; }
         }
 
-        .gallery-hero {
-            padding: 2.6rem 0 1.6rem;
-        }
-
-        .hero-shell {
-            border-radius: 28px;
-            padding: 2rem;
-            background: linear-gradient(135deg, rgba(139,21,56,0.96), rgba(90,16,38,0.94));
-            color: #fff;
-            box-shadow: 0 28px 60px rgba(90,16,38,0.18);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .hero-shell::after {
-            content: "";
-            position: absolute;
-            inset: auto -48px -48px auto;
-            width: 220px;
-            height: 220px;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.08);
-        }
-
-        .hero-shell::before {
-            content: "";
-            position: absolute;
-            inset: -2px;
-            border-radius: 30px;
-            background: linear-gradient(120deg, rgba(255,42,122,0.36), rgba(212,175,55,0.34), rgba(255,255,255,0.16));
-            filter: blur(18px);
-            opacity: 0.55;
-            z-index: -1;
-        }
-
-        .hero-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: .55rem;
-            padding: .42rem .8rem;
-            border-radius: 999px;
-            background: rgba(255,255,255,0.14);
-            color: #fff;
-            font-size: .78rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: .04em;
-            margin-bottom: 1rem;
-        }
-
-        .hero-title {
-            font-size: clamp(2rem, 4vw, 3rem);
-            font-weight: 900;
-            line-height: 1.08;
-            margin: 0 0 .75rem;
-        }
-
-        .hero-copy {
-            margin: 0;
-            max-width: 46rem;
-            color: rgba(255,255,255,0.86);
-            font-size: 1rem;
-        }
-
-        .hero-stats {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: .9rem;
-        }
-
-        .hero-stat {
-            border-radius: 22px;
-            padding: 1rem 1.05rem;
-            background: rgba(255,255,255,0.12);
-            border: 1px solid rgba(255,255,255,0.12);
-        }
-
-        .hero-stat strong {
-            display: block;
-            font-size: 1.7rem;
-            line-height: 1;
-            margin-bottom: .35rem;
-        }
-
-        .hero-stat span {
-            color: rgba(255,255,255,0.82);
-            font-size: .92rem;
-        }
-
-        .albums-wrap {
-            padding: 0 0 4.2rem;
-        }
-
-        .album-card {
-            border-radius: 22px;
-            overflow: hidden;
-            background: rgba(255,255,255,0.94);
-            border: 1px solid rgba(139,21,56,0.08);
-            box-shadow: 0 18px 45px rgba(49,24,31,0.08);
-            margin-bottom: 1.2rem;
-        }
-
-        .album-hero {
-            position: relative;
-            min-height: 160px;
-            padding: 1.35rem 1.35rem 1.25rem;
-            background:
-                radial-gradient(circle at 12% 18%, rgba(212,175,55,0.22), transparent 40%),
-                linear-gradient(135deg, rgba(15,18,28,0.86), rgba(90,16,38,0.86));
-            color: #fff;
-            overflow: hidden;
-        }
-
-        .album-hero.has-cover {
-            background-size: cover;
-            background-position: center;
-        }
-
-        .album-hero::after {
-            content: "";
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(180deg, rgba(0,0,0,0.20), rgba(0,0,0,0.62));
-        }
-
-        .album-hero > * {
-            position: relative;
-            z-index: 1;
-        }
-
-        .album-title {
-            font-weight: 900;
-            margin: 0;
-            font-size: 1.3rem;
-        }
-
-        .album-meta {
-            display: flex;
-            flex-wrap: wrap;
-            gap: .5rem;
-            align-items: center;
-            margin-top: .65rem;
-            color: rgba(255,255,255,0.86);
-            font-weight: 700;
-            font-size: .9rem;
-        }
-
-        .album-chip {
-            display: inline-flex;
-            align-items: center;
-            gap: .45rem;
-            padding: .38rem .7rem;
-            border-radius: 999px;
-            background: rgba(255,255,255,0.12);
-            border: 1px solid rgba(255,255,255,0.14);
-        }
-
-        .album-desc {
-            padding: 1rem 1.35rem 0;
-            color: var(--gallery-muted);
-            font-size: .95rem;
-        }
-
-        .album-desc strong {
-            color: rgba(15,18,28,0.78);
-        }
-
-        .photo-grid {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: .75rem;
-            padding: 1.15rem 1.35rem 1.35rem;
-        }
-
-        @media (min-width: 576px) {
-            .photo-grid {
-                grid-template-columns: repeat(3, minmax(0, 1fr));
-            }
-        }
-
-        @media (min-width: 992px) {
-            .photo-grid {
-                grid-template-columns: repeat(4, minmax(0, 1fr));
-            }
-        }
-
-        .photo-item {
-            position: relative;
-            border-radius: 18px;
-            overflow: hidden;
-            background: rgba(15,18,28,0.06);
-            border: 1px solid rgba(15,18,28,0.08);
-            box-shadow: 0 14px 28px rgba(0,0,0,0.10);
-        }
-
-        .photo-item a {
-            display: block;
-            text-decoration: none;
-            color: inherit;
-        }
-
-        .photo-item img {
-            width: 100%;
-            height: auto;
-            aspect-ratio: 4 / 3;
-            object-fit: cover;
-            transition: transform .35s ease, filter .35s ease;
-            display: block;
-        }
-
-        .photo-item:hover img {
-            transform: scale(1.04);
-            filter: saturate(1.04);
-        }
-
-        .photo-overlay {
-            position: absolute;
-            inset: 0;
-            background: radial-gradient(circle at 50% 30%, rgba(255,255,255,0.06), rgba(0,0,0,0.58));
-            opacity: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: opacity .2s ease;
-        }
-
-        .photo-item:hover .photo-overlay {
-            opacity: 1;
-        }
-
         .empty-state {
             border-radius: 24px;
             padding: 2.4rem 1.4rem;
@@ -373,15 +143,134 @@ if (!empty($albums) && is_array($albums)) {
 
         @media (max-width: 575.98px) {
             body { padding-top: 78px; }
-            .hero-shell { padding: 1.5rem; border-radius: 24px; }
-            .hero-stats { gap: .65rem; }
-            .hero-stat { border-radius: 18px; padding: .85rem .9rem; }
-            .hero-stat strong { font-size: 1.42rem; }
-            .hero-stat span { font-size: .82rem; }
-            .album-desc { padding-left: 1.1rem; padding-right: 1.1rem; }
-            .photo-grid { padding-left: 1.1rem; padding-right: 1.1rem; gap: .65rem; }
         }
 
+        /* Gallery/Video Wall tab switcher */
+        .gallery-tabs-wrap { display: flex; justify-content: center; padding-top: 1.6rem; }
+        .gallery-tabs {
+            display: inline-flex;
+            gap: .3rem;
+            background: rgba(255,255,255,0.9);
+            border: 1px solid rgba(15,18,28,0.08);
+            border-radius: 999px;
+            padding: .3rem;
+            box-shadow: 0 10px 24px rgba(0,0,0,0.06);
+        }
+        .gallery-tab {
+            display: inline-flex;
+            align-items: center;
+            gap: .5rem;
+            padding: .55rem 1.1rem;
+            border-radius: 999px;
+            font-weight: 700;
+            font-size: .86rem;
+            color: var(--gallery-ink);
+            text-decoration: none;
+        }
+        .gallery-tab.is-active { background: #212529; color: #fff; }
+
+        /* Header card */
+        .gallery-page-wrap { padding: 1.6rem 0 4rem; }
+        .gallery-header-card {
+            background: #fff;
+            border: 1px solid rgba(15,18,28,0.07);
+            border-radius: 22px;
+            padding: 1.5rem 1.75rem;
+            box-shadow: 0 18px 40px rgba(0,0,0,0.05);
+            margin-bottom: 1.5rem;
+        }
+        .gallery-breadcrumb { font-size: .8rem; color: rgba(15,18,28,0.4); margin-bottom: .8rem; }
+        .gallery-breadcrumb a { color: rgba(15,18,28,0.4); text-decoration: none; }
+        .gallery-breadcrumb strong { color: var(--gallery-ink); font-weight: 700; }
+        .gallery-header-row { display: flex; justify-content: space-between; align-items: flex-end; gap: 1.5rem; flex-wrap: wrap; }
+        .gallery-header-row h1 { font-weight: 900; font-size: 2rem; margin-bottom: .5rem; }
+        .gallery-header-row p { color: var(--gallery-muted); max-width: 540px; margin-bottom: 0; }
+        .gallery-header-meta { display: flex; align-items: center; gap: .85rem; flex-wrap: wrap; }
+        .gallery-meta-text { color: var(--gallery-muted); font-size: .86rem; font-weight: 600; white-space: nowrap; }
+        .gallery-meta-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: .4rem;
+            background: #212529;
+            color: #fff;
+            font-size: .78rem;
+            font-weight: 700;
+            padding: .45rem .8rem;
+            border-radius: 999px;
+            white-space: nowrap;
+        }
+
+        /* Filters */
+        .gallery-filters { display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: 2rem; }
+        .gallery-filter-pill {
+            border: 1px solid rgba(15,18,28,0.1);
+            background: #fff;
+            border-radius: 999px;
+            padding: .5rem 1rem;
+            font-size: .84rem;
+            font-weight: 700;
+            color: var(--gallery-ink);
+            display: inline-flex;
+            align-items: center;
+            gap: .4rem;
+        }
+        .gallery-filter-pill .count { opacity: .6; }
+        .gallery-filter-pill.is-active { background: #212529; border-color: #212529; color: #fff; }
+
+        /* Year sections */
+        .gallery-year-section { margin-bottom: 2.5rem; }
+        .gallery-year-head { display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; }
+        .gallery-year-title { font-weight: 900; font-size: 1.15rem; white-space: nowrap; }
+        .gallery-year-line { flex: 1; height: 1px; background: rgba(15,18,28,0.1); }
+        .gallery-year-count { font-size: .74rem; font-weight: 700; letter-spacing: .04em; color: var(--gallery-muted); text-transform: uppercase; white-space: nowrap; }
+
+        .gallery-photo-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            grid-auto-rows: 190px;
+            grid-auto-flow: dense;
+            gap: 1rem;
+        }
+        .gallery-photo-item {
+            position: relative;
+            border-radius: 16px;
+            overflow: hidden;
+            background: rgba(15,18,28,0.06);
+            box-shadow: 0 12px 26px rgba(0,0,0,0.08);
+        }
+        .gallery-photo-item:nth-child(3n) {
+            grid-row: span 2;
+        }
+        .gallery-photo-item.is-hidden { display: none; }
+        .gallery-photo-item a { display: block; width: 100%; height: 100%; text-decoration: none; }
+        .gallery-photo-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform .3s ease;
+        }
+        .gallery-photo-item:hover img { transform: scale(1.04); }
+        .gallery-photo-caption {
+            position: absolute;
+            left: .6rem;
+            bottom: .6rem;
+            right: .6rem;
+            background: rgba(255,255,255,0.94);
+            color: var(--gallery-ink);
+            font-size: .78rem;
+            font-weight: 700;
+            padding: .4rem .7rem;
+            border-radius: 10px;
+        }
+
+        @media (max-width: 767.98px) {
+            .gallery-photo-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: 160px; }
+            .gallery-header-row { align-items: flex-start; }
+        }
+        @media (max-width: 480px) {
+            .gallery-photo-grid { grid-template-columns: 1fr; }
+            .gallery-photo-item:nth-child(3n) { grid-row: span 1; }
+        }
     </style>
 </head>
 <body>
@@ -404,100 +293,71 @@ if (!empty($albums) && is_array($albums)) {
         </div>
     </nav>
 
-    <section class="gallery-hero" id="inicio">
-        <div class="container">
-            <div class="hero-shell">
-                <div class="row g-4 align-items-end">
-                    <div class="col-lg-8">
-                        <span class="hero-badge"><i class="fas fa-camera-retro"></i> Mural de Fotos</span>
-                        <h1 class="hero-title">Momentos marcantes da comunidade</h1>
-                        <p class="hero-copy">Álbuns organizados por evento. Toque em uma foto para abrir e deslize para ver as próximas.</p>
-                    </div>
-                    <div class="col-lg-4">
-                        <div class="hero-stats">
-                            <div class="hero-stat">
-                                <strong><?= (int)$albumCount ?></strong>
-                                <span>Álbuns publicados</span>
-                            </div>
-                            <div class="hero-stat">
-                                <strong><?= (int)$highlightPhotosCount ?></strong>
-                                <span>Fotos em destaque</span>
-                            </div>
-                        </div>
-                    </div>
+    <div class="gallery-tabs-wrap">
+        <div class="gallery-tabs">
+            <a href="/galeria" class="gallery-tab is-active"><i class="fas fa-images"></i> Galeria de Fotos</a>
+            <a href="/mural-de-videos" class="gallery-tab"><i class="fas fa-clapperboard"></i> Mural de Vídeos</a>
+        </div>
+    </div>
+
+    <div class="container gallery-page-wrap">
+        <div class="gallery-header-card">
+            <nav class="gallery-breadcrumb"><a href="/">Início</a> › <strong>Galeria</strong></nav>
+            <div class="gallery-header-row">
+                <div>
+                    <h1>Galeria de Fotos</h1>
+                    <p>Reviva os melhores momentos da nossa igreja. Cada imagem conta uma história de fé, comunhão e celebração.</p>
+                </div>
+                <div class="gallery-header-meta">
+                    <span class="gallery-meta-text"><i class="far fa-calendar me-1"></i> <?= (int)$albumCount ?> <?= $albumCount === 1 ? 'álbum' : 'álbuns' ?><?= $yearRange !== '' ? ' • ' . htmlspecialchars($yearRange) : '' ?></span>
+                    <span class="gallery-meta-badge"><i class="fas fa-arrows-rotate"></i> Atualizado semanalmente</span>
                 </div>
             </div>
         </div>
-    </section>
 
-    <div class="albums-wrap" id="albuns">
-        <div class="container">
-        <?php if (empty($albums)): ?>
+        <?php if (empty($photosByYear)): ?>
             <div class="empty-state">
                 <i class="fas fa-images fa-3x mb-3" style="color: rgba(15,18,28,0.26);"></i>
                 <h3 class="h4 mb-2">Nenhum álbum publicado ainda.</h3>
                 <p class="mb-0">Assim que os álbuns forem publicados, as fotos vão aparecer aqui.</p>
             </div>
         <?php else: ?>
-            <?php foreach ($albums as $album): ?>
-                <?php
-                    $albumTitle = (string)($album['title'] ?? '');
-                    $albumLocation = (string)($album['location'] ?? '');
-                    $albumDescription = (string)($album['description'] ?? '');
-                    $albumDateRaw = (string)($album['event_date'] ?? '');
-                    $albumDate = $albumDateRaw !== '' ? date('d/m/Y', strtotime($albumDateRaw)) : '';
-                    $cover = '';
-                    if (!empty($album['photos']) && is_array($album['photos'])) {
-                        $first = $album['photos'][0] ?? null;
-                        if (is_array($first) && !empty($first['filename'])) {
-                            $cover = '/uploads/gallery/' . ltrim((string)$first['filename'], '/');
-                        }
-                    }
-                    $heroStyle = $cover !== '' ? ' style="background-image:url(\'' . htmlspecialchars($cover) . '\')"' : '';
-                    $heroClass = $cover !== '' ? 'album-hero has-cover' : 'album-hero';
-                ?>
-                <div class="album-card">
-                    <div class="<?= $heroClass ?>"<?= $heroStyle ?>>
-                        <h2 class="album-title"><?= htmlspecialchars($albumTitle) ?></h2>
-                        <div class="album-meta" aria-label="Informações do álbum">
-                            <?php if ($albumDate !== ''): ?>
-                                <span class="album-chip"><i class="far fa-calendar"></i><?= htmlspecialchars($albumDate) ?></span>
-                            <?php endif; ?>
-                            <?php if ($albumLocation !== ''): ?>
-                                <span class="album-chip"><i class="fas fa-location-dot"></i><?= htmlspecialchars($albumLocation) ?></span>
-                            <?php endif; ?>
-                        </div>
+            <div class="gallery-filters">
+                <button type="button" class="gallery-filter-pill is-active" data-gallery-filter="all">Todos <span class="count"><?= (int)$albumCount ?></span></button>
+                <?php foreach ($categories as $cat): ?>
+                    <?php if (($categoryCounts[$cat] ?? 0) === 0) continue; ?>
+                    <button type="button" class="gallery-filter-pill" data-gallery-filter="<?= htmlspecialchars($cat) ?>"><?= htmlspecialchars($cat) ?> <span class="count"><?= (int)$categoryCounts[$cat] ?></span></button>
+                <?php endforeach; ?>
+            </div>
+
+            <?php foreach ($photosByYear as $year => $yearPhotos): ?>
+                <div class="gallery-year-section" data-year-section>
+                    <div class="gallery-year-head">
+                        <span class="gallery-year-title"><?= (int)$year ?></span>
+                        <span class="gallery-year-line"></span>
+                        <span class="gallery-year-count" data-year-count><?= count($yearPhotos) ?> foto<?= count($yearPhotos) === 1 ? '' : 's' ?></span>
                     </div>
-                    <?php if ($albumDescription !== ''): ?>
-                        <div class="album-desc">
-                            <strong>Descrição:</strong> <?= htmlspecialchars($albumDescription) ?>
-                        </div>
-                    <?php endif; ?>
-                    <div class="photo-grid" aria-label="Fotos do álbum">
-                        <?php foreach (($album['photos'] ?? []) as $photo): ?>
-                            <?php $file = (string)($photo['filename'] ?? ''); ?>
-                            <?php if ($file === '') continue; ?>
-                            <?php $url = '/uploads/gallery/' . ltrim($file, '/'); ?>
-                            <div class="photo-item">
-                                <a href="<?= htmlspecialchars($url) ?>" data-lightbox="album-<?= (int)($album['id'] ?? 0) ?>" data-title="<?= htmlspecialchars($albumTitle) ?>">
-                                    <img src="<?= htmlspecialchars($url) ?>" alt="Foto do álbum">
-                                    <div class="photo-overlay" aria-hidden="true">
-                                        <i class="fas fa-magnifying-glass-plus fa-2x text-white"></i>
-                                    </div>
+                    <div class="gallery-photo-grid">
+                        <?php foreach ($yearPhotos as $photo): ?>
+                            <div class="gallery-photo-item" data-gallery-photo data-category="<?= htmlspecialchars($photo['category']) ?>">
+                                <a href="<?= htmlspecialchars($photo['url']) ?>" data-lightbox="gallery-<?= (int)$year ?>" data-title="<?= htmlspecialchars($photo['album_title']) ?>">
+                                    <img src="<?= htmlspecialchars($photo['url']) ?>" alt="<?= htmlspecialchars($photo['album_title'] ?: 'Foto da galeria') ?>" loading="lazy">
+                                    <?php if ($photo['is_first_of_album'] && $photo['album_title'] !== ''): ?>
+                                        <span class="gallery-photo-caption"><?= htmlspecialchars($photo['album_title']) ?></span>
+                                    <?php endif; ?>
                                 </a>
                             </div>
                         <?php endforeach; ?>
-                        <?php if (empty($album['photos'])): ?>
-                            <div class="empty-state" style="padding: 1.4rem 1.2rem; grid-column: 1 / -1;">
-                                <i class="fas fa-image fa-2x mb-2" style="color: rgba(15,18,28,0.26);"></i>
-                                <div class="fw-bold">Álbum sem fotos</div>
-                            </div>
-                        <?php endif; ?>
                     </div>
                 </div>
             <?php endforeach; ?>
+
+            <?php if ($totalPhotoCount > $galleryInitialLimit): ?>
+                <div class="text-center mt-2 mb-4">
+                    <button type="button" class="btn btn-outline-dark rounded-pill px-4" id="galleryLoadMoreBtn">Ver mais fotos</button>
+                </div>
+            <?php endif; ?>
         <?php endif; ?>
-        </div>
     </div>
 
     <?php include __DIR__ . '/partials/floating_faith_widget.php'; ?>
@@ -505,5 +365,61 @@ if (!empty($albums) && is_array($albums)) {
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/js/lightbox.min.js"></script>
+    <script>
+        (function () {
+            var INITIAL_LIMIT = <?= (int)$galleryInitialLimit ?>;
+            var state = { category: 'all', revealCount: INITIAL_LIMIT };
+
+            var pills = document.querySelectorAll('[data-gallery-filter]');
+            var photos = document.querySelectorAll('[data-gallery-photo]');
+            var yearSections = document.querySelectorAll('[data-year-section]');
+            var loadMoreBtn = document.getElementById('galleryLoadMoreBtn');
+
+            function applyFilters() {
+                var visibleIndex = 0;
+                photos.forEach(function (photo) {
+                    var matchesCategory = state.category === 'all' || photo.getAttribute('data-category') === state.category;
+                    var show = false;
+                    if (matchesCategory) {
+                        show = visibleIndex < state.revealCount;
+                        visibleIndex++;
+                    }
+                    photo.classList.toggle('is-hidden', !show);
+                });
+
+                yearSections.forEach(function (section) {
+                    var visiblePhotos = section.querySelectorAll('[data-gallery-photo]:not(.is-hidden)');
+                    section.style.display = visiblePhotos.length > 0 ? '' : 'none';
+                    var countEl = section.querySelector('[data-year-count]');
+                    if (countEl) {
+                        countEl.textContent = visiblePhotos.length + (visiblePhotos.length === 1 ? ' foto' : ' fotos');
+                    }
+                });
+
+                if (loadMoreBtn) {
+                    loadMoreBtn.style.display = visibleIndex > state.revealCount ? '' : 'none';
+                }
+            }
+
+            pills.forEach(function (pill) {
+                pill.addEventListener('click', function () {
+                    pills.forEach(function (p) { p.classList.remove('is-active'); });
+                    pill.classList.add('is-active');
+                    state.category = pill.getAttribute('data-gallery-filter');
+                    state.revealCount = INITIAL_LIMIT;
+                    applyFilters();
+                });
+            });
+
+            if (loadMoreBtn) {
+                loadMoreBtn.addEventListener('click', function () {
+                    state.revealCount = Infinity;
+                    applyFilters();
+                });
+            }
+
+            applyFilters();
+        })();
+    </script>
 </body>
 </html>

@@ -1327,6 +1327,16 @@ function getVideoWallCategories() {
     }
 }
 
+function getPhotoAlbumCategories() {
+    try {
+        $db = (new Database())->connect();
+        $names = $db->query('SELECT name FROM photo_album_categories ORDER BY name ASC')->fetchAll(PDO::FETCH_COLUMN);
+        return $names ?: ['Eventos'];
+    } catch (Throwable $e) {
+        return ['Cultos', 'Eventos', 'Batismos', 'Jovens', 'Casais'];
+    }
+}
+
 // Formats a naive "Y-m-d H:i:s" datetime (stored in the app's own
 // timezone, America/Sao_Paulo) as an ISO 8601 string with an explicit UTC
 // offset, so `new Date(...)` on the client resolves the same instant in
