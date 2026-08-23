@@ -53,7 +53,7 @@ $firstAndLastName = function ($name) {
             --text-dark: #333;
         }
         
-        body { font-family: '<?= explode(',', $site_settings['font_family'] ?? 'Poppins, sans-serif')[0] ?>', sans-serif; color: var(--text-dark); padding-bottom: 116px; }
+        body { font-family: '<?= explode(',', $site_settings['font_family'] ?? 'Poppins, sans-serif')[0] ?>', sans-serif; color: var(--text-dark); }
         
         /* Custom Colors */
         .text-gold { color: var(--primary-gold) !important; }
