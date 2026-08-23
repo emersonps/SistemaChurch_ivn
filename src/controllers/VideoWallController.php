@@ -211,10 +211,11 @@ class VideoWallController {
     public function publicIndex() {
         $db = (new Database())->connect();
         $category = trim((string)($_GET['category'] ?? ''));
+        $status = trim((string)($_GET['status'] ?? ''));
 
         $where = '';
         $params = [];
-        if ($category !== '') {
+        if ($status === '' && $category !== '') {
             $where = 'WHERE category = ?';
             $params[] = $category;
         }
@@ -223,10 +224,32 @@ class VideoWallController {
         $stmt->execute($params);
         $videos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+        // "Ao vivo"/"Encerrados" are computed from is_livestream + livestream_scheduled_at
+        // in PHP (not a SQL date filter, to stay driver-agnostic across mysql/sqlite) using
+        // the same 4h live window as the countdown/live/ended badge in
+        // views/partials/livestream_badge.php, so they stay in sync instead of needing
+        // manual categorization.
+        if ($status === 'ao_vivo' || $status === 'encerrado') {
+            $liveWindowSeconds = 4 * 3600;
+            $now = time();
+            $videos = array_values(array_filter($videos, function ($v) use ($status, $now, $liveWindowSeconds) {
+                if (empty($v['is_livestream']) || empty($v['livestream_scheduled_at'])) {
+                    return false;
+                }
+                $scheduled = strtotime($v['livestream_scheduled_at']);
+                if ($scheduled === false || $scheduled > $now) {
+                    return false;
+                }
+                $isLive = ($now - $scheduled) < $liveWindowSeconds;
+                return $status === 'ao_vivo' ? $isLive : !$isLive;
+            }));
+        }
+
         view('public/video_wall', [
             'videos' => $videos,
             'categories' => getVideoWallCategories(),
-            'selectedCategory' => $category,
+            'selectedCategory' => $status === '' ? $category : '',
+            'selectedStatus' => $status,
             'siteProfile' => getChurchSiteProfileSettings(),
         ]);
     }

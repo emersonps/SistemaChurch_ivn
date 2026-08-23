@@ -20,6 +20,14 @@ $siteProfile = getChurchSiteProfileSettings();
             background: #fff; color: #343a40; font-weight: 600; font-size: .85rem; text-decoration: none;
         }
         .vw-filter-pill.is-active { background: #212529; color: #fff; border-color: #212529; }
+        .vw-filter-divider { width: 1px; align-self: stretch; background: #dee2e6; margin: 0 .25rem; }
+        .vw-filter-pill.vw-filter-live { display: inline-flex; align-items: center; gap: .4rem; }
+        .vw-filter-pill.vw-filter-live::before {
+            content: ''; width: 7px; height: 7px; border-radius: 50%; background: #dc3545;
+        }
+        .vw-filter-pill.vw-filter-ended::before {
+            content: ''; width: 7px; height: 7px; border-radius: 50%; background: #adb5bd; display: inline-block; margin-right: .4rem;
+        }
         .vw-card {
             background: #fff; border-radius: 16px; overflow: hidden; height: 100%;
             box-shadow: 0 .5rem 1.5rem rgba(0,0,0,0.06); display: flex; flex-direction: column;
@@ -60,11 +68,15 @@ $siteProfile = getChurchSiteProfileSettings();
     </div>
 
     <div class="container">
+        <?php $selectedStatus = $selectedStatus ?? ''; ?>
         <div class="vw-filters">
-            <a href="/mural-de-videos" class="vw-filter-pill <?= $selectedCategory === '' ? 'is-active' : '' ?>">Todos</a>
+            <a href="/mural-de-videos" class="vw-filter-pill <?= ($selectedCategory === '' && $selectedStatus === '') ? 'is-active' : '' ?>">Todos</a>
             <?php foreach ($categories as $cat): ?>
                 <a href="/mural-de-videos?category=<?= urlencode($cat) ?>" class="vw-filter-pill <?= $selectedCategory === $cat ? 'is-active' : '' ?>"><?= htmlspecialchars($cat) ?></a>
             <?php endforeach; ?>
+            <span class="vw-filter-divider"></span>
+            <a href="/mural-de-videos?status=ao_vivo" class="vw-filter-pill vw-filter-live <?= $selectedStatus === 'ao_vivo' ? 'is-active' : '' ?>">Ao Vivo</a>
+            <a href="/mural-de-videos?status=encerrado" class="vw-filter-pill vw-filter-ended <?= $selectedStatus === 'encerrado' ? 'is-active' : '' ?>">Encerrados</a>
         </div>
 
         <?php if (empty($videos)): ?>
