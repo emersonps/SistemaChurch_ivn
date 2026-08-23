@@ -211,6 +211,18 @@ $footerNavItems = [
     .footer-bottom-made i {
         color: var(--primary-red);
     }
+    @media (max-width: 575.98px) {
+        .site-footer { text-align: center; }
+        .footer-brand { justify-content: center; }
+        .footer-tagline { margin-left: auto; margin-right: auto; }
+        .footer-since-badge { margin-left: auto; margin-right: auto; }
+        .footer-contact-item { justify-content: center; }
+        .footer-newsletter-form { max-width: 320px; margin-left: auto; margin-right: auto; }
+        .footer-social-row { justify-content: center; }
+        .footer-bottom { flex-direction: column; text-align: center; }
+        .footer-bottom-links { justify-content: center; }
+        .footer-bottom-made { justify-content: center; }
+    }
 </style>
 
 <footer id="contato" class="site-footer">
