@@ -1117,6 +1117,17 @@ $firstAndLastName = function ($name) {
             color: var(--primary-red);
             margin-top: .15rem;
         }
+        .flat-strip-card-date {
+            display: flex;
+            align-items: center;
+            gap: .4rem;
+            color: #9a8f92;
+            font-size: .78rem;
+            margin-bottom: .5rem;
+        }
+        .flat-strip-card-date i {
+            color: #9a8f92;
+        }
         .flat-strip-card-cta {
             margin-top: auto;
             display: inline-flex;
@@ -2330,7 +2341,7 @@ $firstAndLastName = function ($name) {
         <div class="container py-5">
             <?php if (empty($eventos)): ?>
                 <div class="flat-strip-head">
-                    <h2 class="section-title mb-0">Próximos eventos</h2>
+                    <span class="section-panel-kicker"><i class="fas fa-calendar-day"></i> Próximos eventos</span>
                 </div>
                 <div class="text-center">
                     <p class="text-muted">Nenhum evento próximo agendado.</p>
@@ -2339,7 +2350,7 @@ $firstAndLastName = function ($name) {
                 <?php $eventosDayAbbrev = ['Domingo' => 'DOM', 'Segunda' => 'SEG', 'Terça' => 'TER', 'Terca' => 'TER', 'Quarta' => 'QUA', 'Quinta' => 'QUI', 'Sexta' => 'SEX', 'Sábado' => 'SAB', 'Sabado' => 'SAB']; ?>
                 <div data-flat-strip-group>
                 <div class="flat-strip-head">
-                    <h2 class="section-title mb-0">Próximos eventos</h2>
+                    <span class="section-panel-kicker"><i class="fas fa-calendar-day"></i> Próximos eventos</span>
                     <div class="carousel-mini-nav">
                         <button type="button" class="carousel-mini-btn" data-flat-strip-scroll="prev" aria-label="Eventos anteriores"><i class="fas fa-chevron-left"></i></button>
                         <button type="button" class="carousel-mini-btn" data-flat-strip-scroll="next" aria-label="Próximos eventos"><i class="fas fa-chevron-right"></i></button>
@@ -2353,6 +2364,7 @@ $firstAndLastName = function ($name) {
                                 $firstBadge = $dateBadges[0] ?? null;
                                 $dayLabel = $firstBadge ? ($eventosDayAbbrev[$firstBadge['weekday']] ?? mb_strtoupper(mb_substr($firstBadge['weekday'], 0, 3))) : '—';
                                 $timeLabel = $firstBadge['time'] ?? '';
+                                $dateLabel = $firstBadge['date'] ?? '';
                             ?>
                             <div class="flat-strip-card">
                                 <div class="flat-strip-card-top">
@@ -2361,6 +2373,9 @@ $firstAndLastName = function ($name) {
                                         <span class="flat-strip-time-pill"><i class="far fa-clock"></i> <?= htmlspecialchars($timeLabel) ?></span>
                                     <?php endif; ?>
                                 </div>
+                                <?php if ($dateLabel !== ''): ?>
+                                    <div class="flat-strip-card-date"><i class="far fa-calendar"></i> <?= htmlspecialchars($dateLabel) ?></div>
+                                <?php endif; ?>
                                 <h4><?= htmlspecialchars($evento['title']) ?></h4>
                                 <?php if (!empty($evento['location'])): ?>
                                     <div class="flat-strip-card-location">
