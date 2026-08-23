@@ -1194,6 +1194,124 @@ $firstAndLastName = function ($name) {
             border-top: 1px solid rgba(0,0,0,0.08);
         }
 
+        .eventos-strip-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-bottom: 1.75rem;
+        }
+        .eventos-strip-shell {
+            position: relative;
+        }
+        .eventos-track {
+            display: flex;
+            gap: 1rem;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            scroll-behavior: smooth;
+            scrollbar-width: none;
+            padding-bottom: .25rem;
+        }
+        .eventos-track::-webkit-scrollbar {
+            display: none;
+        }
+        .eventos-card {
+            flex: 0 0 calc(25% - .75rem);
+            scroll-snap-align: start;
+            background: #fff;
+            border: 1px solid rgba(0,0,0,0.07);
+            border-radius: 18px;
+            padding: 1rem;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.04);
+            display: flex;
+            flex-direction: column;
+        }
+        .eventos-card-top {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: .6rem;
+            margin-bottom: .9rem;
+        }
+        .eventos-day-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 46px;
+            height: 46px;
+            padding: 0 .4rem;
+            border-radius: 14px;
+            background: var(--primary-red);
+            color: #fff;
+            font-weight: 800;
+            font-size: .82rem;
+            letter-spacing: .02em;
+        }
+        .eventos-time-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: .35rem;
+            padding: .32rem .65rem;
+            border-radius: 999px;
+            background: rgba(179,0,0,0.08);
+            color: var(--primary-red);
+            font-size: .78rem;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+        .eventos-card h4 {
+            font-size: 1rem;
+            font-weight: 800;
+            color: #2d1a21;
+            margin-bottom: .5rem;
+        }
+        .eventos-card-location {
+            display: flex;
+            align-items: flex-start;
+            gap: .4rem;
+            color: #6b7280;
+            font-size: .84rem;
+            margin-bottom: .9rem;
+        }
+        .eventos-card-location i {
+            color: var(--primary-red);
+            margin-top: .15rem;
+        }
+        .eventos-card-cta {
+            margin-top: auto;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: .5rem;
+            width: 100%;
+            border: 1px solid rgba(0,0,0,0.12);
+            border-radius: 999px;
+            padding: .55rem .9rem;
+            background: #fff;
+            color: #2d1a21;
+            font-weight: 700;
+            font-size: .84rem;
+            text-decoration: none;
+            transition: background .16s ease, border-color .16s ease;
+        }
+        .eventos-card-cta:hover {
+            background: #f8f9fa;
+            border-color: rgba(0,0,0,0.2);
+            color: #2d1a21;
+        }
+        @media (max-width: 991.98px) {
+            .eventos-card {
+                flex: 0 0 calc(50% - .5rem);
+            }
+        }
+        @media (max-width: 575.98px) {
+            .eventos-card {
+                flex: 0 0 82%;
+            }
+        }
+
         /* Footer */
         .footer { 
             background: #1a1a1a; 
@@ -2029,7 +2147,6 @@ $firstAndLastName = function ($name) {
                                             <span id="heroCountdownTotal"><?= (int)count($countdownCultos) ?></span>
                                         </div>
                                     </div>
-                                    <div class="hero-countdown-subtitle">Role para o lado para ver mais informações.</div>
                                 </div>
                             </div>
                             <div class="countdown-carousel">
@@ -2176,7 +2293,6 @@ $firstAndLastName = function ($name) {
                                     <button type="button" class="section-carousel-btn next carousel-mini-btn" aria-label="Próximo quadro das atualizações"><i class="fas fa-chevron-right"></i></button>
                                 </div>
                             </div>
-                            <p class="text-muted small mb-0 mt-2">Role para o lado para ver mais informações.</p>
                         </div>
                         <div class="panel-soft-body">
                         <div class="section-carousel js-section-carousel section-carousel-inline">
@@ -2390,7 +2506,6 @@ $firstAndLastName = function ($name) {
             <div class="text-center mb-5">
                 <h2 class="section-title">Nossos Cultos</h2>
                 <p class="text-muted">Participe das nossas celebrações semanais</p>
-                <p class="text-muted small mb-0">Role para o lado para ver mais informações.</p>
             </div>
 
             <?php
@@ -2513,157 +2628,66 @@ $firstAndLastName = function ($name) {
     <!-- Events Section -->
     <section id="eventos" class="py-5">
         <div class="container py-5">
-            <div class="text-center mb-5">
-                <h2 class="section-title">Próximos Eventos</h2>
-                <p class="text-muted">Fique por dentro da nossa agenda</p>
-                <p class="text-muted small mb-0">Role para o lado para ver mais informações.</p>
-            </div>
-            
-            <?php
-            // Agrupar eventos por congregação
-            $eventosPorCongregacao = [];
-            foreach ($eventos as $e) {
-                $loc = !empty($e['location']) ? $e['location'] : 'Geral';
-                if (!isset($eventosPorCongregacao[$loc])) {
-                    $eventosPorCongregacao[$loc] = [];
-                }
-                $eventosPorCongregacao[$loc][] = $e;
-            }
-            ksort($eventosPorCongregacao); // Ordenar alfabeticamente
-            
-            // Mover Sede para o início
-            if (isset($eventosPorCongregacao['Sede'])) {
-                $sede = $eventosPorCongregacao['Sede'];
-                unset($eventosPorCongregacao['Sede']);
-                $eventosPorCongregacao = array_merge(['Sede' => $sede], $eventosPorCongregacao);
-            }
-            ?>
-
-            <?php if (empty($eventosPorCongregacao)): ?>
+            <?php if (empty($eventos)): ?>
+                <div class="eventos-strip-head">
+                    <h2 class="section-title mb-0">Próximos eventos</h2>
+                </div>
                 <div class="text-center">
                     <p class="text-muted">Nenhum evento próximo agendado.</p>
                 </div>
             <?php else: ?>
-                <?php $eventosTotalSlides = count($eventosPorCongregacao); $eventosSlideIndex = 0; ?>
-                <div class="section-carousel-shell" data-carousel-group>
-                    <div class="section-carousel js-section-carousel">
-                        <div class="section-carousel-track">
-                            <?php foreach ($eventosPorCongregacao as $congregacao => $items): ?>
-                                <div class="section-carousel-slide">
-                                    <div class="section-panel-card">
-                                        <div class="section-panel-head">
-                                            <div class="section-panel-head-top">
-                                                <span class="section-panel-kicker"><i class="fas fa-calendar-days"></i> Eventos</span>
-                                                <?php if ($eventosTotalSlides > 1): ?>
-                                                    <div class="carousel-mini-nav">
-                                                        <span class="carousel-mini-progress"><span class="carousel-mini-progress-bar" style="width: <?= round((($eventosSlideIndex + 1) / $eventosTotalSlides) * 100) ?>%"></span></span>
-                                                        <span class="carousel-counter"><?= $eventosSlideIndex + 1 ?> / <?= $eventosTotalSlides ?></span>
-                                                        <button type="button" class="section-carousel-btn prev carousel-mini-btn" aria-label="Congregação anterior"><i class="fas fa-chevron-left"></i></button>
-                                                        <button type="button" class="section-carousel-btn next carousel-mini-btn" aria-label="Próxima congregação"><i class="fas fa-chevron-right"></i></button>
+                <?php $eventosDayAbbrev = ['Domingo' => 'DOM', 'Segunda' => 'SEG', 'Terça' => 'TER', 'Terca' => 'TER', 'Quarta' => 'QUA', 'Quinta' => 'QUI', 'Sexta' => 'SEX', 'Sábado' => 'SAB', 'Sabado' => 'SAB']; ?>
+                <div class="eventos-strip-head">
+                    <h2 class="section-title mb-0">Próximos eventos</h2>
+                    <div class="carousel-mini-nav" data-eventos-nav>
+                        <button type="button" class="carousel-mini-btn" data-eventos-scroll="prev" aria-label="Eventos anteriores"><i class="fas fa-chevron-left"></i></button>
+                        <button type="button" class="carousel-mini-btn" data-eventos-scroll="next" aria-label="Próximos eventos"><i class="fas fa-chevron-right"></i></button>
+                    </div>
+                </div>
+                <div class="eventos-strip-shell">
+                    <div class="eventos-track" id="eventosTrack">
+                        <?php foreach ($eventos as $evento): ?>
+                            <?php
+                                $dateBadges = eventGetDateBadges($evento);
+                                $firstBadge = $dateBadges[0] ?? null;
+                                $dayLabel = $firstBadge ? ($eventosDayAbbrev[$firstBadge['weekday']] ?? mb_strtoupper(mb_substr($firstBadge['weekday'], 0, 3))) : '—';
+                                $timeLabel = $firstBadge['time'] ?? '';
+                            ?>
+                            <div class="eventos-card">
+                                <div class="eventos-card-top">
+                                    <span class="eventos-day-badge"><?= htmlspecialchars($dayLabel) ?></span>
+                                    <?php if ($timeLabel !== ''): ?>
+                                        <span class="eventos-time-pill"><i class="far fa-clock"></i> <?= htmlspecialchars($timeLabel) ?></span>
+                                    <?php endif; ?>
+                                </div>
+                                <h4><?= htmlspecialchars($evento['title']) ?></h4>
+                                <?php if (!empty($evento['location'])): ?>
+                                    <div class="eventos-card-location">
+                                        <i class="fas fa-location-dot"></i>
+                                        <span><?= htmlspecialchars($evento['location']) ?></span>
+                                    </div>
+                                <?php endif; ?>
+                                <?php if (!empty($evento['banner_path'])): ?>
+                                    <button type="button" class="eventos-card-cta" data-bs-toggle="modal" data-bs-target="#bannerModal<?= $evento['id'] ?>">
+                                        <i class="fas fa-image"></i> Ver convite
+                                    </button>
+                                    <div class="modal fade" id="bannerModal<?= $evento['id'] ?>" tabindex="-1" aria-hidden="true">
+                                        <div class="modal-dialog modal-lg modal-dialog-centered">
+                                            <div class="modal-content bg-transparent border-0">
+                                                <div class="modal-body p-0 position-relative text-center">
+                                                    <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-3" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    <img src="<?= $evento['banner_path'] ?>" class="img-fluid rounded shadow-lg" alt="<?= htmlspecialchars($evento['title']) ?>">
+                                                    <div class="mt-2">
+                                                        <a href="<?= $evento['banner_path'] ?>" download class="btn btn-light btn-sm"><i class="fas fa-download me-2"></i> Baixar Convite</a>
                                                     </div>
-                                                <?php endif; ?>
-                                            </div>
-                                            <h3><?= htmlspecialchars($congregacao) ?></h3>
-                                            <p>Role para ver eventos de outras congregações.</p>
-                                        </div>
-                                        <div class="section-panel-body">
-                                            <div class="section-panel-grid">
-                                                <?php foreach ($items as $evento): ?>
-                                                    <div class="card event-card shadow-sm h-100 border-0 overflow-hidden">
-                                                        <?php if (!empty($evento['banner_path'])): ?>
-                                                            <div class="position-relative">
-                                                                <div class="card-img-top bg-light d-flex align-items-center justify-content-center text-muted overflow-hidden" style="height: 180px;">
-                                                                    <img src="<?= $evento['banner_path'] ?>" class="w-100 h-100" style="object-fit: cover; filter: blur(2px); opacity: 0.8;" alt="Thumbnail">
-                                                                    <div class="position-absolute top-50 start-50 translate-middle">
-                                                                        <button type="button" class="btn btn-primary rounded-pill shadow-sm px-4" data-bs-toggle="modal" data-bs-target="#bannerModal<?= $evento['id'] ?>">
-                                                                            <i class="fas fa-image me-2"></i> Ver Banner
-                                                                        </button>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        <?php endif; ?>
-                                                        <div class="card-body p-4">
-                                                            <div class="d-flex justify-content-between align-items-start">
-                                                                <div>
-                                                                    <h5 class="card-title fw-bold text-dark"><?= htmlspecialchars($evento['title']) ?></h5>
-                                                                    <?php $dateBadges = eventGetDateBadges($evento); ?>
-                                                                    <?php if (empty($dateBadges)): ?>
-                                                                        <?php if (!empty($evento['recurring_days'])): ?>
-                                                                            <?php $recurring = json_decode($evento['recurring_days'], true); ?>
-                                                                            <?php if (is_array($recurring) && !empty($recurring)): ?>
-                                                                                <div class="mt-2 d-flex flex-wrap gap-2">
-                                                                                    <span class="badge bg-light text-dark border">
-                                                                                        <i class="fas fa-redo me-1 text-gold"></i> <?= htmlspecialchars(implode(', ', $recurring)) ?>
-                                                                                    </span>
-                                                                                </div>
-                                                                            <?php else: ?>
-                                                                                <h6 class="card-subtitle mb-2 text-muted mt-2">
-                                                                                    <i class="far fa-calendar-alt me-1 text-gold"></i> Data a confirmar
-                                                                                </h6>
-                                                                            <?php endif; ?>
-                                                                        <?php else: ?>
-                                                                            <h6 class="card-subtitle mb-2 text-muted mt-2">
-                                                                                <i class="far fa-calendar-alt me-1 text-gold"></i> Data a confirmar
-                                                                            </h6>
-                                                                        <?php endif; ?>
-                                                                    <?php else: ?>
-                                                                        <div class="mt-2 d-flex flex-wrap gap-2">
-                                                                            <?php foreach ($dateBadges as $b): ?>
-                                                                                <span class="d-inline-flex align-items-center gap-2 flex-nowrap" style="white-space:nowrap;">
-                                                                                    <span class="badge rounded-pill bg-gold text-dark shadow-sm text-nowrap">
-                                                                                        <i class="far fa-calendar-alt me-1"></i><?= htmlspecialchars(($b['weekday'] ?? '') . ' • ' . ($b['date'] ?? '')) ?>
-                                                                                    </span>
-                                                                                    <?php if (!empty($b['time'])): ?>
-                                                                                        <span class="badge rounded-pill bg-gold text-dark shadow-sm text-nowrap">
-                                                                                            <i class="far fa-clock me-1"></i><?= htmlspecialchars($b['time']) ?>
-                                                                                        </span>
-                                                                                    <?php endif; ?>
-                                                                                </span>
-                                                                            <?php endforeach; ?>
-                                                                        </div>
-                                                                    <?php endif; ?>
-                                                                </div>
-                                                                <span class="badge rounded-pill bg-primary text-white"><?= ucfirst($evento['type']) ?></span>
-                                                            </div>
-                                                            <p class="card-text mt-3 text-secondary"><?= htmlspecialchars($evento['description']) ?></p>
-                                                            <div class="small fw-bold text-gold mt-2">Esperamos por você!</div>
-                                                            <?php if (!empty($evento['location']) && $evento['location'] !== $congregacao): ?>
-                                                                <p class="card-text mt-3 pt-3 border-top"><small class="text-muted"><i class="fas fa-map-marker-alt text-danger me-1"></i> <?= htmlspecialchars($evento['location']) ?></small></p>
-                                                            <?php endif; ?>
-                                                        </div>
-                                                    </div>
-
-                                                    <?php if (!empty($evento['banner_path'])): ?>
-                                                    <div class="modal fade" id="bannerModal<?= $evento['id'] ?>" tabindex="-1" aria-hidden="true">
-                                                        <div class="modal-dialog modal-lg modal-dialog-centered">
-                                                            <div class="modal-content bg-transparent border-0">
-                                                                <div class="modal-body p-0 position-relative text-center">
-                                                                    <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-3" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                                    <img src="<?= $evento['banner_path'] ?>" class="img-fluid rounded shadow-lg" alt="<?= htmlspecialchars($evento['title']) ?>">
-                                                                    <div class="mt-2">
-                                                                        <a href="<?= $evento['banner_path'] ?>" download class="btn btn-light btn-sm"><i class="fas fa-download me-2"></i> Baixar Banner</a>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <?php endif; ?>
-                                                <?php endforeach; ?>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                                <?php $eventosSlideIndex++; ?>
-                            <?php endforeach; ?>
-                        </div>
+                                <?php endif; ?>
+                            </div>
+                        <?php endforeach; ?>
                     </div>
-                    <?php if ($eventosTotalSlides > 1): ?>
-                        <div class="carousel-dots">
-                            <?php for ($d = 0; $d < $eventosTotalSlides; $d++): ?>
-                                <button type="button" class="carousel-dot<?= $d === 0 ? ' is-active' : '' ?>" data-section-dot="<?= $d ?>" aria-label="Ir para congregação <?= $d + 1 ?>"></button>
-                            <?php endfor; ?>
-                        </div>
-                    <?php endif; ?>
                 </div>
             <?php endif; ?>
         </div>
@@ -2675,7 +2699,6 @@ $firstAndLastName = function ($name) {
             <div class="text-center mb-5">
                 <h2 class="section-title">Convites</h2>
                 <p class="text-muted">Você é nosso convidado de honra</p>
-                <p class="text-muted small mb-0">Role para o lado para ver mais informações.</p>
             </div>
 
             <?php
@@ -2821,7 +2844,6 @@ $firstAndLastName = function ($name) {
             <div class="text-center mb-5">
                 <h2 class="section-title">Nossas Congregações</h2>
                 <p class="text-muted">Encontre uma de nossas igrejas</p>
-                <p class="text-muted small mb-0">Role para o lado para ver mais informações.</p>
             </div>
             <?php if (empty($congregacoes)): ?>
                 <div class="text-center">
@@ -3579,6 +3601,50 @@ $firstAndLastName = function ($name) {
 
                 updateUI();
             });
+
+            (function () {
+                const track = document.getElementById('eventosTrack');
+                const nav = document.querySelector('[data-eventos-nav]');
+                if (!track || !nav) return;
+
+                const prevBtn = nav.querySelector('[data-eventos-scroll="prev"]');
+                const nextBtn = nav.querySelector('[data-eventos-scroll="next"]');
+
+                function scrollAmount() {
+                    const card = track.querySelector('.eventos-card');
+                    return card ? card.getBoundingClientRect().width + 16 : track.clientWidth * 0.8;
+                }
+
+                function updateButtons() {
+                    const maxScroll = track.scrollWidth - track.clientWidth - 1;
+                    if (prevBtn) prevBtn.disabled = track.scrollLeft <= 0;
+                    if (nextBtn) nextBtn.disabled = track.scrollLeft >= maxScroll;
+                }
+
+                let rafId = 0;
+                track.addEventListener('scroll', function () {
+                    if (rafId) return;
+                    rafId = window.requestAnimationFrame(function () {
+                        rafId = 0;
+                        updateButtons();
+                    });
+                }, { passive: true });
+
+                if (prevBtn) {
+                    prevBtn.addEventListener('click', function () {
+                        track.scrollBy({ left: -scrollAmount(), behavior: 'smooth' });
+                        window.setTimeout(updateButtons, 250);
+                    });
+                }
+                if (nextBtn) {
+                    nextBtn.addEventListener('click', function () {
+                        track.scrollBy({ left: scrollAmount(), behavior: 'smooth' });
+                        window.setTimeout(updateButtons, 250);
+                    });
+                }
+
+                updateButtons();
+            })();
 
             if (bsCollapse) {
                 navLinks.forEach((l) => {
