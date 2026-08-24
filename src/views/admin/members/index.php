@@ -287,6 +287,7 @@ $hasMultipleCongregations = count($groupedMembers) > 1;
                         <th>Cargo</th>
                         <th class="d-none d-md-table-cell">Telefone</th>
                         <th class="d-none d-md-table-cell">Status</th>
+                        <th class="d-none d-md-table-cell">Criado em</th>
                         <th class="text-end">Ações</th>
                     </tr>
                 </thead>
@@ -327,6 +328,7 @@ $hasMultipleCongregations = count($groupedMembers) > 1;
                                 <?= $statusLabel ?>
                             </span>
                         </td>
+                        <td class="align-middle d-none d-md-table-cell small text-muted"><?= !empty($member['created_at']) ? date('d/m/Y H:i', strtotime($member['created_at'])) : '—' ?></td>
                         <td class="align-middle text-end">
                             <a href="/admin/members/show/<?= $member['id'] ?>" class="btn btn-sm btn-outline-primary rounded-pill" title="Ficha">
                                 <i class="fas fa-user me-1"></i> Ficha
@@ -370,7 +372,7 @@ $hasMultipleCongregations = count($groupedMembers) > 1;
             info: true,
             pagingType: 'full_numbers',
             columnDefs: [
-                { orderable: false, targets: [0, 5] } // Não ordenar por Foto (0) e Ações (5)
+                { orderable: false, targets: [0, 6] } // Não ordenar por Foto (0) e Ações (6)
             ]
         });
 

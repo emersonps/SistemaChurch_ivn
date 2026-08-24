@@ -145,6 +145,7 @@
                         <?php foreach ($natures as $nature): ?>
                             <form method="POST" action="/admin/financial/chart-account-natures/update/<?= $nature['id'] ?>" class="nature-row btn-delete-nature-form" data-name="<?= htmlspecialchars($nature['name']) ?>">
                                 <?= csrf_field() ?>
+                                <div class="small text-muted mb-2"><i class="far fa-clock me-1"></i>Criado em <?= !empty($nature['created_at']) ? date('d/m/Y H:i', strtotime($nature['created_at'])) : '—' ?></div>
                                 <div class="row g-2 align-items-end">
                                     <div class="col-md-4">
                                         <label class="form-label">Nome</label>

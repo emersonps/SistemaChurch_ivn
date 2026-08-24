@@ -279,6 +279,7 @@ $hasMultipleCongregations = $tabTotal > 1;
                         <th>Categoria</th>
                         <th>Descrição</th>
                         <th>Valor</th>
+                        <th>Criado em</th>
                         <th class="text-end">Ações</th>
                     </tr>
                 </thead>
@@ -294,6 +295,7 @@ $hasMultipleCongregations = $tabTotal > 1;
                             </td>
                             <td><?= htmlspecialchars($e['description']) ?></td>
                             <td class="text-danger fw-bold" data-sort="<?= $e['amount'] ?>">- R$ <?= number_format($e['amount'], 2, ',', '.') ?></td>
+                            <td class="small text-muted" data-sort="<?= htmlspecialchars($e['created_at'] ?? '') ?>"><?= !empty($e['created_at']) ? date('d/m/Y H:i', strtotime($e['created_at'])) : '—' ?></td>
                             <td class="text-end">
                                 <a href="/admin/expenses/edit/<?= $e['id'] ?>" class="btn btn-sm btn-outline-primary icon-btn" title="Editar">
                                     <i class="fas fa-edit"></i>

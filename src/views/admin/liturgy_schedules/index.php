@@ -71,6 +71,7 @@
                         <th>Período</th>
                         <th>Cultos</th>
                         <th>Próximo</th>
+                        <th>Criado em</th>
                         <th class="text-end">Ações</th>
                     </tr>
                 </thead>
@@ -84,6 +85,7 @@
                             <td><?= htmlspecialchars($periodLabels[$s['period_type']] ?? $s['period_type']) ?></td>
                             <td><?= (int)$s['entries_count'] ?></td>
                             <td class="small text-muted"><?= $s['next_date'] ? date('d/m/Y', strtotime($s['next_date'])) : '-' ?></td>
+                            <td class="small text-muted"><?= !empty($s['created_at']) ? date('d/m/Y H:i', strtotime($s['created_at'])) : '—' ?></td>
                             <td class="text-end">
                                 <a href="/admin/liturgy-schedules/edit/<?= (int)$s['id'] ?>" class="btn btn-sm btn-outline-primary">Abrir</a>
                                 <form action="/admin/liturgy-schedules/delete/<?= (int)$s['id'] ?>" method="POST" class="d-inline" onsubmit="return confirm('Excluir esta escala definitivamente?');">

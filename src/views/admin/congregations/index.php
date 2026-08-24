@@ -67,6 +67,7 @@
                     <th>Dirigente</th>
                     <th>Telefone</th>
                     <th>Data Abertura</th>
+                    <th>Criado em</th>
                     <th class="text-end">Ações</th>
                 </tr>
             </thead>
@@ -83,6 +84,7 @@
                         <td><?= htmlspecialchars($c['leader_name'] ?? 'N/A') ?></td>
                         <td><?= htmlspecialchars($c['phone'] ?? 'N/A') ?></td>
                         <td><?= $c['opening_date'] ? date('d/m/Y', strtotime($c['opening_date'])) : 'N/A' ?></td>
+                        <td class="small text-muted"><?= !empty($c['created_at']) ? date('d/m/Y H:i', strtotime($c['created_at'])) : '—' ?></td>
                         <td class="text-end">
                             <a href="/admin/members?congregation_id=<?= $c['id'] ?>" class="btn btn-sm btn-outline-primary icon-btn" title="Ver Membros">
                                 <i class="fas fa-users"></i>

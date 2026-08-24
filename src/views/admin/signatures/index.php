@@ -84,6 +84,8 @@
                     <?php endif; ?>
                 </div>
 
+                <div class="small text-muted mb-2"><i class="far fa-clock me-1"></i>Atualizado em <?= !empty($sig['updated_at']) ? date('d/m/Y H:i', strtotime($sig['updated_at'])) : '—' ?></div>
+
                 <div class="d-flex justify-content-center gap-2">
                     <button class="btn btn-sm btn-outline-secondary rounded-pill fw-semibold px-3"
                             onclick="editSignature(<?= $sig['id'] ?>, '<?= htmlspecialchars($sig['slug']) ?>', '<?= htmlspecialchars($sig['role_label']) ?>', '<?= htmlspecialchars($sig['name']) ?>', '<?= htmlspecialchars($sig['document_types'] ?? '') ?>')">

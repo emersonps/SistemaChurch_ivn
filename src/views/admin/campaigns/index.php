@@ -93,6 +93,7 @@
                         <span>R$ <?= number_format((float)$campaign['progress']['raised'], 2, ',', '.') ?> arrecadado</span>
                         <span><?= (int)round($campaign['progress']['percent']) ?>%</span>
                     </div>
+                    <div class="text-muted small mb-3"><i class="far fa-clock me-1"></i>Criado em <?= !empty($campaign['created_at']) ? date('d/m/Y H:i', strtotime($campaign['created_at'])) : '—' ?></div>
                     <div class="d-flex gap-2">
                         <a href="/admin/campaigns/<?= (int)$campaign['id'] ?>" class="btn btn-sm btn-outline-primary flex-fill">
                             <i class="fas fa-users me-1"></i> Participantes

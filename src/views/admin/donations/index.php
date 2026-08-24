@@ -114,12 +114,13 @@
                     <th>Chave PIX</th>
                     <th>Tipo</th>
                     <th>Status</th>
+                    <th>Criado em</th>
                     <th class="text-end">Ações</th>
                 </tr>
             </thead>
             <tbody>
                 <?php if (empty($accounts)): ?>
-                    <tr><td colspan="7" class="text-center py-4 text-muted">Nenhuma conta cadastrada ainda. Clique em "Nova Conta/Chave PIX" para começar.</td></tr>
+                    <tr><td colspan="8" class="text-center py-4 text-muted">Nenhuma conta cadastrada ainda. Clique em "Nova Conta/Chave PIX" para começar.</td></tr>
                 <?php else: ?>
                     <?php foreach ($accounts as $a): ?>
                         <tr>
@@ -133,6 +134,7 @@
                                     <?= $a['status'] === 'active' ? 'Ativa' : 'Inativa' ?>
                                 </span>
                             </td>
+                            <td class="small text-muted"><?= !empty($a['created_at']) ? date('d/m/Y H:i', strtotime($a['created_at'])) : '—' ?></td>
                             <td class="text-end">
                                 <?php if (hasPermission('donations.manage')): ?>
                                 <a href="/admin/donations/edit/<?= $a['id'] ?>" class="btn btn-sm btn-outline-secondary icon-btn" title="Editar">

@@ -38,6 +38,7 @@
                         <th>Congregação</th>
                         <th>Papéis</th>
                         <th>Escalas criadas</th>
+                        <th>Criado em</th>
                         <th class="text-end">Ações</th>
                     </tr>
                 </thead>
@@ -49,6 +50,7 @@
                             <td><?= htmlspecialchars($t['congregation_name'] ?? 'Todas') ?></td>
                             <td class="small text-muted"><?= htmlspecialchars(implode(', ', array_column($roles, 'label'))) ?></td>
                             <td><?= (int)$t['schedules_count'] ?></td>
+                            <td class="small text-muted"><?= !empty($t['created_at']) ? date('d/m/Y H:i', strtotime($t['created_at'])) : '—' ?></td>
                             <td class="text-end">
                                 <a href="/admin/liturgy-schedules/templates/edit/<?= (int)$t['id'] ?>" class="btn btn-sm btn-outline-secondary icon-btn"><i class="fas fa-pen"></i></a>
                                 <?php if ((int)$t['schedules_count'] === 0): ?>

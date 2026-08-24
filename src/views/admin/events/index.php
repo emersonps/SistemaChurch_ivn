@@ -271,6 +271,7 @@ $now = new DateTimeImmutable('now');
                             <th>Título</th>
                             <th>Local</th>
                             <th>Status</th>
+                            <th>Criado em</th>
                             <th class="text-end">Ações</th>
                         </tr>
                     </thead>
@@ -307,6 +308,7 @@ $now = new DateTimeImmutable('now');
                                         <?= (($e['status'] ?? 'active') == 'active') ? 'Ativo' : 'Inativo' ?>
                                     </span>
                                 </td>
+                                <td class="small text-muted"><?= !empty($e['created_at']) ? date('d/m/Y H:i', strtotime($e['created_at'])) : '—' ?></td>
                                 <td class="text-end">
                                     <a href="/admin/events/edit/<?= $e['id'] ?>" class="btn btn-sm btn-outline-secondary icon-btn" title="Editar">
                                         <i class="fas fa-edit"></i>
@@ -363,7 +365,7 @@ $now = new DateTimeImmutable('now');
             info: true,
             pagingType: 'full_numbers',
             columnDefs: [
-                { orderable: false, targets: [4] } // Não ordenar ações
+                { orderable: false, targets: [5] } // Não ordenar ações
             ]
         });
 

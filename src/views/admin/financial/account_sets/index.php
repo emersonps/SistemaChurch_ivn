@@ -156,12 +156,13 @@
                             <th>Escopo</th>
                             <th>Status</th>
                             <th>Padrão</th>
+                            <th>Criado em</th>
                             <th class="text-end">Ações</th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php if (empty($sets)): ?>
-                            <tr><td colspan="5" class="text-center py-4 text-muted">Nenhum Plano cadastrado.</td></tr>
+                            <tr><td colspan="6" class="text-center py-4 text-muted">Nenhum Plano cadastrado.</td></tr>
                         <?php else: ?>
                             <?php foreach (($sets ?? []) as $s): ?>
                                 <tr>
@@ -176,6 +177,7 @@
                                     </td>
                                     <td><span class="status-pill status-<?= $s['active'] ? 'active' : 'inactive' ?>"><?= $s['active'] ? 'Ativo' : 'Inativo' ?></span></td>
                                     <td><?php if ($s['is_default']): ?><span class="default-pill">Padrão</span><?php endif; ?></td>
+                                    <td class="small text-muted"><?= !empty($s['created_at']) ? date('d/m/Y H:i', strtotime($s['created_at'])) : '—' ?></td>
                                     <td class="text-end">
                                         <a href="/admin/financial/account-sets/edit/<?= $s['id'] ?>" class="btn btn-sm btn-outline-primary icon-btn" title="Editar">
                                             <i class="fas fa-edit"></i>

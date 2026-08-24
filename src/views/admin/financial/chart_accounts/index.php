@@ -120,12 +120,13 @@ $typeIcons = ['asset' => 'fa-arrow-up', 'liability' => 'fa-arrow-down', 'income'
                     <th>Natureza</th>
                     <th>Estrutura</th>
                     <th>Status</th>
+                    <th>Criado em</th>
                     <th class="text-end">Ações</th>
                 </tr>
             </thead>
             <tbody>
                 <?php if (empty($accounts)): ?>
-                    <tr><td colspan="6" class="text-center py-4 text-muted">Nenhuma conta contábil cadastrada.</td></tr>
+                    <tr><td colspan="7" class="text-center py-4 text-muted">Nenhuma conta contábil cadastrada.</td></tr>
                 <?php else: ?>
                     <?php foreach ($accounts as $acc):
                         $level = substr_count($acc['code'], '.');
@@ -151,6 +152,7 @@ $typeIcons = ['asset' => 'fa-arrow-up', 'liability' => 'fa-arrow-down', 'income'
                                 <?php endif; ?>
                             </td>
                             <td><span class="status-pill status-<?= $acc['status'] ?>"><?= $acc['status'] === 'active' ? 'Ativa' : 'Inativa' ?></span></td>
+                            <td class="small text-muted"><?= !empty($acc['created_at']) ? date('d/m/Y H:i', strtotime($acc['created_at'])) : '—' ?></td>
                             <td class="text-end">
                                 <a href="/admin/financial/chart-accounts/edit/<?= $acc['id'] ?>" class="btn btn-sm btn-outline-primary icon-btn" title="Editar">
                                     <i class="fas fa-edit"></i>

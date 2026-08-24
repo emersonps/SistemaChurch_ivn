@@ -92,12 +92,13 @@
                     <th>Título</th>
                     <th>Link</th>
                     <th>Status</th>
+                    <th>Criado em</th>
                     <th class="text-end">Ações</th>
                 </tr>
             </thead>
             <tbody>
                 <?php if (empty($banners)): ?>
-                    <tr><td colspan="6" class="text-center py-4 text-muted">Nenhum banner cadastrado.</td></tr>
+                    <tr><td colspan="7" class="text-center py-4 text-muted">Nenhum banner cadastrado.</td></tr>
                 <?php else: ?>
                     <?php foreach ($banners as $b): ?>
                         <tr>
@@ -112,6 +113,7 @@
                                     <?= $b['active'] ? 'Ativo' : 'Inativo' ?>
                                 </span>
                             </td>
+                            <td class="small text-muted"><?= !empty($b['created_at']) ? date('d/m/Y H:i', strtotime($b['created_at'])) : '—' ?></td>
                             <td class="text-end">
                                 <a href="/admin/banners/edit/<?= $b['id'] ?>" class="btn btn-sm btn-outline-secondary icon-btn" title="Editar">
                                     <i class="fas fa-edit"></i>

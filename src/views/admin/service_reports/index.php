@@ -207,6 +207,7 @@ $hasMultipleCongregations = $tabTotal > 1;
                             <th>Dirigente</th>
                             <th>Total Pessoas</th>
                             <th>Criado por</th>
+                            <th>Criado em</th>
                             <th class="text-end">Ações</th>
                         </tr>
                     </thead>
@@ -218,6 +219,7 @@ $hasMultipleCongregations = $tabTotal > 1;
                                 <td><?= htmlspecialchars($r['leader_name']) ?></td>
                                 <td><span class="count-pill"><i class="fas fa-users"></i> <?= $r['total_attendance'] ?></span></td>
                                 <td class="small text-muted"><?= htmlspecialchars($r['creator_name']) ?></td>
+                                <td class="small text-muted"><?= !empty($r['created_at']) ? date('d/m/Y H:i', strtotime($r['created_at'])) : '—' ?></td>
                                 <td class="text-end">
                                     <button type="button" class="btn btn-sm btn-outline-info icon-btn" onclick="showVisitors(<?= $r['id'] ?>)" title="Ver Visitantes">
                                         <i class="fas fa-users"></i>
@@ -271,7 +273,7 @@ $hasMultipleCongregations = $tabTotal > 1;
             info: true,
             pagingType: 'full_numbers',
             columnDefs: [
-                { orderable: false, targets: [5] } // Não ordenar ações
+                { orderable: false, targets: [6] } // Não ordenar ações
             ]
         });
 

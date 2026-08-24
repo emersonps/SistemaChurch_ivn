@@ -48,18 +48,20 @@
                     <th>Data</th>
                     <th>Título</th>
                     <th>Local</th>
+                    <th>Criado em</th>
                     <th class="text-end">Ações</th>
                 </tr>
             </thead>
             <tbody>
                 <?php if (empty($albums)): ?>
-                    <tr><td colspan="4" class="text-center py-4 text-muted">Nenhum álbum cadastrado.</td></tr>
+                    <tr><td colspan="5" class="text-center py-4 text-muted">Nenhum álbum cadastrado.</td></tr>
                 <?php else: ?>
                     <?php foreach ($albums as $a): ?>
                         <tr>
                             <td><?= $a['event_date'] ? date('d/m/Y', strtotime($a['event_date'])) : 'N/A' ?></td>
                             <td class="fw-bold"><?= htmlspecialchars($a['title']) ?></td>
                             <td><?= htmlspecialchars($a['location']) ?></td>
+                            <td class="small text-muted"><?= !empty($a['created_at']) ? date('d/m/Y H:i', strtotime($a['created_at'])) : '—' ?></td>
                             <td class="text-end">
                                 <a href="/admin/gallery/edit/<?= $a['id'] ?>" class="btn btn-sm btn-outline-secondary icon-btn" title="Editar Informações">
                                     <i class="fas fa-edit"></i>

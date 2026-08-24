@@ -290,6 +290,7 @@ $hasMultipleCongregations = $tabTotal > 1;
                         <th class="d-none d-md-table-cell">Tipo</th>
                         <th>Valor</th>
                         <th class="d-none d-md-table-cell">Método</th>
+                        <th class="d-none d-md-table-cell">Criado em</th>
                         <th class="text-end">Ações</th>
                     </tr>
                 </thead>
@@ -327,6 +328,7 @@ $hasMultipleCongregations = $tabTotal > 1;
                         </td>
                         <td class="fw-bold text-success" data-sort="<?= $t['amount'] ?>">R$ <?= number_format($t['amount'], 2, ',', '.') ?></td>
                         <td class="d-none d-md-table-cell"><?= ucfirst($t['payment_method']) ?></td>
+                        <td class="d-none d-md-table-cell small text-muted"><?= !empty($t['created_at']) ? date('d/m/Y H:i', strtotime($t['created_at'])) : '—' ?></td>
                         <td class="text-end">
                             <button type="button" class="btn btn-sm btn-outline-info icon-btn" data-bs-toggle="modal" data-bs-target="#receiptModal" data-url="/admin/tithes/receipt/<?= $t['id'] ?>" title="Recibo"><i class="fas fa-print"></i></button>
                             <a href="/admin/tithes/edit/<?= $t['id'] ?>" class="btn btn-sm btn-outline-primary icon-btn" title="Editar"><i class="fas fa-edit"></i></a>

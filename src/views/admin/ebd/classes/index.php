@@ -80,7 +80,8 @@
                 <p class="text-muted small mb-2"><?= htmlspecialchars((string)$class['description']) ?></p>
 
                 <div class="class-meta mb-1"><strong class="text-dark">Faixa Etária:</strong> <?= $class['min_age'] ?? 0 ?> a <?= $class['max_age'] ?? 99 ?> anos</div>
-                <div class="class-meta mb-3"><strong class="text-dark">Professor(es):</strong> <?= htmlspecialchars($class['teachers_names'] ?? 'Nenhum') ?></div>
+                <div class="class-meta mb-1"><strong class="text-dark">Professor(es):</strong> <?= htmlspecialchars($class['teachers_names'] ?? 'Nenhum') ?></div>
+                <div class="class-meta mb-3"><i class="far fa-clock me-1"></i> Criado em <?= !empty($class['created_at']) ? date('d/m/Y H:i', strtotime($class['created_at'])) : '—' ?></div>
 
                 <div class="d-flex justify-content-between align-items-center">
                     <span class="class-meta"><i class="fas fa-users me-1"></i> <?= $class['students_count'] ?> alunos</span>

@@ -112,12 +112,17 @@
                     </div>
                     <?php endif; ?>
 
-                    <div class="group-meta mb-3">
+                    <div class="group-meta mb-1">
                         <i class="far fa-clock me-1"></i>
                         <?= htmlspecialchars((string)$group['meeting_day']) ?>
                         <?php if (!empty($group['meeting_time'])): ?>
                              às <?= substr($group['meeting_time'], 0, 5) ?>
                         <?php endif; ?>
+                    </div>
+
+                    <div class="group-meta mb-3">
+                        <i class="fas fa-calendar-plus me-1"></i>
+                        Criado em <?= !empty($group['created_at']) ? date('d/m/Y H:i', strtotime($group['created_at'])) : '—' ?>
                     </div>
 
                     <a href="/admin/groups/show/<?= $group['id'] ?>" class="btn btn-sm btn-outline-primary rounded-pill fw-semibold mt-auto">

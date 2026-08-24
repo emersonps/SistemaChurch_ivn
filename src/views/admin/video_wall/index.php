@@ -162,6 +162,7 @@
                             <?php if (!empty($video['speaker'])): ?> · <?= htmlspecialchars($video['speaker']) ?><?php endif; ?>
                             · <?= (int)$video['views'] ?> views
                         </div>
+                        <div class="vw-tile-meta mb-2"><i class="far fa-clock me-1"></i>Criado em <?= !empty($video['created_at']) ? date('d/m/Y H:i', strtotime($video['created_at'])) : '—' ?></div>
                         <div class="vw-tile-actions">
                             <form action="/admin/video-wall/toggle-featured/<?= (int)$video['id'] ?>" method="POST" class="d-inline">
                                 <?= csrf_field() ?>

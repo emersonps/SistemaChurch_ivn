@@ -138,6 +138,7 @@ $accountTypeIcons = [
                             </div>
                             <div class="d-flex flex-column gap-2 align-items-end">
                                 <span class="status-pill status-<?= $acc['status'] ?>"><?= $acc['status'] === 'active' ? 'Ativa' : 'Inativa' ?></span>
+                                <span class="small text-muted">Criado em <?= !empty($acc['created_at']) ? date('d/m/Y H:i', strtotime($acc['created_at'])) : '—' ?></span>
                                 <a href="/admin/financial/bank-accounts/edit/<?= $acc['id'] ?>" class="btn btn-sm btn-outline-primary rounded-pill fw-semibold px-3">
                                     <i class="fas fa-edit me-1"></i> Editar
                                 </a>
@@ -161,6 +162,7 @@ $accountTypeIcons = [
                     <th>Banco/Agência/Conta</th>
                     <th>Saldo Atual</th>
                     <th>Status</th>
+                    <th>Criado em</th>
                     <th class="text-end">Ações</th>
                 </tr>
             </thead>
@@ -186,6 +188,7 @@ $accountTypeIcons = [
                                 R$ <?= number_format($acc['current_balance'], 2, ',', '.') ?>
                             </td>
                             <td><span class="status-pill status-<?= $acc['status'] ?>"><?= $acc['status'] === 'active' ? 'Ativa' : 'Inativa' ?></span></td>
+                            <td class="small text-muted"><?= !empty($acc['created_at']) ? date('d/m/Y H:i', strtotime($acc['created_at'])) : '—' ?></td>
                             <td class="text-end">
                                 <a href="/admin/financial/bank-accounts/edit/<?= $acc['id'] ?>" class="btn btn-sm btn-outline-primary icon-btn" title="Editar">
                                     <i class="fas fa-edit"></i>
