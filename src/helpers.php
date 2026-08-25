@@ -622,6 +622,10 @@ function getSignatureDocumentTypes() {
         'contribution_receipt' => 'Recibo de Contribuição',
         'expense_report' => 'Relatório de Despesas',
         'offering_receipt' => 'Recibo de Ofertas',
+        'cash_closure' => 'Fechamento de Caixa',
+        'general_report' => 'Relatório Geral de Estatísticas',
+        'attendance_report' => 'Lista de Presença',
+        'ebd_report' => 'Relatório da EBD',
     ];
 }
 

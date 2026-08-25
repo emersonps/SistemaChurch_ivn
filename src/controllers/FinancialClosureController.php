@@ -196,6 +196,7 @@ class FinancialClosureController {
         $db = (new Database())->connect();
         $closure = $this->fetchClosure($db, $id);
         if (!$closure) return;
-        view('admin/financial/print_closure', ['closure' => $closure]);
+        $closureSignatures = $db->query("SELECT * FROM signatures WHERE document_types LIKE '%cash_closure%'")->fetchAll();
+        view('admin/financial/print_closure', ['closure' => $closure, 'closureSignatures' => $closureSignatures]);
     }
 }

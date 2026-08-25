@@ -702,8 +702,10 @@ class EventController {
         ");
         $stmtAtt->execute([$eventId]);
         $attendees = $stmtAtt->fetchAll();
-        
-        view('admin/events/print_attendance', ['event' => $event, 'attendees' => $attendees]);
+
+        $attendanceSignatures = $db->query("SELECT * FROM signatures WHERE document_types LIKE '%attendance_report%'")->fetchAll();
+
+        view('admin/events/print_attendance', ['event' => $event, 'attendees' => $attendees, 'attendanceSignatures' => $attendanceSignatures]);
     }
     
     public function registerAttendance($eventId) {

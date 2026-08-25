@@ -104,6 +104,9 @@ class GeneralReportController {
 
     public function printGeneral() {
         requirePermission('general_reports.view');
-        view('admin/reports/print_general', $this->gatherStats());
+        $db = (new Database())->connect();
+        $data = $this->gatherStats();
+        $data['reportSignatures'] = $db->query("SELECT * FROM signatures WHERE document_types LIKE '%general_report%'")->fetchAll();
+        view('admin/reports/print_general', $data);
     }
 }

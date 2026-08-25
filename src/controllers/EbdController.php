@@ -54,7 +54,10 @@ class EbdController {
 
     public function printReports() {
         requirePermission('ebd.view');
-        view('admin/ebd/reports/print_ebd', $this->gatherReportStats());
+        $db = (new Database())->connect();
+        $data = $this->gatherReportStats();
+        $data['reportSignatures'] = $db->query("SELECT * FROM signatures WHERE document_types LIKE '%ebd_report%'")->fetchAll();
+        view('admin/ebd/reports/print_ebd', $data);
     }
 
     private function gatherReportStats() {

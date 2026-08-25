@@ -267,6 +267,23 @@
         </tbody>
     </table>
 
+    <div class="signature-block" style="margin-top: 30px;">
+        <?php if (!empty($reportSignatures)): ?>
+            <div style="display: flex; justify-content: space-around; flex-wrap: wrap; gap: 15px;">
+                <?php foreach ($reportSignatures as $sig): ?>
+                    <div style="text-align: center;">
+                        <?php if (!empty($sig['image_path'])): ?>
+                            <img src="/uploads/signatures/<?= htmlspecialchars($sig['image_path']) ?>" style="max-height: 45px; max-width: 140px;" alt="Assinatura"><br>
+                        <?php endif; ?>
+                        <span style="display:inline-block; border-top: 1px solid #000; padding-top: 3px; font-size: 11px; min-width: 160px;">
+                            <?= htmlspecialchars($sig['name'] ?? $sig['role_label']) ?>
+                        </span>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        <?php endif; ?>
+    </div>
+
     <div class="footer">
         <p>Sistema de Gestão de Membros</p>
     </div>

@@ -192,7 +192,9 @@ class FinancialReportController {
     public function print() {
         requirePermission('financial.view');
         $db = (new Database())->connect();
-        view('admin/financial/print_report', $this->buildReportData($db));
+        $data = $this->buildReportData($db);
+        $data['reportSignatures'] = $db->query("SELECT * FROM signatures WHERE document_types LIKE '%expense_report%'")->fetchAll();
+        view('admin/financial/print_report', $data);
     }
 
     public function export($type) {
