@@ -612,8 +612,8 @@ class MemberController {
             $systemUser = $stmtUserOld->fetch();
         }
         
-        // Fetch Signatures (President)
-        $signature = $db->query("SELECT * FROM signatures WHERE slug = 'president' OR slug LIKE '%presidente%' LIMIT 1")->fetch();
+        // Assinatura configurada para o documento "Cartão de Membro" (a mais recentemente atualizada, se houver mais de uma)
+        $signature = $db->query("SELECT * FROM signatures WHERE document_types LIKE '%member_card%' ORDER BY updated_at DESC LIMIT 1")->fetch();
 
         view('admin/members/card', ['member' => $member, 'systemUser' => $systemUser, 'signature' => $signature]);
     }

@@ -432,10 +432,10 @@ class PortalController {
         $stmt->execute([$member_id]);
         $member = $stmt->fetch();
         
-        // Fetch Signatures (President) just like in Admin
+        // Assinatura configurada para o documento "Cartão de Membro"
         $signature = null;
         try {
-            $stmtSig = $db->query("SELECT * FROM signatures WHERE slug = 'president' OR slug LIKE '%presidente%' LIMIT 1");
+            $stmtSig = $db->query("SELECT * FROM signatures WHERE document_types LIKE '%member_card%' ORDER BY updated_at DESC LIMIT 1");
             if ($stmtSig) {
                 $signature = $stmtSig->fetch();
             }
