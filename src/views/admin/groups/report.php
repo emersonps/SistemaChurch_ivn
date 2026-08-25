@@ -12,9 +12,9 @@
         <h1 class="h3 mb-0">Relatório: <?= htmlspecialchars($group['name']) ?></h1>
     </div>
     <div class="btn-toolbar mb-2 mb-md-0 gap-2">
-        <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill fw-semibold px-3" onclick="window.print()">
+        <a href="/admin/groups/report/<?= $group['id'] ?>/print" target="_blank" class="btn btn-sm btn-outline-secondary rounded-pill fw-semibold px-3">
             <i class="fas fa-print me-1"></i> Imprimir
-        </button>
+        </a>
         <a href="/admin/groups/show/<?= $group['id'] ?>" class="btn btn-sm btn-outline-primary rounded-pill fw-semibold px-3">
             <i class="fas fa-arrow-left me-1"></i> Voltar
         </a>

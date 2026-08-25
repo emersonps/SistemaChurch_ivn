@@ -626,6 +626,7 @@ function getSignatureDocumentTypes() {
         'general_report' => 'Relatório Geral de Estatísticas',
         'attendance_report' => 'Lista de Presença',
         'ebd_report' => 'Relatório da EBD',
+        'group_report' => 'Relatório de Grupo/Célula',
     ];
 }
 

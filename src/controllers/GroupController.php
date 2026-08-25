@@ -463,30 +463,27 @@ class GroupController {
         }
     }
 
-    public function report($id) {
-        requirePermission('groups.view');
-        $db = (new Database())->connect();
-        
+    private function fetchGroupReportData(PDO $db, $id) {
         // Dados do Grupo
-        $stmt = $db->prepare("SELECT g.*, c.name as congregation_name, l.name as leader_name 
-                              FROM `groups` g 
-                              LEFT JOIN congregations c ON g.congregation_id = c.id 
-                              LEFT JOIN members l ON g.leader_id = l.id 
+        $stmt = $db->prepare("SELECT g.*, c.name as congregation_name, l.name as leader_name
+                              FROM `groups` g
+                              LEFT JOIN congregations c ON g.congregation_id = c.id
+                              LEFT JOIN members l ON g.leader_id = l.id
                               WHERE g.id = ?");
         $stmt->execute([$id]);
         $group = $stmt->fetch();
-        
+
         if (!$group) redirect('/admin/groups');
-        
+
         // Membros e Status
-        $stmtM = $db->prepare("SELECT gm.*, m.name, m.phone, m.is_new_convert, m.accepted_jesus_at, m.reconciled_at 
-                               FROM group_members gm 
-                               JOIN members m ON gm.member_id = m.id 
-                               WHERE gm.group_id = ? 
+        $stmtM = $db->prepare("SELECT gm.*, m.name, m.phone, m.is_new_convert, m.accepted_jesus_at, m.reconciled_at
+                               FROM group_members gm
+                               JOIN members m ON gm.member_id = m.id
+                               WHERE gm.group_id = ?
                                ORDER BY m.name ASC");
         $stmtM->execute([$id]);
         $members = $stmtM->fetchAll();
-        
+
         // Stats
         $stats = [
             'total' => count($members),
@@ -494,13 +491,27 @@ class GroupController {
             'accepted_jesus' => 0,
             'reconciled' => 0
         ];
-        
+
         foreach ($members as $m) {
             if ($m['is_new_convert']) $stats['new_converts']++;
             if ($m['accepted_jesus_at']) $stats['accepted_jesus']++;
             if ($m['reconciled_at']) $stats['reconciled']++;
         }
-        
-        view('admin/groups/report', ['group' => $group, 'members' => $members, 'stats' => $stats]);
+
+        return ['group' => $group, 'members' => $members, 'stats' => $stats];
+    }
+
+    public function report($id) {
+        requirePermission('groups.view');
+        $db = (new Database())->connect();
+        view('admin/groups/report', $this->fetchGroupReportData($db, $id));
+    }
+
+    public function printReport($id) {
+        requirePermission('groups.view');
+        $db = (new Database())->connect();
+        $data = $this->fetchGroupReportData($db, $id);
+        $data['reportSignatures'] = $db->query("SELECT * FROM signatures WHERE document_types LIKE '%group_report%'")->fetchAll();
+        view('admin/groups/print_report', $data);
     }
 }

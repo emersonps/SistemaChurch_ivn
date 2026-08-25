@@ -1303,6 +1303,9 @@ elseif (preg_match('#^/admin/groups/delete/(\d+)$#', $uri, $matches)) {
 elseif (preg_match('#^/admin/groups/report/(\d+)$#', $uri, $matches)) {
     (new GroupController())->report($matches[1]);
 }
+elseif (preg_match('#^/admin/groups/report/(\d+)/print$#', $uri, $matches)) {
+    (new GroupController())->printReport($matches[1]);
+}
 elseif ($uri == '/admin/groups/members/add') {
     if ($method == 'POST') {
         (new GroupController())->addMember();
