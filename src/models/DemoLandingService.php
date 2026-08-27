@@ -99,21 +99,36 @@ class DemoLandingService {
             $hash = password_hash($plainPassword, PASSWORD_DEFAULT);
             $applied = false;
 
-            $stmt = $this->db->prepare('UPDATE users SET password = ? WHERE username = ?');
-            $stmt->execute([$hash, $slot['username']]);
-            if ($stmt->rowCount() > 0) {
-                $applied = true;
-            }
-
-            // The "member" slot is usually a portal login identified by
-            // CPF, not a users.username row — try that too (same lookup
-            // as "Alterar senha por CPF"). Harmless no-op if the value
-            // isn't CPF-shaped or doesn't match anyone.
-            $cpf = preg_replace('/[^0-9]/', '', $slot['username']);
-            if ($cpf !== '') {
-                $memberStmt = $this->db->prepare("UPDATE members SET password = ? WHERE REPLACE(REPLACE(REPLACE(cpf, '.', ''), '-', ''), ' ', '') = ?");
-                $memberStmt->execute([$hash, $cpf]);
-                if ($memberStmt->rowCount() > 0) {
+            if ($key === 'member') {
+                // O login do portal usa CPF, não users.username — mesma
+                // busca de "Alterar senha por CPF". Se ainda não existe
+                // nenhum membro com esse CPF, cria um registro mínimo na
+                // hora, para a demonstração já sair funcionando sem exigir
+                // um cadastro manual prévio.
+                $cpf = preg_replace('/[^0-9]/', '', $slot['username']);
+                if ($cpf !== '') {
+                    $memberStmt = $this->db->prepare("UPDATE members SET password = ? WHERE REPLACE(REPLACE(REPLACE(cpf, '.', ''), '-', ''), ' ', '') = ?");
+                    $memberStmt->execute([$hash, $cpf]);
+                    if ($memberStmt->rowCount() > 0) {
+                        $applied = true;
+                    } else {
+                        $insert = $this->db->prepare("INSERT INTO members (name, cpf, password, role) VALUES (?, ?, ?, 'Membro')");
+                        $insert->execute(['Membro Demonstração', $cpf, $hash]);
+                        $applied = true;
+                    }
+                }
+            } else {
+                // Idem para admin/secretary: se o username configurado ainda
+                // não existe em `users`, cria um usuário mínimo com o papel
+                // correspondente em vez de ficar rotacionando a senha de
+                // ninguém silenciosamente.
+                $stmt = $this->db->prepare('UPDATE users SET password = ? WHERE username = ?');
+                $stmt->execute([$hash, $slot['username']]);
+                if ($stmt->rowCount() > 0) {
+                    $applied = true;
+                } else {
+                    $insert = $this->db->prepare('INSERT INTO users (username, password, role) VALUES (?, ?, ?)');
+                    $insert->execute([$slot['username'], $hash, $key]);
                     $applied = true;
                 }
             }
