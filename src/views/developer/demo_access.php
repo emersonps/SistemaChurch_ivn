@@ -3,6 +3,14 @@
 <h1 class="h2 mb-1">Acesso Demonstrativo</h1>
 <p class="text-muted mb-4">Envie o portal e as credenciais de teste diretamente para um cliente interessado, pelo WhatsApp.</p>
 
+<?php if (isset($_SESSION['success'])): ?>
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <?= htmlspecialchars($_SESSION['success']) ?>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    <?php unset($_SESSION['success']); ?>
+<?php endif; ?>
+
 <?php if (empty($demoConfig['enabled'])): ?>
     <div class="alert alert-warning">
         <i class="fas fa-triangle-exclamation me-2"></i>
@@ -56,9 +64,20 @@
                     </div>
                 <?php endforeach; ?>
             </div>
-            <div class="text-muted small mt-3">
-                <i class="fas fa-rotate me-1"></i> Última renovação: <?= !empty($demo['rotated_at']) ? date('d/m/Y H:i', strtotime($demo['rotated_at'])) : '—' ?>
-                · Próxima: <?= !empty($demo['next_rotation_at']) ? date('d/m/Y H:i', strtotime($demo['next_rotation_at'])) : '—' ?>
+            <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mt-3">
+                <div class="text-muted small">
+                    <i class="fas fa-rotate me-1"></i> Última renovação: <?= !empty($demo['rotated_at']) ? date('d/m/Y H:i', strtotime($demo['rotated_at'])) : '—' ?>
+                    · Próxima: <?= !empty($demo['next_rotation_at']) ? date('d/m/Y H:i', strtotime($demo['next_rotation_at'])) : '—' ?>
+                </div>
+                <form method="POST" action="/developer/demo-access/regenerate" onsubmit="return confirm('Gerar novas senhas agora? As senhas atuais deixarão de funcionar.');">
+                    <?= csrf_field() ?>
+                    <button type="submit" class="btn btn-sm btn-outline-primary rounded-pill fw-semibold px-3">
+                        <i class="fas fa-shuffle me-1"></i> Gerar nova senha agora
+                    </button>
+                </form>
+            </div>
+            <div class="text-muted small mt-2">
+                <i class="fas fa-circle-info me-1"></i> Toda senha gerada aqui — automática ou manual — some sozinha em <?= (int)$demo['rotation_days'] ?> dias e dá lugar a uma nova.
             </div>
         </div>
     </div>

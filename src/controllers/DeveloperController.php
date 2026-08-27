@@ -910,6 +910,16 @@ class DeveloperController {
         require_once __DIR__ . '/../views/developer/demo_access.php';
     }
 
+    public function demoRegenerate() {
+        $this->requireDeveloper();
+        $demoService = new DemoLandingService();
+        if ($demoService->getConfig()['enabled']) {
+            $demoService->forceRotateNow();
+            $_SESSION['success'] = 'Novas senhas geradas. Elas serão renovadas novamente em 2 dias, como sempre.';
+        }
+        redirect('/developer/demo-access');
+    }
+
     private function syncPaymentsToCentralSilently() {
         try {
             $service = new CentralBillingSyncService();

@@ -360,6 +360,9 @@ elseif ($uri == '/developer/dashboard') {
 elseif ($uri == '/developer/demo-access') {
     (new DeveloperController())->demoAccess();
 }
+elseif ($uri == '/developer/demo-access/regenerate' && $method == 'POST') {
+    (new DeveloperController())->demoRegenerate();
+}
 elseif ($uri == '/developer/payments') {
     (new DeveloperController())->payments();
 }
