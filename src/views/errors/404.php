@@ -10,7 +10,7 @@ try {
 
 $requestUri = $_SERVER['REQUEST_URI'] ?? '/';
 $isBackoffice = strpos($requestUri, '/admin') === 0 || strpos($requestUri, '/developer') === 0;
-$homeUrl = strpos($requestUri, '/developer') === 0 ? '/developer/dashboard' : ($isBackoffice ? '/admin/dashboard' : '/');
+$homeUrl = strpos($requestUri, '/developer') === 0 ? '/developer/migrations' : ($isBackoffice ? '/admin/dashboard' : '/');
 $homeLabel = $isBackoffice ? 'Voltar ao Painel' : 'Voltar ao Início';
 ?>
 <!DOCTYPE html>

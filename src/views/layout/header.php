@@ -7,7 +7,7 @@ if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'developer') {
     if (strpos($_SERVER['REQUEST_URI'], '/admin') === 0 && 
         strpos($_SERVER['REQUEST_URI'], '/admin/logout') === false && 
         strpos($_SERVER['REQUEST_URI'], '/admin/users') === false) {
-        header("Location: /developer/dashboard");
+        header("Location: /developer/migrations");
         exit;
     }
 }
@@ -210,7 +210,7 @@ $isAdminOrDevArea = isLoggedIn() && (strpos($currentUri, '/admin') === 0 || strp
 $isAdminArea = isLoggedIn() && strpos($currentUri, '/admin') === 0;
 $isMobileLauncherPage = $isAdminArea && (($_GET['launcher'] ?? '') === '1');
 $bodyClass = $isMobileLauncherPage ? 'mobile-launcher-page' : '';
-$mobileHomeHref = strpos($currentUri, '/developer') === 0 ? '/developer/dashboard' : '/admin';
+$mobileHomeHref = strpos($currentUri, '/developer') === 0 ? '/developer/migrations' : '/admin';
 $mobileLauncherHref = '/admin?launcher=1';
 ?>
 <body class="<?= htmlspecialchars($bodyClass) ?>">
@@ -558,7 +558,7 @@ $mobileLauncherHref = '/admin?launcher=1';
                         if ($isDev): 
                         ?>
                         <li class="nav-item">
-                            <a class="nav-link text-primary fw-bold" href="/developer/dashboard">
+                            <a class="nav-link text-primary fw-bold" href="/developer/migrations">
                                 <i class="fas fa-code me-2"></i> Painel Dev
                             </a>
                         </li>

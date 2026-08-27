@@ -16,7 +16,7 @@ class AuthController {
     public function showLogin() {
         if (isset($_SESSION['user_id'])) {
             if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'developer') {
-                redirect('/developer/dashboard');
+                redirect('/developer/migrations');
             } else {
                 if ($this->isMobileRequest()) {
                     redirect('/admin?launcher=1');
@@ -48,7 +48,7 @@ class AuthController {
             
             // Redirect based on role
             if ($user['role'] === 'developer') {
-                redirect('/developer/dashboard');
+                redirect('/developer/migrations');
             } else {
                 $_SESSION['show_today_birthdays_modal'] = 1;
                 if ($this->isMobileRequest()) {

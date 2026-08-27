@@ -298,19 +298,6 @@ elseif ($uri == '/developer/migrations/rollback' && $method == 'POST') {
 elseif ($uri == '/admin/manual') {
     (new ManualController())->index();
 }
-elseif ($uri == '/developer/manuals') {
-    if ($method == 'POST') {
-        (new ManualController())->store();
-    } else {
-        (new ManualController())->manage();
-    }
-}
-elseif (preg_match('#^/developer/manuals/edit/(\d+)$#', $uri, $matches)) {
-    (new ManualController())->manage($matches[1]);
-}
-elseif ($method == 'POST' && preg_match('#^/developer/manuals/delete/(\d+)$#', $uri, $matches)) {
-    (new ManualController())->delete($matches[1]);
-}
 elseif ($uri == '/developer/manual-sync') {
     (new ManualSyncController())->index();
 }
@@ -354,17 +341,11 @@ elseif ($uri == '/admin/system-payments') {
 elseif ($uri == '/admin/system-payments/pay') {
     (new SystemPaymentController())->pay();
 }
-elseif ($uri == '/developer/dashboard') {
-    (new DeveloperController())->index();
-}
 elseif ($uri == '/developer/demo-access') {
     (new DeveloperController())->demoAccess();
 }
 elseif ($uri == '/developer/demo-access/regenerate' && $method == 'POST') {
     (new DeveloperController())->demoRegenerate();
-}
-elseif ($uri == '/developer/payments') {
-    (new DeveloperController())->payments();
 }
 elseif ($uri == '/developer/backups') {
     (new DeveloperController())->backups();
@@ -374,21 +355,6 @@ elseif ($uri == '/developer/backups/generate' && $method == 'POST') {
 }
 elseif ($uri == '/developer/backups/download') {
     (new DeveloperController())->downloadBackup();
-}
-elseif ($uri == '/developer/payments/generate') {
-    (new DeveloperController())->generateCharge();
-}
-elseif ($uri == '/developer/payments/sync-central' && $method == 'POST') {
-    (new DeveloperController())->syncPaymentsToCentral();
-}
-elseif ($uri == '/developer/payments/sync-from-central' && $method == 'POST') {
-    (new DeveloperController())->syncPaymentsFromCentral();
-}
-elseif ($uri == '/developer/payments/delete') {
-    (new DeveloperController())->deletePayment();
-}
-elseif ($uri == '/developer/payments/update-status') {
-    (new DeveloperController())->updateStatus();
 }
 elseif ($uri == '/developer/import') {
     (new DeveloperController())->import();

@@ -52,7 +52,7 @@
                 ?>
                 <?php foreach ($demo['credentials'] as $cred): ?>
                     <div class="col-md-4">
-                        <div class="border rounded-3 p-3 h-100">
+                        <div class="border rounded-3 p-3 h-100 demo-cred-card" data-label="<?= htmlspecialchars($cred['label']) ?>" data-username="<?= htmlspecialchars($cred['username']) ?>" data-password="<?= htmlspecialchars($cred['password']) ?>">
                             <div class="text-muted small text-uppercase fw-bold mb-2">
                                 <i class="fas <?= $icons[$cred['label']] ?? 'fa-user' ?> me-1"></i> <?= htmlspecialchars($cred['label']) ?>
                             </div>
@@ -100,22 +100,29 @@
     </div>
 
     <script>
-        const demoMessage = <?= json_encode(
-            "Conheça o " . ($siteProfile['name'] ?? 'nosso sistema') . " na prática! 🚀\n\n" .
-            "Acesse o portal demonstrativo e explore os recursos:\n" . ($demoConfig['public_url'] ?? '') . "\n\n" .
-            implode("\n\n", array_map(function ($c) {
-                return "*" . $c['label'] . "*\nUsuário: " . $c['username'] . "\nSenha: " . $c['password'];
-            }, $demo['credentials'])) .
-            "\n\nPor segurança, essas senhas são renovadas periodicamente — se pararem de funcionar, me chame que eu envio novas.",
-            JSON_UNESCAPED_UNICODE
-        ) ?>;
+        // Monta a mensagem sempre a partir do que está na tela agora (os data-*
+        // dos cartões de credenciais), nunca de um valor fixado no carregamento
+        // da página — assim, depois de "Gerar nova senha agora", copiar/enviar
+        // sempre pega a senha que acabou de ser gerada, nunca uma antiga.
+        function buildDemoMessage() {
+            const brand = <?= json_encode($siteProfile['name'] ?? 'nosso sistema', JSON_UNESCAPED_UNICODE) ?>;
+            const portalUrl = <?= json_encode($demoConfig['public_url'] ?? '', JSON_UNESCAPED_UNICODE) ?>;
+            const blocks = Array.from(document.querySelectorAll('.demo-cred-card')).map(function (card) {
+                return '*' + card.dataset.label + '*\nUsuário: ' + card.dataset.username + '\nSenha: ' + card.dataset.password;
+            });
+
+            return 'Conheça o ' + brand + ' na prática! 🚀\n\n' +
+                'Acesse o portal demonstrativo e explore os recursos:\n' + portalUrl + '\n\n' +
+                blocks.join('\n\n') +
+                '\n\nPor segurança, essas senhas são renovadas periodicamente — se pararem de funcionar, me chame que eu envio novas.';
+        }
 
         function sendDemoWhatsapp() {
-            window.open('https://wa.me/?text=' + encodeURIComponent(demoMessage), '_blank');
+            window.open('https://wa.me/?text=' + encodeURIComponent(buildDemoMessage()), '_blank');
         }
 
         document.getElementById('btnCopyDemoText').addEventListener('click', function () {
-            navigator.clipboard.writeText(demoMessage).then(() => {
+            navigator.clipboard.writeText(buildDemoMessage()).then(() => {
                 const btn = document.getElementById('btnCopyDemoText');
                 const original = btn.innerHTML;
                 btn.innerHTML = '<i class="fas fa-check me-2"></i> Copiado!';

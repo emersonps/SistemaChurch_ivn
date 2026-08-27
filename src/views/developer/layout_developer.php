@@ -40,11 +40,6 @@
                 ?>
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item">
-                        <a class="nav-link <?= (strpos($_SERVER['REQUEST_URI'], '/developer/dashboard') !== false || $_SERVER['REQUEST_URI'] === '/developer') && strpos($_SERVER['REQUEST_URI'], '/developer/payments') === false ? 'active' : '' ?>" href="/developer/dashboard">
-                            <i class="fas fa-tachometer-alt me-2"></i> Painel
-                        </a>
-                    </li>
-                    <li class="nav-item">
                         <a class="nav-link <?= strpos($_SERVER['REQUEST_URI'], '/developer/demo-access') !== false ? 'active' : '' ?>" href="/developer/demo-access">
                             <i class="fab fa-whatsapp me-2"></i> Acesso Demonstrativo
                         </a>
@@ -52,11 +47,6 @@
                     <li class="nav-item">
                         <a class="nav-link <?= strpos($_SERVER['REQUEST_URI'], '/developer/logs') !== false ? 'active' : '' ?>" href="/developer/logs">
                             <i class="fas fa-satellite-dish me-2"></i> Acessos e Logs
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link <?= strpos($_SERVER['REQUEST_URI'], '/admin/system-payments') !== false || strpos($_SERVER['REQUEST_URI'], '/developer/payments') !== false ? 'active' : '' ?>" href="/developer/payments">
-                            <i class="fas fa-file-invoice-dollar me-2"></i> Gerenciar Pagamentos
                         </a>
                     </li>
                     <li class="nav-item">
@@ -75,11 +65,6 @@
                     <li class="nav-item">
                         <a class="nav-link <?= strpos($_SERVER['REQUEST_URI'], '/developer/backups') !== false ? 'active' : '' ?>" href="/developer/backups">
                             <i class="fas fa-box-archive me-2"></i> Backups do Banco
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link <?= strpos($_SERVER['REQUEST_URI'], '/developer/manuals') !== false ? 'active' : '' ?>" href="/developer/manuals">
-                            <i class="fas fa-circle-play me-2"></i> Gerenciar Manuais
                         </a>
                     </li>
                     <li class="nav-item">
@@ -115,11 +100,6 @@
                     <h4 class="px-3 mb-4 text-white">Painel do Dev</h4>
                     <ul class="nav flex-column">
                         <li class="nav-item">
-                            <a class="nav-link <?= (strpos($_SERVER['REQUEST_URI'], '/developer/dashboard') !== false || $_SERVER['REQUEST_URI'] === '/developer') && strpos($_SERVER['REQUEST_URI'], '/developer/payments') === false ? 'active' : '' ?>" href="/developer/dashboard">
-                                <i class="fas fa-tachometer-alt me-2"></i> Painel
-                            </a>
-                        </li>
-                        <li class="nav-item">
                             <a class="nav-link <?= strpos($_SERVER['REQUEST_URI'], '/developer/demo-access') !== false ? 'active' : '' ?>" href="/developer/demo-access">
                                 <i class="fab fa-whatsapp me-2"></i> Acesso Demonstrativo
                             </a>
@@ -127,11 +107,6 @@
                         <li class="nav-item">
                             <a class="nav-link <?= strpos($_SERVER['REQUEST_URI'], '/developer/logs') !== false ? 'active' : '' ?>" href="/developer/logs">
                                 <i class="fas fa-satellite-dish me-2"></i> Acessos e Logs
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link <?= strpos($_SERVER['REQUEST_URI'], '/admin/system-payments') !== false || strpos($_SERVER['REQUEST_URI'], '/developer/payments') !== false ? 'active' : '' ?>" href="/developer/payments">
-                                <i class="fas fa-file-invoice-dollar me-2"></i> Gerenciar Pagamentos
                             </a>
                         </li>
                         <li class="nav-item">
@@ -150,11 +125,6 @@
                         <li class="nav-item">
                             <a class="nav-link <?= strpos($_SERVER['REQUEST_URI'], '/developer/backups') !== false ? 'active' : '' ?>" href="/developer/backups">
                                 <i class="fas fa-box-archive me-2"></i> Backups do Banco
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link <?= strpos($_SERVER['REQUEST_URI'], '/developer/manuals') !== false ? 'active' : '' ?>" href="/developer/manuals">
-                                <i class="fas fa-circle-play me-2"></i> Gerenciar Manuais
                             </a>
                         </li>
                         <li class="nav-item">

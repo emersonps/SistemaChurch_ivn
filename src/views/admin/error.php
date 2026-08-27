@@ -13,7 +13,7 @@
     <div class="card">
         <div class="card-body">
             <p class="mb-2"><?= htmlspecialchars($hint) ?></p>
-            <a href="/developer/dashboard" class="btn btn-outline-secondary btn-sm">Abrir Gerenciador de Migrações</a>
+            <a href="/developer/migrations" class="btn btn-outline-secondary btn-sm">Abrir Gerenciador de Migrações</a>
         </div>
     </div>
 <?php endif; ?>
