@@ -45,6 +45,11 @@
                         </a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link <?= strpos($_SERVER['REQUEST_URI'], '/developer/demo-access') !== false ? 'active' : '' ?>" href="/developer/demo-access">
+                            <i class="fab fa-whatsapp me-2"></i> Acesso Demonstrativo
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link <?= strpos($_SERVER['REQUEST_URI'], '/developer/logs') !== false ? 'active' : '' ?>" href="/developer/logs">
                             <i class="fas fa-satellite-dish me-2"></i> Acessos e Logs
                         </a>
@@ -112,6 +117,11 @@
                         <li class="nav-item">
                             <a class="nav-link <?= (strpos($_SERVER['REQUEST_URI'], '/developer/dashboard') !== false || $_SERVER['REQUEST_URI'] === '/developer') && strpos($_SERVER['REQUEST_URI'], '/developer/payments') === false ? 'active' : '' ?>" href="/developer/dashboard">
                                 <i class="fas fa-tachometer-alt me-2"></i> Painel
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link <?= strpos($_SERVER['REQUEST_URI'], '/developer/demo-access') !== false ? 'active' : '' ?>" href="/developer/demo-access">
+                                <i class="fab fa-whatsapp me-2"></i> Acesso Demonstrativo
                             </a>
                         </li>
                         <li class="nav-item">

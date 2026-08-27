@@ -901,6 +901,15 @@ class DeveloperController {
         }
     }
 
+    public function demoAccess() {
+        $this->requireDeveloper();
+        $demoService = new DemoLandingService();
+        $demoConfig = $demoService->getConfig();
+        $demo = $demoConfig['enabled'] ? $demoService->getDisplayCredentials() : null;
+        $siteProfile = getChurchSiteProfileSettings();
+        require_once __DIR__ . '/../views/developer/demo_access.php';
+    }
+
     private function syncPaymentsToCentralSilently() {
         try {
             $service = new CentralBillingSyncService();

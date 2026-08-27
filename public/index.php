@@ -357,6 +357,9 @@ elseif ($uri == '/admin/system-payments/pay') {
 elseif ($uri == '/developer/dashboard') {
     (new DeveloperController())->index();
 }
+elseif ($uri == '/developer/demo-access') {
+    (new DeveloperController())->demoAccess();
+}
 elseif ($uri == '/developer/payments') {
     (new DeveloperController())->payments();
 }

@@ -3,24 +3,12 @@
 
 class HomeController {
     public function index() {
-        $requestPath = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH);
-        if (in_array($requestPath, ['/', '/home'], true)) {
-            $demoService = new DemoLandingService();
-            $demoConfig = $demoService->getConfig();
-            if ($demoConfig['enabled']) {
-                $demo = $demoService->getDisplayCredentials();
-                view('public/demo_landing', ['demo' => $demo, 'demoConfig' => $demoConfig]);
-                return;
-            }
-        }
-
         $this->renderPublicHomepage();
     }
 
-    // Always shows the real church homepage, bypassing the demo-landing
-    // interception in index() — this is what the demo page's own "visit
-    // the real site" link points to, so it doesn't just loop back to
-    // itself.
+    // Kept as an alias so old /site links/bookmarks still work now that
+    // the demo-landing interception (which used to live at /) is gone —
+    // both routes just show the real homepage.
     public function siteHome() {
         $this->renderPublicHomepage();
     }
