@@ -107,14 +107,33 @@
         function buildDemoMessage() {
             const brand = <?= json_encode($siteProfile['name'] ?? 'nosso sistema', JSON_UNESCAPED_UNICODE) ?>;
             const portalUrl = <?= json_encode($demoConfig['public_url'] ?? '', JSON_UNESCAPED_UNICODE) ?>;
-            const blocks = Array.from(document.querySelectorAll('.demo-cred-card')).map(function (card) {
-                return '*' + card.dataset.label + '*\nUsuário: ' + card.dataset.username + '\nSenha: ' + card.dataset.password;
+
+            const blockInfo = {
+                'Administrador': { title: 'Área Administrativa - Administrador', desc: 'Acesso geral ao sistema.' },
+                'Secretaria': { title: 'Área Administrativa — Secretaria', desc: 'Veja os recursos disponíveis para a secretaria.' },
+                'Membro': { title: 'Área do Membro', desc: 'Veja como funciona a área exclusiva dos membros.' }
+            };
+            const numberEmojis = ['1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣'];
+
+            const blocks = Array.from(document.querySelectorAll('.demo-cred-card')).map(function (card, index) {
+                const info = blockInfo[card.dataset.label] || { title: card.dataset.label, desc: '' };
+                const numberEmoji = numberEmojis[index] || (index + 1) + '.';
+                const lines = [numberEmoji + ' *' + info.title + '*'];
+                if (info.desc) lines.push(info.desc);
+                lines.push('');
+                lines.push('👤 Usuário: ' + card.dataset.username);
+                lines.push('🔑 Senha: ' + card.dataset.password);
+                return lines.join('\n');
             });
 
-            return 'Conheça o ' + brand + ' na prática! 🚀\n\n' +
-                'Acesse o portal demonstrativo e explore os recursos:\n' + portalUrl + '\n\n' +
-                blocks.join('\n\n') +
-                '\n\nPor segurança, essas senhas são renovadas periodicamente — se pararem de funcionar, me chame que eu envio novas.';
+            return '🚀 *Conheça o ' + brand + ' na prática!*\n\n' +
+                'Olá! Seja bem-vindo!\n\n' +
+                'Preparamos um ambiente de demonstração para você conhecer o *sistema de gestão + site integrado* na prática.\n\n' +
+                'Acesse: ' + portalUrl + '\n\n' +
+                'Explore os recursos utilizando os acessos abaixo:\n\n' +
+                blocks.join('\n\n') + '\n\n' +
+                '🔒 *Importante:* por segurança, as senhas são renovadas periodicamente. Caso alguma não funcione, é só me chamar que envio as novas credenciais.\n\n' +
+                'Fique à vontade para explorar o sistema! 🚀';
         }
 
         function sendDemoWhatsapp() {
