@@ -310,6 +310,9 @@ elseif ($uri == '/developer/manual-sync/run' && $method == 'POST') {
 elseif ($uri == '/developer/manual-sync/global-settings' && $method == 'POST') {
     (new ManualSyncController())->syncGlobalSettings();
 }
+elseif ($uri == '/developer/manual-sync/roles' && $method == 'POST') {
+    (new ManualSyncController())->syncRoles();
+}
 elseif ($uri == '/admin/login') {
     if ($method == 'POST') {
         (new AuthController())->login();
@@ -376,13 +379,6 @@ elseif ($uri == '/developer/logs') {
 }
 elseif ($uri == '/developer/users' || $uri == '/developer/roles') {
     (new DeveloperController())->users();
-}
-elseif (preg_match('#^/developer/roles/edit/(.+)$#', $uri, $matches)) {
-    if ($method == 'POST') {
-        (new DeveloperController())->updateRole($matches[1]);
-    } else {
-        (new DeveloperController())->editRole($matches[1]);
-    }
 }
 elseif (preg_match('#^/developer/users/edit/(\d+)$#', $uri, $matches)) {
     if ($method == 'POST') {

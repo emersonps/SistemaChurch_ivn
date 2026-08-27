@@ -12,17 +12,21 @@ class ManualSyncController {
 
         $manualService = new CentralManualSyncService();
         $settingsService = new CentralGlobalSettingsSyncService();
+        $rolesService = new CentralRolesSyncService();
         $config = $manualService->getConfig();
         $manualRemoteStatus = null;
         $globalSettingsRemoteStatus = null;
+        $rolesRemoteStatus = null;
 
         if ($manualService->hasRemoteConfig()) {
             try {
                 $manualRemoteStatus = $manualService->fetchRemoteStatus();
                 $globalSettingsRemoteStatus = $settingsService->fetchRemoteStatus();
+                $rolesRemoteStatus = $rolesService->fetchRemoteStatus();
             } catch (Exception $e) {
                 $manualRemoteStatus = ['error' => $e->getMessage()];
                 $globalSettingsRemoteStatus = ['error' => $e->getMessage()];
+                $rolesRemoteStatus = ['error' => $e->getMessage()];
             }
         }
 
@@ -30,13 +34,19 @@ class ManualSyncController {
         $localVideoCount = (int)$db->query("SELECT COUNT(*) FROM manual_videos")->fetchColumn();
         $localThemeCount = (int)$db->query("SELECT COUNT(DISTINCT theme) FROM manual_videos")->fetchColumn();
 
+        $rbac = require __DIR__ . '/../../config/rbac.php';
+        $localRolesCount = count($rbac['roles'] ?? []);
+
         view('developer/manual_sync', [
             'config' => $config,
             'globalSettingsConfig' => $settingsService->getConfig(),
+            'rolesConfig' => $rolesService->getConfig(),
             'manualRemoteStatus' => $manualRemoteStatus,
             'globalSettingsRemoteStatus' => $globalSettingsRemoteStatus,
+            'rolesRemoteStatus' => $rolesRemoteStatus,
             'localVideoCount' => $localVideoCount,
             'localThemeCount' => $localThemeCount,
+            'localRolesCount' => $localRolesCount,
             'siteProfile' => getChurchSiteProfileSettings()
         ]);
     }
@@ -54,6 +64,9 @@ class ManualSyncController {
         ]);
         (new CentralGlobalSettingsSyncService())->saveConfig([
             'enabled' => isset($_POST['global_settings_sync_enabled']) ? '1' : '0'
+        ]);
+        (new CentralRolesSyncService())->saveConfig([
+            'enabled' => isset($_POST['roles_sync_enabled']) ? '1' : '0'
         ]);
 
         $_SESSION['success'] = 'Configuração da central salva com sucesso.';
@@ -83,6 +96,23 @@ class ManualSyncController {
 
         try {
             $result = (new CentralGlobalSettingsSyncService())->syncSettings();
+            $_SESSION['success'] = $result['message'];
+            if (!empty($result['updated'])) {
+                $_SESSION['success'] .= ' Versão importada: ' . $result['version'] . '.';
+            }
+        } catch (Exception $e) {
+            $_SESSION['error'] = $e->getMessage();
+        }
+
+        redirect('/developer/manual-sync');
+    }
+
+    public function syncRoles() {
+        $this->requireDeveloper();
+        verify_csrf();
+
+        try {
+            $result = (new CentralRolesSyncService())->syncRoles();
             $_SESSION['success'] = $result['message'];
             if (!empty($result['updated'])) {
                 $_SESSION['success'] .= ' Versão importada: ' . $result['version'] . '.';

@@ -51,9 +51,13 @@
                             <input class="form-check-input" type="checkbox" id="manual_sync_enabled" name="manual_sync_enabled" value="1" <?= !empty($config['enabled']) ? 'checked' : '' ?>>
                             <label class="form-check-label" for="manual_sync_enabled">Manuais em vídeo</label>
                         </div>
-                        <div class="form-check form-switch">
+                        <div class="form-check form-switch mb-2">
                             <input class="form-check-input" type="checkbox" id="global_settings_sync_enabled" name="global_settings_sync_enabled" value="1" <?= !empty($globalSettingsConfig['enabled']) ? 'checked' : '' ?>>
                             <label class="form-check-label" for="global_settings_sync_enabled">Configurações globais do site</label>
+                        </div>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="roles_sync_enabled" name="roles_sync_enabled" value="1" <?= !empty($rolesConfig['enabled']) ? 'checked' : '' ?>>
+                            <label class="form-check-label" for="roles_sync_enabled">Papéis e permissões</label>
                         </div>
                     </div>
 
@@ -71,8 +75,10 @@
             <div class="card-body">
                 <div class="mb-2"><strong>Manuais via central:</strong> <?= !empty($config['enabled']) ? 'Ativado' : 'Desativado' ?></div>
                 <div class="mb-2"><strong>Configurações globais via central:</strong> <?= !empty($globalSettingsConfig['enabled']) ? 'Ativado' : 'Desativado' ?></div>
+                <div class="mb-2"><strong>Papéis via central:</strong> <?= !empty($rolesConfig['enabled']) ? 'Ativado' : 'Desativado' ?></div>
                 <div class="mb-2"><strong>Vídeos locais:</strong> <?= (int)$localVideoCount ?></div>
                 <div class="mb-2"><strong>Temas locais:</strong> <?= (int)$localThemeCount ?></div>
+                <div class="mb-2"><strong>Papéis locais:</strong> <?= (int)$localRolesCount ?></div>
                 <div class="mb-0"><strong>Telefone atual do site:</strong> <?= htmlspecialchars($siteProfile['phone'] ?? '') ?></div>
             </div>
         </div>
@@ -155,6 +161,37 @@
             </div>
         </div>
     </div>
+
+    <div class="col-xl-6 mt-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <span>Papéis e Permissões</span>
+                <?php if (!empty($rolesConfig['enabled'])): ?>
+                    <form action="/developer/manual-sync/roles" method="POST">
+                        <?= csrf_field() ?>
+                        <button type="submit" class="btn btn-sm btn-primary">
+                            <i class="fas fa-rotate me-1"></i> Sincronizar
+                        </button>
+                    </form>
+                <?php endif; ?>
+            </div>
+            <div class="card-body">
+                <div class="mb-2"><strong>Status local:</strong> <?= !empty($rolesConfig['enabled']) ? 'Ativo' : 'Desativado' ?></div>
+                <div class="mb-2"><strong>Última sincronização:</strong> <?= !empty($rolesConfig['last_sync_at']) ? htmlspecialchars($rolesConfig['last_sync_at']) : 'Ainda não realizada' ?></div>
+                <div class="mb-2"><strong>Última versão importada:</strong> <?= !empty($rolesConfig['last_sync_version']) ? htmlspecialchars($rolesConfig['last_sync_version']) : 'Nenhuma' ?></div>
+                <div class="mb-3"><strong>Checksum local:</strong> <?= !empty($rolesConfig['last_sync_checksum']) ? htmlspecialchars($rolesConfig['last_sync_checksum']) : 'Nenhum' ?></div>
+                <?php if (!empty($rolesRemoteStatus['error'])): ?>
+                    <div class="alert alert-danger mb-0"><?= htmlspecialchars($rolesRemoteStatus['error']) ?></div>
+                <?php elseif (!empty($rolesRemoteStatus)): ?>
+                    <div class="border-top pt-3">
+                        <div class="mb-2"><strong>Versão remota:</strong> <?= htmlspecialchars((string)($rolesRemoteStatus['version'] ?? '')) ?></div>
+                        <div class="mb-2"><strong>Publicado em:</strong> <?= htmlspecialchars($rolesRemoteStatus['published_at'] ?? '') ?></div>
+                        <div class="mb-0"><strong>Checksum remoto:</strong> <?= htmlspecialchars($rolesRemoteStatus['checksum'] ?? '') ?></div>
+                    </div>
+                <?php endif; ?>
+            </div>
+        </div>
+    </div>
 </div>
 
 <div class="card shadow-sm mt-4">
@@ -163,6 +200,7 @@
         <ul class="mb-0">
             <li>Manuais sincronizados substituem os vídeos locais pela última versão publicada na central.</li>
             <li>Configurações globais sincronizadas atualizam telefone, e-mail, texto "Quem Somos" e redes sociais do site.</li>
+            <li>Papéis sincronizados substituem as permissões de cada papel (config/rbac.php) pela última versão publicada na central — a edição de permissões agora é feita lá.</li>
             <li>Se quiser editar um módulo localmente novamente, desative a sincronização desse módulo antes de alterar os dados.</li>
         </ul>
     </div>

@@ -28,28 +28,27 @@
                 <h5 class="mb-0"><i class="fas fa-users-cog text-primary me-2"></i> Lista de Papéis do Sistema</h5>
             </div>
             <div class="card-body">
+                <div class="alert alert-info small mb-3">
+                    <i class="fas fa-circle-info me-1"></i>
+                    As permissões de cada papel agora são editadas na Central e chegam aqui por sincronização
+                    (<a href="/developer/manual-sync">Sincronização da Central</a>).
+                </div>
                 <div class="table-responsive">
                     <table class="table table-striped table-hover">
                         <thead>
                             <tr>
                                 <th>Papel (Role)</th>
                                 <th>Descrição/Nome</th>
-                                <th>Ações</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <?php 
+                            <?php
                             $rbac = require __DIR__ . '/../../../config/rbac.php';
-                            foreach ($rbac['roles'] as $roleKey => $roleData): 
+                            foreach ($rbac['roles'] as $roleKey => $roleData):
                             ?>
                             <tr>
                                 <td><span class="badge bg-primary"><?= $roleKey ?></span></td>
                                 <td><strong><?= htmlspecialchars($roleData['label']) ?></strong></td>
-                                <td>
-                                    <a href="/developer/roles/edit/<?= $roleKey ?>" class="btn btn-sm btn-info text-white me-1">
-                                        <i class="fas fa-user-shield"></i> Editar Permissões do Papel
-                                    </a>
-                                </td>
                             </tr>
                             <?php endforeach; ?>
                         </tbody>
