@@ -58,11 +58,6 @@
                             </a>
                         </li>
                     <li class="nav-item">
-                        <a class="nav-link <?= strpos($_SERVER['REQUEST_URI'], '/developer/users') !== false || strpos($_SERVER['REQUEST_URI'], '/developer/roles') !== false ? 'active' : '' ?>" href="/developer/users">
-                            <i class="fas fa-users-cog me-2"></i> Gerenciar Permissões (Roles)
-                        </a>
-                    </li>
-                    <li class="nav-item">
                         <a class="nav-link <?= strpos($_SERVER['REQUEST_URI'], '/developer/backups') !== false ? 'active' : '' ?>" href="/developer/backups">
                             <i class="fas fa-box-archive me-2"></i> Backups do Banco
                         </a>
@@ -115,11 +110,6 @@
                                 <?php if ($pendingCount > 0): ?>
                                     <span class="badge bg-danger ms-2"><?= $pendingCount ?></span>
                                 <?php endif; ?>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link <?= strpos($_SERVER['REQUEST_URI'], '/developer/users') !== false || strpos($_SERVER['REQUEST_URI'], '/developer/roles') !== false ? 'active' : '' ?>" href="/developer/users">
-                                <i class="fas fa-users-cog me-2"></i> Gerenciar Permissões (Roles)
                             </a>
                         </li>
                         <li class="nav-item">

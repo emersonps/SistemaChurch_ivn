@@ -57,9 +57,19 @@
                                 <i class="fas <?= $icons[$cred['label']] ?? 'fa-user' ?> me-1"></i> <?= htmlspecialchars($cred['label']) ?>
                             </div>
                             <div class="small text-muted">Usuário</div>
-                            <div class="fw-bold mb-2"><?= htmlspecialchars($cred['username']) ?></div>
+                            <div class="fw-bold mb-2 d-flex align-items-center justify-content-between gap-2">
+                                <span><?= htmlspecialchars($cred['username']) ?></span>
+                                <button type="button" class="btn btn-sm btn-outline-secondary btn-copy-field py-0 px-2" data-copy-value="<?= htmlspecialchars($cred['username']) ?>" title="Copiar usuário">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                            </div>
                             <div class="small text-muted">Senha</div>
-                            <div class="fw-bold"><?= htmlspecialchars($cred['password']) ?></div>
+                            <div class="fw-bold d-flex align-items-center justify-content-between gap-2">
+                                <span><?= htmlspecialchars($cred['password']) ?></span>
+                                <button type="button" class="btn btn-sm btn-outline-secondary btn-copy-field py-0 px-2" data-copy-value="<?= htmlspecialchars($cred['password']) ?>" title="Copiar senha">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 <?php endforeach; ?>
@@ -146,6 +156,20 @@
                 const original = btn.innerHTML;
                 btn.innerHTML = '<i class="fas fa-check me-2"></i> Copiado!';
                 setTimeout(() => { btn.innerHTML = original; }, 1500);
+            });
+        });
+
+        // Copia só o usuário ou só a senha de um cartão — para quando você só
+        // precisa colar uma credencial de teste em algum lugar, sem montar a
+        // mensagem inteira do WhatsApp.
+        document.querySelectorAll('.btn-copy-field').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                navigator.clipboard.writeText(btn.dataset.copyValue).then(() => {
+                    const icon = btn.querySelector('i');
+                    const original = icon.className;
+                    icon.className = 'fas fa-check text-success';
+                    setTimeout(() => { icon.className = original; }, 1200);
+                });
             });
         });
     </script>
