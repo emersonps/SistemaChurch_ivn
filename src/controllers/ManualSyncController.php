@@ -21,11 +21,17 @@ class ManualSyncController {
         if ($manualService->hasRemoteConfig()) {
             try {
                 $manualRemoteStatus = $manualService->fetchRemoteStatus();
-                $globalSettingsRemoteStatus = $settingsService->fetchRemoteStatus();
-                $rolesRemoteStatus = $rolesService->fetchRemoteStatus();
             } catch (Exception $e) {
                 $manualRemoteStatus = ['error' => $e->getMessage()];
+            }
+            try {
+                $globalSettingsRemoteStatus = $settingsService->fetchRemoteStatus();
+            } catch (Exception $e) {
                 $globalSettingsRemoteStatus = ['error' => $e->getMessage()];
+            }
+            try {
+                $rolesRemoteStatus = $rolesService->fetchRemoteStatus();
+            } catch (Exception $e) {
                 $rolesRemoteStatus = ['error' => $e->getMessage()];
             }
         }
