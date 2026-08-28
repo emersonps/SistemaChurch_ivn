@@ -2135,9 +2135,8 @@ $firstAndLastName = function ($name) {
                     <li class="nav-item"><a class="nav-link" href="#congregacoes">Congregações</a></li>
                     <li class="nav-item"><a class="nav-link" href="/galeria">Galeria</a></li>
                     <li class="nav-item"><a class="nav-link" href="#contato">Contato</a></li>
-                    <li class="nav-item d-flex flex-column flex-lg-row gap-2 ms-lg-3">
-                        <a class="btn btn-outline-gold px-4 rounded-pill text-nowrap" href="/portal/login">Área do Membro</a>
-                        <a class="btn btn-outline-gold px-4 rounded-pill text-nowrap" href="/admin/login">Área Administrativa</a>
+                    <li class="nav-item ms-lg-3">
+                        <a class="btn btn-outline-gold px-4 rounded-pill text-nowrap" href="/portal/login"><i class="fas fa-right-to-bracket me-1"></i> Entrar</a>
                     </li>
                 </ul>
             </div>
@@ -2153,7 +2152,7 @@ $firstAndLastName = function ($name) {
                     <h1 class="display-3 hero-title mb-3">Bem-vindo à<br><span class="hero-highlight"><?= htmlspecialchars($siteProfile['name'] ?? 'Nossa Igreja') ?></span></h1>
                     <div class="lead mb-4 fs-4"><?= $siteProfile['about_text'] ?? 'Uma igreja comprometida com a Palavra de Deus e o amor ao próximo.' ?></div>
                     <div class="hero-actions">
-                        <a href="/portal/login" class="btn btn-cta"><i class="fas fa-user me-2"></i> Área do Membro</a>
+                        <a href="/portal/login" class="btn btn-cta"><i class="fas fa-right-to-bracket me-2"></i> Entrar no Sistema</a>
                     </div>
                 </div>
                 <div class="col-lg-5">

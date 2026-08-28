@@ -31,21 +31,40 @@ class AuthController {
         $username = $_POST['username'] ?? '';
         $password = $_POST['password'] ?? '';
 
+        $throttle = new LoginThrottleService();
+        $ip = LoginThrottleService::clientIp();
+
+        $ipBlockedMinutes = $throttle->ipBlockedMinutesRemaining($ip);
+        if ($ipBlockedMinutes !== null) {
+            view('admin/login', ['error' => "Muitas tentativas de login detectadas. Tente novamente em {$ipBlockedMinutes} minuto(s)."]);
+            return;
+        }
+
         $db = (new Database())->connect();
         $stmt = $db->prepare("SELECT * FROM users WHERE username = ?");
         $stmt->execute([$username]);
         $user = $stmt->fetch();
 
+        if ($user) {
+            $accountLockedMinutes = $throttle->accountLockedMinutesRemaining($user);
+            if ($accountLockedMinutes !== null) {
+                view('admin/login', ['error' => "Conta temporariamente bloqueada por excesso de tentativas. Tente novamente em {$accountLockedMinutes} minuto(s)."]);
+                return;
+            }
+        }
+
         if ($user && password_verify($password, $user['password'])) {
+            $throttle->resetAccount('users', $user['id']);
+
             // Regenerate session ID to prevent fixation attacks
             session_regenerate_id(true);
-            
+
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['user_name'] = $user['username']; // Armazena o nome de usuário na sessão
             $_SESSION['username'] = $user['username'];
             $_SESSION['user_role'] = $user['role']; // Save role to session
             $_SESSION['user_congregation_id'] = $user['congregation_id']; // Save congregation restriction
-            
+
             // Redirect based on role
             if ($user['role'] === 'developer') {
                 redirect('/developer/migrations');
@@ -56,9 +75,19 @@ class AuthController {
                 }
                 redirect('/admin/dashboard');
             }
-            
+
         } else {
-            view('admin/login', ['error' => 'Usuário ou senha inválidos']);
+            $failureInfo = $throttle->recordFailure('admin', $username, 'users', $user['id'] ?? null);
+            $error = 'Usuário ou senha inválidos.';
+            if ($failureInfo) {
+                if ($failureInfo['just_locked']) {
+                    $error = "Usuário ou senha inválidos. Conta bloqueada temporariamente por excesso de tentativas — tente novamente em {$failureInfo['lock_minutes']} minuto(s).";
+                } elseif ($failureInfo['remaining'] > 0) {
+                    $plural = $failureInfo['remaining'] === 1 ? 'tentativa' : 'tentativas';
+                    $error = "Usuário ou senha inválidos. Restam {$failureInfo['remaining']} {$plural} antes do bloqueio temporário.";
+                }
+            }
+            view('admin/login', ['error' => $error]);
         }
     }
 

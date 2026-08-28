@@ -168,9 +168,8 @@ if (!empty($fhRestCategories)) {
         </div>
     <?php endif; ?>
 
-    <div class="d-flex justify-content-between align-items-center mt-3 fh-footnote">
+    <div class="mt-3 fh-footnote">
         <span><i class="fas fa-circle text-success" style="font-size:.4rem;"></i> Dados consultados automaticamente</span>
-        <span>sem exibir R$</span>
     </div>
 </div>
 
@@ -252,11 +251,7 @@ if (!empty($fhRestCategories)) {
                     <div class="fh-progress mt-3">
                         <div class="fh-progress-bar" style="width: 100%;"></div>
                     </div>
-                    <div class="text-center text-muted small mt-1">100% das saídas distribuídas — sem R$</div>
                 <?php endif; ?>
-            </div>
-            <div class="modal-footer fh-modal-footer justify-content-center">
-                <span class="text-muted small text-center">Sem R$ na visão pública evita fofoca e mantém o foco no cuidado da casa</span>
             </div>
         </div>
     </div>

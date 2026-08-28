@@ -13,18 +13,46 @@ class MemberAuthController {
         $cpf = preg_replace('/[^0-9]/', '', $_POST['cpf']);
         $password = $_POST['password'];
 
+        $throttle = new LoginThrottleService();
+        $ip = LoginThrottleService::clientIp();
+
+        $ipBlockedMinutes = $throttle->ipBlockedMinutesRemaining($ip);
+        if ($ipBlockedMinutes !== null) {
+            view('portal/login', ['error' => "Muitas tentativas de login detectadas. Tente novamente em {$ipBlockedMinutes} minuto(s)."]);
+            return;
+        }
+
         $db = (new Database())->connect();
         $stmt = $db->prepare("SELECT * FROM members WHERE REPLACE(REPLACE(REPLACE(cpf, '.', ''), '-', ''), ' ', '') = ?");
         $stmt->execute([$cpf]);
         $member = $stmt->fetch();
 
+        if ($member) {
+            $accountLockedMinutes = $throttle->accountLockedMinutesRemaining($member);
+            if ($accountLockedMinutes !== null) {
+                view('portal/login', ['error' => "Conta temporariamente bloqueada por excesso de tentativas. Tente novamente em {$accountLockedMinutes} minuto(s)."]);
+                return;
+            }
+        }
+
         if ($member && !empty($member['password']) && password_verify($password, $member['password'])) {
+            $throttle->resetAccount('members', $member['id']);
             $_SESSION['member_id'] = $member['id'];
             $_SESSION['member_name'] = $member['name'];
             $_SESSION['member_congregation'] = $member['congregation_id'];
             redirect('/portal/dashboard');
         } else {
-            view('portal/login', ['error' => 'CPF ou senha inválidos. Se é seu primeiro acesso, faça o cadastro.']);
+            $failureInfo = $throttle->recordFailure('member', $cpf, 'members', $member['id'] ?? null);
+            $error = 'CPF ou senha inválidos. Se é seu primeiro acesso, faça o cadastro.';
+            if ($failureInfo) {
+                if ($failureInfo['just_locked']) {
+                    $error = "CPF ou senha inválidos. Conta bloqueada temporariamente por excesso de tentativas — tente novamente em {$failureInfo['lock_minutes']} minuto(s).";
+                } elseif ($failureInfo['remaining'] > 0) {
+                    $plural = $failureInfo['remaining'] === 1 ? 'tentativa' : 'tentativas';
+                    $error = "CPF ou senha inválidos. Restam {$failureInfo['remaining']} {$plural} antes do bloqueio temporário.";
+                }
+            }
+            view('portal/login', ['error' => $error]);
         }
     }
 

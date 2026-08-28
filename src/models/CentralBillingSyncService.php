@@ -116,12 +116,26 @@ class CentralBillingSyncService {
 
     private function replaceLocalPayments(array $payments) {
         $hasDueDateColumn = $this->tableHasColumn('system_payments', 'due_date');
+        $hasTypeColumn = $this->tableHasColumn('system_payments', 'type');
 
         $this->db->beginTransaction();
         try {
             $this->db->exec("DELETE FROM system_payments");
 
-            if ($hasDueDateColumn) {
+            if ($hasDueDateColumn && $hasTypeColumn) {
+                $stmt = $this->db->prepare("INSERT INTO system_payments (reference_month, status, amount, due_date, payment_date, type) VALUES (?, ?, ?, ?, ?, ?)");
+                foreach ($payments as $payment) {
+                    $type = trim((string)($payment['type'] ?? 'recurring'));
+                    $stmt->execute([
+                        trim((string)($payment['reference_month'] ?? '')),
+                        trim((string)($payment['status'] ?? 'pending')),
+                        (float)($payment['amount'] ?? 59.99),
+                        $this->normalizeNullableDateTime($payment['due_date'] ?? null, trim((string)($payment['reference_month'] ?? '')) . '-05 00:00:00'),
+                        $this->normalizeNullableDateTime($payment['payment_date'] ?? null),
+                        $type !== '' ? $type : 'recurring'
+                    ]);
+                }
+            } elseif ($hasDueDateColumn) {
                 $stmt = $this->db->prepare("INSERT INTO system_payments (reference_month, status, amount, due_date, payment_date) VALUES (?, ?, ?, ?, ?)");
                 foreach ($payments as $payment) {
                     $stmt->execute([

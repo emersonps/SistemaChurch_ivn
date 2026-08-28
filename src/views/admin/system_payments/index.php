@@ -408,7 +408,12 @@ $hero = ($status === 'paid' && !empty($latestPaidPayment)) ? $heroMap['paid'] : 
                                 $rowClass = ['paid' => 'st-paid', 'overdue' => 'st-overdue', 'today' => 'st-today', 'alert' => 'st-alert'];
                                 ?>
                                 <tr>
-                                    <td class="fw-bold"><?= htmlspecialchars(date('m/Y', strtotime($p['reference_month'] . '-01'))) ?></td>
+                                    <td class="fw-bold">
+                                        <?= htmlspecialchars(date('m/Y', strtotime($p['reference_month'] . '-01'))) ?>
+                                        <?php if (($p['type'] ?? 'recurring') === 'adesao'): ?>
+                                            <span class="badge bg-dark ms-1">Adesão</span>
+                                        <?php endif; ?>
+                                    </td>
                                     <td><?= htmlspecialchars($historyDueDateText) ?></td>
                                     <td>
                                         R$ <?= number_format($historyAmountValue, 2, ',', '.') ?>
