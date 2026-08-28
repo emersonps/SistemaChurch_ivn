@@ -23,25 +23,32 @@ class LoginThrottleService {
     }
 
     // Minutos restantes se o IP estiver bloqueado (muitas falhas recentes,
-    // de qualquer conta), ou null se liberado.
+    // de qualquer conta), ou null se liberado. Se a migration que cria
+    // login_failure_log ainda não rodou nesta instância, falha aberto (sem
+    // bloqueio) em vez de derrubar o login inteiro — proteção contra força
+    // bruta é melhor que nenhuma, mas login quebrado é pior que os dois.
     public function ipBlockedMinutesRemaining($ip) {
-        $windowStart = date('Y-m-d H:i:s', strtotime('-' . self::IP_THROTTLE_WINDOW_MINUTES . ' minutes'));
-        $stmt = $this->db->prepare('SELECT COUNT(*) FROM login_failure_log WHERE ip_address = ? AND created_at >= ?');
-        $stmt->execute([$ip, $windowStart]);
-        if ((int)$stmt->fetchColumn() < self::IP_THROTTLE_THRESHOLD) {
+        try {
+            $windowStart = date('Y-m-d H:i:s', strtotime('-' . self::IP_THROTTLE_WINDOW_MINUTES . ' minutes'));
+            $stmt = $this->db->prepare('SELECT COUNT(*) FROM login_failure_log WHERE ip_address = ? AND created_at >= ?');
+            $stmt->execute([$ip, $windowStart]);
+            if ((int)$stmt->fetchColumn() < self::IP_THROTTLE_THRESHOLD) {
+                return null;
+            }
+
+            $stmtLast = $this->db->prepare('SELECT MAX(created_at) FROM login_failure_log WHERE ip_address = ?');
+            $stmtLast->execute([$ip]);
+            $lastFailure = $stmtLast->fetchColumn();
+            if (!$lastFailure) {
+                return null;
+            }
+
+            $unlockAt = strtotime($lastFailure) + self::IP_THROTTLE_WINDOW_MINUTES * 60;
+            $remaining = (int)ceil(($unlockAt - time()) / 60);
+            return $remaining > 0 ? $remaining : null;
+        } catch (Throwable $e) {
             return null;
         }
-
-        $stmtLast = $this->db->prepare('SELECT MAX(created_at) FROM login_failure_log WHERE ip_address = ?');
-        $stmtLast->execute([$ip]);
-        $lastFailure = $stmtLast->fetchColumn();
-        if (!$lastFailure) {
-            return null;
-        }
-
-        $unlockAt = strtotime($lastFailure) + self::IP_THROTTLE_WINDOW_MINUTES * 60;
-        $remaining = (int)ceil(($unlockAt - time()) / 60);
-        return $remaining > 0 ? $remaining : null;
     }
 
     // Minutos restantes se a conta (linha de users/members) estiver
@@ -61,13 +68,18 @@ class LoginThrottleService {
     // Quando a conta existe, retorna ['attempts', 'remaining', 'just_locked',
     // 'lock_minutes'] pro controller poder avisar quantas tentativas restam.
     public function recordFailure($loginType, $identifier, $table = null, $recordId = null) {
-        $ip = self::clientIp();
-        $insert = $this->db->prepare('INSERT INTO login_failure_log (ip_address, login_type, identifier, created_at) VALUES (?, ?, ?, CURRENT_TIMESTAMP)');
-        $insert->execute([$ip, $loginType, $identifier]);
+        try {
+            $ip = self::clientIp();
+            $insert = $this->db->prepare('INSERT INTO login_failure_log (ip_address, login_type, identifier, created_at) VALUES (?, ?, ?, CURRENT_TIMESTAMP)');
+            $insert->execute([$ip, $loginType, $identifier]);
 
-        // Limpeza leve a cada falha — nao existe cron nesse projeto, entao
-        // o proprio caminho de escrita mantem a tabela de log enxuta.
-        $this->db->exec("DELETE FROM login_failure_log WHERE created_at < '" . date('Y-m-d H:i:s', strtotime('-7 days')) . "'");
+            // Limpeza leve a cada falha — nao existe cron nesse projeto, entao
+            // o proprio caminho de escrita mantem a tabela de log enxuta.
+            $this->db->exec("DELETE FROM login_failure_log WHERE created_at < '" . date('Y-m-d H:i:s', strtotime('-7 days')) . "'");
+        } catch (Throwable $e) {
+            // Tabela ainda nao existe (migration pendente) — ignora o log,
+            // mas nao impede o resto do fluxo de login.
+        }
 
         if (!$table || !$recordId) {
             // Conta inexistente — sem contador real pra reportar. Devolver
@@ -76,29 +88,39 @@ class LoginThrottleService {
             return null;
         }
 
-        $this->db->prepare("UPDATE $table SET failed_login_attempts = failed_login_attempts + 1 WHERE id = ?")->execute([$recordId]);
+        try {
+            $this->db->prepare("UPDATE $table SET failed_login_attempts = failed_login_attempts + 1 WHERE id = ?")->execute([$recordId]);
 
-        $stmtCount = $this->db->prepare("SELECT failed_login_attempts FROM $table WHERE id = ?");
-        $stmtCount->execute([$recordId]);
-        $attempts = (int)$stmtCount->fetchColumn();
+            $stmtCount = $this->db->prepare("SELECT failed_login_attempts FROM $table WHERE id = ?");
+            $stmtCount->execute([$recordId]);
+            $attempts = (int)$stmtCount->fetchColumn();
 
-        $justLocked = false;
-        if ($attempts >= self::ACCOUNT_LOCK_THRESHOLD) {
-            $lockUntil = date('Y-m-d H:i:s', strtotime('+' . self::ACCOUNT_LOCK_MINUTES . ' minutes'));
-            $this->db->prepare("UPDATE $table SET locked_until = ? WHERE id = ?")->execute([$lockUntil, $recordId]);
-            $justLocked = true;
+            $justLocked = false;
+            if ($attempts >= self::ACCOUNT_LOCK_THRESHOLD) {
+                $lockUntil = date('Y-m-d H:i:s', strtotime('+' . self::ACCOUNT_LOCK_MINUTES . ' minutes'));
+                $this->db->prepare("UPDATE $table SET locked_until = ? WHERE id = ?")->execute([$lockUntil, $recordId]);
+                $justLocked = true;
+            }
+
+            return [
+                'attempts' => $attempts,
+                'remaining' => max(self::ACCOUNT_LOCK_THRESHOLD - $attempts, 0),
+                'just_locked' => $justLocked,
+                'lock_minutes' => self::ACCOUNT_LOCK_MINUTES,
+            ];
+        } catch (Throwable $e) {
+            // Colunas failed_login_attempts/locked_until ainda nao existem
+            // nesta tabela (migration pendente) — sem contador pra reportar.
+            return null;
         }
-
-        return [
-            'attempts' => $attempts,
-            'remaining' => max(self::ACCOUNT_LOCK_THRESHOLD - $attempts, 0),
-            'just_locked' => $justLocked,
-            'lock_minutes' => self::ACCOUNT_LOCK_MINUTES,
-        ];
     }
 
     // Chamado em todo login bem-sucedido — zera o contador da conta.
     public function resetAccount($table, $recordId) {
-        $this->db->prepare("UPDATE $table SET failed_login_attempts = 0, locked_until = NULL WHERE id = ?")->execute([$recordId]);
+        try {
+            $this->db->prepare("UPDATE $table SET failed_login_attempts = 0, locked_until = NULL WHERE id = ?")->execute([$recordId]);
+        } catch (Throwable $e) {
+            // Migration pendente — nao ha o que zerar ainda.
+        }
     }
 }
