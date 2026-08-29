@@ -356,9 +356,8 @@ foreach ($congregacoes as $c) {
                     <li class="nav-item"><a class="nav-link" href="/">Início</a></li>
                     <li class="nav-item"><a class="nav-link active" href="/cultos" aria-current="page">Cultos</a></li>
                     <li class="nav-item"><a class="nav-link" href="/galeria">Galeria</a></li>
-                    <li class="nav-item d-flex flex-column flex-lg-row gap-2 ms-lg-3">
-                        <a class="btn btn-outline-dark px-4 rounded-pill text-nowrap" href="/portal/login">Área do Membro</a>
-                        <a class="btn btn-outline-dark px-4 rounded-pill text-nowrap" href="/admin/login">Área Administrativa</a>
+                    <li class="nav-item ms-lg-3">
+                        <a class="btn btn-outline-dark px-4 rounded-pill text-nowrap" href="/portal/login"><i class="fas fa-right-to-bracket me-1"></i> Entrar</a>
                     </li>
                 </ul>
             </div>
