@@ -972,11 +972,9 @@ $totalPages = max(1, (int)($totalPages ?? 1));
                 var baseUrl = window.location.origin || '';
                 var prayerUrl = baseUrl + '/oracao';
                 var devotionalUrl = baseUrl + '/devocional';
-                var leadUrl = baseUrl + '/contato';
                 var shareText = 'A igreja está unida em oração.\n\n' +
                     '🙏 Envie seu pedido e acompanhe o mural:\n' + prayerUrl + '\n\n' +
-                    '📖 Receba uma palavra no Devocional do Dia:\n' + devotionalUrl + '\n\n' +
-                    'Quer um sistema como esse para sua igreja?\n' + leadUrl;
+                    '📖 Receba uma palavra no Devocional do Dia:\n' + devotionalUrl;
                 var title = document.title || 'Mural de Oração';
 
                 if (navigator.share) {
