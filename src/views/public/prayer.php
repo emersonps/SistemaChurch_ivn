@@ -718,6 +718,9 @@ $totalPages = max(1, (int)($totalPages ?? 1));
                 <a href="#pedido-form" class="btn btn-cta btn-sm px-3 text-nowrap">
                     <i class="fas fa-paper-plane me-2"></i><span class="d-none d-sm-inline">Enviar pedido</span><span class="d-inline d-sm-none">Enviar</span>
                 </a>
+                <a href="/portal/login" class="btn btn-outline-dark btn-sm px-3 text-nowrap">
+                    <i class="fas fa-right-to-bracket"></i><span class="d-none d-md-inline"> Entrar</span>
+                </a>
             </div>
         </div>
     </header>
