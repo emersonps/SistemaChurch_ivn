@@ -43,4 +43,21 @@ if (!empty($siteProfile['show_example_banner'])):
         }
     })();
 </script>
+
+<?php
+// CTA de aquisição — mesmo número configurado como "Telefone da igreja" na
+// instância (Central > Configurações Globais), sem número de fallback: sem
+// telefone configurado, não tem pra quem mandar a mensagem.
+$demoWhatsappPhone = preg_replace('/\D/', '', (string)($siteProfile['phone'] ?? ''));
+if ($demoWhatsappPhone !== ''):
+    $demoWhatsappMessage = 'Olá! Vi o sistema de demonstração e fiquei interessado(a). '
+        . 'Como faço para adquirir o mesmo sistema para minha igreja?';
+    $demoWhatsappUrl = 'https://wa.me/55' . $demoWhatsappPhone . '?text=' . rawurlencode($demoWhatsappMessage);
+?>
+<a href="<?= htmlspecialchars($demoWhatsappUrl) ?>" target="_blank" rel="noopener" id="demoAcquireCta"
+   style="position:fixed;right:18px;bottom:18px;z-index:99998;display:inline-flex;align-items:center;gap:.5rem;background:#25D366;color:#fff;font-weight:700;font-size:.88rem;text-decoration:none;padding:.7rem 1.1rem;border-radius:999px;box-shadow:0 4px 14px rgba(0,0,0,.25);">
+    <i class="fab fa-whatsapp" style="font-size:1.15rem;"></i>
+    <span>Quero adquirir este sistema</span>
+</a>
+<?php endif; ?>
 <?php endif; ?>
