@@ -295,6 +295,12 @@ elseif ($uri == '/developer/migrations/run') {
 elseif ($uri == '/developer/migrations/rollback' && $method == 'POST') {
     (new MigrationController())->rollback($_POST['filename'] ?? '');
 }
+elseif ($uri == '/developer/data-cleanup') {
+    (new DataCleanupController())->index();
+}
+elseif ($uri == '/developer/data-cleanup/run' && $method == 'POST') {
+    (new DataCleanupController())->run();
+}
 elseif ($uri == '/admin/manual') {
     (new ManualController())->index();
 }

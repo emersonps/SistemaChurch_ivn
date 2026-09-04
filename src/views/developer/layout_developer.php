@@ -57,6 +57,11 @@
                                 <?php endif; ?>
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link <?= strpos($_SERVER['REQUEST_URI'], '/developer/data-cleanup') !== false ? 'active' : '' ?>" href="/developer/data-cleanup">
+                                <i class="fas fa-broom me-2"></i> Limpar Dados
+                            </a>
+                        </li>
                     <li class="nav-item">
                         <a class="nav-link <?= strpos($_SERVER['REQUEST_URI'], '/developer/backups') !== false ? 'active' : '' ?>" href="/developer/backups">
                             <i class="fas fa-box-archive me-2"></i> Backups do Banco
@@ -110,6 +115,11 @@
                                 <?php if ($pendingCount > 0): ?>
                                     <span class="badge bg-danger ms-2"><?= $pendingCount ?></span>
                                 <?php endif; ?>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link <?= strpos($_SERVER['REQUEST_URI'], '/developer/data-cleanup') !== false ? 'active' : '' ?>" href="/developer/data-cleanup">
+                                <i class="fas fa-broom me-2"></i> Limpar Dados
                             </a>
                         </li>
                         <li class="nav-item">
