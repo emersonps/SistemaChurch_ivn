@@ -1,6 +1,7 @@
 <?php $suppressMobileTopbar = true; include __DIR__ . '/../layout/header.php'; ?>
 <?php
-$canToggleFinancialValues = in_array($_SESSION['user_role'] ?? '', ['admin', 'secretary'], true);
+$hideFinancialForRole = ($_SESSION['user_role'] ?? '') === 'secretary';
+$canToggleFinancialValues = !$hideFinancialForRole && in_array($_SESSION['user_role'] ?? '', ['admin', 'secretary'], true);
 $tithesSumFormatted = 'R$ ' . number_format($tithes_sum, 2, ',', '.');
 $offeringsSumFormatted = 'R$ ' . number_format($offerings_sum, 2, ',', '.');
 $totalFinancialFormatted = 'R$ ' . number_format($total_financial, 2, ',', '.');
@@ -16,6 +17,7 @@ $totalFinancialFormatted = 'R$ ' . number_format($total_financial, 2, ',', '.');
                 <i class="fas fa-eye"></i>
             </button>
         <?php endif; ?>
+        <?php if (!$hideFinancialForRole): ?>
         <form class="d-flex align-items-center gap-2" method="GET">
             <select name="month" class="form-select form-select-sm" onchange="this.form.submit()">
                 <?php
@@ -34,6 +36,7 @@ $totalFinancialFormatted = 'R$ ' . number_format($total_financial, 2, ',', '.');
                 <?php endfor; ?>
             </select>
         </form>
+        <?php endif; ?>
     </div>
 </div>
 
@@ -230,6 +233,7 @@ $totalFinancialFormatted = 'R$ ' . number_format($total_financial, 2, ',', '.');
                 </div>
             </div>
         </div>
+        <?php if (!$hideFinancialForRole): ?>
         <div class="dashboard-cards-slide">
             <div class="stat-box stat-tithes">
                 <div class="stat-icon"><i class="fas fa-hand-holding-dollar"></i></div>
@@ -257,6 +261,7 @@ $totalFinancialFormatted = 'R$ ' . number_format($total_financial, 2, ',', '.');
                 </div>
             </div>
         </div>
+        <?php endif; ?>
     </div>
 </div>
 
@@ -270,6 +275,7 @@ $totalFinancialFormatted = 'R$ ' . number_format($total_financial, 2, ',', '.');
             </div>
         </div>
     </div>
+    <?php if (!$hideFinancialForRole): ?>
     <div class="col-md-3">
         <div class="stat-box stat-tithes">
             <div class="stat-icon"><i class="fas fa-hand-holding-dollar"></i></div>
@@ -297,6 +303,7 @@ $totalFinancialFormatted = 'R$ ' . number_format($total_financial, 2, ',', '.');
             </div>
         </div>
     </div>
+    <?php endif; ?>
 </div>
 
 <?php if ($canToggleFinancialValues): ?>
@@ -351,9 +358,11 @@ $totalFinancialFormatted = 'R$ ' . number_format($total_financial, 2, ',', '.');
                         <tr>
                             <th>Congregação</th>
                             <th class="text-center">Membros</th>
+                            <?php if (!$hideFinancialForRole): ?>
                             <th class="text-end">Dízimos</th>
                             <th class="text-end">Ofertas</th>
                             <th class="text-end">Total</th>
+                            <?php endif; ?>
                         </tr>
                     </thead>
                     <tbody>
@@ -369,9 +378,11 @@ $totalFinancialFormatted = 'R$ ' . number_format($total_financial, 2, ',', '.');
                                 <tr>
                                     <td class="fw-bold"><?= htmlspecialchars($stat['congregation_name']) ?></td>
                                     <td class="text-center"><?= $stat['member_count'] ?></td>
+                                    <?php if (!$hideFinancialForRole): ?>
                                     <td class="text-end sensitive-dashboard-value" data-value="<?= htmlspecialchars($titheValue) ?>"><?= $canToggleFinancialValues ? 'R$ ••••••' : $titheValue ?></td>
                                     <td class="text-end sensitive-dashboard-value" data-value="<?= htmlspecialchars($offeringValue) ?>"><?= $canToggleFinancialValues ? 'R$ ••••••' : $offeringValue ?></td>
                                     <td class="text-end fw-bold sensitive-dashboard-value" data-value="<?= htmlspecialchars($totalValue) ?>"><?= $canToggleFinancialValues ? 'R$ ••••••' : $totalValue ?></td>
+                                    <?php endif; ?>
                                 </tr>
                             <?php endforeach; ?>
                         <?php endif; ?>

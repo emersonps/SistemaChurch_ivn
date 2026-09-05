@@ -226,9 +226,18 @@ if ($mdbView === 'aniversariantes') {
             <?php if ($canToggleFinancialValues): ?>
                 <button type="button" class="mdb-fin-eye" id="toggle-dashboard-values-mobile" aria-label="Exibir valores"><i class="fas fa-eye"></i></button>
             <?php endif; ?>
-            <button type="button" class="mdb-fin-pill" data-bs-toggle="offcanvas" data-bs-target="#mdbFilterSheet"><i class="far fa-calendar me-1"></i> <?= htmlspecialchars($mdbMonthLabel) ?> / <?= htmlspecialchars($selected_year) ?></button>
+            <?php if (!$hideFinancialForRole): ?>
+                <button type="button" class="mdb-fin-pill" data-bs-toggle="offcanvas" data-bs-target="#mdbFilterSheet"><i class="far fa-calendar me-1"></i> <?= htmlspecialchars($mdbMonthLabel) ?> / <?= htmlspecialchars($selected_year) ?></button>
+            <?php endif; ?>
         </div>
 
+        <?php if ($hideFinancialForRole): ?>
+            <div class="mdb-fin-hero">
+                <div class="mdb-fin-quickstats">
+                    <span><?= $members_count ?> membros</span>
+                </div>
+            </div>
+        <?php else: ?>
         <div class="mdb-fin-hero">
             <div class="mdb-fin-hero-top">
                 <div>
@@ -252,6 +261,7 @@ if ($mdbView === 'aniversariantes') {
                 <span class="mdb-fin-health-dot is-<?= htmlspecialchars($mdbHealthTier) ?>"></span>
             </div>
         </div>
+        <?php endif; ?>
 
         <div class="mdb-section-header">
             <div class="mdb-section-title">POR CONGREGAÇÃO</div>
@@ -272,7 +282,9 @@ if ($mdbView === 'aniversariantes') {
                     <<?= $mdbCongTag ?> class="mdb-conglist-row <?= $total > 0 ? 'is-active' : '' ?>" <?= $mdbCongHref ? 'href="' . htmlspecialchars($mdbCongHref) . '"' : '' ?>>
                         <span class="mdb-conglist-dot"></span>
                         <span class="mdb-conglist-name"><?= htmlspecialchars($stat['congregation_name']) ?></span>
+                        <?php if (!$hideFinancialForRole): ?>
                         <span class="mdb-conglist-amount sensitive-dashboard-value" data-value="<?= htmlspecialchars($totalValue) ?>"><?= $canToggleFinancialValues ? '••••••' : $totalValue ?></span>
+                        <?php endif; ?>
                         <span class="mdb-conglist-badge"><?= $stat['member_count'] ?></span>
                         <?php if ($mdbCongHref): ?><i class="fas fa-chevron-right mdb-conglist-chevron"></i><?php endif; ?>
                     </<?= $mdbCongTag ?>>
