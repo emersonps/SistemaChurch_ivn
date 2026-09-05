@@ -5,11 +5,8 @@ ini_set('display_errors', 1);
 // public/index.php
 date_default_timezone_set('America/Sao_Paulo');
 
-// Configuração Robusta de Sessão
-$sessionPath = dirname(__DIR__) . '/tmp';
-if (!file_exists($sessionPath)) {
-    @mkdir($sessionPath, 0777, true);
-}
+require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/../src/models/DbSessionHandler.php';
 
 // Forçar configurações de garbage collection e cookie
 ini_set('session.gc_maxlifetime', 86400); // 24 horas
@@ -17,13 +14,36 @@ ini_set('session.cookie_lifetime', 86400); // 24 horas
 ini_set('session.gc_probability', 1);
 ini_set('session.gc_divisor', 100);
 
-if (is_writable($sessionPath)) {
-    session_save_path($sessionPath);
+// Sessão via banco de dados — em hospedagens com múltiplos nós/processos de
+// servidor atrás de um balanceador, cada um pode ter seu próprio disco
+// local: uma sessão gravada em arquivo pelo nó que atendeu o login pode
+// nunca ser lida pelo nó que atende a página seguinte, derrubando o login
+// aleatoriamente mesmo com a senha certa. O banco já é compartilhado e
+// consistente entre nós. Se a tabela `sessions` ainda não existir nesta
+// instância (migration pendente) ou o banco falhar, cai pro esquema antigo
+// (arquivo em tmp/) em vez de quebrar o login inteiro.
+$sessionUsesDb = false;
+try {
+    $dbForSession = (new Database())->connect();
+    $dbForSession->query('SELECT 1 FROM sessions LIMIT 1');
+    session_set_save_handler(new DbSessionHandler($dbForSession, 86400), true);
+    $sessionUsesDb = true;
+} catch (Throwable $e) {
+    // Tabela pendente ou banco indisponível — segue com arquivo local.
+}
+
+if (!$sessionUsesDb) {
+    $sessionPath = dirname(__DIR__) . '/tmp';
+    if (!file_exists($sessionPath)) {
+        @mkdir($sessionPath, 0777, true);
+    }
+    if (is_writable($sessionPath)) {
+        session_save_path($sessionPath);
+    }
 }
 
 session_start();
 
-require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../src/helpers.php';
 
 // Autoload simple implementation
