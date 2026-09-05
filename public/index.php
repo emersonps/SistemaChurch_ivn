@@ -26,14 +26,17 @@ $sessionUsesDb = false;
 try {
     $dbForSession = (new Database())->connect();
     $dbForSession->query('SELECT 1 FROM sessions LIMIT 1');
-    session_set_save_handler(new DbSessionHandler($dbForSession, 86400), true);
+    $handlerSetResult = session_set_save_handler(new DbSessionHandler($dbForSession, 86400), true);
     $sessionUsesDb = true;
     try {
         $diagDb2 = (new Database())->connect();
+        $diagMsg2 = 'handlerSetResult=' . var_export($handlerSetResult, true)
+            . ' ini_save_handler=' . ini_get('session.save_handler')
+            . ' at ' . date('Y-m-d H:i:s');
         $diagStmt2 = $diagDb2->prepare("UPDATE settings SET setting_value = ? WHERE setting_key = 'debug_session_handler_error'");
-        $diagStmt2->execute(['OK - handler set without exception at ' . date('Y-m-d H:i:s')]);
+        $diagStmt2->execute([$diagMsg2]);
         if ($diagStmt2->rowCount() === 0) {
-            $diagDb2->prepare("INSERT INTO settings (setting_key, setting_value) VALUES ('debug_session_handler_error', ?)")->execute(['OK - handler set without exception at ' . date('Y-m-d H:i:s')]);
+            $diagDb2->prepare("INSERT INTO settings (setting_key, setting_value) VALUES ('debug_session_handler_error', ?)")->execute([$diagMsg2]);
         }
     } catch (Throwable $e3) {
     }
