@@ -176,7 +176,15 @@ class CentralUsersSyncService {
                     $stmt = $this->db->prepare('UPDATE users SET password = ? WHERE id = ?');
                     $stmt->execute([$newPasswordHash, $remoteUserId]);
                 }
-                $applied++;
+                // Central marca a alteracao como entregue assim que a devolve
+                // nesta chamada, antes de saber se ela realmente se aplicou —
+                // se o remote_user_id nao existir mais (conta excluida e
+                // recriada com outro id, por exemplo), o UPDATE roda sem erro
+                // e afeta zero linhas, reportando "sucesso" pra uma mudanca
+                // que nunca aconteceu de verdade.
+                if ($stmt->rowCount() > 0) {
+                    $applied++;
+                }
             } catch (Exception $e) {
                 // Skip this row (e.g. duplicate username) without aborting the rest of the batch.
             }
