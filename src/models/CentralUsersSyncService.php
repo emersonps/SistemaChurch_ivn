@@ -165,6 +165,18 @@ class CentralUsersSyncService {
                 continue;
             }
 
+            // Se a instancia estava offline (fora do ar, em deploy) quando a
+            // central tentou aplicar isso na hora, a mudanca fica pendente
+            // pro proximo carregamento silencioso — sem limite de tempo, ela
+            // podia ressurgir horas ou dias depois e sobrescrever em silencio
+            // uma senha que o usuario ja trocou manualmente nesse meio tempo.
+            // Passado esse prazo, melhor a pessoa refazer a troca do que
+            // aplicar algo tao antigo sem avisar.
+            $createdAt = strtotime((string)($change['created_at'] ?? ''));
+            if ($createdAt !== false && (time() - $createdAt) > 1800) {
+                continue;
+            }
+
             try {
                 if ($newUsername !== '' && $newPasswordHash !== '') {
                     $stmt = $this->db->prepare('UPDATE users SET username = ?, password = ? WHERE id = ?');
