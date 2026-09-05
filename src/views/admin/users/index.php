@@ -53,6 +53,7 @@
     .role-pill.role-developer { background: #212529; color: #fff; }
     .role-pill.role-secretary { background: rgba(13,110,253,0.10); color: #0d6efd; }
     .role-pill.role-accountant { background: rgba(25,135,84,0.10); color: #198754; }
+    .role-pill.role-treasurer { background: rgba(255,153,0,0.12); color: #b36b00; }
     .role-pill.role-default { background: #eef0f2; color: #495057; }
     .linked-members-text {
         font-size: .8rem;
@@ -79,7 +80,7 @@
 
 <?php
 function userRolePillClass($role) {
-    $known = ['admin', 'developer', 'secretary', 'accountant'];
+    $known = ['admin', 'developer', 'secretary', 'accountant', 'treasurer'];
     return in_array($role, $known, true) ? 'role-' . $role : 'role-default';
 }
 $rbac = require __DIR__ . '/../../../../config/rbac.php';

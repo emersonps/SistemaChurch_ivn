@@ -33,6 +33,7 @@
     .role-card-header.role-developer { background: #212529; }
     .role-card-header.role-secretary { background: #0d6efd; }
     .role-card-header.role-accountant { background: #198754; }
+    .role-card-header.role-treasurer { background: #b36b00; }
     .role-card-header.role-default { background: #6c757d; }
     .role-count-badge {
         background: rgba(255,255,255,0.18);
@@ -100,7 +101,7 @@
 
 <?php
 function permissionRoleHeaderClass($roleKey) {
-    $known = ['admin', 'developer', 'secretary', 'accountant'];
+    $known = ['admin', 'developer', 'secretary', 'accountant', 'treasurer'];
     return in_array($roleKey, $known, true) ? 'role-' . $roleKey : 'role-default';
 }
 ?>

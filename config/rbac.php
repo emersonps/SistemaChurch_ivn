@@ -90,13 +90,28 @@ return array (
         3 => 'system_payments.manage',
       ),
     ),
-    'accountant' => 
+    'accountant' =>
     array (
       'label' => 'Contador',
-      'permissions' => 
+      'permissions' =>
       array (
         0 => 'financial.manage',
         1 => 'financial.view',
+      ),
+    ),
+    'treasurer' =>
+    array (
+      'label' => 'Tesoureiro',
+      'permissions' =>
+      array (
+        0 => 'dashboard.view',
+        1 => 'financial.view',
+        2 => 'financial.manage',
+        3 => 'financial_accounts.manage',
+        4 => 'financial_ofx.manage',
+        5 => 'donations.view',
+        6 => 'donations.manage',
+        7 => 'general_reports.view',
       ),
     ),
   ),

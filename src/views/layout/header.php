@@ -593,7 +593,7 @@ $mobileLauncherHref = '/admin?launcher=1';
                 $loggedUserName = $_SESSION['user_name'] ?? $_SESSION['username'] ?? '';
                 $loggedUserRole = $_SESSION['user_role'] ?? '';
 
-                $topbarRoleLabels = ['admin' => 'Administrador', 'secretary' => 'Secretária(o)', 'accountant' => 'Contador'];
+                $topbarRoleLabels = ['admin' => 'Administrador', 'secretary' => 'Secretária(o)', 'accountant' => 'Contador', 'treasurer' => 'Tesoureiro'];
                 $topbarRoleLabel = $topbarRoleLabels[$loggedUserRole] ?? ucfirst((string)$loggedUserRole);
 
                 $topbarWeekDays = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
