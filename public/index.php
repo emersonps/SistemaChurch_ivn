@@ -28,8 +28,31 @@ try {
     $dbForSession->query('SELECT 1 FROM sessions LIMIT 1');
     session_set_save_handler(new DbSessionHandler($dbForSession, 86400), true);
     $sessionUsesDb = true;
+    try {
+        $diagDb2 = (new Database())->connect();
+        $diagStmt2 = $diagDb2->prepare("UPDATE settings SET setting_value = ? WHERE setting_key = 'debug_session_handler_error'");
+        $diagStmt2->execute(['OK - handler set without exception at ' . date('Y-m-d H:i:s')]);
+        if ($diagStmt2->rowCount() === 0) {
+            $diagDb2->prepare("INSERT INTO settings (setting_key, setting_value) VALUES ('debug_session_handler_error', ?)")->execute(['OK - handler set without exception at ' . date('Y-m-d H:i:s')]);
+        }
+    } catch (Throwable $e3) {
+    }
 } catch (Throwable $e) {
     // Tabela pendente ou banco indisponível — segue com arquivo local.
+    // Diagnostico temporario: grava o motivo exato pra investigar por que
+    // a sessao via banco nao esta ativando em producao mesmo com a tabela
+    // ja existindo. Remover depois de identificado o problema.
+    try {
+        $diagDb = (new Database())->connect();
+        $diagMsg = get_class($e) . ': ' . $e->getMessage();
+        $diagStmt = $diagDb->prepare("UPDATE settings SET setting_value = ? WHERE setting_key = 'debug_session_handler_error'");
+        $diagStmt->execute([$diagMsg]);
+        if ($diagStmt->rowCount() === 0) {
+            $diagDb->prepare("INSERT INTO settings (setting_key, setting_value) VALUES ('debug_session_handler_error', ?)")->execute([$diagMsg]);
+        }
+    } catch (Throwable $e2) {
+        // Nem isso — ignora, nao pode quebrar o login por causa de um log.
+    }
 }
 
 if (!$sessionUsesDb) {
