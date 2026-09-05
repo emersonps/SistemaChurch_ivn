@@ -19,6 +19,12 @@ $mdbView = $_GET['view'] ?? 'overview';
 if (!in_array($mdbView, ['overview', 'aniversariantes', 'eventos'], true)) {
     $mdbView = 'overview';
 }
+// Secretaria nao ve totais de membros/congregacao nem valores financeiros
+// no dashboard — a tela "Financeiro" (overview) ficaria praticamente vazia
+// pra esse papel, entao manda direto pra aniversariantes.
+if (!empty($hideFinancialForRole) && $mdbView === 'overview') {
+    $mdbView = 'aniversariantes';
+}
 $mdbTitles = [
     'overview' => 'Financeiro',
     'aniversariantes' => 'Aniversariantes do Mês',

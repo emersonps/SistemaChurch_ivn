@@ -216,6 +216,7 @@ $totalFinancialFormatted = 'R$ ' . number_format($total_financial, 2, ',', '.');
     #birthdayModal .modal-content { border-radius: 16px; border: none; overflow: hidden; }
 </style>
 
+<?php if (!$hideFinancialForRole): ?>
 <div class="dashboard-cards-carousel d-none mb-2">
     <div class="px-2 pt-2">
         <div class="d-flex justify-content-between align-items-center">
@@ -233,7 +234,6 @@ $totalFinancialFormatted = 'R$ ' . number_format($total_financial, 2, ',', '.');
                 </div>
             </div>
         </div>
-        <?php if (!$hideFinancialForRole): ?>
         <div class="dashboard-cards-slide">
             <div class="stat-box stat-tithes">
                 <div class="stat-icon"><i class="fas fa-hand-holding-dollar"></i></div>
@@ -261,10 +261,11 @@ $totalFinancialFormatted = 'R$ ' . number_format($total_financial, 2, ',', '.');
                 </div>
             </div>
         </div>
-        <?php endif; ?>
     </div>
 </div>
+<?php endif; ?>
 
+<?php if (!$hideFinancialForRole): ?>
 <div class="row d-none d-lg-flex g-3 mb-1">
     <div class="col-md-3">
         <div class="stat-box stat-members">
@@ -275,7 +276,6 @@ $totalFinancialFormatted = 'R$ ' . number_format($total_financial, 2, ',', '.');
             </div>
         </div>
     </div>
-    <?php if (!$hideFinancialForRole): ?>
     <div class="col-md-3">
         <div class="stat-box stat-tithes">
             <div class="stat-icon"><i class="fas fa-hand-holding-dollar"></i></div>
@@ -303,8 +303,8 @@ $totalFinancialFormatted = 'R$ ' . number_format($total_financial, 2, ',', '.');
             </div>
         </div>
     </div>
-    <?php endif; ?>
 </div>
+<?php endif; ?>
 
 <?php if ($canToggleFinancialValues): ?>
 <script>
@@ -346,6 +346,7 @@ $totalFinancialFormatted = 'R$ ' . number_format($total_financial, 2, ',', '.');
 </script>
 <?php endif; ?>
 
+<?php if (!$hideFinancialForRole): ?>
 <div class="row mt-4 d-none d-lg-flex">
     <div class="col-12 mb-4">
         <div class="member-form-card">
@@ -392,6 +393,7 @@ $totalFinancialFormatted = 'R$ ' . number_format($total_financial, 2, ',', '.');
         </div>
     </div>
 </div>
+<?php endif; ?>
 
 <div class="row d-none d-lg-flex">
     <?php if (hasPermission('members.view')): ?>
