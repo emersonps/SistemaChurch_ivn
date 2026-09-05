@@ -224,7 +224,8 @@ class CentralManualSyncService {
         }
 
         if (!is_array($decoded)) {
-            throw new RuntimeException('A central retornou uma resposta inválida.');
+            $snippet = htmlspecialchars(substr((string)$raw, 0, 300), ENT_QUOTES, 'UTF-8');
+            throw new RuntimeException('A central retornou uma resposta inválida. Trecho recebido: ' . $snippet);
         }
 
         if ($status >= 400) {
