@@ -282,7 +282,11 @@ class UserController {
         $db = (new Database())->connect();
         $username = $_POST['username'];
         $role = $_POST['role'];
-        $password = $_POST['password']; 
+        // Vem ausente do POST quando o checkbox "Alterar senha" nao foi
+        // marcado (o campo fica disabled, e inputs disabled nao sao
+        // enviados) — nesse caso o comportamento pretendido e o mesmo de
+        // vir vazio: manter a senha atual.
+        $password = $_POST['password'] ?? '';
         $congregation_id = !empty($_POST['congregation_id']) ? $_POST['congregation_id'] : null;
         $member_ids = !empty($_POST['member_ids']) ? json_decode($_POST['member_ids'], true) : [];
         $custom_permissions = normalizePermissionSelection(isset($_POST['permissions']) ? $_POST['permissions'] : []);

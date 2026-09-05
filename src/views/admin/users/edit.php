@@ -163,8 +163,12 @@
                 </div>
 
                 <div class="col-md-6">
-                    <label for="password" class="form-label">Senha (Deixe em branco para manter a atual)</label>
-                    <input type="password" class="form-control" id="password" name="password">
+                    <div class="form-check mb-1">
+                        <input class="form-check-input" type="checkbox" id="change_password_toggle">
+                        <label class="form-check-label" for="change_password_toggle">Alterar senha</label>
+                    </div>
+                    <label for="password" class="form-label">Nova Senha</label>
+                    <input type="password" class="form-control" id="password" name="password" autocomplete="new-password" disabled>
                 </div>
 
                 <div class="col-12">
@@ -373,6 +377,20 @@
 </div>
 
 <script>
+    // Campo de senha comeca desabilitado — so entra no POST quando o admin
+    // marca explicitamente que quer trocar. Sem isso, o autofill do
+    // navegador podia preencher esse campo sozinho (mesmo parecendo vazio)
+    // e uma edicao que so mudava papel/permissoes acabava trocando a senha
+    // do usuario sem ninguem perceber.
+    const changePasswordToggle = document.getElementById('change_password_toggle');
+    const passwordField = document.getElementById('password');
+    changePasswordToggle.addEventListener('change', function () {
+        passwordField.disabled = !this.checked;
+        if (!this.checked) {
+            passwordField.value = '';
+        }
+    });
+
     // Logic to capture the ID from the datalist
     const memberInput = document.getElementById('member_search');
     const memberIdsInput = document.getElementById('member_ids');
