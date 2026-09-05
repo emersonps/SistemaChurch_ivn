@@ -587,7 +587,12 @@
                 if (Object.prototype.hasOwnProperty.call(manualPermissionState, slug)) {
                     input.checked = manualPermissionState[slug];
                 } else {
-                    input.checked = input.dataset.explicit === '1';
+                    // Personalizar parte do que o usuário já tem de fato
+                    // (papel + extras explícitos) — só olhar pro explícito
+                    // fazia permissões do papel aparecerem desmarcadas ao
+                    // entrar em modo override, mesmo sem ter sido removido
+                    // nada ainda.
+                    input.checked = isRolePerm || input.dataset.explicit === '1';
                 }
                 input.disabled = false;
                 badge.classList.add('d-none');
