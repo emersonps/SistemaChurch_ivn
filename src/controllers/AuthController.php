@@ -46,7 +46,7 @@ class AuthController {
         $user = $stmt->fetch();
 
         if ($user) {
-            $accountLockedMinutes = $throttle->accountLockedMinutesRemaining($user);
+            $accountLockedMinutes = $throttle->accountLockedMinutesRemaining($user, 'users', $user['id']);
             if ($accountLockedMinutes !== null) {
                 view('admin/login', ['error' => "Conta temporariamente bloqueada por excesso de tentativas. Tente novamente em {$accountLockedMinutes} minuto(s)."]);
                 return;

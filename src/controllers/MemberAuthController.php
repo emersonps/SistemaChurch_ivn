@@ -28,7 +28,7 @@ class MemberAuthController {
         $member = $stmt->fetch();
 
         if ($member) {
-            $accountLockedMinutes = $throttle->accountLockedMinutesRemaining($member);
+            $accountLockedMinutes = $throttle->accountLockedMinutesRemaining($member, 'members', $member['id']);
             if ($accountLockedMinutes !== null) {
                 view('portal/login', ['error' => "Conta temporariamente bloqueada por excesso de tentativas. Tente novamente em {$accountLockedMinutes} minuto(s)."]);
                 return;

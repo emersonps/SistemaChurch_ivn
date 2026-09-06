@@ -52,14 +52,26 @@ class LoginThrottleService {
     }
 
     // Minutos restantes se a conta (linha de users/members) estiver
-    // bloqueada, ou null se liberada.
-    public function accountLockedMinutesRemaining(array $record) {
+    // bloqueada, ou null se liberada. Quando $table/$recordId sao passados
+    // e o bloqueio ja expirou, zera failed_login_attempts aqui mesmo — sem
+    // isso, a proxima senha errada somava em cima da contagem antiga (ja
+    // no limite) e rebloqueava na primeira tentativa nova, em vez de dar
+    // as ACCOUNT_LOCK_THRESHOLD tentativas novas que o usuario deveria
+    // ganhar depois de esperar o tempo do bloqueio.
+    public function accountLockedMinutesRemaining(array $record, $table = null, $recordId = null) {
         if (empty($record['locked_until'])) {
             return null;
         }
         $unlockAt = strtotime($record['locked_until']);
         $remaining = (int)ceil(($unlockAt - time()) / 60);
-        return $remaining > 0 ? $remaining : null;
+        if ($remaining > 0) {
+            return $remaining;
+        }
+
+        if ($table && $recordId) {
+            $this->resetAccount($table, $recordId);
+        }
+        return null;
     }
 
     // Chamado em toda falha de login (usuario/CPF nao encontrado OU senha

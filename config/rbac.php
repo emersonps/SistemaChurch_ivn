@@ -62,21 +62,34 @@ return array (
         0 => 'dashboard.view',
         1 => 'members.view',
         2 => 'members.manage',
-        3 => 'service_reports.view',
-        4 => 'service_reports.manage',
-        5 => 'general_reports.view',
-        6 => 'signatures.view',
-        7 => 'signatures.manage',
-        8 => 'groups.view',
-        9 => 'groups.manage',
-        10 => 'financial.view',
-        11 => 'financial.manage',
-        12 => 'donations.view',
-        13 => 'donations.manage',
-        14 => 'campaigns.view',
-        15 => 'campaigns.manage',
-        16 => 'liturgy_schedules.view',
-        17 => 'liturgy_schedules.manage',
+        3 => 'congregations.view',
+        4 => 'congregations.manage',
+        5 => 'events.view',
+        6 => 'events.manage',
+        7 => 'service_reports.view',
+        8 => 'service_reports.manage',
+        9 => 'general_reports.view',
+        10 => 'signatures.view',
+        11 => 'signatures.manage',
+        12 => 'groups.view',
+        13 => 'groups.manage',
+        14 => 'gallery.view',
+        15 => 'gallery.manage',
+        16 => 'banners.view',
+        17 => 'banners.manage',
+        18 => 'video_wall.view',
+        19 => 'video_wall.manage',
+        20 => 'liturgy_schedules.view',
+        21 => 'liturgy_schedules.manage',
+        22 => 'campaigns.view',
+        23 => 'campaigns.manage',
+        24 => 'ebd.view',
+        25 => 'ebd.manage',
+        26 => 'ebd.lessons',
+        27 => 'studies.view',
+        28 => 'studies.manage',
+        29 => 'settings.layout.view',
+        30 => 'settings.card.view',
       ),
     ),
     'developer' => 
@@ -90,19 +103,19 @@ return array (
         3 => 'system_payments.manage',
       ),
     ),
-    'accountant' =>
+    'accountant' => 
     array (
       'label' => 'Contador',
-      'permissions' =>
+      'permissions' => 
       array (
         0 => 'financial.manage',
         1 => 'financial.view',
       ),
     ),
-    'treasurer' =>
+    'treasurer' => 
     array (
       'label' => 'Tesoureiro',
-      'permissions' =>
+      'permissions' => 
       array (
         0 => 'dashboard.view',
         1 => 'financial.view',
