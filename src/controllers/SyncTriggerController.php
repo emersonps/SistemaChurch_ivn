@@ -28,7 +28,7 @@ class SyncTriggerController {
                 exit;
             }
 
-            if (!$this->allowedNow()) {
+            if (!$this->allowedNow('central_users_sync_trigger_last_at')) {
                 http_response_code(429);
                 echo json_encode(['status' => 'skipped']);
                 exit;
@@ -43,9 +43,54 @@ class SyncTriggerController {
         exit;
     }
 
-    private function allowedNow() {
+    // Central chama isso logo depois de salvar Configurações Globais (nome
+    // da igreja, faixa de demonstração, etc.) pra aplicar na hora — sem
+    // isso, a mudança so pegava quando um admin acessava o painel dessa
+    // instancia (CentralGlobalSettingsSyncService::syncSettings() so roda
+    // hoje pelo header.php, em toda pagina /admin).
+    public function globalSettingsSyncNow() {
+        header('Content-Type: application/json; charset=utf-8');
+
+        try {
+            $connector = new CentralManualSyncService();
+            if (!$connector->hasRemoteConfig()) {
+                http_response_code(404);
+                echo json_encode(['status' => 'not_configured']);
+                exit;
+            }
+
+            $providedCode = trim((string)($_SERVER['HTTP_X_INSTANCE_CODE'] ?? ''));
+            $configuredCode = $connector->getConnectionConfig()['instance_code'] ?? '';
+            if ($providedCode === '' || $providedCode !== $configuredCode) {
+                http_response_code(401);
+                echo json_encode(['status' => 'unauthorized']);
+                exit;
+            }
+
+            if (!$this->allowedNow('central_global_settings_sync_trigger_last_at')) {
+                http_response_code(429);
+                echo json_encode(['status' => 'skipped']);
+                exit;
+            }
+
+            $service = new CentralGlobalSettingsSyncService();
+            if (!$service->isEnabled()) {
+                http_response_code(404);
+                echo json_encode(['status' => 'not_configured']);
+                exit;
+            }
+
+            $result = $service->syncSettings();
+            echo json_encode(['status' => 'ok', 'updated' => (bool)($result['updated'] ?? false)]);
+        } catch (Throwable $e) {
+            http_response_code(500);
+            echo json_encode(['status' => 'error']);
+        }
+        exit;
+    }
+
+    private function allowedNow($key) {
         $db = (new Database())->connect();
-        $key = 'central_users_sync_trigger_last_at';
 
         $stmt = $db->prepare('SELECT setting_value FROM settings WHERE setting_key = ?');
         $stmt->execute([$key]);

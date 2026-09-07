@@ -240,6 +240,9 @@ elseif ($uri == '/harpa/hino') {
 elseif ($uri == '/api/v1/users/sync-now' && $method == 'POST') {
     (new SyncTriggerController())->usersSyncNow();
 }
+elseif ($uri == '/api/v1/global-settings/sync-now' && $method == 'POST') {
+    (new SyncTriggerController())->globalSettingsSyncNow();
+}
 elseif ($uri == '/harpa/letra') {
     $num = (int)($_GET['n'] ?? $_GET['num'] ?? $_GET['numero'] ?? 0);
     if ($num <= 0) {

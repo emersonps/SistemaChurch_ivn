@@ -730,6 +730,144 @@ $mobileLauncherHref = '/admin?launcher=1';
                     </div>
                 </div>
 
+                <!-- System Payment Alert Modal Logic -->
+                <?php
+                // Simple logic to check if we need to show the modal (only on admin pages)
+                // Ideally this should be passed from a global controller or middleware,
+                // but for simplicity we can do a quick check here if user is logged in.
+
+                // Check status only if we are in admin panel
+                // Movido pra antes do launcher/dashboard mobile — antes ficava
+                // depois de todo o conteudo da tela inicial mobile (que sozinha
+                // ja passa de uma tela cheia), entao o aviso de mensalidade
+                // atrasada so aparecia rolando ate o fim, e ninguem via.
+                if (isLoggedIn() && strpos($_SERVER['REQUEST_URI'], '/admin') === 0) {
+                    // We need to check payment status.
+                    // Reusing logic from SystemPaymentController essentially.
+                    // To avoid DB calls on every page load, maybe use session?
+                    // But user wants "always updated". DB call is safer.
+
+                    try {
+                        $billingSyncService = new CentralBillingSyncService();
+                        if ($billingSyncService->hasRemoteConfig()) {
+                            $billingSyncService->syncFromCentral();
+                        }
+
+                        try {
+                            $usersSyncService = new CentralUsersSyncService();
+                            if ($usersSyncService->hasRemoteConfig()) {
+                                $usersSyncService->syncSilently();
+                            }
+                        } catch (Throwable $e) {
+                            // Never block page render on a users-sync failure —
+                            // catches Error too (e.g. class/file missing), not
+                            // just Exception, since either would otherwise crash
+                            // every admin page load with a blank white screen.
+                        }
+
+                        try {
+                            $globalSettingsSyncService = new CentralGlobalSettingsSyncService();
+                            if ($globalSettingsSyncService->isEnabled()) {
+                                $globalSettingsSyncService->syncSettings();
+                            }
+                        } catch (Throwable $e) {
+                            // Same reasoning as the users-sync block above: this
+                            // is what brings centrally-edited branding and demo
+                            // landing config down automatically, but must never
+                            // break an admin page load if the central is
+                            // unreachable or the payload is momentarily invalid.
+                        }
+
+                        $db = (new Database())->connect();
+                        $currentMonth = date('Y-m');
+
+                        // Check payment status
+                        $hasDueDateColumn = false;
+                        if ($db->getAttribute(PDO::ATTR_DRIVER_NAME) === 'mysql') {
+                            $stmtCol = $db->prepare("SHOW COLUMNS FROM `system_payments` LIKE ?");
+                            $stmtCol->execute(['due_date']);
+                            $hasDueDateColumn = (bool)$stmtCol->fetch();
+                        } else {
+                            $stmtCol = $db->query("PRAGMA table_info(system_payments)");
+                            $cols = $stmtCol->fetchAll(PDO::FETCH_ASSOC);
+                            foreach ($cols as $col) {
+                                if (($col['name'] ?? '') === 'due_date') {
+                                    $hasDueDateColumn = true;
+                                    break;
+                                }
+                            }
+                        }
+
+                        $select = $hasDueDateColumn
+                            ? "SELECT reference_month, status, due_date, payment_date FROM system_payments WHERE status <> 'paid' ORDER BY reference_month ASC"
+                            : "SELECT reference_month, status, payment_date FROM system_payments WHERE status <> 'paid' ORDER BY reference_month ASC";
+                        $stmt = $db->query($select);
+                        $systemPaymentAlertRows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                        $systemPaymentShowAlert = false;
+                        $systemPaymentAlertType = '';
+                        $systemPaymentDueDateText = '05/' . date('m/Y');
+
+                        $systemPaymentAlertCurrent = null;
+                        $systemPaymentClosestDaysRemaining = null;
+                        foreach ($systemPaymentAlertRows as $candidate) {
+                            $candidateDueDateRaw = $candidate['due_date'] ?? ($candidate['payment_date'] ?? (($candidate['reference_month'] ?? $currentMonth) . '-05 00:00:00'));
+                            $candidateDueDate = date('Y-m-d', strtotime($candidateDueDateRaw));
+                            $candidateDaysRemaining = (int)floor((strtotime($candidateDueDate) - strtotime(date('Y-m-d'))) / 86400);
+
+                            if ($systemPaymentAlertCurrent === null || $candidateDaysRemaining < $systemPaymentClosestDaysRemaining) {
+                                $systemPaymentAlertCurrent = $candidate;
+                                $systemPaymentClosestDaysRemaining = $candidateDaysRemaining;
+                                $systemPaymentDueDateText = date('d/m/Y', strtotime($candidateDueDateRaw));
+                            }
+                        }
+
+                        if ($systemPaymentAlertCurrent) {
+                            $systemPaymentDaysRemaining = $systemPaymentClosestDaysRemaining;
+                            if ($systemPaymentDaysRemaining < 0) {
+                                $systemPaymentShowAlert = true;
+                                $systemPaymentAlertType = 'overdue';
+                            } elseif ($systemPaymentDaysRemaining === 0) {
+                                $systemPaymentShowAlert = true;
+                                $systemPaymentAlertType = 'today';
+                            } elseif ($systemPaymentDaysRemaining <= 2 && $systemPaymentDaysRemaining > 0) {
+                                $systemPaymentShowAlert = true;
+                                $systemPaymentAlertType = 'alert';
+                            }
+                        }
+
+                        if ($systemPaymentShowAlert):
+                ?>
+                    <!-- Banner de pagamento (topo da tela, substitui o antigo modal) -->
+                    <?php
+                        $paymentAlertIsDanger = $systemPaymentAlertType == 'overdue';
+                        $paymentAlertTitle = $paymentAlertIsDanger ? 'Mensalidade em Aberto' : ($systemPaymentAlertType == 'today' ? 'Mensalidade Vence Hoje' : 'Lembrete de Mensalidade');
+                        $paymentAlertIcon = $paymentAlertIsDanger ? 'fa-exclamation-circle' : ($systemPaymentAlertType == 'today' ? 'fa-exclamation-triangle' : 'fa-clock');
+                        $paymentAlertMainText = $paymentAlertIsDanger
+                            ? 'Sua mensalidade venceu em ' . $systemPaymentDueDateText . ' e ainda não identificamos o pagamento.'
+                            : ($systemPaymentAlertType == 'today'
+                                ? 'Sua mensalidade vence hoje (' . $systemPaymentDueDateText . ').'
+                                : 'Sua mensalidade vence em ' . $systemPaymentDueDateText . '.');
+                    ?>
+                    <div class="alert <?= $paymentAlertIsDanger ? 'alert-danger' : 'alert-warning' ?> d-flex align-items-center justify-content-between flex-wrap gap-3 shadow-sm mb-3">
+                        <div class="d-flex align-items-start gap-2">
+                            <i class="fas <?= $paymentAlertIcon ?> mt-1"></i>
+                            <div>
+                                <div class="fw-bold"><?= htmlspecialchars($paymentAlertTitle) ?></div>
+                                <div class="small"><?= htmlspecialchars($paymentAlertMainText) ?></div>
+                                <div class="small opacity-75 mt-1">Após a confirmação do pagamento, este aviso desaparece automaticamente em até 24 horas.</div>
+                            </div>
+                        </div>
+                        <a href="/admin/system-payments" class="btn btn-sm <?= $paymentAlertIsDanger ? 'btn-danger' : 'btn-dark' ?> fw-semibold text-nowrap">Ir para Pagamento</a>
+                    </div>
+                <?php
+                        endif;
+                    } catch (Exception $e) {
+                        // Silent fail
+                    }
+                }
+                ?>
+
                 <?php if ($isMobileLauncherPage): ?>
                     <div class="d-lg-none">
                         <?php include __DIR__ . '/mobile_launcher.php'; ?>
@@ -1039,139 +1177,6 @@ $mobileLauncherHref = '/admin?launcher=1';
                 </script>
             <?php endif; ?>
 
-            <!-- System Payment Alert Modal Logic -->
-            <?php
-            // Simple logic to check if we need to show the modal (only on admin pages)
-            // Ideally this should be passed from a global controller or middleware, 
-            // but for simplicity we can do a quick check here if user is logged in.
-            
-            // Check status only if we are in admin panel
-            if (isLoggedIn() && strpos($_SERVER['REQUEST_URI'], '/admin') === 0) {
-                // We need to check payment status.
-                // Reusing logic from SystemPaymentController essentially.
-                // To avoid DB calls on every page load, maybe use session?
-                // But user wants "always updated". DB call is safer.
-                
-                try {
-                    $billingSyncService = new CentralBillingSyncService();
-                    if ($billingSyncService->hasRemoteConfig()) {
-                        $billingSyncService->syncFromCentral();
-                    }
-
-                    try {
-                        $usersSyncService = new CentralUsersSyncService();
-                        if ($usersSyncService->hasRemoteConfig()) {
-                            $usersSyncService->syncSilently();
-                        }
-                    } catch (Throwable $e) {
-                        // Never block page render on a users-sync failure —
-                        // catches Error too (e.g. class/file missing), not
-                        // just Exception, since either would otherwise crash
-                        // every admin page load with a blank white screen.
-                    }
-
-                    try {
-                        $globalSettingsSyncService = new CentralGlobalSettingsSyncService();
-                        if ($globalSettingsSyncService->isEnabled()) {
-                            $globalSettingsSyncService->syncSettings();
-                        }
-                    } catch (Throwable $e) {
-                        // Same reasoning as the users-sync block above: this
-                        // is what brings centrally-edited branding and demo
-                        // landing config down automatically, but must never
-                        // break an admin page load if the central is
-                        // unreachable or the payload is momentarily invalid.
-                    }
-
-                    $db = (new Database())->connect();
-                    $currentMonth = date('Y-m');
-                    
-                    // Check payment status
-                    $hasDueDateColumn = false;
-                    if ($db->getAttribute(PDO::ATTR_DRIVER_NAME) === 'mysql') {
-                        $stmtCol = $db->prepare("SHOW COLUMNS FROM `system_payments` LIKE ?");
-                        $stmtCol->execute(['due_date']);
-                        $hasDueDateColumn = (bool)$stmtCol->fetch();
-                    } else {
-                        $stmtCol = $db->query("PRAGMA table_info(system_payments)");
-                        $cols = $stmtCol->fetchAll(PDO::FETCH_ASSOC);
-                        foreach ($cols as $col) {
-                            if (($col['name'] ?? '') === 'due_date') {
-                                $hasDueDateColumn = true;
-                                break;
-                            }
-                        }
-                    }
-
-                    $select = $hasDueDateColumn
-                        ? "SELECT reference_month, status, due_date, payment_date FROM system_payments WHERE status <> 'paid' ORDER BY reference_month ASC"
-                        : "SELECT reference_month, status, payment_date FROM system_payments WHERE status <> 'paid' ORDER BY reference_month ASC";
-                    $stmt = $db->query($select);
-                    $systemPaymentAlertRows = $stmt->fetchAll(PDO::FETCH_ASSOC);
-                    
-                    $systemPaymentShowAlert = false;
-                    $systemPaymentAlertType = '';
-                    $systemPaymentDueDateText = '05/' . date('m/Y');
-                    
-                    $systemPaymentAlertCurrent = null;
-                    $systemPaymentClosestDaysRemaining = null;
-                    foreach ($systemPaymentAlertRows as $candidate) {
-                        $candidateDueDateRaw = $candidate['due_date'] ?? ($candidate['payment_date'] ?? (($candidate['reference_month'] ?? $currentMonth) . '-05 00:00:00'));
-                        $candidateDueDate = date('Y-m-d', strtotime($candidateDueDateRaw));
-                        $candidateDaysRemaining = (int)floor((strtotime($candidateDueDate) - strtotime(date('Y-m-d'))) / 86400);
-
-                        if ($systemPaymentAlertCurrent === null || $candidateDaysRemaining < $systemPaymentClosestDaysRemaining) {
-                            $systemPaymentAlertCurrent = $candidate;
-                            $systemPaymentClosestDaysRemaining = $candidateDaysRemaining;
-                            $systemPaymentDueDateText = date('d/m/Y', strtotime($candidateDueDateRaw));
-                        }
-                    }
-
-                    if ($systemPaymentAlertCurrent) {
-                        $systemPaymentDaysRemaining = $systemPaymentClosestDaysRemaining;
-                        if ($systemPaymentDaysRemaining < 0) {
-                            $systemPaymentShowAlert = true;
-                            $systemPaymentAlertType = 'overdue';
-                        } elseif ($systemPaymentDaysRemaining === 0) {
-                            $systemPaymentShowAlert = true;
-                            $systemPaymentAlertType = 'today';
-                        } elseif ($systemPaymentDaysRemaining <= 2 && $systemPaymentDaysRemaining > 0) {
-                            $systemPaymentShowAlert = true;
-                            $systemPaymentAlertType = 'alert';
-                        }
-                    }
-                    
-                    if ($systemPaymentShowAlert):
-            ?>
-                <!-- Banner de pagamento (topo da tela, substitui o antigo modal) -->
-                <?php
-                    $paymentAlertIsDanger = $systemPaymentAlertType == 'overdue';
-                    $paymentAlertTitle = $paymentAlertIsDanger ? 'Mensalidade em Aberto' : ($systemPaymentAlertType == 'today' ? 'Mensalidade Vence Hoje' : 'Lembrete de Mensalidade');
-                    $paymentAlertIcon = $paymentAlertIsDanger ? 'fa-exclamation-circle' : ($systemPaymentAlertType == 'today' ? 'fa-exclamation-triangle' : 'fa-clock');
-                    $paymentAlertMainText = $paymentAlertIsDanger
-                        ? 'Sua mensalidade venceu em ' . $systemPaymentDueDateText . ' e ainda não identificamos o pagamento.'
-                        : ($systemPaymentAlertType == 'today'
-                            ? 'Sua mensalidade vence hoje (' . $systemPaymentDueDateText . ').'
-                            : 'Sua mensalidade vence em ' . $systemPaymentDueDateText . '.');
-                ?>
-                <div class="alert <?= $paymentAlertIsDanger ? 'alert-danger' : 'alert-warning' ?> d-flex align-items-center justify-content-between flex-wrap gap-3 shadow-sm mb-3">
-                    <div class="d-flex align-items-start gap-2">
-                        <i class="fas <?= $paymentAlertIcon ?> mt-1"></i>
-                        <div>
-                            <div class="fw-bold"><?= htmlspecialchars($paymentAlertTitle) ?></div>
-                            <div class="small"><?= htmlspecialchars($paymentAlertMainText) ?></div>
-                            <div class="small opacity-75 mt-1">Após a confirmação do pagamento, este aviso desaparece automaticamente em até 24 horas.</div>
-                        </div>
-                    </div>
-                    <a href="/admin/system-payments" class="btn btn-sm <?= $paymentAlertIsDanger ? 'btn-danger' : 'btn-dark' ?> fw-semibold text-nowrap">Ir para Pagamento</a>
-                </div>
-            <?php
-                    endif;
-                } catch (Exception $e) {
-                    // Silent fail
-                }
-            }
-            ?>
             <div class="app-page-content">
 <?php else: // Member/Public View ?>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
