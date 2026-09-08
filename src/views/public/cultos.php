@@ -227,6 +227,10 @@ foreach ($congregacoes as $c) {
         .cultos-full-card-address i { color: #9a8f92; margin-top: .15rem; }
         .cultos-full-card-time { display: flex; align-items: center; gap: .4rem; color: #6b7280; font-size: .84rem; margin-bottom: .6rem; }
         .cultos-full-card-time i { color: var(--primary-red); }
+        .cultos-full-card-contacts { display: flex; flex-direction: column; gap: .3rem; margin-bottom: .6rem; }
+        .cultos-full-card-contacts a { display: flex; align-items: center; gap: .4rem; color: #25963c; font-size: .82rem; text-decoration: none; }
+        .cultos-full-card-contacts a:hover { text-decoration: underline; }
+        .cultos-full-card-contacts a i { color: #25963c; }
         .cultos-full-card-desc { color: #6b7280; font-size: .86rem; margin-bottom: .8rem; }
         .cultos-full-card-footer {
             display: flex;
@@ -442,6 +446,17 @@ foreach ($congregacoes as $c) {
                                         <?php endif; ?>
                                         <?php if ($culto['time_range'] !== ''): ?>
                                             <div class="cultos-full-card-time"><i class="far fa-clock"></i> <?= htmlspecialchars($culto['time_range']) ?></div>
+                                        <?php endif; ?>
+                                        <?php $cultoContacts = eventGetContacts($culto); ?>
+                                        <?php if (!empty($cultoContacts)): ?>
+                                            <div class="cultos-full-card-contacts">
+                                                <?php foreach ($cultoContacts as $cc): ?>
+                                                    <a href="https://wa.me/<?= htmlspecialchars($cc['wa_digits']) ?>" target="_blank" rel="noopener noreferrer">
+                                                        <i class="fab fa-whatsapp"></i>
+                                                        <span><?= htmlspecialchars($cc['role'] !== '' ? $cc['role'] : 'WhatsApp') ?>: <?= htmlspecialchars($cc['phone']) ?></span>
+                                                    </a>
+                                                <?php endforeach; ?>
+                                            </div>
                                         <?php endif; ?>
                                         <?php if (!empty($culto['description'])): ?>
                                             <p class="cultos-full-card-desc"><?= htmlspecialchars($culto['description']) ?></p>

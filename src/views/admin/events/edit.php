@@ -126,6 +126,22 @@ if (empty($eventDatesSeed) && !empty($event['event_date']) && strtotime($event['
     ];
 }
 
+$eventContactsSeed = [];
+if (!empty($event['contacts'])) {
+    $decodedContacts = json_decode((string)$event['contacts'], true);
+    if (is_array($decodedContacts)) {
+        foreach ($decodedContacts as $c) {
+            if (!is_array($c)) continue;
+            $phone = trim((string)($c['phone'] ?? ''));
+            if ($phone === '') continue;
+            $eventContactsSeed[] = ['role' => trim((string)($c['role'] ?? '')), 'phone' => $phone];
+        }
+    }
+}
+if (empty($eventContactsSeed) && !empty($event['contact_phone'])) {
+    $eventContactsSeed[] = ['role' => '', 'phone' => (string)$event['contact_phone']];
+}
+
 $recurringDaysSelected = [];
 if (!empty($event['recurring_days'])) {
     $decodedRecurring = json_decode((string)$event['recurring_days'], true);
@@ -292,9 +308,14 @@ if (!empty($event['recurring_days'])) {
                     <label class="form-label">E-mail de Contato</label>
                     <input type="email" class="form-control" name="contact_email" value="<?= htmlspecialchars($event['contact_email'] ?? '') ?>" placeholder="ex: contato@igreja.com">
                 </div>
-                <div class="col-md-6">
-                    <label class="form-label">WhatsApp/Celular</label>
-                    <input type="text" class="form-control" name="contact_phone" value="<?= htmlspecialchars($event['contact_phone'] ?? '') ?>" placeholder="(00) 00000-0000">
+                <div class="col-12" id="eventContactsBox">
+                    <label class="form-label">Contatos (Responsáveis)</label>
+                    <div id="eventContactsContainer" class="d-grid gap-2"></div>
+                    <div class="form-text">Adicione um ou mais responsáveis com telefone/WhatsApp para contato.</div>
+                    <datalist id="eventContactRoles">
+                        <option value="Pastor"><option value="Líder"><option value="Coordenador">
+                        <option value="Secretária(o)"><option value="Diácono"><option value="Tesoureiro">
+                    </datalist>
                 </div>
 
                 <div class="col-md-12">
@@ -497,6 +518,88 @@ if (!isset($typeLabelsPhp[$currentTypeKey])) { $currentTypeKey = 'evento'; }
                 });
                 updateWeekday(row);
             }
+            renumber();
+        }
+
+        if (Array.isArray(seed) && seed.length) {
+            seed.forEach(function (s) { addRow(s); });
+        } else {
+            addRow();
+        }
+    })();
+
+    (function () {
+        var seed = <?= json_encode($eventContactsSeed, JSON_UNESCAPED_UNICODE) ?>;
+        var container = document.getElementById('eventContactsContainer');
+        if (!container) return;
+
+        function renumber() {
+            var rows = container.querySelectorAll('.event-contact-row');
+            rows.forEach(function (row, idx) {
+                row.dataset.index = String(idx);
+                var roleInput = row.querySelector('.contact-role-input');
+                var phoneInput = row.querySelector('.contact-phone-input');
+                if (roleInput) roleInput.name = 'contacts[' + idx + '][role]';
+                if (phoneInput) phoneInput.name = 'contacts[' + idx + '][phone]';
+            });
+            rows.forEach(function (row) {
+                var del = row.querySelector('.btn-remove-contact');
+                if (del) del.disabled = rows.length <= 1;
+            });
+        }
+
+        function applyPhoneMask(input) {
+            if (!input || !window.jQuery || !jQuery.fn.mask) return;
+            var behavior = function (val) {
+                return val.replace(/\D/g, '').length === 11 ? '(00) 00000-0000' : '(00) 0000-00009';
+            };
+            var options = {
+                onKeyPress: function (val, e, field, opts) {
+                    field.mask(behavior.apply({}, arguments), opts);
+                }
+            };
+            jQuery(input).mask(behavior, options);
+        }
+
+        function addRow(initial) {
+            var idx = container.querySelectorAll('.event-contact-row').length;
+            var row = document.createElement('div');
+            row.className = 'event-contact-row row g-2 align-items-start';
+            row.dataset.index = String(idx);
+            row.innerHTML = `
+                <div class="col-12 col-md-4">
+                    <label class="form-label mb-1">Função</label>
+                    <input type="text" class="form-control contact-role-input" list="eventContactRoles" name="contacts[${idx}][role]" placeholder="Ex: Pastor, Líder...">
+                </div>
+                <div class="col-12 col-md-5">
+                    <label class="form-label mb-1">WhatsApp/Celular</label>
+                    <input type="text" class="form-control contact-phone-input phone" name="contacts[${idx}][phone]" placeholder="(00) 00000-0000">
+                </div>
+                <div class="col-12 col-md-3 d-flex gap-2 align-self-end">
+                    <button type="button" class="btn btn-outline-primary btn-add-contact" title="Adicionar outro contato">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                    <button type="button" class="btn btn-outline-danger btn-remove-contact" title="Remover este contato">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            `;
+            container.appendChild(row);
+
+            var roleInput = row.querySelector('.contact-role-input');
+            var phoneInput = row.querySelector('.contact-phone-input');
+            if (initial && roleInput) roleInput.value = initial.role || '';
+            if (initial && phoneInput) phoneInput.value = initial.phone || '';
+            applyPhoneMask(phoneInput);
+
+            row.querySelector('.btn-add-contact').addEventListener('click', function () {
+                addRow();
+                renumber();
+            });
+            row.querySelector('.btn-remove-contact').addEventListener('click', function () {
+                row.remove();
+                renumber();
+            });
             renumber();
         }
 

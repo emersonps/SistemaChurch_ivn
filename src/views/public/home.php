@@ -942,6 +942,17 @@ $firstAndLastName = function ($name) {
             color: var(--primary-red);
             margin-top: .15rem;
         }
+        .flat-strip-card-contact {
+            display: flex;
+            align-items: flex-start;
+            gap: .4rem;
+            color: #25963c;
+            font-size: .84rem;
+            margin-bottom: .9rem;
+            text-decoration: none;
+        }
+        .flat-strip-card-contact:hover { text-decoration: underline; }
+        .flat-strip-card-contact i { color: #25963c; margin-top: .15rem; }
         .flat-strip-card-date {
             display: flex;
             align-items: center;
@@ -1101,6 +1112,17 @@ $firstAndLastName = function ($name) {
         .convite-card-location i {
             color: var(--primary-red);
         }
+        .convite-card-contact {
+            display: flex;
+            align-items: center;
+            gap: .35rem;
+            color: #25963c;
+            font-size: .8rem;
+            text-decoration: none;
+            margin-bottom: .6rem;
+        }
+        .convite-card-contact:hover { text-decoration: underline; }
+        .convite-card-contact i { color: #25963c; }
         .convite-card-waiting {
             color: var(--primary-red);
             font-weight: 700;
@@ -2629,6 +2651,13 @@ $firstAndLastName = function ($name) {
                                         <span><?= htmlspecialchars($evento['location']) ?></span>
                                     </div>
                                 <?php endif; ?>
+                                <?php $eventoContacts = eventGetContacts($evento); ?>
+                                <?php if (!empty($eventoContacts)): ?>
+                                    <a href="https://wa.me/<?= htmlspecialchars($eventoContacts[0]['wa_digits']) ?>" target="_blank" rel="noopener noreferrer" class="flat-strip-card-contact">
+                                        <i class="fab fa-whatsapp"></i>
+                                        <span><?= htmlspecialchars($eventoContacts[0]['role'] !== '' ? $eventoContacts[0]['role'] : 'WhatsApp') ?></span>
+                                    </a>
+                                <?php endif; ?>
                                 <?php if (!empty($evento['banner_path'])): ?>
                                     <button type="button" class="flat-strip-card-cta" data-bs-toggle="modal" data-bs-target="#bannerModal<?= $evento['id'] ?>">
                                         <i class="fas fa-image"></i> Ver banner
@@ -2683,6 +2712,7 @@ $firstAndLastName = function ($name) {
                                 $firstBadge = $dateBadges[0] ?? null;
                                 $congName = trim((string)($convite['congregation_name'] ?? ''));
                                 $conviteId = (int)$convite['id'];
+                                $conviteContacts = eventGetContacts($convite);
                             ?>
                             <div class="flat-strip-card convite-card">
                                 <div class="convite-card-thumb">
@@ -2710,6 +2740,12 @@ $firstAndLastName = function ($name) {
                                     <?php endif; ?>
                                     <?php if (!empty($convite['description'])): ?>
                                         <p class="convite-card-desc"><?= htmlspecialchars($convite['description']) ?></p>
+                                    <?php endif; ?>
+                                    <?php if (!empty($conviteContacts)): ?>
+                                        <a href="https://wa.me/<?= htmlspecialchars($conviteContacts[0]['wa_digits']) ?>" target="_blank" rel="noopener noreferrer" class="convite-card-contact">
+                                            <i class="fab fa-whatsapp"></i>
+                                            <span><?= htmlspecialchars($conviteContacts[0]['role'] !== '' ? $conviteContacts[0]['role'] : 'WhatsApp') ?></span>
+                                        </a>
                                     <?php endif; ?>
                                     <div class="convite-card-footer">
                                         <?php if (!empty($convite['location'])): ?>
@@ -2767,6 +2803,14 @@ $firstAndLastName = function ($name) {
                                             <?php else: ?>
                                                 <p class="mb-2"><i class="fas fa-arrow-up-right-from-square me-2 text-danger"></i>Evento Externo</p>
                                             <?php endif; ?>
+                                            <?php foreach ($conviteContacts as $cc): ?>
+                                                <p class="mb-2">
+                                                    <i class="fab fa-whatsapp me-2 text-danger"></i>
+                                                    <a href="https://wa.me/<?= htmlspecialchars($cc['wa_digits']) ?>" target="_blank" rel="noopener noreferrer" class="text-decoration-none">
+                                                        <?= htmlspecialchars($cc['role'] !== '' ? $cc['role'] : 'WhatsApp') ?>: <?= htmlspecialchars($cc['phone']) ?>
+                                                    </a>
+                                                </p>
+                                            <?php endforeach; ?>
                                             <?php if (!empty($convite['description'])): ?>
                                                 <p class="mb-0 mt-3"><?= nl2br(htmlspecialchars($convite['description'])) ?></p>
                                             <?php endif; ?>

@@ -45,6 +45,44 @@ class EventController {
         return $items;
     }
 
+    private function ensureEventsContactsColumn(PDO $db): void {
+        try {
+            $db->query("SELECT contacts FROM events LIMIT 1")->fetch();
+            return;
+        } catch (Exception $e) {
+        }
+
+        try {
+            $db->exec("ALTER TABLE events ADD COLUMN contacts TEXT NULL");
+        } catch (Exception $e) {
+        }
+    }
+
+    // Ordem do POST e preservada de proposito (nao ordena como as datas) —
+    // e a ordem de apresentacao escolhida pela pessoa que cadastrou o
+    // evento, o primeiro contato e o "principal".
+    private function buildEventContactsFromPost(): array {
+        $raw = $_POST['contacts'] ?? null;
+        if (!is_array($raw)) {
+            return [];
+        }
+
+        $items = [];
+        foreach ($raw as $row) {
+            if (!is_array($row)) {
+                continue;
+            }
+            $phone = trim((string)($row['phone'] ?? ''));
+            if ($phone === '') {
+                continue;
+            }
+            $role = trim((string)($row['role'] ?? ''));
+            $items[] = ['role' => $role, 'phone' => $phone];
+        }
+
+        return $items;
+    }
+
     public function index() {
         requirePermission('events.view');
         $db = (new Database())->connect();
@@ -207,10 +245,13 @@ class EventController {
         $congregation_id = $stmtFindCong->fetchColumn() ?: null;
 
         $eventDatesJson = !empty($eventDates) ? json_encode($eventDates, JSON_UNESCAPED_UNICODE) : null;
+        $contacts = $this->buildEventContactsFromPost();
+        $contactsJson = !empty($contacts) ? json_encode($contacts, JSON_UNESCAPED_UNICODE) : null;
         $this->ensureEventsEventDatesColumn($db);
+        $this->ensureEventsContactsColumn($db);
         try {
-            $stmt = $db->prepare("INSERT INTO events (title, description, event_date, event_dates, location, type, status, recurring_days, end_time, banner_path, address, contact_email, contact_phone, congregation_id) VALUES (?, ?, ?, ?, ?, ?, 'active', ?, ?, ?, ?, ?, ?, ?)");
-            $stmt->execute([$title, $description, $event_date, $eventDatesJson, $location, $type, $recurring_days, $end_time, $banner_path, $address, $contact_email, $contact_phone, $congregation_id]);
+            $stmt = $db->prepare("INSERT INTO events (title, description, event_date, event_dates, location, type, status, recurring_days, end_time, banner_path, address, contact_email, contact_phone, contacts, congregation_id) VALUES (?, ?, ?, ?, ?, ?, 'active', ?, ?, ?, ?, ?, ?, ?, ?)");
+            $stmt->execute([$title, $description, $event_date, $eventDatesJson, $location, $type, $recurring_days, $end_time, $banner_path, $address, $contact_email, $contact_phone, $contactsJson, $congregation_id]);
         } catch (Exception $e) {
             $stmt = $db->prepare("INSERT INTO events (title, description, event_date, location, type, status, recurring_days, end_time, banner_path, address, contact_email, contact_phone, congregation_id) VALUES (?, ?, ?, ?, ?, 'active', ?, ?, ?, ?, ?, ?, ?)");
             $stmt->execute([$title, $description, $event_date, $location, $type, $recurring_days, $end_time, $banner_path, $address, $contact_email, $contact_phone, $congregation_id]);
@@ -412,8 +453,11 @@ class EventController {
         }
         
         $eventDatesJson = !empty($eventDates) ? json_encode($eventDates, JSON_UNESCAPED_UNICODE) : null;
+        $contacts = $this->buildEventContactsFromPost();
+        $contactsJson = !empty($contacts) ? json_encode($contacts, JSON_UNESCAPED_UNICODE) : null;
         $this->ensureEventsEventDatesColumn($db);
-        $baseSql = "UPDATE events SET title=?, description=?, event_date=?, event_dates=?, location=?, type=?, status=?, recurring_days=?, end_time=?, ";
+        $this->ensureEventsContactsColumn($db);
+        $baseSql = "UPDATE events SET title=?, description=?, event_date=?, event_dates=?, contacts=?, location=?, type=?, status=?, recurring_days=?, end_time=?, ";
         $tailWithBanner = "banner_path=?, address=?, contact_email=?, contact_phone=?, congregation_id=? WHERE id=?";
         $tailWithoutBanner = "address=?, contact_email=?, contact_phone=?, congregation_id=? WHERE id=?";
         $tailRemoveBanner = "banner_path=NULL, address=?, contact_email=?, contact_phone=?, congregation_id=? WHERE id=?";
@@ -421,13 +465,13 @@ class EventController {
         try {
             if ($banner_path) {
                 $stmt = $db->prepare($baseSql . $tailWithBanner);
-                $stmt->execute([$title, $description, $event_date, $eventDatesJson, $location, $type, $status, $recurring_days, $end_time, $banner_path, $address, $contact_email, $contact_phone, $congregation_id, $id]);
+                $stmt->execute([$title, $description, $event_date, $eventDatesJson, $contactsJson, $location, $type, $status, $recurring_days, $end_time, $banner_path, $address, $contact_email, $contact_phone, $congregation_id, $id]);
             } elseif ($removeBanner) {
                 $stmt = $db->prepare($baseSql . $tailRemoveBanner);
-                $stmt->execute([$title, $description, $event_date, $eventDatesJson, $location, $type, $status, $recurring_days, $end_time, $address, $contact_email, $contact_phone, $congregation_id, $id]);
+                $stmt->execute([$title, $description, $event_date, $eventDatesJson, $contactsJson, $location, $type, $status, $recurring_days, $end_time, $address, $contact_email, $contact_phone, $congregation_id, $id]);
             } else {
                 $stmt = $db->prepare($baseSql . $tailWithoutBanner);
-                $stmt->execute([$title, $description, $event_date, $eventDatesJson, $location, $type, $status, $recurring_days, $end_time, $address, $contact_email, $contact_phone, $congregation_id, $id]);
+                $stmt->execute([$title, $description, $event_date, $eventDatesJson, $contactsJson, $location, $type, $status, $recurring_days, $end_time, $address, $contact_email, $contact_phone, $congregation_id, $id]);
             }
         } catch (Exception $e) {
             if ($banner_path) {

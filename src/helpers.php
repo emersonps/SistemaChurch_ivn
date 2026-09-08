@@ -1113,6 +1113,50 @@ function eventGetDateBadges(array $event) {
     return $out;
 }
 
+// Normaliza os contatos (funcao + telefone) de um evento pra exibicao
+// publica: decodifica o JSON, cai pro contact_phone antigo se nao houver
+// contatos cadastrados (eventos criados antes dessa funcionalidade), e
+// calcula o digito puro pro link wa.me — mesma normalizacao ja usada no
+// CTA de WhatsApp global de cultos.php.
+function eventGetContacts(array $event) {
+    $contacts = [];
+    $decoded = json_decode((string)($event['contacts'] ?? ''), true);
+    if (is_array($decoded)) {
+        foreach ($decoded as $c) {
+            if (!is_array($c)) {
+                continue;
+            }
+            $phone = trim((string)($c['phone'] ?? ''));
+            if ($phone === '') {
+                continue;
+            }
+            $contacts[] = ['role' => trim((string)($c['role'] ?? '')), 'phone' => $phone];
+        }
+    }
+
+    if (empty($contacts) && !empty($event['contact_phone'])) {
+        $contacts[] = ['role' => '', 'phone' => (string)$event['contact_phone']];
+    }
+
+    $out = [];
+    foreach ($contacts as $c) {
+        $digits = preg_replace('/\D/', '', $c['phone']);
+        if ($digits === '') {
+            continue;
+        }
+        if (strlen($digits) <= 11) {
+            $digits = '55' . $digits;
+        }
+        $out[] = [
+            'role' => $c['role'],
+            'phone' => $c['phone'],
+            'wa_digits' => $digits,
+        ];
+    }
+
+    return $out;
+}
+
 function eventNextOccurrence(array $event, $now = null) {
     $now = $now instanceof DateTimeImmutable ? $now : new DateTimeImmutable('now');
 
