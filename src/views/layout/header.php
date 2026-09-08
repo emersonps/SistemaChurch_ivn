@@ -830,7 +830,7 @@ $mobileLauncherHref = '/admin?launcher=1';
                             } elseif ($systemPaymentDaysRemaining === 0) {
                                 $systemPaymentShowAlert = true;
                                 $systemPaymentAlertType = 'today';
-                            } elseif ($systemPaymentDaysRemaining <= 2 && $systemPaymentDaysRemaining > 0) {
+                            } elseif ($systemPaymentDaysRemaining <= 5 && $systemPaymentDaysRemaining > 0) {
                                 $systemPaymentShowAlert = true;
                                 $systemPaymentAlertType = 'alert';
                             }
@@ -860,6 +860,47 @@ $mobileLauncherHref = '/admin?launcher=1';
                         </div>
                         <a href="/admin/system-payments" class="btn btn-sm <?= $paymentAlertIsDanger ? 'btn-danger' : 'btn-dark' ?> fw-semibold text-nowrap">Ir para Pagamento</a>
                     </div>
+
+                    <?php if ($paymentAlertIsDanger): ?>
+                    <!-- Popup de mensalidade atrasada — fecha e volta a aparecer sozinho a
+                         cada 5 min até a confirmação do pagamento (mesmo padrão do aviso do
+                         AssociaGestor: incomoda de propósito, sem travar a tela). -->
+                    <div class="modal fade" id="systemPaymentOverdueModal" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content">
+                                <div class="modal-body text-center p-4">
+                                    <i class="fas fa-exclamation-circle text-danger" style="font-size: 2.5rem;"></i>
+                                    <h5 class="fw-bold mt-3">Mensalidade do sistema atrasada</h5>
+                                    <p class="text-muted small mb-3"><?= htmlspecialchars($paymentAlertMainText) ?></p>
+                                    <a href="/admin/system-payments" class="btn btn-danger w-100 mb-2">Ir para Pagamento</a>
+                                    <button type="button" class="btn btn-link text-muted" data-bs-dismiss="modal">Fechar</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <script>
+                    (function () {
+                        var STORAGE_KEY = 'systemPaymentOverdueDismissedAt';
+                        var REAPPEAR_MS = 5 * 60 * 1000;
+                        var modalEl = document.getElementById('systemPaymentOverdueModal');
+                        if (!modalEl || typeof bootstrap === 'undefined') return;
+                        var modal = new bootstrap.Modal(modalEl);
+
+                        function shouldShow() {
+                            var dismissedAt = parseInt(localStorage.getItem(STORAGE_KEY) || '0', 10);
+                            return (Date.now() - dismissedAt) > REAPPEAR_MS;
+                        }
+                        function maybeShow() {
+                            if (shouldShow() && !modalEl.classList.contains('show')) { modal.show(); }
+                        }
+                        modalEl.addEventListener('hide.bs.modal', function () {
+                            localStorage.setItem(STORAGE_KEY, String(Date.now()));
+                        });
+                        maybeShow();
+                        setInterval(maybeShow, 30000);
+                    })();
+                    </script>
+                    <?php endif; ?>
                 <?php
                         endif;
                     } catch (Exception $e) {

@@ -311,9 +311,18 @@ class CentralBillingSyncService {
     }
 
     private function saveSetting($key, $value) {
-        $stmt = $this->db->prepare("UPDATE settings SET setting_value = ? WHERE setting_key = ?");
-        $stmt->execute([$value, $key]);
-        if ($stmt->rowCount() > 0) {
+        // rowCount() de um UPDATE no MySQL conta LINHAS REALMENTE ALTERADAS,
+        // não linhas casadas pelo WHERE — se o valor salvo já for igual ao
+        // atual (nada muda de verdade), rowCount() volta 0 mesmo a
+        // setting já existindo, e cair pro INSERT abaixo estoura
+        // "Duplicate entry" pra essa setting_key. Checar existência antes
+        // evita o problema na raiz (isso já tinha corrompido silenciosamente
+        // o aviso de mensalidade atrasada, engolido pelo catch do header.php).
+        $stmt = $this->db->prepare("SELECT COUNT(*) FROM settings WHERE setting_key = ?");
+        $stmt->execute([$key]);
+        if ((int)$stmt->fetchColumn() > 0) {
+            $update = $this->db->prepare("UPDATE settings SET setting_value = ? WHERE setting_key = ?");
+            $update->execute([$value, $key]);
             return;
         }
 
