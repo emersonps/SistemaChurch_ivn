@@ -67,12 +67,27 @@ class CentralGlobalSettingsSyncService {
             $payload['church_logo_url'] = $logoUrl;
         }
 
+        // O payload sempre traz TODAS as configuracoes globais da instancia,
+        // nao so as que mudaram — entao so forcar a rotacao quando o VALOR
+        // de alguma chave de demo realmente for diferente do que ja estava
+        // salvo. Sem essa checagem, qualquer sync (inclusive um disparado por
+        // uma mudanca sem relacao nenhuma, tipo branding) reseta a senha de
+        // demonstracao antes do prazo de 2 dias, derrubando quem estava
+        // logado com a senha atual.
+        $demoLandingKeys = ['demo_landing_enabled', 'demo_public_url', 'demo_admin_username', 'demo_secretary_username', 'demo_member_username'];
+        $demoConfigChanged = false;
+        foreach ($demoLandingKeys as $demoKey) {
+            if (array_key_exists($demoKey, $payload) && $this->getSetting($demoKey, '') !== (string)$payload[$demoKey]) {
+                $demoConfigChanged = true;
+                break;
+            }
+        }
+
         foreach ($payload as $key => $value) {
             $this->saveSetting($key, (string)$value);
         }
 
-        $demoLandingKeys = ['demo_landing_enabled', 'demo_public_url', 'demo_admin_username', 'demo_secretary_username', 'demo_member_username'];
-        if (array_intersect($demoLandingKeys, array_keys($payload))) {
+        if ($demoConfigChanged) {
             (new DemoLandingService())->forceRotateNow();
         }
 
