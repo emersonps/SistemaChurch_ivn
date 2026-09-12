@@ -1,10 +1,11 @@
 <?php
 $dlBrand = getChurchBrandingName($siteProfile);
 $dlLogoUrl = getChurchLogoUrl($siteProfile);
+$dlPlanPrices = isset($planPrices) && is_array($planPrices) ? $planPrices : [];
 $dlPlans = [
-    'mensal' => ['label' => 'Mensal', 'price' => 59.99, 'note' => 'Ideal para testar sem compromisso.'],
-    'trimestral' => ['label' => 'Trimestral', 'price' => 53.99, 'note' => 'Equilíbrio perfeito entre economia e flexibilidade.', 'highlight' => true],
-    'anual' => ['label' => 'Anual', 'price' => 47.99, 'note' => 'Para igrejas que querem economia máxima.'],
+    'mensal' => ['label' => 'Mensal', 'price' => (float)($dlPlanPrices['mensal'] ?? 59.99), 'note' => 'Ideal para testar sem compromisso.'],
+    'trimestral' => ['label' => 'Trimestral', 'price' => (float)($dlPlanPrices['trimestral'] ?? 53.99), 'note' => 'Equilíbrio perfeito entre economia e flexibilidade.', 'highlight' => true],
+    'anual' => ['label' => 'Anual', 'price' => (float)($dlPlanPrices['anual'] ?? 47.99), 'note' => 'Para igrejas que querem economia máxima.'],
 ];
 ?>
 <!DOCTYPE html>

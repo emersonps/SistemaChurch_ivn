@@ -42,6 +42,7 @@ class DemoLandingPublicController {
             'accessCards' => $accessCards,
             'clients' => $logos['clients'],
             'salesWhatsapp' => $logos['sales_whatsapp'],
+            'planPrices' => $logos['plan_prices'] ?? [],
             'leadError' => $_SESSION['flash_error'] ?? null,
         ]);
         unset($_SESSION['flash_error']);
