@@ -129,7 +129,17 @@ if ($method === 'POST' && strpos($uri, '/admin') === 0) {
 
 // Routes
 if ($uri == '/' || $uri == '/home') {
-    (new HomeController())->index();
+    if ((new DemoLandingService())->getConfig()['enabled']) {
+        (new DemoLandingPublicController())->index();
+    } else {
+        (new HomeController())->index();
+    }
+}
+elseif (preg_match('#^/demo/entrar/([a-z]+)/([0-9a-f]{16,})$#', $uri, $demoMatches)) {
+    (new DemoLandingPublicController())->enter($demoMatches[1], $demoMatches[2]);
+}
+elseif ($uri == '/demo/solicitar-sistema' && $method == 'POST') {
+    (new DemoLandingPublicController())->submitLead();
 }
 elseif ($uri == '/devocional') {
     (new HomeController())->index();

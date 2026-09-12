@@ -74,7 +74,7 @@ class CentralGlobalSettingsSyncService {
         // uma mudanca sem relacao nenhuma, tipo branding) reseta a senha de
         // demonstracao antes do prazo de 2 dias, derrubando quem estava
         // logado com a senha atual.
-        $demoLandingKeys = ['demo_landing_enabled', 'demo_public_url', 'demo_admin_username', 'demo_secretary_username', 'demo_member_username'];
+        $demoLandingKeys = ['demo_landing_enabled', 'demo_public_url', 'demo_admin_username', 'demo_secretary_username', 'demo_treasurer_username', 'demo_member_username'];
         $demoConfigChanged = false;
         foreach ($demoLandingKeys as $demoKey) {
             if (array_key_exists($demoKey, $payload) && $this->getSetting($demoKey, '') !== (string)$payload[$demoKey]) {

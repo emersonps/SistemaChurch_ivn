@@ -26,6 +26,7 @@ class DemoLandingService {
             'public_url' => $this->getSetting('demo_public_url', 'https://igrejabr.com.br'),
             'admin_username' => $this->getSetting('demo_admin_username', ''),
             'secretary_username' => $this->getSetting('demo_secretary_username', ''),
+            'treasurer_username' => $this->getSetting('demo_treasurer_username', ''),
             'member_username' => $this->getSetting('demo_member_username', ''),
         ];
     }
@@ -38,6 +39,7 @@ class DemoLandingService {
         $slots = [
             'admin' => ['label' => 'Administrador', 'username' => $config['admin_username']],
             'secretary' => ['label' => 'Secretaria', 'username' => $config['secretary_username']],
+            'treasurer' => ['label' => 'Tesoureiro', 'username' => $config['treasurer_username']],
             'member' => ['label' => 'Membro', 'username' => $config['member_username']],
         ];
 
@@ -79,6 +81,7 @@ class DemoLandingService {
         $slots = [
             'admin' => ['label' => 'Administrador', 'username' => $config['admin_username']],
             'secretary' => ['label' => 'Secretaria', 'username' => $config['secretary_username']],
+            'treasurer' => ['label' => 'Tesoureiro', 'username' => $config['treasurer_username']],
             'member' => ['label' => 'Membro', 'username' => $config['member_username']],
         ];
 
