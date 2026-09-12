@@ -119,5 +119,6 @@ $portalBottomNavActive = function ($paths) use ($portalCurrentUri) {
         });
     });
 </script>
+<?php include __DIR__ . '/../../partials/demo_back_button.php'; ?>
 </body>
 </html>

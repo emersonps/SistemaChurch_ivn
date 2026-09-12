@@ -42,8 +42,12 @@ $dlPlans = [
         .dl-role-btn.dl-role-btn-outline { background: transparent; color: var(--dl-ink); border: 1px solid rgba(15,23,42,.15); }
         .dl-role-btn.dl-role-btn-outline:hover { background: #f8f9fc; }
         .dl-safety-note { background: #fffbeb; border: 1px solid rgba(217,119,6,.25); border-radius: 1rem; padding: 1rem 1.3rem; font-size: .88rem; color: #92400e; display: flex; gap: .7rem; align-items: flex-start; }
-        .dl-client-strip { background: #fff; }
-        .dl-client-badge { display: flex; align-items: center; gap: .6rem; background: #f8f9fc; border: 1px solid rgba(15,23,42,.06); border-radius: 999px; padding: .5rem 1rem .5rem .5rem; white-space: nowrap; }
+        .dl-client-strip { background: #fff; overflow: hidden; }
+        .dl-client-track-wrap { overflow: hidden; -webkit-mask-image: linear-gradient(90deg, transparent, #000 5%, #000 95%, transparent); mask-image: linear-gradient(90deg, transparent, #000 5%, #000 95%, transparent); }
+        .dl-client-track { display: flex; gap: 1rem; width: max-content; animation: dlClientScroll 35s linear infinite; }
+        .dl-client-track:hover { animation-play-state: paused; }
+        @keyframes dlClientScroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+        .dl-client-badge { display: flex; align-items: center; gap: .6rem; background: #f8f9fc; border: 1px solid rgba(15,23,42,.06); border-radius: 999px; padding: .5rem 1.1rem .5rem .5rem; white-space: nowrap; flex: 0 0 auto; }
         .dl-client-avatar { width: 2.1rem; height: 2.1rem; border-radius: 50%; object-fit: cover; background: var(--dl-purple); color: #fff; display: inline-flex; align-items: center; justify-content: center; font-weight: 700; font-size: .75rem; flex: 0 0 auto; }
         .dl-plan-card { background: #fff; border: 1px solid rgba(15,23,42,.08); border-radius: 1.1rem; padding: 1.8rem; height: 100%; }
         .dl-plan-card.dl-plan-highlight { background: var(--dl-ink); color: #fff; transform: scale(1.03); }
@@ -90,11 +94,18 @@ $dlPlans = [
             <span class="dl-live-dot"></span>
             <span>DEMO AO VIVO &middot; Dados fictícios &middot; Atualiza a cada <?= (int)$rotationDays ?> dias</span>
         </div>
-        <h1 class="mb-3">Conheça o <span class="dl-accent"><?= htmlspecialchars($dlBrand) ?></span><br>por dentro, sem precisar pedir senha</h1>
+        <h1 class="mb-3">O sistema que já faz parte de <span class="dl-accent">igrejas de verdade</span><br>e está mudando a forma como elas se gerenciam</h1>
         <p class="text-muted mx-auto mb-4" style="max-width:640px;">
             Explore em 1 clique como se fosse Administrador, Secretaria, Tesoureiro ou Membro. No seu servidor real, tudo protegido por <strong>login e senha</strong>.
         </p>
-        <a href="#acessos" class="dl-cta-btn">Explorar demonstração agora <i class="fa-solid fa-arrow-right ms-1"></i></a>
+        <div class="d-flex flex-wrap justify-content-center gap-2">
+            <a href="#acessos" class="dl-cta-btn">Explorar demonstração agora <i class="fa-solid fa-arrow-right ms-1"></i></a>
+            <?php if (!empty($salesWhatsapp)): ?>
+                <a href="https://wa.me/<?= htmlspecialchars(preg_replace('/\D/', '', $salesWhatsapp)) ?>?text=<?= rawurlencode('Olá! Vi a demonstração do ' . $dlBrand . ' e quero saber mais.') ?>" target="_blank" rel="noopener" class="dl-whatsapp-btn">
+                    <i class="fa-brands fa-whatsapp"></i> Falar no WhatsApp
+                </a>
+            <?php endif; ?>
+        </div>
         <div class="mt-3 small text-muted" id="dlPresenceLabel" style="display:none;">
             <i class="fa-solid fa-circle-user me-1"></i><span id="dlPresenceCount">0</span> pessoa(s) explorando agora
         </div>
@@ -143,11 +154,18 @@ $dlPlans = [
 <section class="dl-section dl-client-strip" id="clientes">
     <div class="container">
         <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
-            <h2 class="dl-section-title mb-0 text-start"><i class="fa-regular fa-building me-2"></i>Igrejas que confiam no <?= htmlspecialchars($dlBrand) ?></h2>
+            <h2 class="dl-section-title mb-0 text-start"><i class="fa-regular fa-building me-2"></i>Igrejas que já utilizam o nosso sistema</h2>
             <span class="dl-tag">+<?= count($clients) ?> igrejas ativas</span>
         </div>
-        <div class="d-flex flex-wrap gap-3">
-            <?php foreach ($clients as $client): ?>
+    </div>
+    <?php
+    // Duplica a lista pra animação de scroll infinito nunca mostrar um
+    // "buraco" no fim — translateX(-50%) encosta exatamente na 2ª cópia.
+    $dlClientLoop = array_merge($clients, $clients);
+    ?>
+    <div class="dl-client-track-wrap">
+        <div class="dl-client-track">
+            <?php foreach ($dlClientLoop as $client): ?>
                 <div class="dl-client-badge">
                     <?php if (!empty($client['logo_url'])): ?>
                         <img src="<?= htmlspecialchars($client['logo_url']) ?>" alt="" class="dl-client-avatar">
@@ -156,7 +174,7 @@ $dlPlans = [
                     <?php endif; ?>
                     <div>
                         <div class="fw-bold small"><?= htmlspecialchars($client['sigla']) ?></div>
-                        <div class="text-muted" style="font-size:.68rem;">Cliente ativo</div>
+                        <div class="text-muted" style="font-size:.68rem;"><?= !empty($client['location']) ? htmlspecialchars(str_replace('/', ' · ', $client['location'])) : 'Cliente ativo' ?></div>
                     </div>
                 </div>
             <?php endforeach; ?>
