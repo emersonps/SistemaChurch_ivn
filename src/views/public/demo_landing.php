@@ -7,6 +7,27 @@ $dlPlans = [
     'trimestral' => ['label' => 'Trimestral', 'price' => (float)($dlPlanPrices['trimestral'] ?? 53.99), 'note' => 'Equilíbrio perfeito entre economia e flexibilidade.', 'highlight' => true],
     'anual' => ['label' => 'Anual', 'price' => (float)($dlPlanPrices['anual'] ?? 47.99), 'note' => 'Para igrejas que querem economia máxima.'],
 ];
+
+// Etiqueta de desconto: no Mensal mostra o período promocional ativo (se
+// houver); no Trimestral/Anual mostra quanto eles já economizam em relação
+// ao preço do Mensal — mesmo sem trial, esses planos nascem mais baratos.
+$dlPromo = isset($promo) && is_array($promo) ? $promo : [];
+$dlTrial = isset($dlPromo['trial']) && is_array($dlPromo['trial']) ? $dlPromo['trial'] : [];
+if (!empty($dlTrial['enabled']) && (float)($dlTrial['percent'] ?? 0) > 0) {
+    $dlPlans['mensal']['trial_percent'] = (float)$dlTrial['percent'];
+    $dlPlans['mensal']['trial_months'] = max(1, (int)($dlTrial['months'] ?? 1));
+}
+$dlMensalPrice = $dlPlans['mensal']['price'];
+foreach ($dlPlans as $dlPlanKey => &$dlPlanRef) {
+    if ($dlPlanKey === 'mensal' || $dlMensalPrice <= 0 || $dlPlanRef['price'] >= $dlMensalPrice) {
+        continue;
+    }
+    $dlPlanRef['savings_percent'] = (int)round((1 - $dlPlanRef['price'] / $dlMensalPrice) * 100);
+}
+unset($dlPlanRef);
+
+$dlAdesaoDiscount = isset($dlPromo['adesao_discount']) && is_array($dlPromo['adesao_discount']) ? $dlPromo['adesao_discount'] : [];
+$dlAdesaoDiscountActive = !empty($dlAdesaoDiscount['enabled']) && (float)($dlAdesaoDiscount['amount'] ?? 0) > 0;
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -54,6 +75,9 @@ $dlPlans = [
         .dl-plan-card.dl-plan-highlight { background: var(--dl-ink); color: #fff; transform: scale(1.03); }
         .dl-plan-card.dl-plan-highlight .text-muted { color: rgba(255,255,255,.6) !important; }
         .dl-plan-badge { background: #fff; color: var(--dl-ink); font-size: .68rem; font-weight: 800; padding: .25rem .6rem; border-radius: 999px; }
+        .dl-savings-badge { background: #16a34a; color: #fff; font-size: .68rem; font-weight: 800; padding: .25rem .6rem; border-radius: 999px; }
+        .dl-adesao-badge { display: inline-block; background: #fef3c7; color: #92400e; font-size: .85rem; font-weight: 700; padding: .5rem 1.1rem; border-radius: 999px; }
+        .dl-price-struck { text-decoration: line-through; font-size: 1rem; }
         .dl-final-cta { background: linear-gradient(135deg, var(--dl-ink), #1e1b4b); color: #fff; border-radius: 1.5rem; padding: 3rem 2.5rem; }
         .dl-whatsapp-btn { background: #16a34a; color: #fff; border-radius: .7rem; padding: .8rem 1.3rem; font-weight: 700; border: 0; text-decoration: none; display: inline-flex; align-items: center; gap: .5rem; }
         .dl-whatsapp-btn:hover { background: #15803d; color: #fff; }
@@ -188,13 +212,44 @@ $dlPlans = [
     <div class="container">
         <h2 class="dl-section-title">Escolha como quer começar</h2>
         <p class="dl-section-sub">Sem fidelidade. Cancele quando quiser. Migração gratuita e suporte humano.</p>
+        <?php if ($dlAdesaoDiscountActive): ?>
+            <div class="text-center mb-4">
+                <span class="dl-adesao-badge">🎁 Adesão com R$ <?= number_format((float)$dlAdesaoDiscount['amount'], 2, ',', '.') ?> de desconto por tempo limitado</span>
+            </div>
+        <?php endif; ?>
         <div class="row g-4 justify-content-center">
             <?php foreach ($dlPlans as $planKey => $plan): ?>
                 <div class="col-md-4">
                     <div class="dl-plan-card <?= !empty($plan['highlight']) ? 'dl-plan-highlight' : '' ?>">
-                        <?php if (!empty($plan['highlight'])): ?><span class="dl-plan-badge mb-2 d-inline-block">MAIS ESCOLHIDO</span><?php endif; ?>
+                        <div class="d-flex flex-wrap gap-2 mb-2">
+                            <?php if (!empty($plan['highlight'])): ?><span class="dl-plan-badge d-inline-block">MAIS ESCOLHIDO</span><?php endif; ?>
+                            <?php if (!empty($plan['trial_percent'])): ?>
+                                <span class="dl-savings-badge d-inline-block">-<?= (int)round($plan['trial_percent']) ?>% por <?= $plan['trial_months'] ?> <?= $plan['trial_months'] == 1 ? 'mês' : 'meses' ?></span>
+                            <?php elseif (!empty($plan['savings_percent'])): ?>
+                                <span class="dl-savings-badge d-inline-block">Economize <?= $plan['savings_percent'] ?>%</span>
+                            <?php endif; ?>
+                        </div>
+                        <?php
+                        // Preço riscado: no Mensal com trial ativo, risca o preço
+                        // cheio e mostra o valor promocional; no Trimestral/Anual,
+                        // risca o preço do Mensal pra evidenciar quanto já
+                        // economizam nesses planos.
+                        $dlStruckPrice = null;
+                        $dlDisplayPrice = $plan['price'];
+                        if (!empty($plan['trial_percent'])) {
+                            $dlStruckPrice = $plan['price'];
+                            $dlDisplayPrice = round($plan['price'] * (1 - $plan['trial_percent'] / 100), 2);
+                        } elseif (!empty($plan['savings_percent'])) {
+                            $dlStruckPrice = $dlMensalPrice;
+                        }
+                        ?>
                         <div class="fw-bold mb-1"><?= htmlspecialchars($plan['label']) ?></div>
-                        <div class="mb-2"><span class="fw-bold" style="font-size:2rem;">R$ <?= number_format($plan['price'], 2, ',', '.') ?></span><span class="text-muted">/mês</span></div>
+                        <div class="mb-2">
+                            <?php if ($dlStruckPrice !== null): ?>
+                                <span class="dl-price-struck text-muted d-block">de R$ <?= number_format($dlStruckPrice, 2, ',', '.') ?></span>
+                            <?php endif; ?>
+                            <span class="fw-bold" style="font-size:2rem;">R$ <?= number_format($dlDisplayPrice, 2, ',', '.') ?></span><span class="text-muted">/mês</span>
+                        </div>
                         <p class="text-muted small mb-3"><?= htmlspecialchars($plan['note']) ?></p>
                         <button type="button" class="btn <?= !empty($plan['highlight']) ? 'btn-light' : 'btn-outline-dark' ?> w-100 fw-semibold" onclick="dlSelectPlan('<?= $planKey ?>')">Escolher <?= htmlspecialchars($plan['label']) ?></button>
                     </div>
