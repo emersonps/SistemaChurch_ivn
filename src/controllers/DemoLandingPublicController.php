@@ -10,9 +10,9 @@
 
 class DemoLandingPublicController {
     private $roleMeta = [
-        'admin' => ['label' => 'Administrador', 'desc' => 'Visão completa, financeiro, usuários, configurações.', 'icon' => 'fa-crown', 'highlight' => true],
+        'admin' => ['label' => 'Administrador', 'desc' => 'Visão completa, financeiro, usuários, configurações.', 'icon' => 'fa-crown'],
         'secretary' => ['label' => 'Secretaria', 'desc' => 'Cadastro de membros, congregações, cultos e grupos.', 'icon' => 'fa-users'],
-        'treasurer' => ['label' => 'Tesoureiro', 'desc' => 'Lançamentos, relatórios financeiros, controle de dízimos.', 'icon' => 'fa-sack-dollar'],
+        'treasurer' => ['label' => 'Tesoureiro', 'desc' => 'Lançamentos, relatórios financeiros, controle de dízimos.', 'icon' => 'fa-coins'],
         'member' => ['label' => 'Membro', 'desc' => 'Carteirinha digital, eventos e histórico pessoal.', 'icon' => 'fa-id-card'],
     ];
 
