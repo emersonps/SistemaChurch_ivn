@@ -171,13 +171,18 @@ class DemoLandingPublicController {
         return hash('sha256', $role . '|' . $username . '|' . $password);
     }
 
-    // Cache local (6h) da lista de clientes puxada da Central — a landing
-    // nunca quebra se a Central estiver fora do ar, só mostra o último
-    // resultado bom conhecido (ou nada, na primeira vez).
+    // Cache local (5min) da lista de clientes + preços/promoção puxados da
+    // Central — a landing nunca quebra se a Central estiver fora do ar, só
+    // mostra o último resultado bom conhecido (ou nada, na primeira vez).
+    // Curto de propósito: quando o admin configura um preço ou promoção na
+    // Central, ele espera ver refletido na landing rapidamente, não em até
+    // 6h — a query em si é leve, então cachear por minutos já resolve o
+    // problema de nunca bater na Central a cada visita, sem deixar o admin
+    // esperando horas pra ver a própria mudança.
     private function fetchClientLogos() {
         $db = (new Database())->connect();
         $cachedAt = $this->getSetting($db, 'demo_client_logos_cached_at', '');
-        $stale = $cachedAt === '' || (time() - strtotime($cachedAt)) > 6 * 3600;
+        $stale = $cachedAt === '' || (time() - strtotime($cachedAt)) > 5 * 60;
 
         if ($stale) {
             $central = new CentralManualSyncService();
