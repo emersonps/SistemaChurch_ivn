@@ -106,7 +106,15 @@ class AuthController {
 
     public function changePassword() {
         requireLogin();
-        
+
+        // Trocar a senha aqui invalidaria o link magico da demonstracao (que
+        // recalcula o token a partir da senha ATUAL do slot) pra todo mundo,
+        // nao so pra quem esta de visita - bloqueado enquanto a Pagina de
+        // Demonstracao estiver ativa nesta instancia.
+        if ((new DemoLandingService())->getConfig()['enabled']) {
+            redirect('/admin/dashboard');
+        }
+
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $current_password = $_POST['current_password'];
             $new_password = $_POST['new_password'];

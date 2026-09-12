@@ -48,6 +48,14 @@ $portalNavGroups = [
         ['label' => 'Manual / Ajuda', 'subtitle' => 'Vídeos e suporte', 'icon' => 'fa-circle-question', 'href' => '/portal/manual', 'color' => 'cyan'],
     ],
 ];
+
+// Trocar a senha invalidaria o link mágico da demonstração pra todo mundo,
+// não só pra quem está de visita — some do menu enquanto a demo estiver ativa.
+if ((new DemoLandingService())->getConfig()['enabled']) {
+    $portalNavGroups['Minha Conta'] = array_values(array_filter($portalNavGroups['Minha Conta'], function ($item) {
+        return $item['href'] !== '/portal/change-password';
+    }));
+}
 $portalCurrentUri = $_SERVER['REQUEST_URI'] ?? '';
 ?>
 <!DOCTYPE html>
@@ -448,7 +456,7 @@ $portalCurrentUri = $_SERVER['REQUEST_URI'] ?? '';
                 </button>
                 <ul class="dropdown-menu dropdown-menu-end shadow-sm">
                     <li><a class="dropdown-item" href="/portal/profile"><i class="fas fa-user-pen me-2 text-muted"></i> Meus Dados</a></li>
-                    <li><a class="dropdown-item" href="/portal/change-password"><i class="fas fa-key me-2 text-muted"></i> Alterar Senha</a></li>
+                    <?php if (!(new DemoLandingService())->getConfig()['enabled']): ?><li><a class="dropdown-item" href="/portal/change-password"><i class="fas fa-key me-2 text-muted"></i> Alterar Senha</a></li><?php endif; ?>
                     <li><a class="dropdown-item" href="/portal/manual"><i class="fas fa-circle-question me-2 text-muted"></i> Manual / Ajuda</a></li>
                     <li><hr class="dropdown-divider"></li>
                     <li><a class="dropdown-item text-danger" href="/portal/logout"><i class="fas fa-sign-out-alt me-2"></i> Sair</a></li>

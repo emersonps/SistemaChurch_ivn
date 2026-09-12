@@ -97,7 +97,9 @@ if (hasPermission('system_payments.view')) {
     $ml2Sistema[] = ['label' => 'Mensalidade', 'subtitle' => 'Pagamentos do sistema', 'icon' => 'fa-credit-card', 'color' => 'green', 'href' => '/admin/system-payments'];
 }
 $ml2Sistema[] = ['label' => 'Manual', 'subtitle' => 'Ajuda e vídeos', 'icon' => 'fa-question-circle', 'color' => 'gray', 'href' => '/admin/manual'];
-$ml2Sistema[] = ['label' => 'Senha', 'subtitle' => 'Alterar senha', 'icon' => 'fa-key', 'color' => 'gray', 'href' => '/admin/change-password'];
+if (!(new DemoLandingService())->getConfig()['enabled']) {
+    $ml2Sistema[] = ['label' => 'Senha', 'subtitle' => 'Alterar senha', 'icon' => 'fa-key', 'color' => 'gray', 'href' => '/admin/change-password'];
+}
 
 $ml2HasSecretaria = count($ml2Secretaria) > 0;
 

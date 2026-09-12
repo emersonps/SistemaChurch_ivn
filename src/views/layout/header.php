@@ -575,11 +575,13 @@ $mobileLauncherHref = '/admin?launcher=1';
                             </a>
                         </li>
 
+                        <?php if (!(new DemoLandingService())->getConfig()['enabled']): ?>
                         <li class="nav-item">
                             <a class="nav-link <?= strpos($_SERVER['REQUEST_URI'], '/admin/change-password') !== false ? 'active' : 'text-dark' ?>" href="/admin/change-password">
                                 <i class="fas fa-key me-2"></i> Alterar Senha
                             </a>
                         </li>
+                        <?php endif; ?>
                         <li class="nav-item mt-3 mb-3">
                             <a class="nav-link text-danger" href="/admin/logout">
                                 <i class="fas fa-sign-out-alt me-2"></i> Sair
@@ -721,7 +723,7 @@ $mobileLauncherHref = '/admin?launcher=1';
                             <i class="fas fa-chevron-down"></i>
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end shadow-sm">
-                            <li><a class="dropdown-item" href="/admin/change-password"><i class="fas fa-key me-2 text-muted"></i> Alterar Senha</a></li>
+                            <?php if (!(new DemoLandingService())->getConfig()['enabled']): ?><li><a class="dropdown-item" href="/admin/change-password"><i class="fas fa-key me-2 text-muted"></i> Alterar Senha</a></li><?php endif; ?>
                             <li><a class="dropdown-item" href="/admin/manual"><i class="fas fa-book me-2 text-muted"></i> Manual / Ajuda</a></li>
                             <li><a class="dropdown-item" href="/" target="_blank"><i class="fas fa-arrow-up-right-from-square me-2 text-muted"></i> Ver Site</a></li>
                             <li><hr class="dropdown-divider"></li>
