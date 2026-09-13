@@ -28,6 +28,51 @@ unset($dlPlanRef);
 
 $dlAdesaoDiscount = isset($dlPromo['adesao_discount']) && is_array($dlPromo['adesao_discount']) ? $dlPromo['adesao_discount'] : [];
 $dlAdesaoDiscountActive = !empty($dlAdesaoDiscount['enabled']) && (float)($dlAdesaoDiscount['amount'] ?? 0) > 0;
+
+// Mapa do Brasil: extrai a UF de cada cliente (real ou fictício) que já
+// tem localização, pra colorir no cartograma quais estados já têm alguma
+// igreja usando o sistema. Layout em grade (não é um mapa geográfico real,
+// é um cartograma simplificado) — cada UF tem uma posição fixa aproximada
+// à sua posição real no mapa.
+$dlStatesWithClients = [];
+foreach ($clients as $dlClient) {
+    if (empty($dlClient['location'])) {
+        continue;
+    }
+    $dlLocParts = explode('/', $dlClient['location']);
+    $dlState = strtoupper(trim(end($dlLocParts)));
+    if (strlen($dlState) !== 2) {
+        continue;
+    }
+    if (!isset($dlStatesWithClients[$dlState])) {
+        $dlStatesWithClients[$dlState] = [];
+    }
+    $dlStatesWithClients[$dlState][] = $dlClient['sigla'];
+}
+
+$dlBrazilStates = [
+    'RR' => ['Roraima', 0, 2], 'AP' => ['Amapá', 0, 4],
+    'AM' => ['Amazonas', 1, 1], 'PA' => ['Pará', 1, 3], 'MA' => ['Maranhão', 1, 5], 'CE' => ['Ceará', 1, 6], 'RN' => ['Rio Grande do Norte', 1, 7],
+    'AC' => ['Acre', 2, 0], 'RO' => ['Rondônia', 2, 1], 'TO' => ['Tocantins', 2, 4], 'PI' => ['Piauí', 2, 5], 'PE' => ['Pernambuco', 2, 6], 'PB' => ['Paraíba', 2, 7],
+    'MT' => ['Mato Grosso', 3, 2], 'DF' => ['Distrito Federal', 3, 3], 'GO' => ['Goiás', 3, 4], 'BA' => ['Bahia', 3, 5], 'SE' => ['Sergipe', 3, 6], 'AL' => ['Alagoas', 3, 7],
+    'MS' => ['Mato Grosso do Sul', 4, 2], 'MG' => ['Minas Gerais', 4, 4], 'ES' => ['Espírito Santo', 4, 5],
+    'SP' => ['São Paulo', 5, 3], 'RJ' => ['Rio de Janeiro', 5, 4],
+    'PR' => ['Paraná', 6, 3],
+    'SC' => ['Santa Catarina', 7, 3],
+    'RS' => ['Rio Grande do Sul', 8, 3],
+];
+
+// Mural de depoimentos — pastores fictícios das próprias igrejas fictícias
+// da vitrine (mesma sigla, pra puxar o logo certo automaticamente).
+$dlTestimonials = [
+    ['name' => 'Pr. Marcos Andrade', 'church' => 'Igreja Batista Nova Vida', 'sigla' => 'IBNV', 'quote' => 'Depois que começamos a usar o sistema, a gestão financeira da igreja ficou muito mais transparente. Os dízimos e ofertas são registrados na hora, e o financeiro fecha o mês em minutos, não mais em dias.'],
+    ['name' => 'Pra. Sandra Lima', 'church' => 'Comunidade Cristã Águas Vivas', 'sigla' => 'CCAV', 'quote' => 'O que mais gosto é a carteirinha digital dos membros e o controle de frequência. Facilitou muito o acompanhamento pastoral da nossa congregação.'],
+    ['name' => 'Pr. Eliseu Fontes', 'church' => 'Igreja Presbiteriana Monte Sinai', 'sigla' => 'IPMS', 'quote' => 'Migramos de planilhas soltas pra um sistema completo em poucos dias. O suporte nos ajudou em cada etapa, e hoje não vivemos mais sem ele.'],
+    ['name' => 'Pr. Ronaldo Vieira', 'church' => 'Igreja Metodista Renascer', 'sigla' => 'IMR', 'quote' => 'A área do tesoureiro mudou a forma como prestamos contas pra igreja. Tudo fica registrado, com relatório pronto pra apresentar em qualquer reunião.'],
+    ['name' => 'Pra. Débora Nascimento', 'church' => 'Assembleia de Deus Shalom', 'sigla' => 'ADS', 'quote' => 'Os membros adoraram o portal deles — conseguem ver a agenda de cultos, os estudos e até a própria carteirinha pelo celular.'],
+    ['name' => 'Pr. Anderson Melo', 'church' => 'Igreja Batista Getsêmani', 'sigla' => 'BGET', 'quote' => 'Antes gastávamos horas organizando informações dos membros. Hoje é tudo automático, e sobra mais tempo pra cuidar das pessoas.'],
+    ['name' => 'Pr. Ivan Castro', 'church' => 'Comunidade Evangélica Vida Plena', 'sigla' => 'CEVP', 'quote' => 'Recomendo pra qualquer igreja que ainda usa papel e caneta. O sistema organiza tudo: membros, finanças e comunicação, num só lugar.'],
+];
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -68,6 +113,19 @@ $dlAdesaoDiscountActive = !empty($dlAdesaoDiscount['enabled']) && (float)($dlAde
         .dl-client-track-wrap { overflow: hidden; -webkit-mask-image: linear-gradient(90deg, transparent, #000 5%, #000 95%, transparent); mask-image: linear-gradient(90deg, transparent, #000 5%, #000 95%, transparent); }
         .dl-client-track { display: flex; gap: 1rem; width: max-content; animation: dlClientScroll 35s linear infinite; }
         .dl-client-track:hover { animation-play-state: paused; }
+
+        .dl-brazil-map { display: grid; grid-template-columns: repeat(8, 1fr); gap: .4rem; max-width: 420px; margin: 0 auto; }
+        .dl-state-cell { aspect-ratio: 1; border-radius: .45rem; background: rgba(15,23,42,.06); color: #94a3b8; display: flex; align-items: center; justify-content: center; font-size: .62rem; font-weight: 800; cursor: default; transition: transform .15s ease; }
+        .dl-state-cell.on-active { background: var(--dl-purple); color: #fff; box-shadow: 0 .3rem .8rem rgba(109,40,217,.3); }
+        .dl-state-cell.on-active:hover { transform: scale(1.12); }
+        .dl-map-legend { display: flex; align-items: center; justify-content: center; gap: 1.5rem; margin-top: 1.5rem; font-size: .8rem; color: #64748b; flex-wrap: wrap; }
+        .dl-map-legend-swatch { display: inline-block; width: .8rem; height: .8rem; border-radius: .25rem; margin-right: .4rem; vertical-align: -1px; }
+
+        .dl-testimonial-card { background: #fff; border: 1px solid rgba(15,23,42,.07); border-radius: 1.1rem; padding: 1.6rem; height: 100%; box-shadow: 0 .5rem 1.5rem rgba(15,23,42,.04); }
+        .dl-testimonial-quote-icon { color: rgba(124,58,237,.25); font-size: 1.4rem; }
+        .dl-testimonial-text { font-size: .9rem; color: #334155; margin: .75rem 0 0; line-height: 1.55; }
+        .dl-testimonial-avatar { width: 2.4rem; height: 2.4rem; border-radius: 50%; object-fit: cover; flex: 0 0 auto; }
+        .dl-testimonial-avatar-fallback { background: var(--dl-purple); color: #fff; display: inline-flex; align-items: center; justify-content: center; font-weight: 700; font-size: .75rem; }
         @keyframes dlClientScroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
         .dl-client-badge { display: flex; align-items: center; gap: .6rem; background: #f8f9fc; border: 1px solid rgba(15,23,42,.06); border-radius: 999px; padding: .5rem 1.1rem .5rem .5rem; white-space: nowrap; flex: 0 0 auto; }
         .dl-client-avatar { width: 2.1rem; height: 2.1rem; border-radius: 50%; object-fit: cover; background: var(--dl-purple); color: #fff; display: inline-flex; align-items: center; justify-content: center; font-weight: 700; font-size: .75rem; flex: 0 0 auto; }
@@ -200,6 +258,71 @@ $dlAdesaoDiscountActive = !empty($dlAdesaoDiscount['enabled']) && (float)($dlAde
                     <div>
                         <div class="fw-bold small"><?= htmlspecialchars($client['sigla']) ?></div>
                         <div class="text-muted" style="font-size:.68rem;"><?= !empty($client['location']) ? htmlspecialchars(str_replace('/', ' · ', $client['location'])) : 'Cliente ativo' ?></div>
+                    </div>
+                </div>
+            <?php endforeach; ?>
+        </div>
+    </div>
+</section>
+<?php endif; ?>
+
+<?php if (!empty($dlStatesWithClients)): ?>
+<section class="dl-section" id="mapa" style="background:#fff;">
+    <div class="container text-center">
+        <h2 class="dl-section-title"><i class="fa-solid fa-map-location-dot me-2"></i>Igrejas em todo o Brasil</h2>
+        <p class="dl-section-sub">
+            <?= count($dlStatesWithClients) ?> <?= count($dlStatesWithClients) === 1 ? 'estado já tem' : 'estados já têm' ?> igrejas usando o sistema — e esse número só cresce.
+        </p>
+        <div class="dl-brazil-map">
+            <?php foreach ($dlBrazilStates as $dlUf => $dlStateInfo): ?>
+                <?php
+                $dlHasClient = isset($dlStatesWithClients[$dlUf]);
+                $dlTooltip = $dlStateInfo[0] . ($dlHasClient ? ': ' . implode(', ', $dlStatesWithClients[$dlUf]) : '');
+                ?>
+                <div class="dl-state-cell<?= $dlHasClient ? ' on-active' : '' ?>" style="grid-column:<?= $dlStateInfo[2] + 1 ?>;grid-row:<?= $dlStateInfo[1] + 1 ?>;" title="<?= htmlspecialchars($dlTooltip) ?>">
+                    <?= htmlspecialchars($dlUf) ?>
+                </div>
+            <?php endforeach; ?>
+        </div>
+        <div class="dl-map-legend">
+            <span><span class="dl-map-legend-swatch" style="background:var(--dl-purple);"></span>Com igrejas usando o sistema</span>
+            <span><span class="dl-map-legend-swatch" style="background:rgba(15,23,42,.06);"></span>Em breve</span>
+        </div>
+    </div>
+</section>
+<?php endif; ?>
+
+<?php if (!empty($dlTestimonials)): ?>
+<section class="dl-section" id="depoimentos" style="background:#f8f9fc;">
+    <div class="container">
+        <h2 class="dl-section-title text-center"><i class="fa-solid fa-quote-left me-2"></i>O que os pastores estão dizendo</h2>
+        <p class="dl-section-sub text-center mb-4">Depoimentos de quem já usa o sistema no dia a dia da igreja.</p>
+        <div class="row g-4">
+            <?php foreach ($dlTestimonials as $dlT): ?>
+                <?php
+                $dlTLogo = null;
+                foreach ($clients as $dlC) {
+                    if ($dlC['sigla'] === $dlT['sigla']) {
+                        $dlTLogo = $dlC['logo_url'] ?? null;
+                        break;
+                    }
+                }
+                ?>
+                <div class="col-md-6 col-lg-4">
+                    <div class="dl-testimonial-card">
+                        <i class="fa-solid fa-quote-left dl-testimonial-quote-icon"></i>
+                        <p class="dl-testimonial-text">"<?= htmlspecialchars($dlT['quote']) ?>"</p>
+                        <div class="d-flex align-items-center gap-2 mt-3">
+                            <?php if (!empty($dlTLogo)): ?>
+                                <img src="<?= htmlspecialchars($dlTLogo) ?>" class="dl-testimonial-avatar" alt="">
+                            <?php else: ?>
+                                <span class="dl-testimonial-avatar dl-testimonial-avatar-fallback"><?= htmlspecialchars(mb_substr($dlT['sigla'], 0, 2, 'UTF-8')) ?></span>
+                            <?php endif; ?>
+                            <div>
+                                <div class="fw-bold small"><?= htmlspecialchars($dlT['name']) ?></div>
+                                <div class="text-muted" style="font-size:.72rem;"><?= htmlspecialchars($dlT['church']) ?></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             <?php endforeach; ?>
