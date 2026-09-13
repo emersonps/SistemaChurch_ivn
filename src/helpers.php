@@ -323,6 +323,22 @@ function removeAccents($string) {
 }
 
 /**
+ * Detecta se a requisicao atual veio de um navegador mobile (Android/iPhone/iPad),
+ * via User-Agent. Usado para decidir se o pos-login deve cair no launcher
+ * mobile (/admin?launcher=1) ou no dashboard classico.
+ */
+function isMobileRequest(): bool {
+    $ua = $_SERVER['HTTP_USER_AGENT'] ?? '';
+    if ($ua === '') return false;
+    $ua = strtolower($ua);
+    return strpos($ua, 'mobile') !== false
+        || strpos($ua, 'android') !== false
+        || strpos($ua, 'iphone') !== false
+        || strpos($ua, 'ipad') !== false
+        || strpos($ua, 'ipod') !== false;
+}
+
+/**
  * Registra um acesso ou atividade no sistema
  */
 function logAccess() {

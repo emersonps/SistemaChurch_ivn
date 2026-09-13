@@ -136,6 +136,9 @@ class DemoLandingPublicController {
         $_SESSION['user_role'] = $user['role'];
         $_SESSION['user_congregation_id'] = $user['congregation_id'];
 
+        if (isMobileRequest()) {
+            redirect('/admin?launcher=1');
+        }
         redirect('/admin/dashboard');
     }
 
