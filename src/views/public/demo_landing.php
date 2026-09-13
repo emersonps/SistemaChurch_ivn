@@ -159,7 +159,7 @@ $dlTestimonials = [
         <div class="d-flex align-items-center gap-2">
             <span class="dl-brand-icon overflow-hidden"><?php if (!empty($dlLogoUrl) && strpos($dlLogoUrl, '/assets/img/logo.png') === false): ?><img src="<?= htmlspecialchars($dlLogoUrl) ?>" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:.6rem;"><?php else: ?><i class="fa-solid fa-church"></i><?php endif; ?></span>
             <span class="fw-bold fs-5"><?= htmlspecialchars($dlBrand) ?></span>
-            <span class="dl-tag">DEMO</span>
+            <span class="dl-tag">AMOSTRA</span>
         </div>
         <div class="d-none d-md-flex align-items-center gap-4">
             <a href="#acessos" class="text-decoration-none text-dark small fw-semibold">Demonstração</a>
@@ -177,7 +177,7 @@ $dlTestimonials = [
     <div class="container">
         <div class="dl-live-pill mb-4" id="dlLivePill">
             <span class="dl-live-dot"></span>
-            <span>DEMO AO VIVO &middot; Dados fictícios &middot; Atualiza a cada <?= (int)$rotationDays ?> dias</span>
+            <span>AMOSTRA AO VIVO &middot; Dados fictícios &middot; Atualiza a cada <?= (int)$rotationDays ?> dias</span>
         </div>
         <h1 class="mb-3">O sistema que já faz parte de <span class="dl-accent">igrejas de verdade</span><br>e está mudando a forma como elas se gerenciam</h1>
         <p class="text-muted mx-auto mb-4" style="max-width:640px;">
