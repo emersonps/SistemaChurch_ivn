@@ -72,6 +72,7 @@ $dlTestimonials = [
     ['name' => 'Pra. Débora Nascimento', 'church' => 'Assembleia de Deus Shalom', 'sigla' => 'ADS', 'quote' => 'Os membros adoraram o portal deles — conseguem ver a agenda de cultos, os estudos e até a própria carteirinha pelo celular.'],
     ['name' => 'Pr. Anderson Melo', 'church' => 'Igreja Batista Getsêmani', 'sigla' => 'BGET', 'quote' => 'Antes gastávamos horas organizando informações dos membros. Hoje é tudo automático, e sobra mais tempo pra cuidar das pessoas.'],
     ['name' => 'Pr. Ivan Castro', 'church' => 'Comunidade Evangélica Vida Plena', 'sigla' => 'CEVP', 'quote' => 'Recomendo pra qualquer igreja que ainda usa papel e caneta. O sistema organiza tudo: membros, finanças e comunicação, num só lugar.'],
+    ['name' => 'Secretária Juliana Rocha', 'church' => 'Igreja Metodista Renascer', 'sigla' => 'IMR', 'quote' => 'O que mais nos conquistou foi o suporte: rápido, direto ao ponto e sempre muito educado. O Emerson resolve qualquer dúvida na hora, com uma atenção que a gente raramente encontra em outros sistemas.'],
 ];
 ?>
 <!DOCTYPE html>
