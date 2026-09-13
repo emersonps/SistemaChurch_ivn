@@ -155,19 +155,19 @@ $dlTestimonials = [
 <?php endif; ?>
 
 <nav class="dl-nav py-3">
-    <div class="container d-flex justify-content-between align-items-center flex-wrap gap-2">
+    <div class="container d-flex justify-content-between align-items-center flex-wrap flex-xl-nowrap gap-2">
         <div class="d-flex align-items-center gap-2">
             <span class="dl-brand-icon overflow-hidden"><?php if (!empty($dlLogoUrl) && strpos($dlLogoUrl, '/assets/img/logo.png') === false): ?><img src="<?= htmlspecialchars($dlLogoUrl) ?>" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:.6rem;"><?php else: ?><i class="fa-solid fa-church"></i><?php endif; ?></span>
             <span class="fw-bold fs-5"><?= htmlspecialchars($dlBrand) ?></span>
             <span class="dl-tag">AMOSTRA</span>
         </div>
-        <div class="d-none d-md-flex align-items-center gap-4">
-            <a href="#acessos" class="text-decoration-none text-dark small fw-semibold">Demonstração</a>
-            <a href="#clientes" class="text-decoration-none text-dark small fw-semibold">Igrejas Clientes</a>
-            <a href="#mapa" class="text-decoration-none text-dark small fw-semibold">Igrejas no Brasil</a>
-            <a href="#depoimentos" class="text-decoration-none text-dark small fw-semibold">Depoimentos</a>
-            <a href="#planos" class="text-decoration-none text-dark small fw-semibold">Planos</a>
-            <a href="#solicitar" class="text-decoration-none text-dark small fw-semibold">Contato</a>
+        <div class="d-none d-xl-flex align-items-center gap-3 flex-shrink-0">
+            <a href="#acessos" class="text-decoration-none text-dark small fw-semibold text-nowrap">Demonstração</a>
+            <a href="#clientes" class="text-decoration-none text-dark small fw-semibold text-nowrap">Igrejas Clientes</a>
+            <a href="#mapa" class="text-decoration-none text-dark small fw-semibold text-nowrap">Igrejas no Brasil</a>
+            <a href="#depoimentos" class="text-decoration-none text-dark small fw-semibold text-nowrap">Depoimentos</a>
+            <a href="#planos" class="text-decoration-none text-dark small fw-semibold text-nowrap">Planos</a>
+            <a href="#solicitar" class="text-decoration-none text-dark small fw-semibold text-nowrap">Contato</a>
         </div>
         <a href="#solicitar" class="btn btn-dark rounded-pill px-3 fw-semibold">Quero meu Sistema</a>
     </div>
