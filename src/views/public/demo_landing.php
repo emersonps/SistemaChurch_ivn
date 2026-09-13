@@ -74,6 +74,27 @@ $dlTestimonials = [
     ['name' => 'Pr. Ivan Castro', 'church' => 'Comunidade Evangélica Vida Plena', 'sigla' => 'CEVP', 'quote' => 'Recomendo pra qualquer igreja que ainda usa papel e caneta. O sistema organiza tudo: membros, finanças e comunicação, num só lugar.'],
     ['name' => 'Secretária Juliana Rocha', 'church' => 'Igreja Metodista Renascer', 'sigla' => 'IMR', 'quote' => 'O que mais nos conquistou foi o suporte: rápido, direto ao ponto e sempre muito educado. O Emerson resolve qualquer dúvida na hora, com uma atenção que a gente raramente encontra em outros sistemas.'],
 ];
+
+// Bot de dúvidas por palavras-chave — sem IA de verdade, só casamento de
+// termos (sem custo por mensagem, sem chave de API). Preços/plano vêm dos
+// mesmos $dlPlans já calculados acima, então a resposta nunca fica
+// desatualizada em relação ao que a própria página mostra.
+$dlAiPlanSummary = 'Mensal R$ ' . number_format($dlPlans['mensal']['price'], 2, ',', '.') . '/mês, Trimestral R$ '
+    . number_format($dlPlans['trimestral']['price'], 2, ',', '.') . '/mês e Anual R$ '
+    . number_format($dlPlans['anual']['price'], 2, ',', '.') . '/mês.';
+
+$dlAiFaqs = [
+    ['keywords' => ['oi', 'ola', 'bom dia', 'boa tarde', 'boa noite', 'eae', 'e ai'], 'answer' => 'Olá! 👋 Posso te ajudar com informações sobre preços, planos, suporte ou como testar o sistema. O que você quer saber?'],
+    ['keywords' => ['preco', 'valor', 'quanto custa', 'mensalidade', 'quanto e', 'quanto sai'], 'answer' => 'Nossos planos são: ' . $dlAiPlanSummary . ' Dá uma olhada na seção "Escolha como quer começar" logo abaixo pra ver todos os detalhes.'],
+    ['keywords' => ['plano', 'planos', 'diferenca', 'qual escolher'], 'answer' => 'Temos 3 planos: Mensal, Trimestral e Anual — quanto maior o período, menor o valor mensal. Compare direto na seção de planos aqui na página.'],
+    ['keywords' => ['funciona', 'recurso', 'funcionalidade', 'o que e', 'o que faz', 'pra que serve'], 'answer' => 'O sistema cuida de membros, finanças, cultos, grupos e muito mais — tudo num só lugar. A melhor forma de ver é explorando a demonstração: escolha um perfil (Administrador, Secretaria, Tesoureiro ou Membro) e entre direto, sem senha.'],
+    ['keywords' => ['suporte', 'ajuda', 'atendimento'], 'answer' => 'Nosso suporte é rápido e feito por gente de verdade — vários clientes comentam sobre isso no mural de depoimentos aqui na página. Qualquer dúvida, é só chamar no WhatsApp.'],
+    ['keywords' => ['contratar', 'adquirir', 'comprar', 'assinar', 'como faco', 'quero o sistema'], 'answer' => 'É simples: escolha um plano na seção "Escolha como quer começar" e preencha o formulário "Solicitar meu sistema". Você recebe contato em até 2h úteis pra colocar tudo no ar.'],
+    ['keywords' => ['whatsapp', 'contato', 'falar com alguem', 'humano', 'pessoa', 'atendente'], 'answer' => 'Claro! Você pode falar direto com nossa equipe clicando no botão verde "Falar no WhatsApp" aqui na página.'],
+    ['keywords' => ['teste', 'gratis', 'demonstracao', 'experimentar', 'trial'], 'answer' => 'Você já está na demonstração! Role até "Escolha um perfil e entre direto no sistema" e clique em qualquer card — sem senha, é instantâneo.'],
+    ['keywords' => ['cancelar', 'fidelidade', 'contrato', 'multa'], 'answer' => 'Sem fidelidade nenhuma — você pode cancelar quando quiser, sem multa.'],
+    ['keywords' => ['seguranca', 'senha', 'dados', 'privacidade'], 'answer' => 'No seu sistema real, cada perfil acessa só com usuário e senha pessoal, com dados protegidos. Aqui na demonstração liberamos o acesso direto só pra você explorar, com dados fictícios.'],
+];
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -143,6 +164,13 @@ $dlTestimonials = [
         .dl-ai-fab { position: fixed; left: 1.5rem; bottom: 1.5rem; z-index: 1050; background: var(--dl-purple); color: #fff; border-radius: 999px; padding: .8rem 1.3rem; font-weight: 700; border: 0; box-shadow: 0 .8rem 2rem rgba(109,40,217,.35); display: inline-flex; align-items: center; gap: .5rem; }
         .dl-ai-panel { position: fixed; left: 1.5rem; bottom: 5.2rem; z-index: 1050; width: 320px; max-width: 90vw; background: #fff; border-radius: 1rem; box-shadow: 0 1.5rem 3rem rgba(15,23,42,.2); overflow: hidden; }
         .dl-ai-panel-header { background: var(--dl-purple); color: #fff; padding: .9rem 1.1rem; }
+        .dl-ai-messages { max-height: 320px; overflow-y: auto; padding: .9rem; display: flex; flex-direction: column; gap: .6rem; background: #f8f9fc; }
+        .dl-ai-msg { max-width: 85%; padding: .55rem .8rem; border-radius: .9rem; font-size: .82rem; line-height: 1.4; white-space: pre-wrap; }
+        .dl-ai-msg.on-bot { background: #fff; border: 1px solid rgba(15,23,42,.08); align-self: flex-start; border-bottom-left-radius: .25rem; }
+        .dl-ai-msg.on-user { background: var(--dl-purple); color: #fff; align-self: flex-end; border-bottom-right-radius: .25rem; }
+        .dl-ai-input-row { display: flex; gap: .5rem; padding: .7rem; border-top: 1px solid rgba(15,23,42,.08); background: #fff; }
+        .dl-ai-send-btn { background: var(--dl-purple); color: #fff; border-radius: .6rem; padding: 0 .9rem; border: 0; }
+        .dl-ai-send-btn:hover { background: var(--dl-purple-light); color: #fff; }
         .dl-error-toast { position: fixed; top: 1rem; left: 50%; transform: translateX(-50%); z-index: 1060; }
     </style>
 </head>
@@ -446,9 +474,11 @@ $dlTestimonials = [
         <span class="fw-bold small"><i class="fa-solid fa-robot me-1"></i> Assistente <?= htmlspecialchars($dlBrand) ?></span>
         <button type="button" class="btn-close btn-close-white btn-sm" id="dlAiClose"></button>
     </div>
-    <div class="p-3">
-        <p class="small text-muted mb-0">Assistente virtual em breve por aqui. Por enquanto, fale direto com nossa equipe pelo WhatsApp ou pelo formulário "Solicitar meu sistema" acima. 👋</p>
-    </div>
+    <div class="dl-ai-messages" id="dlAiMessages"></div>
+    <form id="dlAiForm" class="dl-ai-input-row">
+        <input type="text" id="dlAiInput" class="form-control form-control-sm" placeholder="Digite sua pergunta..." autocomplete="off">
+        <button type="submit" class="dl-ai-send-btn"><i class="fa-solid fa-paper-plane"></i></button>
+    </form>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -483,12 +513,65 @@ $dlTestimonials = [
         navigator.sendBeacon && navigator.sendBeacon('/demo-presence/leave', body);
     });
 
-    // Botão "Falar com IA"
+    // Botão "Falar com IA" — bot por palavras-chave, sem custo por
+    // mensagem (nenhuma chamada de API real, só casamento de termos contra
+    // as perguntas mais comuns).
     var fab = document.getElementById('dlAiFab');
     var panel = document.getElementById('dlAiPanel');
     var close = document.getElementById('dlAiClose');
     fab.addEventListener('click', function () { panel.classList.toggle('d-none'); });
     close.addEventListener('click', function () { panel.classList.add('d-none'); });
+
+    var dlAiFaqs = <?= json_encode($dlAiFaqs, JSON_UNESCAPED_UNICODE) ?>;
+    var dlAiFallback = 'Não tenho certeza sobre isso, mas nossa equipe pode te ajudar direto — clica no botão verde "Falar no WhatsApp" aqui na página, ou preenche o formulário "Solicitar meu sistema" que a gente entra em contato.';
+
+    function dlAiNormalize(str) {
+        return str.toLowerCase()
+            .replace(/[áàãâ]/g, 'a').replace(/[éê]/g, 'e').replace(/[íî]/g, 'i')
+            .replace(/[óõô]/g, 'o').replace(/[úü]/g, 'u').replace(/ç/g, 'c');
+    }
+
+    function dlAiFindAnswer(message) {
+        var normalized = dlAiNormalize(message);
+        var best = null;
+        var bestScore = 0;
+        dlAiFaqs.forEach(function (faq) {
+            var score = 0;
+            faq.keywords.forEach(function (kw) {
+                if (normalized.indexOf(kw) !== -1) score++;
+            });
+            if (score > bestScore) {
+                bestScore = score;
+                best = faq;
+            }
+        });
+        return best ? best.answer : dlAiFallback;
+    }
+
+    var dlAiMessages = document.getElementById('dlAiMessages');
+    var dlAiForm = document.getElementById('dlAiForm');
+    var dlAiInput = document.getElementById('dlAiInput');
+
+    function dlAiAddMessage(text, sender) {
+        var div = document.createElement('div');
+        div.className = 'dl-ai-msg on-' + sender;
+        div.textContent = text;
+        dlAiMessages.appendChild(div);
+        dlAiMessages.scrollTop = dlAiMessages.scrollHeight;
+    }
+
+    dlAiAddMessage('Olá! 👋 Sou o assistente virtual da <?= addslashes(htmlspecialchars($dlBrand)) ?>. Pergunte sobre preços, planos, suporte ou como testar o sistema.', 'bot');
+
+    dlAiForm.addEventListener('submit', function (e) {
+        e.preventDefault();
+        var text = dlAiInput.value.trim();
+        if (!text) return;
+        dlAiAddMessage(text, 'user');
+        dlAiInput.value = '';
+        setTimeout(function () {
+            dlAiAddMessage(dlAiFindAnswer(text), 'bot');
+        }, 400);
+    });
 })();
 
 function dlSelectPlan(planKey) {
