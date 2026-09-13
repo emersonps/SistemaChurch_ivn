@@ -164,6 +164,8 @@ $dlTestimonials = [
         <div class="d-none d-md-flex align-items-center gap-4">
             <a href="#acessos" class="text-decoration-none text-dark small fw-semibold">Demonstração</a>
             <a href="#clientes" class="text-decoration-none text-dark small fw-semibold">Igrejas Clientes</a>
+            <a href="#mapa" class="text-decoration-none text-dark small fw-semibold">Igrejas no Brasil</a>
+            <a href="#depoimentos" class="text-decoration-none text-dark small fw-semibold">Depoimentos</a>
             <a href="#planos" class="text-decoration-none text-dark small fw-semibold">Planos</a>
             <a href="#solicitar" class="text-decoration-none text-dark small fw-semibold">Contato</a>
         </div>
