@@ -269,7 +269,6 @@ $dlAiFaqs = [
     <div class="container">
         <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
             <h2 class="dl-section-title mb-0 text-start"><i class="fa-regular fa-building me-2"></i>Igrejas que já utilizam o nosso sistema</h2>
-            <span class="dl-tag">+<?= count($clients) ?> igrejas ativas</span>
         </div>
     </div>
     <?php
