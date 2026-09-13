@@ -456,7 +456,7 @@ $dlAiFaqs = [
                             </select>
                         </div>
                         <button type="submit" class="btn btn-dark w-100 fw-semibold py-2">Solicitar meu sistema agora <i class="fa-solid fa-arrow-right ms-1"></i></button>
-                        <p class="text-muted small mt-2 mb-0 text-center">Você receberá contato em até 2h úteis para colocar seu sistema no ar. Sem compromisso.</p>
+                        <p class="text-muted small mt-2 mb-0 text-center">Você receberá contato em até 2h úteis para colocar seu sistema no ar.</p>
                     </form>
                 </div>
             </div>
